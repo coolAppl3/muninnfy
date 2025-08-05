@@ -1,0 +1,6 @@
+.env
+node_modules
+tasks.md
+.vscode
+muninnfy.session.sql
+temp
