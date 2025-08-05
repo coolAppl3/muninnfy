@@ -1,6 +1,8 @@
 import { dbPool } from './db';
 
 export async function initDb(): Promise<void> {
+  await createAuthSessionsTable();
+
   await createAccountsTable();
   await createAccountVerificationTable();
   await createAccountRecoveryTable();
@@ -14,6 +16,21 @@ export async function initDb(): Promise<void> {
   await createUnexpectedErrorsTable();
 
   console.log('Database initialized.');
+}
+
+async function createAuthSessionsTable(): Promise<void> {
+  try {
+    await dbPool.execute(
+      `CREATE TABLE IF NOT EXISTS auth_sessions (
+        session_id VARCHAR(65) PRIMARY KEY COLLATE utf8mb4_bin,
+        user_id INT NOT NULL,
+        created_on_timestamp BIGINT NOT NULL,
+        expiry_timestamp BIGINT NOT NULL
+      );`,
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
 }
 
 async function createAccountsTable(): Promise<void> {
