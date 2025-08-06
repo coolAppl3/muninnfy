@@ -166,7 +166,7 @@ async function createRateTrackerTable(): Promise<void> {
     // TODO: remove chat request limiters
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS rate_tracker (
-        rate_limit_id VARCHAR(65) PRIMARY KEY COLLATE utf8mb4_bin,
+        rate_limit_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
         requests_count INT UNSIGNED NOT NULL,
         window_timestamp BIGINT NOT NULL
       );`,
