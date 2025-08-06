@@ -44,7 +44,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
       WHERE
         user_id = ?
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
-      [sessionConfig.user_id],
+      [sessionConfig.user_id]
     );
 
     if (sessionRows.length < 3) {
@@ -55,7 +55,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
           created_on_timestamp,
           expiry_timestamp
         ) VALUES (${generatePlaceHolders(4)});`,
-        [newAuthSessionId, sessionConfig.user_id, currentTimestamp, expiryTimestamp],
+        [newAuthSessionId, sessionConfig.user_id, currentTimestamp, expiryTimestamp]
       );
 
       await connection.commit();
@@ -80,7 +80,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
         expiry_timestamp = ?
       WHERE
         session_id = ?;`,
-      [newAuthSessionId, currentTimestamp, expiryTimestamp, oldestAuthSession.session_id],
+      [newAuthSessionId, currentTimestamp, expiryTimestamp, oldestAuthSession.session_id]
     );
 
     if (resultSetHeader.affectedRows === 0) {
@@ -117,7 +117,7 @@ export async function destroyAuthSession(sessionId: string): Promise<void> {
         auth_sessions
       WHERE
         session_id = ?;`,
-      [sessionId],
+      [sessionId]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -132,7 +132,7 @@ export async function purgeAuthSessions(userId: number, userType: 'account' | 'g
       WHERE
         user_id = ?
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
-      [userId],
+      [userId]
     );
   } catch (err: unknown) {
     console.log(err);

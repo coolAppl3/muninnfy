@@ -26,7 +26,7 @@ async function createAuthSessionsTable(): Promise<void> {
         user_id INT NOT NULL,
         created_on_timestamp BIGINT NOT NULL,
         expiry_timestamp BIGINT NOT NULL
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -45,7 +45,7 @@ async function createAccountsTable(): Promise<void> {
         created_on_timestamp BIGINT NOT NULL,
         is_verified BOOLEAN NOT NULL,
         failed_sign_in_attempts INT NOT NULL CHECK(failed_sign_in_attempts <= 5)
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -63,7 +63,7 @@ async function createAccountVerificationTable(): Promise<void> {
         failed_verification_attempts INT NOT NULL CHECK(failed_verification_attempts <= 3),
         expiry_timestamp BIGINT NOT NULL,
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -81,7 +81,7 @@ async function createAccountRecoveryTable(): Promise<void> {
         recovery_emails_sent INT NOT NULL CHECK(recovery_emails_sent <= 3),
         failed_recovery_attempts INT NOT NULL CHECK(failed_recovery_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -99,7 +99,7 @@ async function createAccountDeletionTable(): Promise<void> {
         deletion_emails_sent INT NOT NULL CHECK(deletion_emails_sent <= 3),
         failed_deletion_attempts INT NOT NULL CHECK(failed_deletion_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -118,7 +118,7 @@ async function createEmailUpdateTable(): Promise<void> {
         update_emails_sent INT NOT NULL CHECK(update_emails_sent <= 3),
         failed_update_attempts INT NOT NULL CHECK(failed_update_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -136,7 +136,7 @@ async function createFriendRequestsTable(): Promise<void> {
         UNIQUE(requester_id, requestee_id),
         FOREIGN KEY (requester_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         FOREIGN KEY (requestee_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -154,7 +154,7 @@ async function createFriendshipsTable(): Promise<void> {
         UNIQUE(account_id, friend_id),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         FOREIGN KEY (friend_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -169,7 +169,7 @@ async function createRateTrackerTable(): Promise<void> {
         rate_limit_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
         requests_count INT UNSIGNED NOT NULL,
         window_timestamp BIGINT NOT NULL
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -184,7 +184,7 @@ async function createAbusiveUsersTable(): Promise<void> {
         first_abuse_timestamp BIGINT NOT NULL,
         latest_abuse_timestamp BIGINT NOT NULL,
         rate_limit_reached_count INT UNSIGNED NOT NULL
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -201,7 +201,7 @@ async function createUnexpectedErrorsTable(): Promise<void> {
         error_timestamp BIGINT NOT NULL,
         error_message TEXT,
         stack_trace TEXT
-      );`,
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
