@@ -58,7 +58,7 @@ async function createAccountVerificationTable(): Promise<void> {
       `CREATE TABLE IF NOT EXISTS account_verification (
         verification_id INT PRIMARY KEY AUTO_INCREMENT,
         account_id INT NOT NULL UNIQUE,
-        verification_code VARCHAR(10) NOT NULL COLLATE utf8mb4_bin,
+        verification_token CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
         verification_emails_sent INT NOT NULL CHECK(verification_emails_sent <= 3),
         failed_verification_attempts INT NOT NULL CHECK(failed_verification_attempts <= 3),
         expiry_timestamp BIGINT NOT NULL,
