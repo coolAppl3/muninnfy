@@ -6,7 +6,7 @@ import { dbPool } from '../db/db';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { generateCryptoUuid, generateVerificationCode } from '../util/tokenGenerator';
+import { generateCryptoUuid } from '../util/tokenGenerator';
 import { ACCOUNT_VERIFICATION_WINDOW } from '../util/constants';
 import { sendAccountVerificationEmail } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
