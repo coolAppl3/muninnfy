@@ -22,7 +22,7 @@ async function createAuthSessionsTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS auth_sessions (
-        session_id VARCHAR(65) PRIMARY KEY COLLATE utf8mb4_bin,
+        session_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
         user_id INT NOT NULL,
         created_on_timestamp BIGINT NOT NULL,
         expiry_timestamp BIGINT NOT NULL
