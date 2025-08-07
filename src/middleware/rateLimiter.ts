@@ -47,7 +47,7 @@ async function addToRateTracker(res: Response): Promise<void> {
         requests_count,
         window_timestamp
       ) VALUES (${generatePlaceHolders(3)});`,
-      [newRateId, 1, currentTimestamp],
+      [newRateId, 1, currentTimestamp]
     );
 
     setResponseCookie(res, 'rateLimitId', newRateId, hourMilliseconds, true);
@@ -69,7 +69,7 @@ async function rateLimitReached(rateLimitId: string, res: Response): Promise<boo
         rate_tracker
       WHERE
         rate_limit_id = ?;`,
-      [rateLimitId],
+      [rateLimitId]
     );
 
     const rateTrackerDetails: RateTrackerDetails | undefined = rateTrackerRows[0];
@@ -99,7 +99,7 @@ async function incrementRequestsCount(rateLimitId: string): Promise<void> {
         requests_count = requests_count + 1
       WHERE
         rate_limit_id = ?;`,
-      [rateLimitId],
+      [rateLimitId]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -135,7 +135,7 @@ async function addToAbusiveUsers(req: Request): Promise<void> {
         abusive_users
       WHERE
         ip_address = ?;`,
-      [req.ip],
+      [req.ip]
     );
 
     const userDetails: UserDetails | undefined = userRows[0];
@@ -148,7 +148,7 @@ async function addToAbusiveUsers(req: Request): Promise<void> {
           latest_abuse_timestamp,
           rate_limit_reached_count
         ) VALUES (${generatePlaceHolders(4)});`,
-        [req.ip, currentTimestamp, currentTimestamp, 1],
+        [req.ip, currentTimestamp, currentTimestamp, 1]
       );
 
       return;
@@ -162,7 +162,7 @@ async function addToAbusiveUsers(req: Request): Promise<void> {
         latest_abuse_timestamp = ?
       WHERE
         ip_address = ?;`,
-      [userDetails.rate_limit_reached_count + 1, currentTimestamp, req.ip],
+      [userDetails.rate_limit_reached_count + 1, currentTimestamp, req.ip]
     );
   } catch (err: unknown) {
     console.log(err);

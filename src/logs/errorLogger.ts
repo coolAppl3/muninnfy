@@ -15,7 +15,7 @@ export async function logUnexpectedError(req: Request, err: unknown): Promise<vo
         error_message,
         stack_trace
       ) VALUES (${generatePlaceHolders(5)});`,
-      [req.method, req.originalUrl, currentTimestamp, message, trace],
+      [req.method, req.originalUrl, currentTimestamp, message, trace]
     );
   } catch (err: unknown) {
     console.log(err);

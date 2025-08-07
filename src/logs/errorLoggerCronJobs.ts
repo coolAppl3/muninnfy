@@ -10,7 +10,7 @@ export async function clearErrorLogs(): Promise<void> {
         unexpected_errors
       WHERE
         ? - error_timestamp >= ?;`,
-      [currentTimestamp, 2 * dayMilliseconds],
+      [currentTimestamp, 2 * dayMilliseconds]
     );
   } catch (err: unknown) {
     console.log(err);

@@ -77,7 +77,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       `SELECT
         EXISTS (SELECT 1 FROM accounts WHERE email = ?) AS email_taken,
         EXISTS (SELECT 1 FROM accounts WHERE username = ?) AS username_taken;`,
-      [requestData.email, requestData.email],
+      [requestData.email, requestData.email]
     );
 
     const takenStatus: TakenStatus | undefined = takenStatusRows[0];
@@ -110,7 +110,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
         is_verified,
         failed_sign_in_attempts
       ) VALUES (${generatePlaceHolders(7)});`,
-      [requestData.email, hashedPassword, requestData.username, requestData.displayName, currentTimestamp, false, 0],
+      [requestData.email, hashedPassword, requestData.username, requestData.displayName, currentTimestamp, false, 0]
     );
 
     const accountId: number = resultSetHeader.insertId;
@@ -126,7 +126,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
         failed_verification_attempts,
         expiry_timestamp
       ) VALUES (${generatePlaceHolders(5)});`,
-      [accountId, verificationToken, 1, 0, verificationExpiryTimestamp],
+      [accountId, verificationToken, 1, 0, verificationExpiryTimestamp]
     );
 
     await connection.commit();

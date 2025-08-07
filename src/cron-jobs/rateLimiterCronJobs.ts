@@ -13,7 +13,7 @@ export async function replenishRateRequests(): Promise<void> {
         requests_count = GREATEST(requests_count - ?, 0)
       WHERE
         ? - window_timestamp >= ?;`,
-      [requestsToReplenish, currentTimestamp, minuteMilliseconds / 2],
+      [requestsToReplenish, currentTimestamp, minuteMilliseconds / 2]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -30,7 +30,7 @@ export async function removeStaleRateTrackerRows(): Promise<void> {
       WHERE
         ? - window_timestamp >= ? AND
         requests_count = ?;`,
-      [currentTimestamp, minuteMilliseconds, 0],
+      [currentTimestamp, minuteMilliseconds, 0]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -47,7 +47,7 @@ export async function removeLightRateAbusers(): Promise<void> {
       WHERE
         rate_limit_reached_count <= ? AND
         ? - latest_abuse_timestamp >= ?;`,
-      [LIGHT_DAILY_RATE_ABUSE_COUNT, currentTimestamp, hourMilliseconds],
+      [LIGHT_DAILY_RATE_ABUSE_COUNT, currentTimestamp, hourMilliseconds]
     );
   } catch (err: unknown) {
     console.log(err);
