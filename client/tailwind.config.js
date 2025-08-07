@@ -4,12 +4,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#f4f4f4',
-        secondary: '#EBEBEB',
-        section: '#f4f4f4',
-        title: '#191A1C',
-        description: '#3C3D3E',
-        cta: '#29D0C5',
+        dark: '#141510',
+        primary: '#181B13',
+        secondary: '#212518',
+        title: '#EBEBEB',
+        description: '#CBCBCD',
+        cta: '#A1D321',
         'light-gray': 'rgba(200, 200, 200, 0.25)',
         overlay: 'rgba(30, 30, 30, 0.8)',
         danger: '#f87171',
