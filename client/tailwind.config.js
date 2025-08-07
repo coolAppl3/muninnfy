@@ -28,7 +28,7 @@ module.exports = {
 
       animation: {
         pulse: 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        spin: 'spin 500ms infinite linear forwards',
+        spin: 'spin 350ms infinite linear forwards',
       },
     },
 

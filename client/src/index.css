@@ -107,7 +107,7 @@
   }
 
   .spinner {
-    @apply rounded-[100%] border-[6px] border-solid border-primary border-l-cta animate-spin;
+    @apply rounded-[100%] border-[6px] border-solid border-description/25 border-l-cta animate-spin;
   }
 
   .link {
