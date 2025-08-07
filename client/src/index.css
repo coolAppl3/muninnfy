@@ -1,0 +1,134 @@
+@import 'tailwindcss';
+@config "../tailwind.config.js";
+
+@font-face {
+  font-family: 'Work Sans';
+  src: url('/WorkSans-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Work Sans';
+  src: url('/WorkSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Work Sans';
+  src: url('/WorkSans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Work Sans';
+  src: url('/WorkSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply m-0 p-0 box-border;
+    scrollbar-width: thin;
+    scrollbar-color: #c8c8c8 #666;
+  }
+
+  * {
+    @apply z-1;
+  }
+
+  html {
+    font-size: 62.5%;
+    @apply font-main font-normal leading-[1.4] touch-manipulation bg-primary;
+  }
+
+  body {
+    @apply font-main text-base bg-primary pt-6 relative;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply leading-[1.2] block;
+  }
+
+  p {
+    @apply leading-[1.4] block;
+  }
+
+  li {
+    @apply block;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-[1200px] px-2 my-0 mx-auto h-full;
+  }
+
+  .btn {
+    @apply block min-w-fit py-1 px-[2.4rem] font-bold text-base text-center leading-[2.2rem] rounded border-[1px] border-transparent cursor-pointer transition-[filter] ease-out hover:brightness-75;
+
+    &.btn-mini {
+      @apply text-xs leading-[1.7rem] px-[1.6rem] py-[0.6rem];
+    }
+
+    &.disabled {
+      @apply opacity-25 cursor-default hover:brightness-100;
+    }
+  }
+
+  .btn-secondary {
+    @apply block min-w-fit p-0 underline transition-colors ease-out font-bold text-description hover:text-cta;
+
+    &.disabled {
+      @apply opacity-25 cursor-default hover:text-description;
+    }
+
+    p {
+      @apply bg-cta text-black;
+    }
+  }
+
+  .svg {
+    @apply flex justify-center items-center border-none overflow-hidden;
+
+    svg {
+      @apply overflow-hidden h-fit;
+    }
+  }
+
+  .spinner {
+    @apply rounded-[100%] border-[6px] border-solid border-primary border-l-cta animate-spin;
+  }
+
+  .link {
+    @apply text-blue-400 underline transition-[filter] hover:brightness-150 cursor-pointer;
+  }
+
+  .h-available {
+    min-height: calc(100vh - 6rem);
+    min-height: calc(100svh - 6rem);
+
+    @media (max-width: 830px) {
+      min-height: calc(100vh - 12rem);
+      min-height: calc(100svh - 12rem);
+    }
+  }
+
+  .h-line {
+    @apply w-full h-[2px] bg-light-gray rounded-[5rem];
+  }
+
+  .scroll-disabled {
+    overflow: hidden !important;
+  }
+}
