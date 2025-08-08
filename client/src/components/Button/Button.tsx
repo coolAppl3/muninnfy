@@ -13,6 +13,7 @@ export default function Button({ content, className = '', disabled = false, isSu
   return (
     <button
       type={isSubmitBtn ? 'submit' : 'button'}
+      disabled={disabled}
       className={`Button ${className} ${disabled ? 'disabled' : ''}`}
       onClick={onClick}
     >
