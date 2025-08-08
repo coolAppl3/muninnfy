@@ -11,7 +11,25 @@ export function Router(): JSX.Element {
       <Route
         path='/'
         element={<App />}
-      ></Route>
+      >
+        <Route
+          index
+          element={<Home />}
+        />
+        <Route
+          path='/home'
+          element={<Home />}
+        />
+
+        <Route
+          path='/signIn'
+          element={<SignIn />}
+        />
+        <Route
+          path='/signUp'
+          element={<SignUp />}
+        />
+      </Route>
     </Routes>
   );
 }
