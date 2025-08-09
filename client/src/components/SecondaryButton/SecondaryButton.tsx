@@ -2,13 +2,13 @@ import { JSX, MouseEventHandler } from 'react';
 import './SecondaryButton.css';
 
 interface SecondaryButtonProps {
-  text: string;
+  children: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
   className?: string;
   disabled?: boolean;
 }
 
-export default function SecondaryButton({ text, onClick, className, disabled = false }: SecondaryButtonProps): JSX.Element {
+export default function SecondaryButton({ children, onClick, className, disabled = false }: SecondaryButtonProps): JSX.Element {
   return (
     <button
       type='button'
@@ -16,7 +16,7 @@ export default function SecondaryButton({ text, onClick, className, disabled = f
       className={`SecondaryButton ${className} ${disabled ? 'disabled' : ''}`}
       onClick={onClick}
     >
-      {text}
+      {children}
     </button>
   );
 }
