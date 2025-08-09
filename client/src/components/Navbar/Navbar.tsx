@@ -51,18 +51,20 @@ export default function Navbar(): JSX.Element {
           <div className='flex justify-center items-end gap-1'>
             {location.pathname === '/signIn' || (
               <Button
-                content='Sign in'
                 className='bg-description border-description text-dark'
                 onClick={() => navigate('/signIn')}
-              />
+              >
+                Sign in
+              </Button>
             )}
 
             {location.pathname === '/signUp' || (
               <Button
-                content='Sign up'
                 className='bg-cta border-cta text-dark'
                 onClick={() => navigate('/signUp')}
-              />
+              >
+                Sign up
+              </Button>
             )}
           </div>
         </Container>
