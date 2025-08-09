@@ -58,19 +58,19 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
         </div>
 
         <div className='flex justify-center items-end gap-1'>
-          {routerLocation.pathname === '/signIn' || (
+          {routerLocation.pathname === '/sign-in' || (
             <Button
               className='bg-description border-description text-dark'
-              onClick={() => navigate('/signIn')}
+              onClick={() => navigate('/sign-in')}
             >
               Sign in
             </Button>
           )}
 
-          {routerLocation.pathname === '/signUp' || (
+          {routerLocation.pathname === '/sign-up' || (
             <Button
               className='bg-cta border-cta text-dark'
-              onClick={() => navigate('/signUp')}
+              onClick={() => navigate('/sign-up')}
             >
               Sign up
             </Button>

@@ -4,6 +4,8 @@ import App from '../App';
 import Home from '../pages/Home/Home';
 import SignUp from '../pages/SignUp/SignUp';
 import SignIn from '../pages/SignIn/SignIn';
+import NewWishlist from '../pages/NewWishlist/NewWishlist';
+import Wishlists from '../pages/Wishlists/Wishlists';
 
 export function Router(): JSX.Element {
   return (
@@ -22,12 +24,21 @@ export function Router(): JSX.Element {
         />
 
         <Route
-          path='/signIn'
+          path='/sign-in'
           element={<SignIn />}
         />
         <Route
-          path='/signUp'
+          path='/sign-ip'
           element={<SignUp />}
+        />
+
+        <Route
+          path='/new-wishlist'
+          element={<NewWishlist />}
+        />
+        <Route
+          path='/wishlists'
+          element={<Wishlists />}
         />
       </Route>
     </Routes>
