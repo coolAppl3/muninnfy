@@ -1,10 +1,12 @@
 import { JSX } from 'react';
-import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
-import { Location, useLocation } from 'react-router-dom';
-import Logo from '../../assets/svg/Logo.svg';
+import { Link, NavLink, NavigateFunction, useNavigate, Location, useLocation } from 'react-router-dom';
 import Button from '../Button/Button';
 import Container from '../Container/Container';
-import { NavLink } from 'react-router-dom';
+import Logo from '../../assets/svg/Logo.svg';
+import HomeIcon from '../../assets/svg/HomeIcon.svg?react';
+import SignInIcon from '../../assets/svg/SignInIcon.svg?react';
+import AddIcon from '../../assets/svg/AddIcon.svg?react';
+import './Navbars.css';
 
 export default function Navbars(): JSX.Element {
   const routerLocation: Location = useLocation();
@@ -13,6 +15,11 @@ export default function Navbars(): JSX.Element {
   return (
     <>
       <TopNavbar
+        routerLocation={routerLocation}
+        navigate={navigate}
+      />
+
+      <BottomNavbar
         routerLocation={routerLocation}
         navigate={navigate}
       />
@@ -73,6 +80,38 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
           )}
         </div>
       </Container>
+    </nav>
+  );
+}
+
+function BottomNavbar({ routerLocation, navigate }: { routerLocation: Location; navigate: NavigateFunction }): JSX.Element {
+  return (
+    <nav className='BottomNavbar'>
+      <div>
+        <NavLink
+          to='/home'
+          className={({ isActive }) => (isActive ? 'isActive' : '')}
+        >
+          <HomeIcon className='w-[2.4rem] h-[2.4rem]' />
+          <span>Home</span>
+        </NavLink>
+
+        <NavLink
+          to='/new-wishlist'
+          className={({ isActive }) => (isActive ? 'isActive' : '')}
+        >
+          <AddIcon className='w-[2.4rem] h-[2.4rem]' />
+          <span>New wishlist</span>
+        </NavLink>
+
+        <NavLink
+          to='sign-in'
+          className={({ isActive }) => (isActive ? 'isActive' : '')}
+        >
+          <SignInIcon className='w-[2.4rem] h-[2.4rem]' />
+          <span>Sign in</span>
+        </NavLink>
+      </div>
     </nav>
   );
 }
