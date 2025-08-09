@@ -2,14 +2,14 @@ import { JSX, MouseEventHandler, ReactNode } from 'react';
 import './Button.css';
 
 interface ButtonProps {
-  content: ReactNode;
+  children: ReactNode;
   className?: string;
   disabled?: boolean;
   isSubmitBtn?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
-export default function Button({ content, className = '', disabled = false, isSubmitBtn = false, onClick }: ButtonProps): JSX.Element {
+export default function Button({ children, className = '', disabled = false, isSubmitBtn = false, onClick }: ButtonProps): JSX.Element {
   return (
     <button
       type={isSubmitBtn ? 'submit' : 'button'}
@@ -17,7 +17,7 @@ export default function Button({ content, className = '', disabled = false, isSu
       className={`Button ${className} ${disabled ? 'disabled' : ''}`}
       onClick={onClick}
     >
-      {content}
+      {children}
     </button>
   );
 }
