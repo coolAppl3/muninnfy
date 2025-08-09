@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import { Location, useLocation } from 'react-router-dom';
-import Logo from '../../assets/logo.svg';
+import Logo from '../../assets/svg/Logo.svg';
 import Button from '../Button/Button';
 import Container from '../Container/Container';
 import { NavLink } from 'react-router-dom';
