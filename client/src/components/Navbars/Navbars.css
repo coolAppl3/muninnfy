@@ -1,5 +1,21 @@
 @reference '../../index.css';
 
+.TopNavbar {
+  @apply sticky top-0 left-0 w-full h-6 bg-dark border-b-1 border-b-cta text-title;
+
+  .links-container {
+    @apply font-bold flex justify-center items-center absolute w-fit h-fit left-0 right-0 mx-auto;
+
+    a {
+      @apply mr-1 last:mr-0 relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[3px] after:rounded-pill after:bg-cta/0 hover:after:bg-cta/100 after:transition-[background];
+
+      &.isActive {
+        @apply after:bg-cta/100;
+      }
+    }
+  }
+}
+
 .BottomNavbar {
   @apply fixed bottom-0 left-0 w-full h-6 bg-dark border-t-1 border-t-cta/39 text-title font-medium text-sm;
 

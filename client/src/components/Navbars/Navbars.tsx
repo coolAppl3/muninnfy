@@ -28,11 +28,8 @@ export default function Navbars(): JSX.Element {
 }
 
 function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; navigate: NavigateFunction }): JSX.Element {
-  const navLinkBaseClassname: string =
-    'mr-1 relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[3px] after:rounded-pill hover:after:bg-cta/100 after:transition-[background]';
-
   return (
-    <nav className='sticky top-0 left-0 w-full h-6 bg-dark border-b-1 border-b-cta text-title'>
+    <nav className='TopNavbar'>
       <Container className='flex justify-between items-center'>
         <Link to={'/home'}>
           <div className='flex justify-start items-center gap-1'>
@@ -44,17 +41,17 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
           </div>
         </Link>
 
-        <div className='font-bold flex justify-center items-center absolute w-fit h-fit left-0 right-0 mx-auto'>
+        <div className='links-container'>
           <NavLink
             to='/home'
-            className={({ isActive }) => `${navLinkBaseClassname} ${isActive ? 'after:bg-cta/100' : 'after:bg-cta/0'}`}
+            className={({ isActive }) => (isActive ? 'isActive' : '')}
           >
             Home
           </NavLink>
 
           <NavLink
             to='/wishlists'
-            className={({ isActive }) => `${navLinkBaseClassname} ${isActive ? 'after:bg-cta/100' : 'after:bg-cta/0'}`}
+            className={({ isActive }) => (isActive ? 'isActive' : '')}
           >
             Wishlists
           </NavLink>
