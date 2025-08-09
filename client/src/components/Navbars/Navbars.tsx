@@ -5,9 +5,8 @@ import Logo from '../../assets/logo.svg';
 import Button from '../Button/Button';
 import Container from '../Container/Container';
 import { NavLink } from 'react-router-dom';
-import './Navbar.css';
 
-export default function Navbar(): JSX.Element {
+export default function Navbars(): JSX.Element {
   const routerLocation: Location = useLocation();
   const navigate: NavigateFunction = useNavigate();
 
