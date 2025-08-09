@@ -28,7 +28,7 @@ export function Router(): JSX.Element {
           element={<SignIn />}
         />
         <Route
-          path='/sign-ip'
+          path='/sign-up'
           element={<SignUp />}
         />
 
