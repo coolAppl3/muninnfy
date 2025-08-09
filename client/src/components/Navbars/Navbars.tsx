@@ -50,10 +50,10 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
           </NavLink>
 
           <NavLink
-            to='/wishlists'
+            to='/new-wishlist'
             className={({ isActive }) => (isActive ? 'isActive' : '')}
           >
-            Wishlists
+            New wishlist
           </NavLink>
         </div>
 
