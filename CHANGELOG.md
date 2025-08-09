@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.4] (2024-08-09)
+
+### Features
+
+- Added local `TopNavbar` component under `Navbars`.
+  - Further clarification can be found in the refactoring section.
+- Added the following SVG icons: `HomeIcon`, `AddIcon`, and `SignInIcon`.
+- Added stubs for `NewWishlist` and `Wishlists` pages, under the `/new-wishlist` and `/wishlists` paths respectively.
+
+
+### Code Refactoring
+
+- Renamed `Navbar` component to `Navbars`.
+- Refactored the JSX for the top navbar into its own local `TopNavbar` component.
+- Refactored SVGs into their own SVG directory in `assets`.
+- Refactored the `/signIn` and `/signUp` paths to `/sign-in` and `/sign-up` respectively.
+- Other minor refactors.
+
+
 ## [0.0.3] (2024-08-09)
 
 ### Features

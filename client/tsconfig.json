@@ -11,6 +11,6 @@
     "isolatedModules": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "globals.d.ts"],
+  "include": ["src", "globals.d.ts", "vite-env.d.ts"],
   "exclude": ["node_modules"]
 }
