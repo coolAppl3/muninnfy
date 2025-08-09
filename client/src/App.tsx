@@ -1,11 +1,12 @@
-import { JSX, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { JSX } from 'react';
+import { Outlet } from 'react-router-dom';
 import './App.css';
+import Navbar from './components/Navbar/Navbar';
 
 export default function App(): JSX.Element {
   return (
     <>
-      <nav></nav>
+      <Navbar></Navbar>
       <Outlet />
     </>
   );
