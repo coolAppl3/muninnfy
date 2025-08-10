@@ -37,7 +37,7 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
               className='w-4 h-4'
               src={Logo}
             />
-            <h1 className='font-bold text-3xl'>Muninnfy</h1>
+            <h2 className='font-bold text-3xl'>Muninnfy</h2>
           </div>
         </Link>
 
