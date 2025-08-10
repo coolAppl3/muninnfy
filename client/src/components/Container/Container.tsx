@@ -7,5 +7,5 @@ interface ContainerProps {
 }
 
 export default function Container({ children, className = '' }: ContainerProps): JSX.Element {
-  return <div className={`Container ${className}`}>{children}</div>;
+  return <div className={`container ${className}`}>{children}</div>;
 }

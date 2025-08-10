@@ -1,6 +1,6 @@
 @reference '../../index.css';
 
-.SecondaryButton {
+.btn-secondary {
   @apply block min-w-fit p-0 underline transition-colors ease-out font-bold text-description hover:text-cta cursor-pointer;
 
   &.disabled {
