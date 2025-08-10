@@ -1,1 +1,16 @@
 @reference '../../index.css';
+
+.hero {
+  height: calc(80svh - 6rem);
+  max-height: calc(80svh - 6rem);
+
+  @media (max-width: 830px) {
+    height: calc(80svh - 12rem);
+    max-height: calc(80svh - 12rem);
+  }
+
+  @media (max-height: 500px) {
+    height: fit-content;
+    max-height: fit-content;
+  }
+}
