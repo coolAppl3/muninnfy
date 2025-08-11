@@ -23,7 +23,7 @@
     @apply h-full w-full grid grid-cols-3;
 
     a {
-      @apply border-r-1 border-r-light-gray last:border-r-transparent flex flex-col justify-center items-center gap-[4px];
+      @apply border-r-1 border-r-light-gray last:border-r-transparent flex flex-col justify-center items-center shrink-0 gap-[4px];
 
       &.isActive {
         @apply text-cta;
