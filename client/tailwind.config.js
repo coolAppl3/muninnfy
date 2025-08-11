@@ -34,13 +34,13 @@ module.exports = {
     },
 
     screens: {
-      xl: { max: '1200px' },
-      lg: { max: '970px' },
-      md: { max: '830px' },
-      sm: { max: '650px' },
-      xs: { max: '450px' },
-      '2xs': { max: '390px' },
-      '3xs': { max: '340px' },
+      '3xs': '341px',
+      '2xs': '391px',
+      xs: '451px',
+      sm: '651px',
+      md: '831px',
+      lg: '971px',
+      xl: '1201px',
     },
 
     fontFamily: {

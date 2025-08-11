@@ -41,7 +41,7 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
           </div>
         </Link>
 
-        <div className='links-container md:!hidden'>
+        <div className='links-container'>
           <NavLink
             to='/home'
             className={({ isActive }) => (isActive ? 'isActive' : '')}
@@ -57,7 +57,7 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
           </NavLink>
         </div>
 
-        <div className='flex justify-center items-end gap-1 md:hidden'>
+        <div className='hidden md:flex justify-center items-end gap-1'>
           {routerLocation.pathname === '/sign-in' || (
             <Button
               className='bg-description border-description text-dark'
@@ -83,7 +83,7 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
 
 function BottomNavbar({ routerLocation, navigate }: { routerLocation: Location; navigate: NavigateFunction }): JSX.Element {
   return (
-    <nav className='bottom-navbar hidden md:block'>
+    <nav className='bottom-navbar md:hidden'>
       <div>
         <NavLink
           to='/home'
