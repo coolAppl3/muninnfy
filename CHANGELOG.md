@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.0.5] (2024-08-12)
+
+### Features
+
+- Added font files for Italic bold `Work Sans`.
+- Implemented Hero section in Home page.
+- Implemented Features section in Home page.
+- Added multiple SVGs.
+
+
+### Bug Fixes
+
+- Fixed home links in `Navbars` component not being highlighted as active when in the pathname is at the root.
+
+
+### Code Refactoring
+
+- Refactored CSS to a mobile-first approach.
+- Other minor refactors.
+
+
 ## [0.0.4] (2024-08-09)
 
 ### Features
