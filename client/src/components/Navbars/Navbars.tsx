@@ -44,7 +44,7 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
         <div className='links-container'>
           <NavLink
             to='/home'
-            className={({ isActive }) => (isActive ? 'isActive' : '')}
+            className={({ isActive }) => (isActive || routerLocation.pathname === '/' ? 'isActive' : '')}
           >
             Home
           </NavLink>
@@ -87,7 +87,7 @@ function BottomNavbar({ routerLocation, navigate }: { routerLocation: Location; 
       <div>
         <NavLink
           to='/home'
-          className={({ isActive }) => (isActive ? 'isActive' : '')}
+          className={({ isActive }) => (isActive || routerLocation.pathname === '/' ? 'isActive' : '')}
         >
           <HomeIcon className='w-[2.4rem] h-[2.4rem]' />
           <span>Home</span>
