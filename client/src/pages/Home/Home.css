@@ -20,7 +20,7 @@
     @apply bg-secondary p-2 rounded-sm break-words shadow-simple;
 
     .card-header {
-      @apply flex justify-start gap-1 items-center mb-2 shrink-0;
+      @apply flex justify-start items-center gap-1 mb-2 shrink-0;
 
       h3 {
         @apply text-title text-md font-bold break-words;
