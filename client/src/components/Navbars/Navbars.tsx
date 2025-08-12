@@ -29,7 +29,7 @@ export default function Navbars(): JSX.Element {
 
 function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; navigate: NavigateFunction }): JSX.Element {
   return (
-    <nav className='TopNavbar'>
+    <nav className='top-navbar'>
       <Container className='flex justify-between items-center'>
         <Link to={'/home'}>
           <div className='flex justify-start items-center gap-1'>
@@ -37,14 +37,14 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
               className='w-4 h-4'
               src={Logo}
             />
-            <h1 className='font-bold text-3xl'>Muninnfy</h1>
+            <h2 className='font-bold text-3xl'>Muninnfy</h2>
           </div>
         </Link>
 
         <div className='links-container'>
           <NavLink
             to='/home'
-            className={({ isActive }) => (isActive ? 'isActive' : '')}
+            className={({ isActive }) => (isActive || routerLocation.pathname === '/' ? 'isActive' : '')}
           >
             Home
           </NavLink>
@@ -57,7 +57,7 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
           </NavLink>
         </div>
 
-        <div className='flex justify-center items-end gap-1'>
+        <div className='hidden md:flex justify-center items-end gap-1'>
           {routerLocation.pathname === '/sign-in' || (
             <Button
               className='bg-description border-description text-dark'
@@ -83,11 +83,11 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
 
 function BottomNavbar({ routerLocation, navigate }: { routerLocation: Location; navigate: NavigateFunction }): JSX.Element {
   return (
-    <nav className='BottomNavbar'>
+    <nav className='bottom-navbar md:hidden'>
       <div>
         <NavLink
           to='/home'
-          className={({ isActive }) => (isActive ? 'isActive' : '')}
+          className={({ isActive }) => (isActive || routerLocation.pathname === '/' ? 'isActive' : '')}
         >
           <HomeIcon className='w-[2.4rem] h-[2.4rem]' />
           <span>Home</span>

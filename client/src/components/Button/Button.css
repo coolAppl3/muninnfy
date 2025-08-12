@@ -1,6 +1,6 @@
 @reference '../../index.css';
 
-.Button {
+.btn {
   @apply block min-w-fit py-1 px-[2.4rem] font-bold text-base text-center leading-[2.2rem] rounded border-1 cursor-pointer transition-[filter] ease-out hover:brightness-75;
 
   &.disabled {

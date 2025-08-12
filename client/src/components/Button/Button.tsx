@@ -14,7 +14,7 @@ export default function Button({ children, className = '', disabled = false, isS
     <button
       type={isSubmitBtn ? 'submit' : 'button'}
       disabled={disabled}
-      className={`Button ${className} ${disabled ? 'disabled' : ''}`}
+      className={`btn ${className} ${disabled ? 'disabled' : ''}`}
       onClick={onClick}
     >
       {children}

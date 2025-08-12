@@ -1,13 +1,13 @@
 {
   "name": "muninnfy",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "GPL-3.0",
   "description": "Muninnfy is a single-page application meant to function as a flexible wishlist.",
   "author": "Yanal Mohsen",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

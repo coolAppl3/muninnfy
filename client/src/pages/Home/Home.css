@@ -1,0 +1,34 @@
+@reference '../../index.css';
+
+.hero {
+  height: calc(80svh - 12rem);
+  max-height: calc(80svh - 12rem);
+
+  @media (min-width: 831px) {
+    height: calc(80svh - 6rem);
+    max-height: calc(80svh - 6rem);
+  }
+
+  @media (max-height: 500px) {
+    height: fit-content;
+    max-height: fit-content;
+  }
+}
+
+.features {
+  .card {
+    @apply bg-secondary p-2 rounded-sm break-words shadow-simple;
+
+    .card-header {
+      @apply flex justify-start items-center gap-1 mb-2 shrink-0;
+
+      h3 {
+        @apply text-title text-md font-bold break-words;
+      }
+    }
+
+    p {
+      @apply text-description font-medium;
+    }
+  }
+}

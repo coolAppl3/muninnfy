@@ -13,7 +13,7 @@ export default function SecondaryButton({ children, onClick, className, disabled
     <button
       type='button'
       disabled={disabled}
-      className={`SecondaryButton ${className} ${disabled ? 'disabled' : ''}`}
+      className={`btn-secondary ${className} ${disabled ? 'disabled' : ''}`}
       onClick={onClick}
     >
       {children}
