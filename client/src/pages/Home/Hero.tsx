@@ -1,5 +1,4 @@
 import { JSX } from 'react';
-import './Home.css';
 import Button from '../../components/Button/Button';
 import Container from '../../components/Container/Container';
 import HeroGradient from '../../assets/svg/HeroGradient.svg?react';
