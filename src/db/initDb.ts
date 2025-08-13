@@ -37,13 +37,15 @@ async function createAccountsTable(): Promise<void> {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS accounts (
         account_id INT PRIMARY KEY AUTO_INCREMENT,
+        public_account_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
         email VARCHAR(254) NOT NULL UNIQUE,
         hashed_password VARCHAR(255) NOT NULL,
         username VARCHAR(40) NOT NULL UNIQUE,
         display_name VARCHAR(40) NOT NULL,
         created_on_timestamp BIGINT NOT NULL,
         is_verified BOOLEAN NOT NULL,
-        failed_sign_in_attempts INT NOT NULL CHECK(failed_sign_in_attempts <= 5)
+        failed_sign_in_attempts INT NOT NULL CHECK(failed_sign_in_attempts <= 5),
+        INDEX idx_public_account_id (public_account_id)
       );`
     );
   } catch (err: unknown) {
