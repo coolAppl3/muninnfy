@@ -1,5 +1,4 @@
 import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
-import { dbPool } from '../db';
 
 export async function deleteAccountById(accountId: number, executor: Pool | PoolConnection): Promise<boolean> {
   try {
