@@ -155,7 +155,6 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       displayName: requestData.displayName,
       accountId,
       verificationToken,
-      expiryTimestamp: verificationExpiryTimestamp,
     });
   } catch (err: unknown) {
     console.log(err);

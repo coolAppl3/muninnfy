@@ -6,7 +6,6 @@ interface SendAccountVerificationEmailConfig {
   displayName: string;
   accountId: number;
   verificationToken: string;
-  expiryTimestamp: number;
 }
 
 export async function sendAccountVerificationEmail(config: SendAccountVerificationEmailConfig): Promise<void> {
