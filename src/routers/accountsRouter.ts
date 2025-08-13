@@ -104,10 +104,13 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     }
 
     const currentTimestamp: number = Date.now();
+
     const hashedPassword: string = await bcrypt.hash(requestData.password, 10);
+    const publicAccountId: string = generateCryptoUuid();
 
     const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO accounts (
+        public_account_id,
         email,
         hashed_password,
         username,
@@ -115,8 +118,8 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
         created_on_timestamp,
         is_verified,
         failed_sign_in_attempts
-      ) VALUES (${generatePlaceHolders(7)});`,
-      [requestData.email, hashedPassword, requestData.username, requestData.displayName, currentTimestamp, false, 0]
+      ) VALUES (${generatePlaceHolders(8)});`,
+      [publicAccountId, requestData.email, hashedPassword, requestData.username, requestData.displayName, currentTimestamp, false, 0]
     );
 
     const accountId: number = resultSetHeader.insertId;
@@ -145,7 +148,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     );
 
     await connection.commit();
-    res.json({});
+    res.json({ publicAccountId });
 
     await sendAccountVerificationEmail({
       receiver: requestData.email,
