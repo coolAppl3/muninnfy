@@ -149,7 +149,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     );
 
     await connection.commit();
-    res.json({ publicAccountId });
+    res.status(201).json({ publicAccountId });
 
     await sendAccountVerificationEmail({
       receiver: requestData.email,
