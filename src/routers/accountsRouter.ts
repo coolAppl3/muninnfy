@@ -84,16 +84,22 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     if (!takenStatus) {
       res.status(500).json({ message: 'Internal server error.' });
+      await connection.rollback();
+
       return;
     }
 
     if (takenStatus.email_taken) {
       res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
+      await connection.rollback();
+
       return;
     }
 
     if (takenStatus.username_taken) {
       res.status(409).json({ message: 'Username is taken.', reason: 'usernameTaken' });
+      await connection.rollback();
+
       return;
     }
 
