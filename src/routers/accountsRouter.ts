@@ -119,6 +119,15 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     const verificationExpiryTimestamp: number = currentTimestamp + ACCOUNT_VERIFICATION_WINDOW;
 
     await connection.execute(
+      `INSERT INTO account_preferences (
+        account_id,
+        is_private,
+        approve_follow_requests
+      ) VALUES (${generatePlaceHolders(3)});`,
+      [accountId, true, true]
+    );
+
+    await connection.execute(
       `INSERT INTO account_verification (
         account_id,
         verification_token,
