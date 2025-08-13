@@ -4,6 +4,7 @@ export async function initDb(): Promise<void> {
   await createAuthSessionsTable();
 
   await createAccountsTable();
+  await createAccountPreferencesTable();
   await createAccountVerificationTable();
   await createAccountRecoveryTable();
   await createAccountDeletionTable();
@@ -43,6 +44,21 @@ async function createAccountsTable(): Promise<void> {
         created_on_timestamp BIGINT NOT NULL,
         is_verified BOOLEAN NOT NULL,
         failed_sign_in_attempts INT NOT NULL CHECK(failed_sign_in_attempts <= 5)
+      );`
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
+
+async function createAccountPreferencesTable(): Promise<void> {
+  try {
+    await dbPool.execute(
+      `CREATE TABLE IF NOT EXISTS account_preferences (
+        account_id INT PRIMARY KEY,
+        is_private BOOLEAN NOT NULL,
+        approve_follow_requests BOOLEAN NOT NULL,
+        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
   } catch (err: unknown) {
