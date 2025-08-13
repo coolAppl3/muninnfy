@@ -180,7 +180,8 @@ async function createUnexpectedErrorsTable(): Promise<void> {
         request_path VARCHAR(255),
         error_timestamp BIGINT NOT NULL,
         error_message TEXT,
-        stack_trace TEXT
+        stack_trace TEXT,
+        description VARCHAR(255)
       );`
     );
   } catch (err: unknown) {
