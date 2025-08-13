@@ -1,35 +1,19 @@
 import { dbPool } from './db';
 
 export async function initDb(): Promise<void> {
-  await createAuthSessionsTable();
-
   await createAccountsTable();
   await createAccountPreferencesTable();
   await createAccountVerificationTable();
   await createAccountRecoveryTable();
   await createAccountDeletionTable();
   await createEmailUpdateTable();
+  await createAuthSessionsTable();
 
   await createRateTrackerTable();
   await createAbusiveUsersTable();
   await createUnexpectedErrorsTable();
 
   console.log('Database initialized.');
-}
-
-async function createAuthSessionsTable(): Promise<void> {
-  try {
-    await dbPool.execute(
-      `CREATE TABLE IF NOT EXISTS auth_sessions (
-        session_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-        user_id INT NOT NULL,
-        created_on_timestamp BIGINT NOT NULL,
-        expiry_timestamp BIGINT NOT NULL
-      );`
-    );
-  } catch (err: unknown) {
-    console.log(err);
-  }
 }
 
 async function createAccountsTable(): Promise<void> {
@@ -133,6 +117,22 @@ async function createEmailUpdateTable(): Promise<void> {
         expiry_timestamp BIGINT NOT NULL,
         update_emails_sent INT NOT NULL CHECK(update_emails_sent <= 3),
         failed_update_attempts INT NOT NULL CHECK(failed_update_attempts <= 3),
+        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
+      );`
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
+
+async function createAuthSessionsTable(): Promise<void> {
+  try {
+    await dbPool.execute(
+      `CREATE TABLE IF NOT EXISTS auth_sessions (
+        session_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY,
+        account_id INT NOT NULL,
+        created_on_timestamp BIGINT NOT NULL,
+        expiry_timestamp BIGINT NOT NULL,
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
