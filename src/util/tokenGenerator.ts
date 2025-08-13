@@ -3,7 +3,8 @@ export function generateCryptoUuid(): string {
 }
 
 export function generateVerificationCode(): string {
-  const allowedCodeCharacters: string = 'ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789'; // uppercase and lowercase O not included
+  // number 0, as well as uppercase and lowercase O, not included
+  const allowedCodeCharacters: string = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
   let verificationCode: string = '';
 
   while (verificationCode.length < 6) {
