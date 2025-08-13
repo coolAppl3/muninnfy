@@ -8,8 +8,6 @@ export async function initDb(): Promise<void> {
   await createAccountRecoveryTable();
   await createAccountDeletionTable();
   await createEmailUpdateTable();
-  await createFriendRequestsTable();
-  await createFriendshipsTable();
 
   await createRateTrackerTable();
   await createAbusiveUsersTable();
@@ -118,42 +116,6 @@ async function createEmailUpdateTable(): Promise<void> {
         update_emails_sent INT NOT NULL CHECK(update_emails_sent <= 3),
         failed_update_attempts INT NOT NULL CHECK(failed_update_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
-    );
-  } catch (err: unknown) {
-    console.log(err);
-  }
-}
-
-async function createFriendRequestsTable(): Promise<void> {
-  try {
-    await dbPool.execute(
-      `CREATE TABLE IF NOT EXISTS friend_requests (
-        request_id INT PRIMARY KEY AUTO_INCREMENT,
-        requester_id INT NOT NULL,
-        requestee_id INT NOT NULL,
-        request_timestamp BIGINT NOT NULL,
-        UNIQUE(requester_id, requestee_id),
-        FOREIGN KEY (requester_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
-        FOREIGN KEY (requestee_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
-    );
-  } catch (err: unknown) {
-    console.log(err);
-  }
-}
-
-async function createFriendshipsTable(): Promise<void> {
-  try {
-    await dbPool.execute(
-      `CREATE TABLE IF NOT EXISTS friendships (
-        friendship_id INT PRIMARY KEY AUTO_INCREMENT,
-        account_id INT NOT NULL,
-        friend_id INT NOT NULL,
-        friendship_timestamp BIGINT NOT NULL,
-        UNIQUE(account_id, friend_id),
-        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
-        FOREIGN KEY (friend_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
   } catch (err: unknown) {
