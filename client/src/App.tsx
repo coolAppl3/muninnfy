@@ -6,7 +6,7 @@ import Navbars from './components/Navbars/Navbars';
 export default function App(): JSX.Element {
   return (
     <>
-      <Navbars></Navbars>
+      <Navbars />
       <Outlet />
     </>
   );
