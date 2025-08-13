@@ -47,7 +47,7 @@ export default function Footer(): JSX.Element {
             links={[
               { title: 'Terms of Service', path: '/terms-of-service' },
               { title: 'Privacy Policy', path: '/privacy-policy' },
-              { title: 'Cookie Policy', path: '/Cookie-policy' },
+              { title: 'Cookie Policy', path: '/cookie-policy' },
             ]}
           />
         </div>
