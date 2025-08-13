@@ -8,7 +8,7 @@ export function isValidAuthSessionId(authSessionId: string): boolean {
 }
 
 interface AuthSessionDetails {
-  user_id: number;
+  account_id: number;
   expiry_timestamp: number;
 }
 
