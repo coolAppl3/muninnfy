@@ -1,9 +1,9 @@
 export function isValidAuthSessionId(authSessionId: string): boolean {
-  if (authSessionId.length !== 32) {
+  if (authSessionId.length !== 36) {
     return false;
   }
 
-  const regex: RegExp = /^[A-Za-z0-9]{32}$/;
+  const regex: RegExp = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return regex.test(authSessionId);
 }
 
