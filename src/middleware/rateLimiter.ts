@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { getRequestCookie, setResponseCookie } from '../util/cookieUtils';
 import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { RowDataPacket } from 'mysql2';
+import { RowDataPacket } from 'mysql2/promise';
 import { REQUESTS_RATE_LIMIT, hourMilliseconds } from '../util/constants';
 import { generateCryptoUuid } from '../util/tokenGenerator';
 

@@ -3,7 +3,7 @@ import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidDisplayName, isValidEmail, isValidNewPassword, isValidUsername } from '../util/validation/userValidation';
 import { getRequestCookie } from '../util/cookieUtils';
 import { dbPool } from '../db/db';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { generateCryptoUuid } from '../util/tokenGenerator';

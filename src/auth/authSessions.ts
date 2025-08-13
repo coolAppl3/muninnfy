@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { dbPool } from '../db/db';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { setResponseCookie } from '../util/cookieUtils';
 import { AUTH_SESSIONS_LIMIT, hourMilliseconds } from '../util/constants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
