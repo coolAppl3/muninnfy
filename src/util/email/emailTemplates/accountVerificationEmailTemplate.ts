@@ -2,10 +2,11 @@ import { ACCOUNT_VERIFICATION_WINDOW, minuteMilliseconds } from '../../constants
 
 interface AccountVerificationEmailTemplate {
   displayName: string;
+  publicAccountId: string;
   verificationToken: string;
 }
 
-export default function accountVerificationEmailTemplate({ displayName, verificationToken }: AccountVerificationEmailTemplate): string {
+export default function accountVerificationEmailTemplate({ displayName, publicAccountId, verificationToken }: AccountVerificationEmailTemplate): string {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -25,8 +26,8 @@ export default function accountVerificationEmailTemplate({ displayName, verifica
 
           <p>
             To verify your account, please click the following link:
-            <a href="https://muninnfy.com/verification/sign-up?verificationToken=${verificationToken}"
-              >https://muninnfy.com/verification/sign-up?verificationToken=${verificationToken}</a
+            <a href="https://muninnfy.com/verification/sign-up?publicAccountId=${publicAccountId}&verificationToken=${verificationToken}"
+              >https://muninnfy.com/verification/sign-up?publicAccountId=${publicAccountId}&verificationToken=${verificationToken}</a
             >.
           </p>
 

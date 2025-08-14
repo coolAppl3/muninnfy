@@ -4,7 +4,7 @@ import accountVerificationEmailTemplate from './emailTemplates/accountVerificati
 interface SendAccountVerificationEmailConfig {
   receiver: string;
   displayName: string;
-  accountId: number;
+  publicAccountId: string;
   verificationToken: string;
 }
 
@@ -14,7 +14,11 @@ export async function sendAccountVerificationEmail(config: SendAccountVerificati
       from: `Muninnfy <${process.env.TRANSPORTER_USER}>`,
       to: config.receiver,
       subject: 'Muninnfy - Account Verification',
-      html: accountVerificationEmailTemplate({ displayName: config.displayName, verificationToken: config.verificationToken }),
+      html: accountVerificationEmailTemplate({
+        displayName: config.displayName,
+        publicAccountId: config.publicAccountId,
+        verificationToken: config.verificationToken,
+      }),
     });
   } catch (err: unknown) {
     console.log(err);

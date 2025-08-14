@@ -154,7 +154,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     await sendAccountVerificationEmail({
       receiver: requestData.email,
       displayName: requestData.displayName,
-      accountId,
+      publicAccountId,
       verificationToken,
     });
   } catch (err: unknown) {
@@ -212,6 +212,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
   try {
     interface AccountDetails extends RowDataPacket {
       account_id: number;
+      public_account_id: string;
       email: string;
       display_name: string;
       is_verified: boolean;
@@ -224,6 +225,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     const [accountRows] = await dbPool.execute<AccountDetails[]>(
       `SELECT
         accounts.account_id,
+        accounts.public_account_id,
         accounts.email,
         accounts.display_name,
         accounts.is_verified,
@@ -298,9 +300,9 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     res.json({});
 
     await sendAccountVerificationEmail({
-      accountId: accountDetails.account_id,
       receiver: accountDetails.email,
       displayName: accountDetails.display_name,
+      publicAccountId: accountDetails.public_account_id,
       verificationToken: accountDetails.verification_token,
     });
   } catch (err: unknown) {
