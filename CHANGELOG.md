@@ -1,12 +1,52 @@
 # Changelog
 
+## [0.0.6] (2024-08-14)
+
+### Features
+
+- Added `SignUp_Illustration` SVG.
+- Added `JoinMuninnfy` component for `Home` page.
+- Added `Footer` component.
+- Added `account_preferences` table.
+  - Updated POST `accounts/signUp` to insert a row upon account creation.
+- Added `accountVerificationEmailTemplate` under `util/emailTemplates/`.
+  - Ditched the single-file approach for a more modular one. 
+- Implemented `sendAccountVerificationEmail()`.
+- Added `public_account_id` field to `accounts` table.
+  - Updated POST `accounts/signUp` to align with this change.
+- Added `deleteAccountById()` under accountDbHelpers.ts
+- Added `description` field to `unexpected_errors` table.
+  - Refactored `logUnexpectedError()` to accept an optional `description` parameter to align with this change.
+- Added PATCH `accounts/verification/resendEmail`.
+
+
+### Changes
+
+- Dropped `friend_requests` and `friendships` tables in favour of a follow system, which will be implemented down the line.
+- Removed `authUtils`.
+
+
+### Bug Fixes
+
+- Fixed POST `accounts/signUp` not rolling back the transaction if the user's credentials are taken.
+
+
+### Code Refactoring
+
+- Renamed `user_id` field in `auth_sessions` table to `account_id`, set it as a foreign key, and set `session_id` as primary key.
+- Refactored `generateVerificationCode()` to also exclude the number 0, alongside the letter O, to avoid any user confusion.
+- Reworked `isValidAuthSessionId()` as `isValidUuid()` under `tokenGenerator`.
+  - Fixed it validating the old structure of an auth session Id in the process.
+- Refactored POST `accounts/signUp` to return a `201` instead of `200` as a successful response.
+
+
 ## [0.0.5] (2024-08-12)
 
 ### Features
 
 - Added font files for Italic bold `Work Sans`.
-- Implemented Hero section in Home page.
-- Implemented Features section in Home page.
+- Added `Hero` component to `Home` page.
+- Added `Features` component to `Home` page.
 - Added multiple SVGs.
 
 
