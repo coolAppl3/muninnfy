@@ -11,7 +11,7 @@ import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_UPDATE_LIMIT, ACCOUNT_VERIFIC
 import { sendAccountVerificationEmail } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
-import { deleteAccountById } from '../db/helpers/accountDbHelpers';
+import { deleteAccountById, incrementFailedVerificationAttempts } from '../db/helpers/accountDbHelpers';
 
 export const accountsRouter: Router = express.Router();
 
@@ -301,5 +301,145 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+accountsRouter.patch('/verification/verify', async (req: Request, res: Response) => {
+  interface RequestData {
+    publicAccountId: string;
+    verificationToken: string;
+  }
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['publicAccountId', 'verificationToken'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  if (!isValidUuid(requestData.publicAccountId)) {
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    return;
+  }
+
+  if (!isValidUuid(requestData.verificationToken)) {
+    res.status(400).json({ message: 'Invalid verification token.', reason: 'invalidVerificationToken' });
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
+    await connection.beginTransaction();
+
+    interface AccountDetails extends RowDataPacket {
+      account_id: number;
+      is_verified: boolean;
+      verification_id: number;
+      verification_token: string;
+      failed_verification_attempts: number;
+    }
+
+    const [accountRows] = await connection.execute<AccountDetails[]>(
+      `SELECT
+        accounts.account_id,
+        accounts.is_verified,
+        account_verification.verification_id,
+        account_verification.verification_token,
+        account_verification.failed_verification_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        account_verification ON accounts.account_id = account_verification.account_id
+      WHERE
+        accounts.public_account_id = ?;`,
+      [requestData.publicAccountId]
+    );
+
+    const accountDetails: AccountDetails | undefined = accountRows[0];
+
+    if (!accountDetails) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
+
+      return;
+    }
+
+    if (accountDetails.is_verified) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Account is already verified.', reason: 'alreadyVerified' });
+
+      return;
+    }
+
+    if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      await connection.rollback();
+      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool);
+
+      if (!accountDeleted) {
+        res.status(500).json({ message: 'Internal server error.' });
+        return;
+      }
+
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
+      return;
+    }
+
+    if (requestData.verificationToken === accountDetails.verification_token) {
+      const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+        `UPDATE
+          accounts
+        SET
+          is_verified = ?
+        WHERE
+          account_id = ?;`,
+        [true, accountDetails.account_id]
+      );
+
+      if (resultSetHeader.affectedRows === 0) {
+        await connection.rollback();
+        res.status(500).json({ message: 'Internal server error.' });
+
+        return;
+      }
+
+      await connection.commit();
+      res.json({});
+
+      return;
+    }
+
+    await connection.rollback();
+
+    if (accountDetails.failed_verification_attempts + 1 >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool);
+
+      if (!accountDeleted) {
+        res.status(500).json({ message: 'Internal server error.' });
+        return;
+      }
+
+      res.status(401).json({ message: 'Incorrect verification token. Account deleted' });
+      return;
+    }
+
+    const incremented: boolean = await incrementFailedVerificationAttempts(accountDetails.verification_id, dbPool);
+    incremented || (await logUnexpectedError(req, null, 'Failed to increment failed_verification_attempts.'));
+
+    res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken' });
+  } catch (err: unknown) {
+    console.log(err);
+    connection?.rollback();
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+  } finally {
+    connection?.release();
   }
 });
