@@ -57,12 +57,3 @@ export function isValidDisplayName(displayName: any): boolean {
   const regex: RegExp = /^[A-Za-z ]{1,25}$/;
   return regex.test(displayName);
 }
-
-export function isValidVerificationCode(verificationCode: any): boolean {
-  if (typeof verificationCode !== 'string') {
-    return false;
-  }
-
-  const regex: RegExp = /^[A-NP-Z0-9]{6}$/;
-  return regex.test(verificationCode);
-}

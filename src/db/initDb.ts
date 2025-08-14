@@ -1,15 +1,13 @@
 import { dbPool } from './db';
 
 export async function initDb(): Promise<void> {
-  await createAuthSessionsTable();
-
   await createAccountsTable();
+  await createAccountPreferencesTable();
   await createAccountVerificationTable();
   await createAccountRecoveryTable();
   await createAccountDeletionTable();
   await createEmailUpdateTable();
-  await createFriendRequestsTable();
-  await createFriendshipsTable();
+  await createAuthSessionsTable();
 
   await createRateTrackerTable();
   await createAbusiveUsersTable();
@@ -18,14 +16,20 @@ export async function initDb(): Promise<void> {
   console.log('Database initialized.');
 }
 
-async function createAuthSessionsTable(): Promise<void> {
+async function createAccountsTable(): Promise<void> {
   try {
     await dbPool.execute(
-      `CREATE TABLE IF NOT EXISTS auth_sessions (
-        session_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-        user_id INT NOT NULL,
+      `CREATE TABLE IF NOT EXISTS accounts (
+        account_id INT PRIMARY KEY AUTO_INCREMENT,
+        public_account_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+        email VARCHAR(254) NOT NULL UNIQUE,
+        hashed_password VARCHAR(255) NOT NULL,
+        username VARCHAR(40) NOT NULL UNIQUE,
+        display_name VARCHAR(40) NOT NULL,
         created_on_timestamp BIGINT NOT NULL,
-        expiry_timestamp BIGINT NOT NULL
+        is_verified BOOLEAN NOT NULL,
+        failed_sign_in_attempts INT NOT NULL CHECK(failed_sign_in_attempts <= 5),
+        INDEX idx_public_account_id (public_account_id)
       );`
     );
   } catch (err: unknown) {
@@ -33,18 +37,14 @@ async function createAuthSessionsTable(): Promise<void> {
   }
 }
 
-async function createAccountsTable(): Promise<void> {
+async function createAccountPreferencesTable(): Promise<void> {
   try {
     await dbPool.execute(
-      `CREATE TABLE IF NOT EXISTS accounts (
-        account_id INT PRIMARY KEY AUTO_INCREMENT,
-        email VARCHAR(254) NOT NULL UNIQUE,
-        hashed_password VARCHAR(255) NOT NULL,
-        username VARCHAR(40) NOT NULL UNIQUE,
-        display_name VARCHAR(40) NOT NULL,
-        created_on_timestamp BIGINT NOT NULL,
-        is_verified BOOLEAN NOT NULL,
-        failed_sign_in_attempts INT NOT NULL CHECK(failed_sign_in_attempts <= 5)
+      `CREATE TABLE IF NOT EXISTS account_preferences (
+        account_id INT PRIMARY KEY,
+        is_private BOOLEAN NOT NULL,
+        approve_follow_requests BOOLEAN NOT NULL,
+        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
   } catch (err: unknown) {
@@ -125,35 +125,15 @@ async function createEmailUpdateTable(): Promise<void> {
   }
 }
 
-async function createFriendRequestsTable(): Promise<void> {
+async function createAuthSessionsTable(): Promise<void> {
   try {
     await dbPool.execute(
-      `CREATE TABLE IF NOT EXISTS friend_requests (
-        request_id INT PRIMARY KEY AUTO_INCREMENT,
-        requester_id INT NOT NULL,
-        requestee_id INT NOT NULL,
-        request_timestamp BIGINT NOT NULL,
-        UNIQUE(requester_id, requestee_id),
-        FOREIGN KEY (requester_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
-        FOREIGN KEY (requestee_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
-    );
-  } catch (err: unknown) {
-    console.log(err);
-  }
-}
-
-async function createFriendshipsTable(): Promise<void> {
-  try {
-    await dbPool.execute(
-      `CREATE TABLE IF NOT EXISTS friendships (
-        friendship_id INT PRIMARY KEY AUTO_INCREMENT,
+      `CREATE TABLE IF NOT EXISTS auth_sessions (
+        session_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY,
         account_id INT NOT NULL,
-        friend_id INT NOT NULL,
-        friendship_timestamp BIGINT NOT NULL,
-        UNIQUE(account_id, friend_id),
-        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
-        FOREIGN KEY (friend_id) REFERENCES accounts(account_id) ON DELETE CASCADE
+        created_on_timestamp BIGINT NOT NULL,
+        expiry_timestamp BIGINT NOT NULL,
+        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
   } catch (err: unknown) {
@@ -200,7 +180,8 @@ async function createUnexpectedErrorsTable(): Promise<void> {
         request_path VARCHAR(255),
         error_timestamp BIGINT NOT NULL,
         error_message TEXT,
-        stack_trace TEXT
+        stack_trace TEXT,
+        description VARCHAR(255)
       );`
     );
   } catch (err: unknown) {

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { dbPool } from '../db/db';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { setResponseCookie } from '../util/cookieUtils';
 import { AUTH_SESSIONS_LIMIT, hourMilliseconds } from '../util/constants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
@@ -8,7 +8,7 @@ import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { generateCryptoUuid } from '../util/tokenGenerator';
 
 interface CreateAuthSessionConfig {
-  user_id: number;
+  account_id: number;
   keepSignedIn: boolean;
 }
 
@@ -42,20 +42,20 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
       FROM
         auth_sessions
       WHERE
-        user_id = ?
+        account_id = ?
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
-      [sessionConfig.user_id]
+      [sessionConfig.account_id]
     );
 
     if (sessionRows.length < 3) {
       await connection.execute(
         `INSERT INTO auth_sessions (
           session_id,
-          user_id,
+          account_id,
           created_on_timestamp,
           expiry_timestamp
         ) VALUES (${generatePlaceHolders(4)});`,
-        [newAuthSessionId, sessionConfig.user_id, currentTimestamp, expiryTimestamp]
+        [newAuthSessionId, sessionConfig.account_id, currentTimestamp, expiryTimestamp]
       );
 
       await connection.commit();
@@ -130,7 +130,7 @@ export async function purgeAuthSessions(userId: number, userType: 'account' | 'g
       `DELETE FROM
         auth_sessions
       WHERE
-        user_id = ?
+        account_id = ?
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
       [userId]
     );
