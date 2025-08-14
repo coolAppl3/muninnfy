@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { dbPool } from '../db/db';
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { setResponseCookie } from '../util/cookieUtils';
 import { AUTH_SESSIONS_LIMIT, hourMilliseconds } from '../util/constants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
@@ -23,7 +23,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
   const maxAge: number = sessionConfig.keepSignedIn ? hourMilliseconds * 24 * 7 : hourMilliseconds * 6;
   const expiryTimestamp: number = currentTimestamp + maxAge;
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     connection = await dbPool.getConnection();
