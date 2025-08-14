@@ -7,6 +7,8 @@ interface AccountVerificationEmailTemplate {
 }
 
 export default function accountVerificationEmailTemplate({ displayName, publicAccountId, verificationToken }: AccountVerificationEmailTemplate): string {
+  const origin: string = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://muninnfy.com';
+
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -26,8 +28,8 @@ export default function accountVerificationEmailTemplate({ displayName, publicAc
 
           <p>
             To verify your account, please click the following link:
-            <a href="https://muninnfy.com/verification/sign-up?publicAccountId=${publicAccountId}&verificationToken=${verificationToken}"
-              >https://muninnfy.com/verification/sign-up?publicAccountId=${publicAccountId}&verificationToken=${verificationToken}</a
+            <a href="${origin}/verification/sign-up?publicAccountId=${publicAccountId}&verificationToken=${verificationToken}"
+              >${origin}/verification/sign-up?publicAccountId=${publicAccountId}&verificationToken=${verificationToken}</a
             >.
           </p>
 
