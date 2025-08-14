@@ -10,11 +10,7 @@ export async function deleteAccountById(accountId: number, executor: Pool | Pool
       [accountId]
     );
 
-    if (resultSetHeader.affectedRows === 0) {
-      return false;
-    }
-
-    return true;
+    return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
     return false;
