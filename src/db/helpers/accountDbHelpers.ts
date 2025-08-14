@@ -15,7 +15,7 @@ export async function deleteAccountById(accountId: number, executor: Pool | Pool
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'Failed to delete account.');
+    await logUnexpectedError(req, err, 'failed to delete account');
 
     return false;
   }
@@ -36,7 +36,7 @@ export async function incrementVerificationEmailsSent(verificationId: Readonly<n
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'Failed to increment verification_emails_sent.');
+    await logUnexpectedError(req, err, 'failed to increment verification_emails_sent');
 
     return false;
   }
@@ -57,7 +57,7 @@ export async function incrementFailedVerificationAttempts(verificationId: number
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'Failed to increment failed_verification_attempts');
+    await logUnexpectedError(req, err, 'failed to increment failed_verification_attempts');
 
     return false;
   }
