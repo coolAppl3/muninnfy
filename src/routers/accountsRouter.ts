@@ -254,7 +254,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       return;
     }
 
-    if (!accountDetails.verification_id) {
+    if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
       const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool);
 
       if (!accountDeleted) {
@@ -263,18 +263,6 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       }
 
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-      return;
-    }
-
-    if (accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool);
-
-      if (!accountDeleted) {
-        res.status(500).json({ message: 'Internal server error.' });
-        return;
-      }
-
-      res.status(403).json({ message: 'Too many failed verification attempts.', reason: 'failureLimitReached' });
       return;
     }
 
