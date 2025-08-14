@@ -255,7 +255,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool);
+      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
 
       if (!accountDeleted) {
         res.status(500).json({ message: 'Internal server error.' });
@@ -271,9 +271,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       return;
     }
 
-    const incremented: boolean = await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool);
-    incremented || (await logUnexpectedError(req, null, 'Failed to increment verification_emails_sent.'));
-
+    await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool, req);
     res.json({ publicAccountId: accountDetails.public_account_id });
 
     await sendAccountVerificationEmail({
@@ -366,7 +364,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
       await connection.rollback();
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool);
+      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
 
       if (!accountDeleted) {
         res.status(500).json({ message: 'Internal server error.' });
@@ -404,7 +402,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     await connection.rollback();
 
     if (accountDetails.failed_verification_attempts + 1 >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool);
+      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
 
       if (!accountDeleted) {
         res.status(500).json({ message: 'Internal server error.' });
@@ -415,9 +413,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       return;
     }
 
-    const incremented: boolean = await incrementFailedVerificationAttempts(accountDetails.verification_id, dbPool);
-    incremented || (await logUnexpectedError(req, null, 'Failed to increment failed_verification_attempts.'));
-
+    await incrementFailedVerificationAttempts(accountDetails.verification_id, dbPool, req);
     res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken' });
   } catch (err: unknown) {
     console.log(err);
