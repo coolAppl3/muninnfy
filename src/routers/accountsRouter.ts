@@ -11,7 +11,7 @@ import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_UPDATE_LIMIT, ACCOUNT_VERIFIC
 import { sendAccountVerificationEmail } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
-import { deleteAccountById, incrementFailedVerificationAttempts } from '../db/helpers/accountDbHelpers';
+import { deleteAccountById, incrementFailedVerificationAttempts, incrementVerificationEmailsSent } from '../db/helpers/accountDbHelpers';
 
 export const accountsRouter: Router = express.Router();
 
@@ -271,19 +271,8 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       return;
     }
 
-    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
-      `UPDATE
-        account_verification
-      SET
-        verification_emails_sent = verification_emails_sent + 1
-      WHERE
-        verification_id = ?;`,
-      [accountDetails.verification_id]
-    );
-
-    if (resultSetHeader.affectedRows === 0) {
-      await logUnexpectedError(req, null, 'Failed to increment verification_emails_sent.');
-    }
+    const incremented: boolean = await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool);
+    incremented || (await logUnexpectedError(req, null, 'Failed to increment verification_emails_sent.'));
 
     res.json({});
 
