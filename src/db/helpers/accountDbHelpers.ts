@@ -62,3 +62,24 @@ export async function incrementFailedVerificationAttempts(verificationId: number
     return false;
   }
 }
+
+export async function incrementFailedSignInAttempts(accountId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        accounts
+      SET
+        failed_sign_in_attempts = failed_sign_in_attempts + 1
+      WHERE
+        account_id = ?;`,
+      [accountId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, err, 'failed to increment failed_sign_in_attempts');
+
+    return false;
+  }
+}
