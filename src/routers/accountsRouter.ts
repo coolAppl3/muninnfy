@@ -288,6 +288,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
 
@@ -424,6 +425,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   } finally {
     connection?.release();
   }
