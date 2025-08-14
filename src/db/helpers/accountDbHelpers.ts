@@ -16,3 +16,22 @@ export async function deleteAccountById(accountId: number, executor: Pool | Pool
     return false;
   }
 }
+
+export async function incrementFailedVerificationAttempts(verificationId: number, executor: Pool | PoolConnection): Promise<boolean> {
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        account_verification
+      SET
+        failed_verification_attempts = failed_verification_attempts + 1
+      WHERE
+        verification_id = ?`,
+      [verificationId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    return false;
+  }
+}
