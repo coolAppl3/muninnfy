@@ -1,17 +1,23 @@
 import express, { Router, Request, Response } from 'express';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
-import { isValidDisplayName, isValidEmail, isValidNewPassword, isValidUsername } from '../util/validation/userValidation';
+import { isValidDisplayName, isValidEmail, isValidNewPassword, isValidPassword, isValidUsername } from '../util/validation/userValidation';
 import { getRequestCookie } from '../util/cookieUtils';
 import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
-import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_UPDATE_LIMIT, ACCOUNT_VERIFICATION_WINDOW } from '../util/constants';
+import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_SIGN_IN_LIMIT, ACCOUNT_FAILED_UPDATE_LIMIT, ACCOUNT_VERIFICATION_WINDOW } from '../util/constants';
 import { sendAccountVerificationEmail } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
-import { deleteAccountById, incrementFailedVerificationAttempts, incrementVerificationEmailsSent } from '../db/helpers/accountDbHelpers';
+import {
+  deleteAccountById,
+  incrementFailedVerificationAttempts,
+  incrementVerificationEmailsSent,
+  resetFailedSignInAttempts,
+} from '../db/helpers/accountDbHelpers';
+import { createAuthSession } from '../auth/authSessions';
 
 export const accountsRouter: Router = express.Router();
 
@@ -428,5 +434,116 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     await logUnexpectedError(req, err);
   } finally {
     connection?.release();
+  }
+});
+
+accountsRouter.post('/signIn', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+
+  if (isSignedIn) {
+    res.status(403).json({ message: `You're already signed in.`, reason: 'alreadySignedIn' });
+    return;
+  }
+
+  interface RequestData {
+    email: string;
+    password: string;
+    keepSignedIn: boolean;
+  }
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['email', 'password'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  if (!isValidEmail(requestData.email)) {
+    res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
+    return;
+  }
+
+  if (!isValidPassword(requestData.password)) {
+    res.status(400).json({ message: 'Invalid password.', reason: 'invalidPassword' });
+    return;
+  }
+
+  if (typeof requestData.keepSignedIn !== 'boolean') {
+    requestData.keepSignedIn = false;
+  }
+
+  try {
+    interface AccountDetails extends RowDataPacket {
+      account_id: number;
+      hashed_password: string;
+      is_verified: boolean;
+      failed_sign_in_attempts: number;
+    }
+
+    const [accountRows] = await dbPool.execute<AccountDetails[]>(
+      `SELECT
+        account_id,
+        hashed_password,
+        is_verified,
+        failed_sign_in_attempts
+      FROM
+        accounts
+      WHERE
+        email = ?;`,
+      [requestData.email]
+    );
+
+    const accountDetails: AccountDetails | undefined = accountRows[0];
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found or unverified.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (!accountDetails.is_verified) {
+      res.status(404).json({ message: 'Account not found or unverified.', reason: 'accountNotFound' });
+      return;
+    }
+
+    const isSuspended: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
+    if (isSuspended) {
+      res.status(403).json({ message: 'Account is suspended.', reason: 'accountSuspended' });
+      return;
+    }
+
+    const isCorrectPassword: boolean = await bcrypt.compare(requestData.password, accountDetails.hashed_password);
+    if (!isCorrectPassword) {
+      const incremented: boolean = await incrementFailedVerificationAttempts(accountDetails.account_id, dbPool, req);
+      const hasBeenSuspended: boolean = accountDetails.failed_sign_in_attempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
+
+      res.status(401).json({
+        message: `Incorrect password.${hasBeenSuspended ? ' Account suspended.' : ''}`,
+        reason: hasBeenSuspended ? 'incorrectPassword_suspended' : 'incorrectPassword',
+      });
+
+      return;
+    }
+
+    if (accountDetails.failed_sign_in_attempts > 0) {
+      await resetFailedSignInAttempts(accountDetails.account_id, dbPool, req);
+    }
+
+    const authSessionCreated: boolean = await createAuthSession(res, accountDetails.account_id, requestData.keepSignedIn);
+    if (!authSessionCreated) {
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
