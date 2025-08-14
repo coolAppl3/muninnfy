@@ -7,12 +7,7 @@ import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { generateCryptoUuid } from '../util/tokenGenerator';
 
-interface CreateAuthSessionConfig {
-  account_id: number;
-  keepSignedIn: boolean;
-}
-
-export async function createAuthSession(res: Response, sessionConfig: CreateAuthSessionConfig, attemptCount: number = 1): Promise<boolean> {
+export async function createAuthSession(res: Response, accountId: number, keepSignedIn: boolean, attemptCount: number = 1): Promise<boolean> {
   if (attemptCount > 3) {
     return false;
   }
@@ -20,7 +15,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
   const newAuthSessionId: string = generateCryptoUuid();
   const currentTimestamp: number = Date.now();
 
-  const maxAge: number = sessionConfig.keepSignedIn ? hourMilliseconds * 24 * 7 : hourMilliseconds * 6;
+  const maxAge: number = keepSignedIn ? hourMilliseconds * 24 * 7 : hourMilliseconds * 6;
   const expiryTimestamp: number = currentTimestamp + maxAge;
 
   let connection: PoolConnection | null = null;
@@ -44,7 +39,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
       WHERE
         account_id = ?
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
-      [sessionConfig.account_id]
+      [accountId]
     );
 
     if (sessionRows.length < 3) {
@@ -55,7 +50,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
           created_on_timestamp,
           expiry_timestamp
         ) VALUES (${generatePlaceHolders(4)});`,
-        [newAuthSessionId, sessionConfig.account_id, currentTimestamp, expiryTimestamp]
+        [newAuthSessionId, accountId, currentTimestamp, expiryTimestamp]
       );
 
       await connection.commit();
@@ -101,7 +96,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'PRIMARY'`)) {
-      return await createAuthSession(res, sessionConfig, ++attemptCount);
+      return await createAuthSession(res, accountId, keepSignedIn, ++attemptCount);
     }
 
     return false;
