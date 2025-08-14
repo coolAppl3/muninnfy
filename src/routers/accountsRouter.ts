@@ -274,7 +274,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     const incremented: boolean = await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool);
     incremented || (await logUnexpectedError(req, null, 'Failed to increment verification_emails_sent.'));
 
-    res.json({});
+    res.json({ publicAccountId: accountDetails.public_account_id });
 
     await sendAccountVerificationEmail({
       receiver: accountDetails.email,
