@@ -1,7 +1,7 @@
 import { dbPool } from '../db/db';
 import { dayMilliseconds } from '../util/constants';
 
-export async function clearErrorLogs(currentTimestamp: number): Promise<void> {
+export async function clearErrorLogsCron(currentTimestamp: number): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM

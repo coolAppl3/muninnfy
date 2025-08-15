@@ -1,7 +1,7 @@
 import { dbPool } from '../db/db';
 import { REQUESTS_RATE_LIMIT, hourMilliseconds, LIGHT_DAILY_RATE_ABUSE_COUNT, minuteMilliseconds } from '../util/constants';
 
-export async function replenishRateRequests(currentTimestamp: number): Promise<void> {
+export async function replenishRateRequestsCron(currentTimestamp: number): Promise<void> {
   const requestsToReplenish: number = REQUESTS_RATE_LIMIT / 2;
 
   try {
@@ -36,7 +36,7 @@ export async function removeStaleRateTrackerRows(): Promise<void> {
   }
 }
 
-export async function removeLightRateAbusers(currentTimestamp: number): Promise<void> {
+export async function removeLightRateAbusersCron(currentTimestamp: number): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
