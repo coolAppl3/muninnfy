@@ -64,7 +64,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: 'You must sign out before being able to create a new account.', reason: 'signedIn' });
+    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -439,7 +439,6 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
 
 accountsRouter.post('/signIn', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
-
   if (isSignedIn) {
     res.status(403).json({ message: `You're already signed in.`, reason: 'alreadySignedIn' });
     return;
