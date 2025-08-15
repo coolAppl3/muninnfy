@@ -59,7 +59,17 @@ export async function createAuthSession(res: Response, accountId: number, keepSi
       return true;
     }
 
-    const oldestAuthSession: SessionDetails | undefined = sessionRows.sort((a, b) => a.created_on_timestamp - b.created_on_timestamp)[0];
+    const oldestAuthSession: SessionDetails | null = sessionRows.reduce((oldest: SessionDetails | null, current: SessionDetails) => {
+      if (!oldest) {
+        return current;
+      }
+
+      if (current.created_on_timestamp < oldest.created_on_timestamp) {
+        return current;
+      }
+
+      return oldest;
+    }, null);
 
     if (!oldestAuthSession) {
       await connection.rollback();
