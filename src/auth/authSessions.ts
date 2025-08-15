@@ -1,18 +1,13 @@
 import { Response } from 'express';
 import { dbPool } from '../db/db';
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { setResponseCookie } from '../util/cookieUtils';
 import { AUTH_SESSIONS_LIMIT, hourMilliseconds } from '../util/constants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { generateCryptoUuid } from '../util/tokenGenerator';
 
-interface CreateAuthSessionConfig {
-  account_id: number;
-  keepSignedIn: boolean;
-}
-
-export async function createAuthSession(res: Response, sessionConfig: CreateAuthSessionConfig, attemptCount: number = 1): Promise<boolean> {
+export async function createAuthSession(res: Response, accountId: number, keepSignedIn: boolean, attemptCount: number = 1): Promise<boolean> {
   if (attemptCount > 3) {
     return false;
   }
@@ -20,10 +15,10 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
   const newAuthSessionId: string = generateCryptoUuid();
   const currentTimestamp: number = Date.now();
 
-  const maxAge: number = sessionConfig.keepSignedIn ? hourMilliseconds * 24 * 7 : hourMilliseconds * 6;
+  const maxAge: number = keepSignedIn ? hourMilliseconds * 24 * 7 : hourMilliseconds * 6;
   const expiryTimestamp: number = currentTimestamp + maxAge;
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     connection = await dbPool.getConnection();
@@ -44,7 +39,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
       WHERE
         account_id = ?
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
-      [sessionConfig.account_id]
+      [accountId]
     );
 
     if (sessionRows.length < 3) {
@@ -55,7 +50,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
           created_on_timestamp,
           expiry_timestamp
         ) VALUES (${generatePlaceHolders(4)});`,
-        [newAuthSessionId, sessionConfig.account_id, currentTimestamp, expiryTimestamp]
+        [newAuthSessionId, accountId, currentTimestamp, expiryTimestamp]
       );
 
       await connection.commit();
@@ -64,7 +59,17 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
       return true;
     }
 
-    const oldestAuthSession: SessionDetails | undefined = sessionRows.sort((a, b) => a.created_on_timestamp - b.created_on_timestamp)[0];
+    const oldestAuthSession: SessionDetails | null = sessionRows.reduce((oldest: SessionDetails | null, current: SessionDetails) => {
+      if (!oldest) {
+        return current;
+      }
+
+      if (current.created_on_timestamp < oldest.created_on_timestamp) {
+        return current;
+      }
+
+      return oldest;
+    }, null);
 
     if (!oldestAuthSession) {
       await connection.rollback();
@@ -101,7 +106,7 @@ export async function createAuthSession(res: Response, sessionConfig: CreateAuth
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'PRIMARY'`)) {
-      return await createAuthSession(res, sessionConfig, ++attemptCount);
+      return await createAuthSession(res, accountId, keepSignedIn, ++attemptCount);
     }
 
     return false;

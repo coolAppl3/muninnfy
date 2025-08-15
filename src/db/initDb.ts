@@ -28,8 +28,7 @@ async function createAccountsTable(): Promise<void> {
         display_name VARCHAR(40) NOT NULL,
         created_on_timestamp BIGINT NOT NULL,
         is_verified BOOLEAN NOT NULL,
-        failed_sign_in_attempts INT NOT NULL CHECK(failed_sign_in_attempts <= 5),
-        INDEX idx_public_account_id (public_account_id)
+        failed_sign_in_attempts INT NOT NULL CHECK(failed_sign_in_attempts <= 5)
       );`
     );
   } catch (err: unknown) {

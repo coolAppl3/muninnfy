@@ -1,19 +1,32 @@
 import cron from 'node-cron';
 
-import { removeLightRateAbusers, replenishRateRequests } from './rateLimiterCronJobs';
+import { removeLightRateAbusersCron, replenishRateRequestsCron } from './rateLimiterCronJobs';
 import { minuteMilliseconds } from '../util/constants';
-import { clearErrorLogs } from '../logs/errorLoggerCronJobs';
+import { clearErrorLogsCron } from '../logs/errorLoggerCronJobs';
+import { deleteStaleAccountVerificationRequestsCron, deleteUnverifiedAccountsCron } from './accountCronJobs';
 
 export function initCronJobs(): void {
   // every 30 seconds
   setInterval(async () => {
-    await replenishRateRequests();
+    const currentTimestamp: number = Date.now();
+
+    await replenishRateRequestsCron(currentTimestamp);
   }, minuteMilliseconds / 2);
+
+  // every minute
+  cron.schedule('0 * * * *', async () => {
+    const currentTimestamp: number = Date.now();
+
+    await deleteUnverifiedAccountsCron(currentTimestamp);
+    await deleteStaleAccountVerificationRequestsCron(currentTimestamp);
+  });
 
   // every day
   cron.schedule('0 0 * * *', async () => {
-    await removeLightRateAbusers();
-    await clearErrorLogs();
+    const currentTimestamp: number = Date.now();
+
+    await removeLightRateAbusersCron(currentTimestamp);
+    await clearErrorLogsCron(currentTimestamp);
   });
 
   console.log('CRON jobs started.');

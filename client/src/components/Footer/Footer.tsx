@@ -12,7 +12,7 @@ export default function Footer(): JSX.Element {
         <div className='footer-container grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3'>
           <div>
             <Link to='/home'>
-              <div className='w-fit flex justify-start items-start gap-1 mb-1 xs:mb-2'>
+              <div className='w-fit flex justify-center items-center gap-1 mb-1 xs:mb-2'>
                 <img
                   className='w-3 h-3'
                   src={Logo}
