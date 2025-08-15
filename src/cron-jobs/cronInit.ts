@@ -3,7 +3,7 @@ import cron from 'node-cron';
 import { removeLightRateAbusersCron, replenishRateRequestsCron } from './rateLimiterCronJobs';
 import { minuteMilliseconds } from '../util/constants';
 import { clearErrorLogsCron } from '../logs/errorLoggerCronJobs';
-import { deleteUnverifiedAccountsCron } from './accountCronJobs';
+import { deleteStaleAccountVerificationRequestsCron, deleteUnverifiedAccountsCron } from './accountCronJobs';
 
 export function initCronJobs(): void {
   // every 30 seconds
@@ -18,6 +18,7 @@ export function initCronJobs(): void {
     const currentTimestamp: number = Date.now();
 
     await deleteUnverifiedAccountsCron(currentTimestamp);
+    await deleteStaleAccountVerificationRequestsCron(currentTimestamp);
   });
 
   // every day
