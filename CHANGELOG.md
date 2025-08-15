@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.0.7] (2024-08-15)
+
+### Features
+
+- Added type definitions to connections created for transactions.
+- Added `incrementFailedVerificationAttempts()` helper.
+- Added PATCH `accounts/verification/verify`.
+- Added `incrementVerificationEmailsSent()` helper.
+- Added `incrementFailedSignInAttempts()` helper.
+- Added `resetFailedSignInAttempts()` helper.
+- Added POST `accounts/signIn`.
+- Reduced time complexity of finding the oldest auth session in `createAuthSession()` from `O(n log n)` to `O(n)`.
+- Added `deleteUnverifiedAccountsCron()`.
+- Added `deleteStaleAccountVerificationRequestsCron()`.
+
+
+### Bug Fixes
+
+- Fixed misalignment between the title and logo in the `Footer` component.
+- Fixed verification emails not being sent with the account's public account ID.
+- Fixed a few endpoints not calling `logUnexpectedError()` when catching an unexpected error.
+
+
+### Code Refactoring
+
+- Refactored `accountVerificationEmailTemplate()` to set the origin to `localhost` for development environments.
+- Refactored PATCH `accounts/verification/resendEmail` to return a 404 if the account is deleted due to too many failed verification attempts.
+- Refactored PATCH `accounts/verification/resendEmail` to return `publicAccountId` on successful responses.
+- Refactored `createAuthSession()` to use direct parameters instead of a config object.
+- Refactored cron-job functions to receive their timestamp from the scheduler to tighten their behavior.
+- Added `Cron` suffix to all cron-job functions.
+- Removed unnecessary index definition for `public_account_id` field in `accounts` table, since it's automatically indexed by the `UNIQUE` constraint.
+- Other minor refactors.
+
+
+### Build Changes
+
+- Changed `target` in `tsconfig.json` to `esnext`.
+
+
+### Documentation Changes
+
+- Added missing patch note in previous patch.
+
+
 ## [0.0.6] (2024-08-14)
 
 ### Features
@@ -38,6 +83,7 @@
 - Reworked `isValidAuthSessionId()` as `isValidUuid()` under `tokenGenerator`.
   - Fixed it validating the old structure of an auth session Id in the process.
 - Refactored POST `accounts/signUp` to return a `201` instead of `200` as a successful response.
+- Refactored imports from `mysql` to `mysql/promise` to prevent type-related inconsistencies.
 
 
 ## [0.0.5] (2024-08-12)
