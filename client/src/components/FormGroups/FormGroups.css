@@ -1,0 +1,49 @@
+@reference '../../index.css';
+
+.form-group {
+  @apply flex flex-col justify-center items-start gap-[6px];
+
+  label {
+    @apply text-sm font-medium text-title;
+  }
+
+  input {
+    @apply w-full h-4 p-1 rounded border-1 border-description/70 outline-0 focus:!border-cta text-description font-medium md:text-sm transition-colors;
+  }
+
+  .password-input-container {
+    @apply relative w-full;
+
+    input {
+      @apply pr-4;
+    }
+
+    button {
+      @apply absolute right-0 top-0 bottom-0 my-auto cursor-pointer p-1 transition-colors;
+
+      &:hover {
+        svg {
+          @apply text-cta;
+        }
+      }
+
+      svg {
+        @apply w-2 h-2 text-description transition-colors;
+      }
+    }
+  }
+
+  .error-span {
+    @apply text-[12px] font-medium text-danger leading-[1.2] break-words hidden;
+  }
+
+  &.error {
+    input {
+      @apply border-danger;
+    }
+
+    .error-span {
+      @apply block;
+    }
+  }
+}
