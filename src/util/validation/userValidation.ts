@@ -55,6 +55,6 @@ export function isValidDisplayName(displayName: any): boolean {
     return false;
   }
 
-  const regex: RegExp = /^[A-Za-z ]{1,25}$/;
+  const regex: RegExp = /^(?=.{1,25}$)(?!.*  )[A-Za-z]+(?: [A-Za-z]+)*$/;
   return regex.test(displayName);
 }
