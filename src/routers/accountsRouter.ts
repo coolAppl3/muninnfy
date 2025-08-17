@@ -7,7 +7,12 @@ import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
-import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_SIGN_IN_LIMIT, ACCOUNT_FAILED_UPDATE_LIMIT, ACCOUNT_VERIFICATION_WINDOW } from '../util/constants';
+import {
+  ACCOUNT_EMAILS_SENT_LIMIT,
+  ACCOUNT_FAILED_SIGN_IN_LIMIT,
+  ACCOUNT_FAILED_UPDATE_LIMIT,
+  ACCOUNT_VERIFICATION_WINDOW,
+} from '../util/constants';
 import { sendAccountVerificationEmail } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
@@ -278,7 +283,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool, req);
-    res.json({ publicAccountId: accountDetails.public_account_id });
+    res.json({});
 
     await sendAccountVerificationEmail({
       receiver: accountDetails.email,
