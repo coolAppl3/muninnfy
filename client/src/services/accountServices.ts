@@ -34,3 +34,13 @@ interface VerifyAccountPayload {
 export function verifyAccountService(body: VerifyAccountPayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/verification/verify`, body);
 }
+
+interface SignInPayload {
+  email: string;
+  password: string;
+  keepSignedIn: boolean;
+}
+
+export function signInService(body: SignInPayload): Promise<AxiosResponse> {
+  return axios.post(`${accountsApiUrl}/signIn`, body);
+}
