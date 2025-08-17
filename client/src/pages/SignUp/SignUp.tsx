@@ -4,6 +4,7 @@ import Container from '../../components/Container/Container';
 import { DefaultFormGroup, PasswordFormGroup } from '../../components/FormGroups/FormGroups';
 import Button from '../../components/Button/Button';
 import { initialSignUpFormValidationState, signUpFormValidationReducer } from './signUpFormValidationReducer';
+import { Link } from 'react-router-dom';
 
 interface FormState {
   isSubmitting: boolean;
@@ -31,7 +32,7 @@ export default function SignUp(): JSX.Element {
 
             <form
               id='sign-up-form'
-              className='grid grid-cols-1 gap-2'
+              className='grid grid-cols-1 gap-2 mb-2'
               onSubmit={async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
 
@@ -92,6 +93,29 @@ export default function SignUp(): JSX.Element {
                 Submit
               </Button>
             </form>
+
+            <div className='text-description text-sm'>
+              <p className='mb-[4px]'>
+                Already have an account?{' '}
+                <Link
+                  to='/sign-in'
+                  className='link'
+                >
+                  Sign in
+                </Link>{' '}
+                instead.
+              </p>
+              <p>
+                Trying to verify your account?{' '}
+                <Link
+                  to='/verification/account'
+                  className='link'
+                >
+                  Continue your account verification
+                </Link>
+                .
+              </p>
+            </div>
           </div>
         </Container>
       </section>
