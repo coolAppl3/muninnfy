@@ -17,3 +17,11 @@ interface SignUpServiceData {
 export function signUpService(body: SignUpServicePayload): Promise<AxiosResponse<SignUpServiceData>> {
   return axios.post(`${accountsApiUrl}/signUp`, body);
 }
+
+interface ResendVerificationEmailPayload {
+  publicAccountId: string;
+}
+
+export function resendAccountVerificationEmailService(body: ResendVerificationEmailPayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/verification/resendEmail`, body);
+}
