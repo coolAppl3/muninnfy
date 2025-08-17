@@ -3,6 +3,7 @@ import { Location, Outlet, useLocation } from 'react-router-dom';
 import './App.css';
 import Navbars from './components/Navbars/Navbars';
 import Footer from './components/Footer/Footer';
+import Providers from './Providers';
 
 export default function App(): JSX.Element {
   const { pathname }: Location = useLocation();
@@ -11,10 +12,10 @@ export default function App(): JSX.Element {
   }, [pathname]);
 
   return (
-    <>
+    <Providers>
       <Navbars />
       <Outlet />
       <Footer />
-    </>
+    </Providers>
   );
 }
