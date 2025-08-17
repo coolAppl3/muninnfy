@@ -25,3 +25,12 @@ interface ResendVerificationEmailPayload {
 export function resendAccountVerificationEmailService(body: ResendVerificationEmailPayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/verification/resendEmail`, body);
 }
+
+interface VerifyAccountPayload {
+  publicAccountId: string;
+  verificationToken: string;
+}
+
+export function verifyAccountService(body: VerifyAccountPayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/verification/verify`, body);
+}
