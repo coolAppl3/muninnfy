@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { validateDisplayName, validateEmail, validateNewPassword, validateUsername } from '../../utils/validation';
+import { validateDisplayName, validateEmail, validateNewPassword, validatePassword, validateUsername } from '../../utils/validation';
 
 interface FormData {
   displayName: string;
@@ -41,17 +41,35 @@ export const initialSignUpFormValidationState: FormValidationState = {
 };
 
 interface Action {
-  type: 'UPDATE_FIELD';
-  payload: ChangeEvent<HTMLInputElement>;
+  type: 'UPDATE_FIELD' | 'VALIDATE_ALL_FIELDS';
+  payload: ChangeEvent<HTMLInputElement> | null;
 }
 
 export function signUpFormValidationReducer(state: FormValidationState, action: Action): FormValidationState {
   const { type, payload } = action;
-  const { name, value } = payload.target;
 
-  if (type !== 'UPDATE_FIELD') {
+  if (type === 'VALIDATE_ALL_FIELDS') {
+    const { displayName, username, email, password, confirmPassword } = state.formData;
+
+    const updatedState: FormValidationState = {
+      ...state,
+      formErrors: {
+        displayName: validateDisplayName(displayName),
+        username: validateUsername(username),
+        email: validateEmail(email),
+        password: validatePassword(password),
+        confirmPassword: confirmPassword === password ? null : `Passwords don't match.`,
+      },
+    };
+
+    return updatedState;
+  }
+
+  if (!payload) {
     return state;
   }
+
+  const { name, value } = payload.target;
 
   if (name === 'displayName' || name === 'username' || name === 'email') {
     const updatedState: FormValidationState = {
