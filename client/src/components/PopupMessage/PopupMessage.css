@@ -1,0 +1,49 @@
+@reference '../../index.css';
+
+.popup-message {
+  @apply fixed top-8 left-0 right-0 mx-auto z-35 flex justify-center items-center w-fit;
+
+  span {
+    @apply py-1 px-[1.4rem] mx-2 w-fit max-w-[32rem] rounded shadow-simple-tiny md:text-sm font-bold text-center text-dark;
+
+    opacity: 0;
+    transition: transform 150ms, opacity 150ms;
+    animation: slideUp 2000ms forwards;
+
+    &.success {
+      @apply bg-success border-success;
+    }
+
+    &.error {
+      @apply bg-danger-popup border-danger;
+    }
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -3rem, 0);
+  }
+
+  6.5% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  93.5% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* temp */
+  /* 100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  } */
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -3rem, 0);
+  }
+}
