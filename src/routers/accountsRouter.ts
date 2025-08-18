@@ -27,6 +27,12 @@ import { createAuthSession } from '../auth/authSessions';
 export const accountsRouter: Router = express.Router();
 
 accountsRouter.post('/signUp', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    return;
+  }
+
   interface RequestData {
     email: string;
     username: string;
@@ -64,12 +70,6 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
   if (requestData.username === requestData.password) {
     res.status(409).json({ message: 'Username and password must not be identical.', reason: 'passwordMatchesUsername' });
-    return;
-  }
-
-  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
-  if (isSignedIn) {
-    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
