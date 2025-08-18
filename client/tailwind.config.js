@@ -13,8 +13,9 @@ module.exports = {
         'light-gray': 'rgba(200, 200, 200, 0.25)',
         overlay: 'rgba(30, 30, 30, 0.8)',
         danger: '#f87171',
-        success: '#28a745',
+        success: '#3ACF5D',
         edit: '#0062CC',
+        'danger-popup': '#F98A8A',
       },
 
       borderWidth: {
