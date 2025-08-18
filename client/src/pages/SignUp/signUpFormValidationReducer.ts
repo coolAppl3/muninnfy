@@ -40,12 +40,25 @@ export const initialSignUpFormValidationState: FormValidationState = {
   },
 };
 
-interface Action {
-  type: 'UPDATE_FIELD' | 'VALIDATE_ALL_FIELDS';
-  payload: ChangeEvent<HTMLInputElement> | null;
+interface ValidateField {
+  type: 'VALIDATE_FIELD';
+  payload: ChangeEvent<HTMLInputElement>;
 }
 
-export function signUpFormValidationReducer(state: FormValidationState, action: Action): FormValidationState {
+interface ValidateAllFields {
+  type: 'VALIDATE_ALL_FIELDS';
+  payload: null;
+}
+
+interface AddFieldError {
+  type: 'ADD_FIELD_ERROR';
+  payload: { errMessage: string; errReason: string };
+}
+
+export function signUpFormValidationReducer(
+  state: FormValidationState,
+  action: ValidateField | ValidateAllFields | AddFieldError
+): FormValidationState {
   const { type, payload } = action;
 
   if (type === 'VALIDATE_ALL_FIELDS') {
@@ -65,8 +78,35 @@ export function signUpFormValidationReducer(state: FormValidationState, action: 
     return updatedState;
   }
 
-  if (!payload) {
-    return state;
+  if (type === 'ADD_FIELD_ERROR') {
+    const { errMessage, errReason } = payload;
+
+    const inputRecord: Record<string, string> = {
+      invalidEmail: 'email',
+      invalidUsername: 'username',
+      invalidPassword: 'password',
+      invalidDisplayName: 'displayName',
+
+      emailTaken: 'email',
+      usernameTaken: 'username',
+      passwordMatchesUsername: 'password',
+    };
+
+    const fieldName: string | undefined = inputRecord[errReason];
+
+    if (!fieldName) {
+      return state;
+    }
+
+    const updatedState: FormValidationState = {
+      ...state,
+      formErrors: {
+        ...state.formErrors,
+        [inputRecord[errReason]]: errMessage,
+      },
+    };
+
+    return updatedState;
   }
 
   const { name, value } = payload.target;
