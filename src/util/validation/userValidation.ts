@@ -5,7 +5,8 @@ export function isValidEmail(email: any): boolean {
     return false;
   }
 
-  const regex: RegExp = /^(?=.{6,254}$)[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]{0,64}@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.[a-zA-Z]{2,}?(?:\.[a-zA-Z]{2,})*$/;
+  const regex: RegExp =
+    /^(?=.{6,254}$)[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]{0,64}@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.[a-zA-Z]{2,}?(?:\.[a-zA-Z]{2,})*$/;
   return regex.test(email);
 }
 
@@ -54,6 +55,6 @@ export function isValidDisplayName(displayName: any): boolean {
     return false;
   }
 
-  const regex: RegExp = /^[A-Za-z ]{1,25}$/;
+  const regex: RegExp = /^(?=.{1,25}$)(?!.*  )[A-Za-z]+(?: [A-Za-z]+)*$/;
   return regex.test(displayName);
 }

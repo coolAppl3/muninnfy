@@ -23,7 +23,7 @@
       @apply flex justify-start items-center gap-1 mb-2 shrink-0;
 
       h3 {
-        @apply text-title text-md font-bold break-words;
+        @apply text-title text-md font-bold;
       }
     }
 

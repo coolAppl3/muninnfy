@@ -7,7 +7,12 @@ import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
-import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_SIGN_IN_LIMIT, ACCOUNT_FAILED_UPDATE_LIMIT, ACCOUNT_VERIFICATION_WINDOW } from '../util/constants';
+import {
+  ACCOUNT_EMAILS_SENT_LIMIT,
+  ACCOUNT_FAILED_SIGN_IN_LIMIT,
+  ACCOUNT_FAILED_UPDATE_LIMIT,
+  ACCOUNT_VERIFICATION_WINDOW,
+} from '../util/constants';
 import { sendAccountVerificationEmail } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
@@ -22,6 +27,12 @@ import { createAuthSession } from '../auth/authSessions';
 export const accountsRouter: Router = express.Router();
 
 accountsRouter.post('/signUp', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    return;
+  }
+
   interface RequestData {
     email: string;
     username: string;
@@ -59,12 +70,6 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
   if (requestData.username === requestData.password) {
     res.status(409).json({ message: 'Username and password must not be identical.', reason: 'passwordMatchesUsername' });
-    return;
-  }
-
-  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
-  if (isSignedIn) {
-    res.status(403).json({ message: 'You must sign out before being able to create a new account.', reason: 'signedIn' });
     return;
   }
 
@@ -278,7 +283,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool, req);
-    res.json({ publicAccountId: accountDetails.public_account_id });
+    res.json({});
 
     await sendAccountVerificationEmail({
       receiver: accountDetails.email,
@@ -439,7 +444,6 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
 
 accountsRouter.post('/signIn', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
-
   if (isSignedIn) {
     res.status(403).json({ message: `You're already signed in.`, reason: 'alreadySignedIn' });
     return;

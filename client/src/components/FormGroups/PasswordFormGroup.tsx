@@ -1,0 +1,46 @@
+import { ChangeEventHandler, JSX, useState } from 'react';
+import EyeIcon from '../../assets/svg/EyeIcon.svg?react';
+import './FormGroups.css';
+
+interface PasswordFormGroupProps {
+  id: string;
+  label: string;
+  value: string;
+  errorMessage: string | null;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+}
+
+export default function PasswordFormGroup({ id, label, value, errorMessage, onChange }: PasswordFormGroupProps): JSX.Element {
+  const [isPasswordType, setIsPasswordType] = useState<boolean>(true);
+
+  function handleClick(): void {
+    setIsPasswordType((prev) => !prev);
+  }
+
+  return (
+    <div className={`form-group ${errorMessage ? 'error' : ''}`}>
+      <label htmlFor={id}>{label}</label>
+      <div className='password-input-container'>
+        <input
+          type={isPasswordType ? 'password' : 'text'}
+          name={id}
+          id={id}
+          autoComplete='current-password'
+          value={value}
+          onChange={onChange}
+        />
+
+        <button
+          type='button'
+          onClick={handleClick}
+          title={`${isPasswordType ? 'Reveal' : 'Hide'} password.`}
+          aria-label={`${isPasswordType ? 'Reveal' : 'Hide'} password.`}
+        >
+          <EyeIcon />
+        </button>
+      </div>
+
+      <span className='error-span'>{errorMessage}</span>
+    </div>
+  );
+}
