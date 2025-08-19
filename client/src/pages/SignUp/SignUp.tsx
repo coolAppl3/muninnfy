@@ -1,7 +1,6 @@
 import { ChangeEvent, FormEvent, JSX, useReducer, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
-import { DefaultFormGroup, PasswordFormGroup } from '../../components/FormGroups/FormGroups';
 import Button from '../../components/Button/Button';
 import { initialSignUpFormValidationState, signUpFormValidationReducer } from './signUpFormValidationReducer';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
@@ -9,6 +8,8 @@ import { useLoadingOverlay } from '../../hooks/useLoadingOverlay';
 import { signUpService } from '../../services/accountServices';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
+import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
+import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
