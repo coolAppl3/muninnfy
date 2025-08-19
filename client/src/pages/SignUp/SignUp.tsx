@@ -25,6 +25,7 @@ export default function SignUp(): JSX.Element {
     try {
       const publicAccountId: string = (await signUpService({ displayName, username, email, password })).data.publicAccountId;
       navigate(`/verification/sign-up?publicAccountId=${publicAccountId}`);
+
       displayPopupMessage('Account created.', 'success');
     } catch (err: unknown) {
       console.log(err);
@@ -48,15 +49,9 @@ export default function SignUp(): JSX.Element {
         return;
       }
 
-      if (status !== 400 && status !== 409) {
-        return;
+      if (status === 400 || status === 409) {
+        errReason && dispatch({ type: 'ADD_FIELD_ERROR', payload: { errMessage, errReason } });
       }
-
-      if (!errReason) {
-        return;
-      }
-
-      dispatch({ type: 'ADD_FIELD_ERROR', payload: { errMessage, errReason } });
     }
   }
 
