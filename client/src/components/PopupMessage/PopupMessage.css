@@ -8,7 +8,7 @@
 
     opacity: 0;
     transition: transform 150ms, opacity 150ms;
-    animation: slideUp 2000ms forwards;
+    animation: slideDown 2000ms forwards;
 
     &.success {
       @apply bg-success border-success;
@@ -20,7 +20,7 @@
   }
 }
 
-@keyframes slideUp {
+@keyframes slideDown {
   0% {
     opacity: 0;
     transform: translate3d(0, -3rem, 0);
