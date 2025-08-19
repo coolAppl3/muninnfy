@@ -43,6 +43,11 @@ export default function SignUp(): JSX.Element {
         return;
       }
 
+      if (status === 429) {
+        displayPopupMessage('Too many requests.', 'error');
+        return;
+      }
+
       if (status !== 400 && status !== 409) {
         return;
       }
