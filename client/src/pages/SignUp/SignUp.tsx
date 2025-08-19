@@ -24,6 +24,7 @@ export default function SignUp(): JSX.Element {
     try {
       const publicAccountId: string = (await signUpService({ displayName, username, email, password })).data.publicAccountId;
       navigate(`/verification/sign-up?publicAccountId=${publicAccountId}`);
+      displayPopupMessage('Account created.', 'success');
     } catch (err: unknown) {
       console.log(err);
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
