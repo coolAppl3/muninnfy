@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.0.8] (2024-08-19)
+
+### Features
+
+- Added `DefaultFormGroup` component.
+- Added `PasswordFormGroup` component.
+- Added `validation` utility module.
+- Added `signUpService()`.
+- Added `resendAccountVerificationEmailService()`.
+- Added `verifyAccountService()`.
+- Added `signInService()`.
+- Added `Providers` and wrapped `App` with it.
+- Added `LoadingOverlayContext`, `LoadingOverlayProvider`, and `useLoadingOverlay()` custom hook.
+- Improved `signUpFormValidationReducer` and added more action types.
+- Added `PopupMessage` component.
+- Added `PopupMessageContext`, `PopupMessageProvider`, and `usePopupMessage()` custom hook.
+- Added `errorUtils` utility module.
+- Implemented sign up logic to `SignUp` page component.
+
+
+### Bug Fixes
+
+- Fixed logical flaws with the regex in `isValidDisplayName()`.
+
+
+### Code Refactoring
+
+- Refactored `success` color, and added `popup-danger` color in `tailwind.config.json`.
+- Other minor refactors.
+
+
+### Build Changes
+
+- Added `axios`.
+
+
 ## [0.0.7] (2024-08-15)
 
 ### Features
