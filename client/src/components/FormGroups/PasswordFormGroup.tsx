@@ -1,5 +1,6 @@
 import { ChangeEventHandler, JSX, useState } from 'react';
 import EyeIcon from '../../assets/svg/EyeIcon.svg?react';
+import EyeShutIcon from '../../assets/svg/EyeShutIcon.svg?react';
 import './FormGroups.css';
 
 interface PasswordFormGroupProps {
@@ -36,7 +37,7 @@ export default function PasswordFormGroup({ id, label, value, errorMessage, onCh
           title={`${isPasswordType ? 'Reveal' : 'Hide'} password.`}
           aria-label={`${isPasswordType ? 'Reveal' : 'Hide'} password.`}
         >
-          <EyeIcon />
+          {isPasswordType ? <EyeIcon /> : <EyeShutIcon />}
         </button>
       </div>
 
