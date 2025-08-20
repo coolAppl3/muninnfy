@@ -1,11 +1,11 @@
 import { useContext } from 'react';
-import { LoadingOverlayContext, LoadingOverlayContextInterface } from '../contexts/LoadingOverlayContext';
+import LoadingOverlayContext, { LoadingOverlayContextInterface } from '../contexts/LoadingOverlayContext';
 
-export function useLoadingOverlay(): LoadingOverlayContextInterface {
-  const context = useContext(LoadingOverlayContext);
+export default function useLoadingOverlay(): LoadingOverlayContextInterface {
+  const context = useContext<LoadingOverlayContextInterface | null>(LoadingOverlayContext);
 
   if (!context) {
-    throw new Error('');
+    throw new Error('useLoadingOverlay must be used within a LoadingOverlayProvider.');
   }
 
   return context;

@@ -4,7 +4,7 @@ import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
 import { initialSignUpFormValidationState, signUpFormValidationReducer } from './signUpFormValidationReducer';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
-import { useLoadingOverlay } from '../../hooks/useLoadingOverlay';
+import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { signUpService } from '../../services/accountServices';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
@@ -75,7 +75,7 @@ export default function SignUp(): JSX.Element {
 
       <section className='py-4 h-available flex justify-center items-center'>
         <Container>
-          <div className='py-3 px-2  bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
+          <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
             <h1 className='text-title text-xl 3xs:text-2xl font-bold text-center'>Sign up to Muninnfy</h1>
             <div className='h-line my-2'></div>
 

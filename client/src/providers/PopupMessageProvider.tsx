@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import PopupMessage from '../components/PopupMessage/PopupMessage';
-import { PopupMessageContext } from '../contexts/PopupMessageContext';
+import PopupMessageContext from '../contexts/PopupMessageContext';
 
-export default function PopupMessageProvider({ children }: { children: React.ReactNode }) {
+export default function PopupMessageProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [visible, setVisible] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [type, setType] = useState<'success' | 'error'>('success');
@@ -20,13 +20,13 @@ export default function PopupMessageProvider({ children }: { children: React.Rea
       return;
     }
 
-    const timer = setTimeout(() => {
+    const timeoutId: number = setTimeout(() => {
       setVisible(false);
       setMessage('');
       setType('success');
     }, 2000);
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timeoutId);
   });
 
   return (
