@@ -10,6 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
+    "noUncheckedIndexedAccess": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
     "types": []
   },
   "include": ["src", "globals.d.ts", "vite-env.d.ts"],
