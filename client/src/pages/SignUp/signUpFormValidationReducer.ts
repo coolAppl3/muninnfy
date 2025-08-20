@@ -102,7 +102,7 @@ export function signUpFormValidationReducer(
       ...state,
       formErrors: {
         ...state.formErrors,
-        [inputRecord[errReason]]: errMessage,
+        [fieldName]: errMessage,
       },
     };
 
