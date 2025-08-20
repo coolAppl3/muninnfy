@@ -51,25 +51,3 @@
     transform: translate3d(0, 0, 0);
   }
 }
-
-/* @keyframes slideUp {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, -3rem, 0);
-  }
-
-  6.5% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-
-  93.5% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate3d(0, -3rem, 0);
-  }
-} */
