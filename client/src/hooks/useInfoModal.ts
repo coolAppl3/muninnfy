@@ -5,7 +5,7 @@ export default function useInfoModal(): InfoModalContextInterface {
   const context = useContext<InfoModalContextInterface | null>(InfoModalContext);
 
   if (!context) {
-    throw new Error('useInfoModal must be used withing InfoModalContext.');
+    throw new Error('useInfoModal must be used within InfoModalContext.');
   }
 
   return context;
