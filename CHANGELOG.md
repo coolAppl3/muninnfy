@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.0.9] (2024-08-21)
+
+### Features
+
+- Added `ConfirmModal` component.
+- Added `ConfirmModalContext`, `ConfirmModalProvider`, and `useConfirmModal()` custom hook.
+- Added `InfoModal` component.
+- Added `InfoModalContext`, `InfoModalProvider`, and `useInfoModal()` custom hook.
+- Added `EyeShutIcon` SVG.
+- Implemented logic to swap between the `EyeIcon` and `EyeShutIcon` SVGs in `PasswordFormGroup` component.
+
+
+### Bug Fixes
+
+- Fixed `usePopupMessage` hook being called outside of a component.
+- Fixed incorrect keyframe name in `PopupMessage.css`.
+- Fixed incorrect validation function being used for the password field in `signUpFormValidationReducer`.
+
+
+### Changes
+
+- Changed the animation for `PopupMessage` to slide up instead.
+
+
+### Build Changes
+
+- Disabled `@typescript-eslint/no-explicit-any` in `eslint.config.json`.
+- Fixed the `globals` npm package causing TypeScript to assume a Node environment, instead of a browser one.
+
+
 ## [0.0.8] (2024-08-19)
 
 ### Features

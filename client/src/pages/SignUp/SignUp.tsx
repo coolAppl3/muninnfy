@@ -4,12 +4,13 @@ import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
 import { initialSignUpFormValidationState, signUpFormValidationReducer } from './signUpFormValidationReducer';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
-import { useLoadingOverlay } from '../../hooks/useLoadingOverlay';
+import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { signUpService } from '../../services/accountServices';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
+import useInfoModal from '../../hooks/useInfoModal';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -18,6 +19,7 @@ export default function SignUp(): JSX.Element {
 
   const { displayLoadingOverlay, hideLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
+  const { displayInfoModal, removeInfoModal } = useInfoModal();
 
   async function handleSubmit(): Promise<void> {
     const { displayName, username, email, password } = formData;
@@ -25,6 +27,7 @@ export default function SignUp(): JSX.Element {
     try {
       const publicAccountId: string = (await signUpService({ displayName, username, email, password })).data.publicAccountId;
       navigate(`/verification/sign-up?publicAccountId=${publicAccountId}`);
+
       displayPopupMessage('Account created.', 'success');
     } catch (err: unknown) {
       console.log(err);
@@ -43,15 +46,21 @@ export default function SignUp(): JSX.Element {
         return;
       }
 
-      if (status !== 400 && status !== 409) {
+      if (status === 429) {
+        displayPopupMessage('Too many requests.', 'error');
+        displayInfoModal({
+          title: 'Please slow down.',
+          description: `You're sending too many requests and have been suspended as a result.\nYou'll be able to send new requests again within 30 to 60 seconds.`,
+          btnTitle: 'Okay',
+          onClick: removeInfoModal,
+        });
+
         return;
       }
 
-      if (!errReason) {
-        return;
+      if (status === 400 || status === 409) {
+        errReason && dispatch({ type: 'ADD_FIELD_ERROR', payload: { errMessage, errReason } });
       }
-
-      dispatch({ type: 'ADD_FIELD_ERROR', payload: { errMessage, errReason } });
     }
   }
 
@@ -75,7 +84,7 @@ export default function SignUp(): JSX.Element {
 
       <section className='py-4 h-available flex justify-center items-center'>
         <Container>
-          <div className='py-3 px-2  bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
+          <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
             <h1 className='text-title text-xl 3xs:text-2xl font-bold text-center'>Sign up to Muninnfy</h1>
             <div className='h-line my-2'></div>
 
