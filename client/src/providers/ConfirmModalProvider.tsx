@@ -18,7 +18,7 @@ export default function ConfirmModalProvider({ children }: { children: ReactNode
     isDangerous: false,
 
     onConfirm: () => {},
-    onCancel: removeConfirmModal,
+    onCancel: () => {},
     onExtraAction: () => {},
   });
 
@@ -44,7 +44,7 @@ export default function ConfirmModalProvider({ children }: { children: ReactNode
       isDangerous: false,
 
       onConfirm: () => {},
-      onCancel: removeConfirmModal,
+      onCancel: () => {},
       onExtraAction: () => {},
     });
   }

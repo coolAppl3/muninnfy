@@ -11,7 +11,7 @@ export default function InfoModalProvider({ children }: { children: ReactNode })
     title: undefined,
     description: undefined,
     btnTitle: 'Okay',
-    onClick: removeInfoModal,
+    onClick: () => {},
   });
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function InfoModalProvider({ children }: { children: ReactNode })
       title: undefined,
       description: undefined,
       btnTitle: 'Okay',
-      onClick: removeInfoModal,
+      onClick: () => {},
     });
   }
 
