@@ -5,10 +5,10 @@ export default function LoadingOverlayProvider({ children }: { children: React.R
   const [visible, setVisible] = useState(false);
 
   const displayLoadingOverlay = () => setVisible(true);
-  const hideLoadingOverlay = () => setVisible(false);
+  const removeLoadingOverlay = () => setVisible(false);
 
   return (
-    <LoadingOverlayContext.Provider value={{ displayLoadingOverlay, hideLoadingOverlay }}>
+    <LoadingOverlayContext.Provider value={{ displayLoadingOverlay, removeLoadingOverlay }}>
       {children}
 
       {visible && (

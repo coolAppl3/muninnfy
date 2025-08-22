@@ -17,7 +17,7 @@ export default function SignUp(): JSX.Element {
   const [{ formData, formErrors }, dispatch] = useReducer(signUpFormValidationReducer, initialSignUpFormValidationState);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const { displayLoadingOverlay, hideLoadingOverlay } = useLoadingOverlay();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
@@ -108,7 +108,7 @@ export default function SignUp(): JSX.Element {
                 await handleSubmit();
 
                 setIsSubmitting(false);
-                hideLoadingOverlay();
+                removeLoadingOverlay();
               }}
             >
               <DefaultFormGroup
