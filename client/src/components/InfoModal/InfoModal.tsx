@@ -15,10 +15,10 @@ export default function InfoModal({ title, description, btnTitle, onClick }: Inf
 
   return (
     <div
-      className={`confirm-modal ${isVisible ? 'visible' : ''}`}
+      className={`info-modal ${isVisible ? 'visible' : ''}`}
       tabIndex={0}
     >
-      <div className={`confirm-modal-container ${title ? '' : 'no-title'}`}>
+      <div className={`info-modal-container ${title ? '' : 'no-title'}`}>
         {title && <h4>{title}</h4>}
         {description && description.split('\n').map((descriptionLine, index) => <p key={index}>{descriptionLine}</p>)}
 
