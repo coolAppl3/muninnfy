@@ -6,6 +6,7 @@ import SignUp from '../pages/SignUp/SignUp';
 import SignIn from '../pages/SignIn/SignIn';
 import NewWishlist from '../pages/NewWishlist/NewWishlist';
 import Wishlists from '../pages/Wishlists/Wishlists';
+import AccountVerification from '../pages/AccountVerification/AccountVerification';
 
 export function Router(): JSX.Element {
   return (
@@ -18,24 +19,32 @@ export function Router(): JSX.Element {
           index
           element={<Home />}
         />
+
         <Route
           path='/home'
           element={<Home />}
         />
 
         <Route
+          path='/sign-up'
+          element={<SignUp />}
+        />
+
+        <Route
           path='/sign-in'
           element={<SignIn />}
         />
+
         <Route
-          path='/sign-up'
-          element={<SignUp />}
+          path='/account/verification'
+          element={<AccountVerification />}
         />
 
         <Route
           path='/new-wishlist'
           element={<NewWishlist />}
         />
+
         <Route
           path='/wishlists'
           element={<Wishlists />}
