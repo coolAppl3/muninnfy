@@ -1,7 +1,7 @@
 @reference '../../index.css';
 
 .info-modal {
-  @apply fixed top-0 left-0 w-full h-[100vh] bg-overlay z-10 grid place-items-center outline-none;
+  @apply fixed top-0 left-0 w-full h-[100vh] bg-overlay z-10 flex justify-center items-center outline-none;
 
   &.visible {
     .info-modal-container {
