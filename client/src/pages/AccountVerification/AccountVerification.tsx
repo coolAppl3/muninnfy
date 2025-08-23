@@ -1,12 +1,15 @@
-import { JSX } from 'react';
+import { ChangeEvent, FormEvent, JSX, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import { NavigateFunction, useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../../components/Button/Button';
-import { resendAccountVerificationEmailService } from '../../services/accountServices';
+import { continueAccountVerificationService, resendAccountVerificationEmailService } from '../../services/accountServices';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useInfoModal from '../../hooks/useInfoModal';
+import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
+import { validateEmail } from '../../utils/validation';
+import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 
 export default function AccountVerification(): JSX.Element {
   const [searchParams] = useSearchParams();
@@ -30,7 +33,94 @@ export default function AccountVerification(): JSX.Element {
 }
 
 function ContinueAccountVerificationForm(): JSX.Element {
-  return <>{/* TODO: implement */}</>;
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [emailValue, setEmailValue] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const navigate: NavigateFunction = useNavigate();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
+  const { displayPopupMessage } = usePopupMessage();
+
+  async function continueAccountVerification(): Promise<void> {
+    const email: string = emailValue;
+    const newErrorMessage: string | null = validateEmail(email);
+
+    if (newErrorMessage) {
+      setErrorMessage(newErrorMessage);
+      return;
+    }
+
+    try {
+      const publicAccountId: string = (await continueAccountVerificationService({ email })).data.publicAccountId;
+      navigate(`/sign-up/verification?publicAccountId=${publicAccountId}`);
+
+      displayPopupMessage('Verification request found.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+
+      if (!asyncErrorData) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      const { status, errMessage, errReason } = asyncErrorData;
+      displayPopupMessage(errMessage, 'error');
+
+      if (!errReason || ![400, 404].includes(status)) {
+        return;
+      }
+
+      setErrorMessage(errMessage);
+    }
+  }
+
+  return (
+    <>
+      <h4 className='text-title font-medium mb-1'>Continue account verification.</h4>
+      <p className='text-description text-sm mb-1'>Enter the email address you used for signing up below.</p>
+      <p className='text-description text-sm mb-2'>Unverified accounts are automatically deleted after 20 minutes.</p>
+
+      <form
+        onSubmit={async (e: FormEvent<HTMLFormElement>) => {
+          e.preventDefault();
+
+          if (isSubmitting) {
+            return;
+          }
+
+          setIsSubmitting(true);
+          displayLoadingOverlay();
+
+          await continueAccountVerification();
+
+          removeLoadingOverlay();
+          setIsSubmitting(false);
+        }}
+      >
+        <DefaultFormGroup
+          id='email'
+          label='Email address'
+          value={emailValue}
+          autoComplete='email'
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            const newValue: string = e.target.value;
+
+            setEmailValue(newValue);
+            setErrorMessage(validateEmail(newValue));
+          }}
+          errorMessage={errorMessage}
+        />
+
+        <Button
+          isSubmitBtn={true}
+          className='bg-cta border-cta w-full mt-2'
+        >
+          Continue
+        </Button>
+      </form>
+    </>
+  );
 }
 
 function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: string }): JSX.Element {
