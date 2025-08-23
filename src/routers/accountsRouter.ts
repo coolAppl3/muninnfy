@@ -203,6 +203,12 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 });
 
 accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    return;
+  }
+
   interface RequestData {
     publicAccountId: string;
   }
@@ -304,6 +310,12 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
 });
 
 accountsRouter.patch('/verification/verify', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    return;
+  }
+
   interface RequestData {
     publicAccountId: string;
     verificationToken: string;
