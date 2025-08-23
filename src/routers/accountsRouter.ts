@@ -236,12 +236,12 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
 
     const [accountRows] = await dbPool.execute<AccountDetails[]>(
       `SELECT
-        account_id,
-        public_account_id,
-        is_verified,
-        (SELECT 1 FROM account_verification WHERE account_id = ?) AS verification_request_exists
+        accounts.account_id,
+        accounts.public_account_id,
+        accounts.is_verified,
+        (SELECT 1 FROM account_verification WHERE account_id = accounts.account_id) AS verification_request_exists
       FROM
-        account_verification
+        accounts
       WHERE
         email = ?;`,
       [requestData.email]
