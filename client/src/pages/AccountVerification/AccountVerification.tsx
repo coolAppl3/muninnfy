@@ -74,6 +74,10 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
       const { status, errMessage, errReason } = asyncErrorData;
       displayPopupMessage(errMessage, 'error');
 
+      if (status === 403 && errReason === 'signedIn') {
+        return;
+      }
+
       if (!errReason || ![400, 403, 404, 409].includes(status)) {
         return;
       }
