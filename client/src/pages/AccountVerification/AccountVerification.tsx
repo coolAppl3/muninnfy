@@ -136,7 +136,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
     },
 
     403: {
-      description: `Emails may a minute to reach you, and could end up in your spam folder.\nIf you still can't find the email, wait 20 minutes and start again.`,
+      description: `Emails may take a minute to arrive, and could end up in your spam folder.\nIf you still can't find the email, wait 20 minutes and start again.`,
       onClick: undefined,
     },
 
