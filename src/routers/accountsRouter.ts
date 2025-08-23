@@ -69,7 +69,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   }
 
   if (requestData.username === requestData.password) {
-    res.status(409).json({ message: 'Username and password must not be identical.', reason: 'passwordMatchesUsername' });
+    res.status(409).json({ message: `Username and password can't match.`, reason: 'passwordMatchesUsername' });
     return;
   }
 
