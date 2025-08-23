@@ -42,7 +42,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
   const infoModalErrorRecord: Record<number, { description: string | undefined; onClick?: () => void }> = {
     400: {
       description: 'Check your inbox for a verification email, or start the sign up process again.',
-      onClick: () => navigate('/account/verification'),
+      onClick: () => navigate('/sign-up/verification'),
     },
 
     403: {

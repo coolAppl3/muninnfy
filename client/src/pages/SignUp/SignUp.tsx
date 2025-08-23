@@ -26,7 +26,7 @@ export default function SignUp(): JSX.Element {
 
     try {
       const publicAccountId: string = (await signUpService({ displayName, username, email, password })).data.publicAccountId;
-      navigate(`/verification/sign-up?publicAccountId=${publicAccountId}`);
+      navigate(`/sign-up/verification?publicAccountId=${publicAccountId}`);
 
       displayPopupMessage('Account created.', 'success');
     } catch (err: unknown) {
@@ -176,7 +176,7 @@ export default function SignUp(): JSX.Element {
               <p>
                 Trying to verify your account?{' '}
                 <Link
-                  to='/verification/account'
+                  to='/sign-up/verification'
                   className='link'
                 >
                   Continue your account verification

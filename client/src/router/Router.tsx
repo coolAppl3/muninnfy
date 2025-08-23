@@ -31,13 +31,13 @@ export function Router(): JSX.Element {
         />
 
         <Route
-          path='/sign-in'
-          element={<SignIn />}
+          path='/sign-up/verification'
+          element={<AccountVerification />}
         />
 
         <Route
-          path='/account/verification'
-          element={<AccountVerification />}
+          path='/sign-in'
+          element={<SignIn />}
         />
 
         <Route
