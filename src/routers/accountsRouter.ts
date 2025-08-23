@@ -222,7 +222,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
   }
 
   if (!isValidEmail(requestData.email)) {
-    res.status(400).json({ message: 'Invalid email.' });
+    res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
     return;
   }
 
