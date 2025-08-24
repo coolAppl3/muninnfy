@@ -508,7 +508,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
         return;
       }
 
-      res.status(401).json({ message: 'Incorrect verification token. Account deleted' });
+      res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken_deleted' });
       return;
     }
 
