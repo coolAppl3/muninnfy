@@ -178,8 +178,8 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
         return;
       }
 
-      const description: string | undefined = infoModalErrorRecord[403]?.description;
-      const onClick: (() => void) | undefined = infoModalErrorRecord[403]?.onClick;
+      const description: string | undefined = infoModalErrorRecord[status]?.description;
+      const onClick: (() => void) | undefined = infoModalErrorRecord[status]?.onClick;
 
       displayInfoModal({
         title: errMessage,
