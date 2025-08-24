@@ -18,6 +18,20 @@ export function signUpService(body: SignUpServicePayload): Promise<AxiosResponse
   return axios.post(`${accountsApiUrl}/signUp`, body);
 }
 
+interface ContinueAccountVerificationServicePayload {
+  email: string;
+}
+
+interface ContinueAccountVerificationServiceData {
+  publicAccountId: string;
+}
+
+export function continueAccountVerificationService(
+  body: ContinueAccountVerificationServicePayload
+): Promise<AxiosResponse<ContinueAccountVerificationServiceData>> {
+  return axios.post(`${accountsApiUrl}/verification/continue`, body);
+}
+
 interface ResendVerificationEmailPayload {
   publicAccountId: string;
 }

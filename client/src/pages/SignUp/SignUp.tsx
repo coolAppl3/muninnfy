@@ -17,7 +17,7 @@ export default function SignUp(): JSX.Element {
   const [{ formData, formErrors }, dispatch] = useReducer(signUpFormValidationReducer, initialSignUpFormValidationState);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const { displayLoadingOverlay, hideLoadingOverlay } = useLoadingOverlay();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
@@ -26,7 +26,7 @@ export default function SignUp(): JSX.Element {
 
     try {
       const publicAccountId: string = (await signUpService({ displayName, username, email, password })).data.publicAccountId;
-      navigate(`/verification/sign-up?publicAccountId=${publicAccountId}`);
+      navigate(`/sign-up/verification?publicAccountId=${publicAccountId}`);
 
       displayPopupMessage('Account created.', 'success');
     } catch (err: unknown) {
@@ -108,7 +108,7 @@ export default function SignUp(): JSX.Element {
                 await handleSubmit();
 
                 setIsSubmitting(false);
-                hideLoadingOverlay();
+                removeLoadingOverlay();
               }}
             >
               <DefaultFormGroup
@@ -176,7 +176,7 @@ export default function SignUp(): JSX.Element {
               <p>
                 Trying to verify your account?{' '}
                 <Link
-                  to='/verification/account'
+                  to='/sign-up/verification'
                   className='link'
                 >
                   Continue your account verification

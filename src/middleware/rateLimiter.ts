@@ -4,7 +4,7 @@ import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { RowDataPacket } from 'mysql2/promise';
 import { REQUESTS_RATE_LIMIT, hourMilliseconds } from '../util/constants';
-import { generateCryptoUuid } from '../util/tokenGenerator';
+import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 
 export async function rateLimiter(req: Request, res: Response, next: NextFunction): Promise<void> {
   const rateLimitId: string | null = getRequestCookie(req, 'rateLimitId');
@@ -16,7 +16,7 @@ export async function rateLimiter(req: Request, res: Response, next: NextFunctio
     return;
   }
 
-  if (!isValidRateLimitId(rateLimitId)) {
+  if (!isValidUuid(rateLimitId)) {
     await addToRateTracker(res);
     next();
 
@@ -104,19 +104,6 @@ async function incrementRequestsCount(rateLimitId: string): Promise<void> {
   } catch (err: unknown) {
     console.log(err);
   }
-}
-
-function isValidRateLimitId(rateLimitId: string): boolean {
-  if (!rateLimitId.startsWith('r')) {
-    return false;
-  }
-
-  if (rateLimitId.length !== 32) {
-    return false;
-  }
-
-  const regex: RegExp = /^[A-Za-z0-9]{32}$/;
-  return regex.test(rateLimitId);
 }
 
 async function addToAbusiveUsers(req: Request): Promise<void> {

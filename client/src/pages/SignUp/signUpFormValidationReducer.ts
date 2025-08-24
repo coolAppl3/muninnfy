@@ -70,7 +70,7 @@ export function signUpFormValidationReducer(
         displayName: validateDisplayName(displayName),
         username: validateUsername(username),
         email: validateEmail(email),
-        password: validateNewPassword(password),
+        password: validateNewPassword(password) || (password === username ? `Username and password can't match.` : null),
         confirmPassword: confirmPassword === password ? null : `Passwords don't match.`,
       },
     };

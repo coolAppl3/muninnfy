@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from 'react';
+import { JSX, useCallback, useEffect, useState } from 'react';
 import PopupMessage from '../components/PopupMessage/PopupMessage';
 import PopupMessageContext from '../contexts/PopupMessageContext';
 
@@ -8,12 +8,12 @@ export default function PopupMessageProvider({ children }: { children: React.Rea
   const [type, setType] = useState<'success' | 'error'>('success');
   const [popupKey, setPopupKey] = useState(0);
 
-  function displayPopupMessage(message: string, type: 'success' | 'error'): void {
+  const displayPopupMessage = useCallback((message: string, type: 'success' | 'error'): void => {
     setMessage(message);
     setType(type);
     setVisible(true);
     setPopupKey((prev) => prev + 1);
-  }
+  }, []);
 
   useEffect(() => {
     if (!visible) {

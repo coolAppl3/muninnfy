@@ -69,7 +69,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   }
 
   if (requestData.username === requestData.password) {
-    res.status(409).json({ message: 'Username and password must not be identical.', reason: 'passwordMatchesUsername' });
+    res.status(409).json({ message: `Username and password can't match.`, reason: 'passwordMatchesUsername' });
     return;
   }
 
@@ -202,7 +202,88 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   }
 });
 
+accountsRouter.post('/verification/continue', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    return;
+  }
+
+  interface RequestData {
+    email: string;
+  }
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['email'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  if (!isValidEmail(requestData.email)) {
+    res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
+    return;
+  }
+
+  try {
+    interface AccountDetails extends RowDataPacket {
+      account_id: number;
+      public_account_id: string;
+      is_verified: boolean;
+      verification_request_exists: boolean;
+    }
+
+    const [accountRows] = await dbPool.execute<AccountDetails[]>(
+      `SELECT
+        accounts.account_id,
+        accounts.public_account_id,
+        accounts.is_verified,
+        (SELECT 1 FROM account_verification WHERE account_id = accounts.account_id) AS verification_request_exists
+      FROM
+        accounts
+      WHERE
+        email = ?;`,
+      [requestData.email]
+    );
+
+    const accountDetails: AccountDetails | undefined = accountRows[0];
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
+      return;
+    }
+
+    if (accountDetails.is_verified) {
+      res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
+      return;
+    }
+
+    if (!accountDetails.verification_request_exists) {
+      await deleteAccountById(accountDetails.account_id, dbPool, req);
+      res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
+      return;
+    }
+
+    res.json({ publicAccountId: accountDetails.public_account_id });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
 accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    return;
+  }
+
   interface RequestData {
     publicAccountId: string;
   }
@@ -304,6 +385,12 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
 });
 
 accountsRouter.patch('/verification/verify', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    return;
+  }
+
   interface RequestData {
     publicAccountId: string;
     verificationToken: string;
@@ -421,7 +508,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
         return;
       }
 
-      res.status(401).json({ message: 'Incorrect verification token. Account deleted' });
+      res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken_deleted' });
       return;
     }
 

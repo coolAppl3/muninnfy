@@ -1,25 +1,37 @@
-import { JSX, ReactNode, useState } from 'react';
+import { JSX, ReactNode, useCallback, useEffect, useState } from 'react';
 import InfoModalContext from '../contexts/InfoModalContext';
 import InfoModal, { InfoModalProps } from '../components/InfoModal/InfoModal';
+import { Location, useLocation } from 'react-router-dom';
 
 export default function InfoModalProvider({ children }: { children: ReactNode }): JSX.Element {
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const routerLocation: Location = useLocation();
 
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [InfoModalState, setInfoModalState] = useState<InfoModalProps>({
     title: undefined,
     description: undefined,
     btnTitle: 'Okay',
-    onClick: removeInfoModal,
+    onClick: () => {},
   });
 
-  function displayInfoModal(props: InfoModalProps): void {
+  const displayInfoModal = useCallback((props: InfoModalProps): void => {
     setInfoModalState({ ...props });
     setIsVisible(true);
-  }
+  }, []);
 
-  function removeInfoModal(): void {
+  const removeInfoModal = useCallback((): void => {
     setIsVisible(false);
-  }
+    setInfoModalState({
+      title: undefined,
+      description: undefined,
+      btnTitle: 'Okay',
+      onClick: () => {},
+    });
+  }, []);
+
+  useEffect(() => {
+    removeInfoModal();
+  }, [routerLocation, removeInfoModal]);
 
   const { title, description, btnTitle, onClick } = InfoModalState;
   return (
