@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, FormEvent, JSX, useEffect, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import { NavigateFunction, useNavigate, useSearchParams } from 'react-router-dom';
@@ -124,8 +124,10 @@ function ContinueAccountVerificationForm(): JSX.Element {
 }
 
 function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: string }): JSX.Element {
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const navigate: NavigateFunction = useNavigate();
 
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
@@ -148,7 +150,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
     409: { description: 'You can simply proceed with singing in.', onClick: () => navigate('/sign-in') },
   };
 
-  async function handleOnClick(): Promise<void> {
+  async function resendAccountVerificationEmail(): Promise<void> {
     try {
       await resendAccountVerificationEmailService({ publicAccountId });
       displayPopupMessage('Email resent.', 'success');
@@ -187,10 +189,23 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
   return (
     <>
       <h4 className='text-title font-medium mb-1'>Ongoing account verification detected.</h4>
-      <p className='text-description text-sm mb-2'>Check your inbox for a verification link, and click it to continue.</p>
+      <p className='text-description text-sm mb-2'>Find the verification email in your inbox, and click the link to continue.</p>
       <Button
         className='bg-description border-description text-dark w-full'
-        onClick={handleOnClick}
+        onClick={async () => {
+          if (isDisabled) {
+            return;
+          }
+
+          setIsDisabled(true);
+          displayLoadingOverlay();
+
+          await resendAccountVerificationEmail();
+
+          removeLoadingOverlay();
+          setTimeout(() => setIsDisabled(false), 3000);
+        }}
+        disabled={isDisabled}
       >
         Resend email
       </Button>
