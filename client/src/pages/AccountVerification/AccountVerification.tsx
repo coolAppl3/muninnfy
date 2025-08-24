@@ -1,9 +1,13 @@
-import { ChangeEvent, FormEvent, JSX, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, JSX, MouseEventHandler, useEffect, useMemo, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import { NavigateFunction, useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../../components/Button/Button';
-import { continueAccountVerificationService, resendAccountVerificationEmailService } from '../../services/accountServices';
+import {
+  continueAccountVerificationService,
+  resendAccountVerificationEmailService,
+  verifyAccountService,
+} from '../../services/accountServices';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useInfoModal from '../../hooks/useInfoModal';
@@ -213,14 +217,174 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
   );
 }
 
-function ConfirmAccountVerification(): JSX.Element {
-  return <>{/* TODO: implement */}</>;
+function ConfirmAccountVerification({
+  publicAccountId,
+  verificationToken,
+}: {
+  publicAccountId: string;
+  verificationToken: string;
+}): JSX.Element {
+  interface ConfirmAccountVerificationState {
+    title: string;
+    description?: string;
+    btnTitle: string;
+    onClick: MouseEventHandler<HTMLButtonElement>;
+  }
+
+  const [verificationState, setVerificationState] = useState<ConfirmAccountVerificationState | null>(null);
+
+  const navigate: NavigateFunction = useNavigate();
+  const { displayPopupMessage } = usePopupMessage();
+
+  const verificationErrorRecord: Record<number, { description: string | undefined; btnTitle: string; onClick?: () => void }> = useMemo(
+    () => ({
+      400: {
+        description: `Your verification link is invalid or malformed.Make sure you've copied the correct link.`,
+        btnTitle: 'Okay',
+        onClick: () => navigate('/verification'),
+      },
+
+      403: {
+        description: undefined,
+        btnTitle: 'Okay',
+        onClick: () => navigate('/home'),
+      },
+
+      404: {
+        description: `Account doesn't exist or may have been deleted after remaining unverified for longer than 20 minutes.`,
+        btnTitle: 'Sign up',
+        onClick: () => navigate('/sign-up'),
+      },
+
+      409: {
+        description: 'You may proceed with singing in.',
+        btnTitle: 'Sign in',
+        onClick: () => navigate('/sign-in'),
+      },
+    }),
+    [navigate]
+  );
+
+  useEffect(() => {
+    let ignore = false;
+
+    const verifyAccount = async (): Promise<void> => {
+      try {
+        await verifyAccountService({ publicAccountId, verificationToken });
+
+        if (ignore) {
+          return;
+        }
+
+        displayPopupMessage('Account verified.', 'success');
+        setVerificationState({
+          title: 'Account verified',
+          description: 'You may now proceed with singing in.',
+          btnTitle: 'Sign in',
+          onClick: () => navigate('/sign-in'),
+        });
+      } catch (err: unknown) {
+        if (ignore) {
+          return;
+        }
+
+        console.log(err);
+        const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+
+        if (!asyncErrorData) {
+          displayPopupMessage('Something went wrong.', 'error');
+          setVerificationState({
+            title: 'Something went wrong.',
+            description: 'Account verification failed due to an unexpected error.',
+            btnTitle: 'Okay',
+            onClick: () => navigate('/home'),
+          });
+
+          return;
+        }
+
+        const { status, errMessage, errReason } = asyncErrorData;
+        displayPopupMessage(errMessage, 'error');
+
+        if (!errReason || ![400, 403, 404, 409].includes(status)) {
+          setVerificationState({
+            title: 'Something went wrong.',
+            description: 'Account verification failed due to an internal server error.',
+            btnTitle: 'Okay',
+            onClick: () => navigate('/home'),
+          });
+
+          return;
+        }
+
+        if (status === 401) {
+          const accountDeleted: boolean = errReason.includes('_deleted');
+          const description: string = accountDeleted
+            ? 'Account deleted due to too many failed verification attempts.'
+            : `Your verification link is invalid or malformed. Make sure you've copied the correct link.`;
+
+          setVerificationState({
+            title: errMessage,
+            description,
+            btnTitle: accountDeleted ? 'Sign up again' : 'Okay',
+            onClick: () => navigate(`/sign-up${accountDeleted ? '/verification' : ''}`),
+          });
+
+          return;
+        }
+
+        const description: string | undefined = verificationErrorRecord[status]?.description;
+        const onClick: (() => void) | undefined = verificationErrorRecord[status]?.onClick;
+        const btnTitle: string | undefined = verificationErrorRecord[status]?.btnTitle;
+
+        setVerificationState({
+          title: errMessage,
+          description,
+          btnTitle: btnTitle || 'Okay',
+          onClick: onClick || (() => navigate('/home')),
+        });
+      }
+    };
+
+    verifyAccount();
+
+    return () => {
+      ignore = true;
+    };
+  }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord]);
+
+  return (
+    <>
+      {verificationState ? (
+        <>
+          <h4 className='text-title font-medium mb-1'>{verificationState.title}</h4>
+          <p className='text-description text-sm'>{verificationState?.description}</p>
+
+          <Button
+            className='bg-description border-description text-dark w-full mt-2'
+            onClick={verificationState.onClick}
+          >
+            {verificationState.btnTitle}
+          </Button>
+        </>
+      ) : (
+        <div className='spinner w-3 h-3 mx-auto block'></div>
+      )}
+    </>
+  );
 }
 
 function determineRenderedJsx(publicAccountId: string | null, verificationToken: string | null): JSX.Element {
   if (publicAccountId) {
     // verificationToken on its own is not useful and will be ignored
-    return verificationToken ? <ConfirmAccountVerification /> : <ResendAccountVerificationEmail publicAccountId={publicAccountId} />;
+    return verificationToken ? (
+      <ConfirmAccountVerification
+        publicAccountId={publicAccountId}
+        verificationToken={verificationToken}
+      />
+    ) : (
+      <ResendAccountVerificationEmail publicAccountId={publicAccountId} />
+    );
   }
 
   return <ContinueAccountVerificationForm />;
