@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.0.10] (2024-08-25)
+
+### Features
+
+- Added `isValidUuid()` as a utility function in `validation`.
+- Added POST `accounts/verification/continue`.
+- Added `continueAccountVerificationService()` to `accountServices`.
+- Added `AccountVerification` page component, which is comprised of the following local child components:
+  - `ContinueAccountVerificationForm`.
+  - `ResendAccountVerificationEmail`.
+  - `ConfirmAccountVerification`.
+
+
+### Bug Fixes
+
+- Fixed incorrect CSS class being used for `InfoModal`.
+- Fixed `ConfirmModal` and `InfoModal` containers not shrinking, causing visual issues on smaller screens.
+- Fixed PATCH `account/verification/resendEmail` and PATCH `account/verification/verify` not rejecting requests when the user is signed in.
+- Fixed incorrect validation logic being used in the `rateLimiter()` middleware causing it to always create a new tracking row.
+- Fixed `signUpFormValidationReducer` not checking if the user's password and username match before submitting the form.
+
+
+### Code Refactoring
+
+- Refactored `InfoModal` and `ConfirmModal` to no longer persist through route navigation. 
+- Renamed `hideLoadingOverlay()` to `removeLoadingOverlay()`.
+- Redefined `/account/verification` path to `/sign-up/verification`.
+- Other minor refactors.
+
+
 ## [0.0.9] (2024-08-21)
 
 ### Features
