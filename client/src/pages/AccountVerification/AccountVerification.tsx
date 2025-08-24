@@ -135,7 +135,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
-  const infoModalErrorRecord: Record<number, { description: string | undefined; onClick?: () => void }> = {
+  const infoModalErrorRecord: Record<number, { description: string | undefined; btnTitle?: string; onClick?: () => void }> = {
     400: {
       description: 'Check your inbox for a verification email, or start the sign up process again.',
       onClick: () => navigate('/sign-up/verification'),
@@ -148,10 +148,15 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
 
     404: {
       description: `Accounts are deleted within 20 minutes of being created if left unverified.\nYou can always start the sign up process again.`,
+      btnTitle: 'Sign up again',
       onClick: () => navigate('/sign-up'),
     },
 
-    409: { description: 'You can simply proceed with singing in.', onClick: () => navigate('/sign-in') },
+    409: {
+      description: 'You can simply proceed with singing in.',
+      btnTitle: 'Sign in',
+      onClick: () => navigate('/sign-in'),
+    },
   };
 
   async function resendAccountVerificationEmail(): Promise<void> {
@@ -180,11 +185,12 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
 
       const description: string | undefined = infoModalErrorRecord[status]?.description;
       const onClick: (() => void) | undefined = infoModalErrorRecord[status]?.onClick;
+      const btnTitle: string | undefined = infoModalErrorRecord[status]?.btnTitle;
 
       displayInfoModal({
         title: errMessage,
         description,
-        btnTitle: 'Okay',
+        btnTitle: btnTitle || 'Okay',
         onClick: onClick || removeInfoModal,
       });
     }
@@ -236,17 +242,15 @@ function ConfirmAccountVerification({
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
 
-  const verificationErrorRecord: Record<number, { description: string | undefined; btnTitle: string; onClick?: () => void }> = useMemo(
+  const verificationErrorRecord: Record<number, { description: string | undefined; btnTitle?: string; onClick?: () => void }> = useMemo(
     () => ({
       400: {
         description: `Your verification link is invalid or malformed.Make sure you've copied the correct link.`,
-        btnTitle: 'Okay',
         onClick: () => navigate('/verification'),
       },
 
       403: {
         description: undefined,
-        btnTitle: 'Okay',
         onClick: () => navigate('/home'),
       },
 
