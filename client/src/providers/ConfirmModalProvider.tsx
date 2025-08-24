@@ -1,4 +1,4 @@
-import { JSX, ReactNode, useEffect, useState } from 'react';
+import { JSX, ReactNode, useCallback, useEffect, useState } from 'react';
 import ConfirmModal, { ConfirmModalProps } from '../components/ConfirmModal/ConfirmModal';
 import ConfirmModalContext from '../contexts/ConfirmModalContext';
 import { Location, useLocation } from 'react-router-dom';
@@ -22,16 +22,12 @@ export default function ConfirmModalProvider({ children }: { children: ReactNode
     onExtraAction: () => {},
   });
 
-  useEffect(() => {
-    removeConfirmModal();
-  }, [routerLocation]);
-
-  function displayConfirmModal(props: ConfirmModalProps): void {
+  const displayConfirmModal = useCallback((props: ConfirmModalProps): void => {
     setConfirmModalState({ ...props });
     setIsVisible(true);
-  }
+  }, []);
 
-  function removeConfirmModal(): void {
+  const removeConfirmModal = useCallback((): void => {
     setIsVisible(false);
     setConfirmModalState({
       title: undefined,
@@ -47,7 +43,11 @@ export default function ConfirmModalProvider({ children }: { children: ReactNode
       onCancel: () => {},
       onExtraAction: () => {},
     });
-  }
+  }, []);
+
+  useEffect(() => {
+    removeConfirmModal();
+  }, [routerLocation, removeConfirmModal]);
 
   return (
     <ConfirmModalContext.Provider value={{ displayConfirmModal, removeConfirmModal }}>

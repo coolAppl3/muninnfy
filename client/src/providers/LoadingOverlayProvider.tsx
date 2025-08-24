@@ -1,11 +1,11 @@
-import { JSX, useState } from 'react';
+import { JSX, useCallback, useState } from 'react';
 import LoadingOverlayContext from '../contexts/LoadingOverlayContext';
 
 export default function LoadingOverlayProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [visible, setVisible] = useState(false);
 
-  const displayLoadingOverlay = () => setVisible(true);
-  const removeLoadingOverlay = () => setVisible(false);
+  const displayLoadingOverlay = useCallback(() => setVisible(true), []);
+  const removeLoadingOverlay = useCallback(() => setVisible(false), []);
 
   return (
     <LoadingOverlayContext.Provider value={{ displayLoadingOverlay, removeLoadingOverlay }}>
