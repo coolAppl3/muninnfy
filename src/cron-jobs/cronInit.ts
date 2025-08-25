@@ -14,7 +14,7 @@ export function initCronJobs(): void {
   }, minuteMilliseconds / 2);
 
   // every minute
-  cron.schedule('0 * * * *', async () => {
+  cron.schedule('* * * * *', async () => {
     const currentTimestamp: number = Date.now();
 
     await deleteUnverifiedAccountsCron(currentTimestamp);
