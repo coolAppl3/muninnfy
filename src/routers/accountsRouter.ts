@@ -347,14 +347,9 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
-
-      if (!accountDeleted) {
-        res.status(500).json({ message: 'Internal server error.' });
-        return;
-      }
-
+      await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
       return;
     }
 
@@ -462,15 +457,9 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     }
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      await connection.rollback();
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
-
-      if (!accountDeleted) {
-        res.status(500).json({ message: 'Internal server error.' });
-        return;
-      }
-
+      await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
+
       return;
     }
 
@@ -501,14 +490,9 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     await connection.rollback();
 
     if (accountDetails.failed_verification_attempts + 1 >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
-
-      if (!accountDeleted) {
-        res.status(500).json({ message: 'Internal server error.' });
-        return;
-      }
-
+      await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken_deleted' });
+
       return;
     }
 
