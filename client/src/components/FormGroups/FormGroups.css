@@ -47,3 +47,27 @@
     }
   }
 }
+
+.checkbox-form-group {
+  @apply flex justify-start items-center gap-1 relative;
+
+  button {
+    @apply bg-[#555] hover:bg-[#555]/50 transition-colors w-2 h-2 rounded cursor-pointer grid place-items-center;
+
+    svg {
+      @apply text-cta w-[14px] h-[14px] transition-transform rotate-[720deg] scale-0;
+    }
+  }
+
+  label {
+    @apply text-sm font-medium text-title cursor-pointer after:absolute after:top-0 after:left-0 after:w-full after:h-full;
+  }
+
+  &.checked {
+    button {
+      svg {
+        @apply rotate-0 scale-100;
+      }
+    }
+  }
+}
