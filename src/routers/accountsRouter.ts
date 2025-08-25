@@ -528,7 +528,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['email', 'password'];
+  const expectedKeys: string[] = ['email', 'password', 'keepSignedIn'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
