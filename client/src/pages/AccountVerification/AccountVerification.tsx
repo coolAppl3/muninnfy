@@ -14,6 +14,7 @@ import useInfoModal from '../../hooks/useInfoModal';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import { validateEmail } from '../../utils/validation';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
+import { CanceledError } from 'axios';
 
 export default function AccountVerification(): JSX.Element {
   const [searchParams] = useSearchParams();
@@ -270,11 +271,12 @@ function ConfirmAccountVerification({
   );
 
   useEffect(() => {
-    let ignore = false;
+    const abortController: AbortController = new AbortController();
+    let ignore: boolean = false;
 
     const verifyAccount = async (): Promise<void> => {
       try {
-        await verifyAccountService({ publicAccountId, verificationToken });
+        await verifyAccountService({ publicAccountId, verificationToken }, abortController.signal);
 
         if (ignore) {
           return;
@@ -288,7 +290,7 @@ function ConfirmAccountVerification({
           onClick: () => navigate('/sign-in'),
         });
       } catch (err: unknown) {
-        if (ignore) {
+        if (ignore || err instanceof CanceledError) {
           return;
         }
 
@@ -354,6 +356,7 @@ function ConfirmAccountVerification({
 
     return () => {
       ignore = true;
+      abortController.abort();
     };
   }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord]);
 
