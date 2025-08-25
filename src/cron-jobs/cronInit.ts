@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 
-import { removeLightRateAbusersCron, replenishRateRequestsCron } from './rateLimiterCronJobs';
+import { removeLightRateAbusersCron, removeStaleRateTrackerRowsCron, replenishRateRequestsCron } from './rateLimiterCronJobs';
 import { minuteMilliseconds } from '../util/constants';
 import { clearErrorLogsCron } from '../logs/errorLoggerCronJobs';
 import { deleteStaleAccountVerificationRequestsCron, deleteUnverifiedAccountsCron } from './accountCronJobs';
@@ -17,6 +17,7 @@ export function initCronJobs(): void {
   cron.schedule('* * * * *', async () => {
     const currentTimestamp: number = Date.now();
 
+    await removeStaleRateTrackerRowsCron(currentTimestamp);
     await deleteUnverifiedAccountsCron(currentTimestamp);
     await deleteStaleAccountVerificationRequestsCron(currentTimestamp);
   });
