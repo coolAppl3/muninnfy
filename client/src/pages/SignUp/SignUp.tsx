@@ -94,11 +94,7 @@ export default function SignUp(): JSX.Element {
               onSubmit={async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
 
-                if (isSubmitting) {
-                  return;
-                }
-
-                if (!allFieldsValid()) {
+                if (isSubmitting || !allFieldsValid()) {
                   return;
                 }
 
