@@ -54,9 +54,10 @@ export async function createAuthSession(
           account_id,
           created_on_timestamp,
           expiry_timestamp,
-          keep_signed_in
-        ) VALUES (${generatePlaceHolders(5)});`,
-        [newAuthSessionId, accountId, currentTimestamp, expiryTimestamp, keepSignedIn]
+          keep_signed_in,
+          extensions_count
+        ) VALUES (${generatePlaceHolders(6)});`,
+        [newAuthSessionId, accountId, currentTimestamp, expiryTimestamp, keepSignedIn, 0]
       );
 
       await connection.commit();
