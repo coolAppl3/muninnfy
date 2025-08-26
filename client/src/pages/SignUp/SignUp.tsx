@@ -94,11 +94,7 @@ export default function SignUp(): JSX.Element {
               onSubmit={async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
 
-                if (isSubmitting) {
-                  return;
-                }
-
-                if (!allFieldsValid()) {
+                if (isSubmitting || !allFieldsValid()) {
                   return;
                 }
 
@@ -163,7 +159,7 @@ export default function SignUp(): JSX.Element {
             </form>
 
             <div className='text-description text-sm'>
-              <p className='mb-[4px]'>
+              <p className='mb-1'>
                 Already have an account?{' '}
                 <Link
                   to='/sign-in'

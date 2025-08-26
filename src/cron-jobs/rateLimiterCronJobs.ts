@@ -19,9 +19,7 @@ export async function replenishRateRequestsCron(currentTimestamp: number): Promi
   }
 }
 
-export async function removeStaleRateTrackerRows(): Promise<void> {
-  const currentTimestamp: number = Date.now();
-
+export async function removeStaleRateTrackerRowsCron(currentTimestamp: number): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM

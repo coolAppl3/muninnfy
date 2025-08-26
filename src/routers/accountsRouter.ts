@@ -347,14 +347,9 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
-
-      if (!accountDeleted) {
-        res.status(500).json({ message: 'Internal server error.' });
-        return;
-      }
-
+      await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
       return;
     }
 
@@ -462,15 +457,9 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     }
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      await connection.rollback();
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
-
-      if (!accountDeleted) {
-        res.status(500).json({ message: 'Internal server error.' });
-        return;
-      }
-
+      await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
+
       return;
     }
 
@@ -501,14 +490,9 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     await connection.rollback();
 
     if (accountDetails.failed_verification_attempts + 1 >= ACCOUNT_FAILED_UPDATE_LIMIT) {
-      const accountDeleted: boolean = await deleteAccountById(accountDetails.account_id, dbPool, req);
-
-      if (!accountDeleted) {
-        res.status(500).json({ message: 'Internal server error.' });
-        return;
-      }
-
+      await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken_deleted' });
+
       return;
     }
 
@@ -532,7 +516,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
 accountsRouter.post('/signIn', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `You're already signed in.`, reason: 'alreadySignedIn' });
+    res.status(403).json({ message: 'Already signed in.', reason: 'alreadySignedIn' });
     return;
   }
 
@@ -544,7 +528,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['email', 'password'];
+  const expectedKeys: string[] = ['email', 'password', 'keepSignedIn'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
@@ -588,29 +572,29 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     const accountDetails: AccountDetails | undefined = accountRows[0];
 
     if (!accountDetails) {
-      res.status(404).json({ message: 'Account not found or unverified.', reason: 'accountNotFound' });
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
       return;
     }
 
     if (!accountDetails.is_verified) {
-      res.status(404).json({ message: 'Account not found or unverified.', reason: 'accountNotFound' });
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
       return;
     }
 
-    const isSuspended: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
-    if (isSuspended) {
-      res.status(403).json({ message: 'Account is suspended.', reason: 'accountSuspended' });
+    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
+    if (isLocked) {
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
       return;
     }
 
     const isCorrectPassword: boolean = await bcrypt.compare(requestData.password, accountDetails.hashed_password);
     if (!isCorrectPassword) {
       const incremented: boolean = await incrementFailedVerificationAttempts(accountDetails.account_id, dbPool, req);
-      const hasBeenSuspended: boolean = accountDetails.failed_sign_in_attempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
+      const hasBeenLocked: boolean = accountDetails.failed_sign_in_attempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
 
       res.status(401).json({
-        message: `Incorrect password.${hasBeenSuspended ? ' Account suspended.' : ''}`,
-        reason: hasBeenSuspended ? 'incorrectPassword_suspended' : 'incorrectPassword',
+        message: `Incorrect password.${hasBeenLocked ? ' Account locked.' : ''}`,
+        reason: hasBeenLocked ? 'incorrectPassword_locked' : 'incorrectPassword',
       });
 
       return;

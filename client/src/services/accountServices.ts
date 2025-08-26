@@ -45,8 +45,8 @@ interface VerifyAccountPayload {
   verificationToken: string;
 }
 
-export function verifyAccountService(body: VerifyAccountPayload): Promise<AxiosResponse> {
-  return axios.patch(`${accountsApiUrl}/verification/verify`, body);
+export function verifyAccountService(body: VerifyAccountPayload, abortSignal: AbortSignal): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/verification/verify`, body, { signal: abortSignal });
 }
 
 interface SignInPayload {

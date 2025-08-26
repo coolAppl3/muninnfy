@@ -14,6 +14,7 @@ import useInfoModal from '../../hooks/useInfoModal';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import { validateEmail } from '../../utils/validation';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
+import { CanceledError } from 'axios';
 
 export default function AccountVerification(): JSX.Element {
   const [searchParams] = useSearchParams();
@@ -135,30 +136,6 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
-  const infoModalErrorRecord: Record<number, { description: string | undefined; btnTitle?: string; onClick?: () => void }> = {
-    400: {
-      description: 'Check your inbox for a verification email, or start the sign up process again.',
-      onClick: () => navigate('/sign-up/verification'),
-    },
-
-    403: {
-      description: `Emails may take a minute to arrive, and could end up in your spam folder.\nIf you still can't find the email, wait 20 minutes and start again.`,
-      onClick: undefined,
-    },
-
-    404: {
-      description: `Accounts are deleted within 20 minutes of being created if left unverified.\nYou can always start the sign up process again.`,
-      btnTitle: 'Sign up again',
-      onClick: () => navigate('/sign-up'),
-    },
-
-    409: {
-      description: 'You can simply proceed with singing in.',
-      btnTitle: 'Sign in',
-      onClick: () => navigate('/sign-in'),
-    },
-  };
-
   async function resendAccountVerificationEmail(): Promise<void> {
     try {
       await resendAccountVerificationEmailService({ publicAccountId });
@@ -195,6 +172,30 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
       });
     }
   }
+
+  const infoModalErrorRecord: Record<number, { description: string | undefined; btnTitle?: string; onClick?: () => void }> = {
+    400: {
+      description: 'Check your inbox for a verification email, or start the sign up process again.',
+      onClick: () => navigate('/sign-up/verification'),
+    },
+
+    403: {
+      description: `Emails may take a minute to arrive, and could end up in your spam folder.\nIf you still can't find the email, wait 20 minutes and start again.`,
+      onClick: undefined,
+    },
+
+    404: {
+      description: `Accounts are deleted within 20 minutes of being created if left unverified.\nYou can always start the sign up process again.`,
+      btnTitle: 'Sign up again',
+      onClick: () => navigate('/sign-up'),
+    },
+
+    409: {
+      description: 'You can simply proceed with singing in.',
+      btnTitle: 'Sign in',
+      onClick: () => navigate('/sign-in'),
+    },
+  };
 
   return (
     <>
@@ -270,11 +271,12 @@ function ConfirmAccountVerification({
   );
 
   useEffect(() => {
-    let ignore = false;
+    const abortController: AbortController = new AbortController();
+    let ignore: boolean = false;
 
     const verifyAccount = async (): Promise<void> => {
       try {
-        await verifyAccountService({ publicAccountId, verificationToken });
+        await verifyAccountService({ publicAccountId, verificationToken }, abortController.signal);
 
         if (ignore) {
           return;
@@ -288,7 +290,7 @@ function ConfirmAccountVerification({
           onClick: () => navigate('/sign-in'),
         });
       } catch (err: unknown) {
-        if (ignore) {
+        if (ignore || err instanceof CanceledError) {
           return;
         }
 
@@ -354,6 +356,7 @@ function ConfirmAccountVerification({
 
     return () => {
       ignore = true;
+      abortController.abort();
     };
   }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord]);
 
