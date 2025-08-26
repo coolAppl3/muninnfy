@@ -6,3 +6,7 @@ const authApiUrl: string = location.hostname === 'localhost' ? `http://localhost
 export function getAuthSessionService(): Promise<AxiosResponse> {
   return axios.get(`${authApiUrl}/session`);
 }
+
+export function signOutService(): Promise<AxiosResponse> {
+  return axios.delete(`${authApiUrl}/session`);
+}
