@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { JSX, useState } from 'react';
 import { Link, NavLink, NavigateFunction, useNavigate, Location, useLocation } from 'react-router-dom';
 import Button from '../Button/Button';
 import Container from '../Container/Container';
@@ -6,6 +6,7 @@ import Logo from '../../assets/svg/Logo.svg';
 import HomeIcon from '../../assets/svg/HomeIcon.svg?react';
 import SignInIcon from '../../assets/svg/SignInIcon.svg?react';
 import AddIcon from '../../assets/svg/AddIcon.svg?react';
+import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
 import './Navbars.css';
 import useAuth from '../../hooks/useAuth';
 
@@ -70,27 +71,63 @@ function TopNavbar({
           </NavLink>
         </div>
 
-        <div className='hidden md:flex justify-center items-end gap-1'>
-          {routerLocation.pathname === '/sign-in' || (
-            <Button
-              className='bg-description border-description text-dark'
-              onClick={() => navigate('/sign-in')}
-            >
-              Sign in
-            </Button>
-          )}
+        {isSignedIn ? (
+          <TopNavbarAccountMenu />
+        ) : (
+          <div className='hidden md:flex justify-center items-end gap-1'>
+            {routerLocation.pathname === '/sign-in' || (
+              <Button
+                className='bg-description border-description text-dark'
+                onClick={() => navigate('/sign-in')}
+              >
+                Sign in
+              </Button>
+            )}
 
-          {routerLocation.pathname === '/sign-up' || (
-            <Button
-              className='bg-cta border-cta text-dark'
-              onClick={() => navigate('/sign-up')}
-            >
-              Sign up
-            </Button>
-          )}
-        </div>
+            {routerLocation.pathname === '/sign-up' || (
+              <Button
+                className='bg-cta border-cta text-dark'
+                onClick={() => navigate('/sign-up')}
+              >
+                Sign up
+              </Button>
+            )}
+          </div>
+        )}
       </Container>
     </nav>
+  );
+}
+
+function TopNavbarAccountMenu(): JSX.Element {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  return (
+    <div className={`account-menu ${isOpen ? 'open' : ''}`}>
+      <button
+        type='button'
+        className='account-menu-btn'
+        onClick={() => setIsOpen((prev) => !prev)}
+        onBlur={() => setIsOpen(false)}
+      >
+        <span>Menu</span>
+        <ChevronIcon />
+      </button>
+
+      <div className='account-menu-container'>
+        <Link to='/account'>My account</Link>
+        <Link to='/account/wishlists'>Wishlists</Link>
+        <button
+          type='button'
+          onClick={() => {
+            console.log(true);
+            // TODO: implement an abstracted signout process
+          }}
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
   );
 }
 
