@@ -2,9 +2,10 @@ import express, { Request, Response, Router } from 'express';
 import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { dbPool } from '../db/db';
-import { RowDataPacket } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { destroyAuthSession } from '../auth/authSessions';
 import { AUTH_EXTENSIONS_LIMIT, dayMilliseconds } from '../util/constants';
+import { logUnexpectedError } from '../logs/errorLogger';
 
 export const authRouter: Router = express.Router();
 
@@ -83,6 +84,43 @@ authRouter.get('/session', async (req: Request, res: Response) => {
           session_id = ?;`,
         [newAuthSessionId, newExpiryTimestamp, authSessionId]
       );
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+authRouter.delete('/session', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+
+  if (!authSessionId) {
+    res.json({});
+    return;
+  }
+
+  if (!isValidUuid(authSessionId)) {
+    removeRequestCookie(res, 'authSessionId', true);
+    res.json({});
+
+    return;
+  }
+
+  removeRequestCookie(res, 'authSessionId', true);
+
+  try {
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `DELETE FROM
+        auth_sessions
+      WHERE
+        session_id = ?;`,
+      [authSessionId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.on('finish', async () => await logUnexpectedError(req, null, 'Failed to delete auth_sessions row on sign out.'));
     }
 
     res.json({});
