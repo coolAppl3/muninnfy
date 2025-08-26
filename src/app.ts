@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 // other
 import { rateLimiter } from './middleware/rateLimiter';
 import { accountsRouter } from './routers/accountsRouter';
+import { authRouter } from './routers/authRouter';
 
 // router imports
 
@@ -39,6 +40,7 @@ app.use('/api/', rateLimiter);
 
 // routes
 app.use('/api/accounts', accountsRouter);
+app.use('/api/auth', authRouter);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
