@@ -7,27 +7,40 @@ import HomeIcon from '../../assets/svg/HomeIcon.svg?react';
 import SignInIcon from '../../assets/svg/SignInIcon.svg?react';
 import AddIcon from '../../assets/svg/AddIcon.svg?react';
 import './Navbars.css';
+import useAuth from '../../hooks/useAuth';
 
 export default function Navbars(): JSX.Element {
   const routerLocation: Location = useLocation();
   const navigate: NavigateFunction = useNavigate();
+
+  const { isSignedIn } = useAuth();
 
   return (
     <>
       <TopNavbar
         routerLocation={routerLocation}
         navigate={navigate}
+        isSignedIn={isSignedIn}
       />
 
       <BottomNavbar
         routerLocation={routerLocation}
         navigate={navigate}
+        isSignedIn={isSignedIn}
       />
     </>
   );
 }
 
-function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; navigate: NavigateFunction }): JSX.Element {
+function TopNavbar({
+  routerLocation,
+  navigate,
+  isSignedIn,
+}: {
+  routerLocation: Location;
+  navigate: NavigateFunction;
+  isSignedIn: boolean;
+}): JSX.Element {
   return (
     <nav className='top-navbar'>
       <Container className='flex justify-between items-center'>
@@ -50,7 +63,7 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
           </NavLink>
 
           <NavLink
-            to='/new-wishlist'
+            to={isSignedIn ? '/account/new-wishlist' : '/guest/new-wishlist'}
             className={({ isActive }) => (isActive ? 'isActive' : '')}
           >
             New wishlist
@@ -81,7 +94,15 @@ function TopNavbar({ routerLocation, navigate }: { routerLocation: Location; nav
   );
 }
 
-function BottomNavbar({ routerLocation, navigate }: { routerLocation: Location; navigate: NavigateFunction }): JSX.Element {
+function BottomNavbar({
+  routerLocation,
+  navigate,
+  isSignedIn,
+}: {
+  routerLocation: Location;
+  navigate: NavigateFunction;
+  isSignedIn: boolean;
+}): JSX.Element {
   return (
     <nav className='bottom-navbar md:hidden'>
       <div>
@@ -94,7 +115,7 @@ function BottomNavbar({ routerLocation, navigate }: { routerLocation: Location; 
         </NavLink>
 
         <NavLink
-          to='/new-wishlist'
+          to={isSignedIn ? '/account/new-wishlist' : '/guest/new-wishlist'}
           className={({ isActive }) => (isActive ? 'isActive' : '')}
         >
           <AddIcon className='w-[2.4rem] h-[2.4rem]' />

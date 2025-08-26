@@ -4,8 +4,11 @@ import Container from '../Container/Container';
 import { NavLink } from 'react-router-dom';
 import Logo from '../../assets/svg/Logo.svg';
 import { Link } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
 export default function Footer(): JSX.Element {
+  const { isSignedIn } = useAuth();
+
   return (
     <footer className='footer'>
       <Container>
@@ -28,7 +31,7 @@ export default function Footer(): JSX.Element {
             title='Pages'
             links={[
               { title: 'Home', path: '/home' },
-              { title: 'New wishlist', path: '/new-wishlist' },
+              { title: 'New wishlist', path: isSignedIn ? '/account/new-wishlist' : '/guest/new-wishlist' },
               { title: 'Sign up', path: '/sign-up' },
               { title: 'Sign in', path: '/sign-in' },
             ]}
@@ -37,7 +40,7 @@ export default function Footer(): JSX.Element {
           <LinksContainer
             title='Useful'
             links={[
-              { title: 'Account recovery', path: '/account-recovery' },
+              { title: 'Account recovery', path: '/account/recovery' },
               { title: 'FAQ', path: '/faq' },
             ]}
           />
