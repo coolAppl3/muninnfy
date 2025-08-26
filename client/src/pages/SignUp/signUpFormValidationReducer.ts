@@ -81,7 +81,7 @@ export function signUpFormValidationReducer(
   if (type === 'ADD_FIELD_ERROR') {
     const { errMessage, errReason } = payload;
 
-    const inputRecord: Record<string, string> = {
+    const errFieldRecord: Record<string, string> = {
       invalidEmail: 'email',
       invalidUsername: 'username',
       invalidPassword: 'password',
@@ -92,7 +92,7 @@ export function signUpFormValidationReducer(
       passwordMatchesUsername: 'password',
     };
 
-    const fieldName: string | undefined = inputRecord[errReason];
+    const fieldName: string | undefined = errFieldRecord[errReason];
 
     if (!fieldName) {
       return state;
