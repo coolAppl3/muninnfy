@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.11] (2024-08-26)
+
+### Features
+
+- Added `CheckIcon` SVG.
+- Added `CheckboxFormGroup` component.
+- Implemented `SignIn` page component.
+  - Further auth-related features to be added down the line.
+
+
+### Bug Fixes
+
+- Fixed cron scheduler meant for running every minute running hourly instead.
+- Fixed `expectedKeys` in POST `accounts/signIn` not containing `keepSignedIn`. 
+
+
+### Improvements
+
+- Implement the use of `AbortController` in `ConfirmAccountVerification` component under `AccountVerification` to further tighten the `useEffect` behavior.
+  - Added `abortSignal` parameter to `verifyAccountService()`.
+
+
+### Code Refactoring
+
+- Refactor `accounts/` endpoints to no longer return a `500` if the account deletion fails prior to the response.
+- Renamed `removeStaleRateTrackerRows()`to `removeStaleRateTrackerRowsCron()` and added it to `cronInit` to run every minute.
+
+
 ## [0.0.10] (2024-08-25)
 
 ### Features
