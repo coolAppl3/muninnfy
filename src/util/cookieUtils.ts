@@ -2,7 +2,13 @@ import { CookieOptions, Request, Response } from 'express';
 
 type AllowedCookieNames = 'authSessionId' | 'rateLimitId';
 
-export function setResponseCookie(res: Response, cookieName: AllowedCookieNames, cookieValue: string, maxAge: number, httpOnly: boolean): void {
+export function setResponseCookie(
+  res: Response,
+  cookieName: AllowedCookieNames,
+  cookieValue: string,
+  maxAge: number,
+  httpOnly: boolean
+): void {
   const cookieOptions: CookieOptions = {
     httpOnly,
     secure: true,

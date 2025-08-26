@@ -7,7 +7,12 @@ import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { generateCryptoUuid } from '../util/tokenGenerator';
 
-export async function createAuthSession(res: Response, accountId: number, keepSignedIn: boolean, attemptCount: number = 1): Promise<boolean> {
+export async function createAuthSession(
+  res: Response,
+  accountId: number,
+  keepSignedIn: boolean,
+  attemptCount: number = 1
+): Promise<boolean> {
   if (attemptCount > 3) {
     return false;
   }
