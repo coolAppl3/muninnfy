@@ -581,20 +581,20 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       return;
     }
 
-    const isSuspended: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
-    if (isSuspended) {
-      res.status(403).json({ message: 'Account is suspended.', reason: 'accountSuspended' });
+    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
+    if (isLocked) {
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
       return;
     }
 
     const isCorrectPassword: boolean = await bcrypt.compare(requestData.password, accountDetails.hashed_password);
     if (!isCorrectPassword) {
       const incremented: boolean = await incrementFailedVerificationAttempts(accountDetails.account_id, dbPool, req);
-      const hasBeenSuspended: boolean = accountDetails.failed_sign_in_attempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
+      const hasBeenLocked: boolean = accountDetails.failed_sign_in_attempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
 
       res.status(401).json({
-        message: `Incorrect password.${hasBeenSuspended ? ' Account suspended.' : ''}`,
-        reason: hasBeenSuspended ? 'incorrectPassword_suspended' : 'incorrectPassword',
+        message: `Incorrect password.${hasBeenLocked ? ' Account locked.' : ''}`,
+        reason: hasBeenLocked ? 'incorrectPassword_locked' : 'incorrectPassword',
       });
 
       return;
