@@ -6,7 +6,7 @@ export function setResponseCookie(
   res: Response,
   cookieName: AllowedCookieNames,
   cookieValue: string,
-  maxAge: number,
+  maxAge: number | undefined,
   httpOnly: boolean
 ): void {
   const cookieOptions: CookieOptions = {

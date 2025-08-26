@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { setResponseCookie } from '../util/cookieUtils';
-import { AUTH_SESSIONS_LIMIT, hourMilliseconds } from '../util/constants';
+import { AUTH_SESSIONS_LIMIT, dayMilliseconds, hourMilliseconds } from '../util/constants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { generateCryptoUuid } from '../util/tokenGenerator';
@@ -20,8 +20,8 @@ export async function createAuthSession(
   const newAuthSessionId: string = generateCryptoUuid();
   const currentTimestamp: number = Date.now();
 
-  const maxAge: number = keepSignedIn ? hourMilliseconds * 24 * 7 : hourMilliseconds * 6;
-  const expiryTimestamp: number = currentTimestamp + maxAge;
+  const maxAge: number | undefined = keepSignedIn ? dayMilliseconds * 7 : undefined;
+  const expiryTimestamp: number = currentTimestamp + (maxAge ? maxAge : hourMilliseconds * 6);
 
   let connection: PoolConnection | null = null;
 
@@ -53,9 +53,10 @@ export async function createAuthSession(
           session_id,
           account_id,
           created_on_timestamp,
-          expiry_timestamp
-        ) VALUES (${generatePlaceHolders(4)});`,
-        [newAuthSessionId, accountId, currentTimestamp, expiryTimestamp]
+          expiry_timestamp,
+          keep_signed_in
+        ) VALUES (${generatePlaceHolders(5)});`,
+        [newAuthSessionId, accountId, currentTimestamp, expiryTimestamp, keepSignedIn]
       );
 
       await connection.commit();
