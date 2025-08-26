@@ -26,6 +26,7 @@ module.exports = {
       boxShadow: {
         simple: '10px 10px 12px rgba(0, 0, 0, 0.15)',
         'simple-tiny': '4px 4px 6px rgba(0, 0, 0, 0.15)',
+        'centered-tiny': '0px 0px 6px rgba(0, 0, 0, 0.25)',
       },
 
       animation: {
