@@ -132,6 +132,7 @@ async function createAuthSessionsTable(): Promise<void> {
         account_id INT NOT NULL,
         created_on_timestamp BIGINT NOT NULL,
         expiry_timestamp BIGINT NOT NULL,
+        keep_signed_in BOOLEAN NOT NULL,
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
