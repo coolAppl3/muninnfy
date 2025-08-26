@@ -8,8 +8,6 @@ import { destroyAuthSession } from '../auth/authSessions';
 export const authRouter: Router = express.Router();
 
 authRouter.get('/session', async (req: Request, res: Response) => {
-  console.log(req.cookies.authSessionId);
-
   const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
 
   if (!authSessionId) {
