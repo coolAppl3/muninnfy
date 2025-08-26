@@ -516,7 +516,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
 accountsRouter.post('/signIn', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `You're already signed in.`, reason: 'alreadySignedIn' });
+    res.status(403).json({ message: 'Already signed in.', reason: 'alreadySignedIn' });
     return;
   }
 
@@ -572,12 +572,12 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     const accountDetails: AccountDetails | undefined = accountRows[0];
 
     if (!accountDetails) {
-      res.status(404).json({ message: 'Account not found or unverified.', reason: 'accountNotFound' });
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
       return;
     }
 
     if (!accountDetails.is_verified) {
-      res.status(404).json({ message: 'Account not found or unverified.', reason: 'accountNotFound' });
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
       return;
     }
 
