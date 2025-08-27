@@ -144,7 +144,6 @@ async function createAuthSessionsTable(): Promise<void> {
 
 async function createRateTrackerTable(): Promise<void> {
   try {
-    // TODO: remove chat request limiters
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS rate_tracker (
         rate_limit_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
