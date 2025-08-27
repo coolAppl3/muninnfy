@@ -103,12 +103,14 @@ function TopNavbarAccountMenu(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <div className={`account-menu ${isOpen ? 'open' : ''}`}>
+    <div
+      className={`account-menu ${isOpen ? 'open' : ''}`}
+      onBlur={() => setIsOpen(false)}
+    >
       <button
         type='button'
         className='account-menu-btn'
         onClick={() => setIsOpen((prev) => !prev)}
-        onBlur={() => setIsOpen(false)}
       >
         <span>Menu</span>
         <ChevronIcon />
