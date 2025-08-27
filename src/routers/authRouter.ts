@@ -13,13 +13,13 @@ authRouter.get('/session', async (req: Request, res: Response) => {
   const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Not signed in.', reason: 'notSignedIn' });
+    res.json({ isValidAuthSession: false });
     return;
   }
 
   if (!isValidUuid(authSessionId)) {
     removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Not signed in.', reason: 'notSignedIn' });
+    res.json({ isValidAuthSession: false });
 
     return;
   }
@@ -49,7 +49,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
 
     if (!authSessionDetails) {
       removeRequestCookie(res, 'authSessionId', true);
-      res.status(404).json({ message: 'Session not found.', reason: 'sessionNotFound' });
+      res.json({ isValidAuthSession: false });
 
       return;
     }
@@ -60,7 +60,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
       removeRequestCookie(res, 'authSessionId', true);
       await destroyAuthSession(authSessionId);
 
-      res.status(401).json({ message: 'Session expired.', reason: 'sessionExpired' });
+      res.json({ isValidAuthSession: false });
       return;
     }
 
@@ -86,10 +86,10 @@ authRouter.get('/session', async (req: Request, res: Response) => {
       );
     }
 
-    res.json({});
+    res.json({ isValidAuthSession: true });
   } catch (err: unknown) {
     console.log(err);
-    res.status(500).json({ message: 'Internal server error.' });
+    res.json({ isValidAuthSession: false });
   }
 });
 

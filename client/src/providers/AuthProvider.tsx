@@ -8,8 +8,8 @@ export default function AuthProvider({ children }: { children: ReactNode }): JSX
   useEffect(() => {
     const checkForAuthSession = async (): Promise<void> => {
       try {
-        await getAuthSessionService();
-        setIsSignedIn(true);
+        const isValidAuthSession: boolean = (await getAuthSessionService()).data.isValidAuthSession;
+        setIsSignedIn(isValidAuthSession);
       } catch (err: unknown) {
         setIsSignedIn(false);
       }
