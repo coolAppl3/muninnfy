@@ -9,6 +9,9 @@ import AddIcon from '../../assets/svg/AddIcon.svg?react';
 import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
 import './Navbars.css';
 import useAuth from '../../hooks/useAuth';
+import usePopupMessage from '../../hooks/usePopupMessage';
+import { signOutService } from '../../services/authServices';
+import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 
 export default function Navbars(): JSX.Element {
   const routerLocation: Location = useLocation();
@@ -102,6 +105,34 @@ function TopNavbar({
 function TopNavbarAccountMenu(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const navigate: NavigateFunction = useNavigate();
+  const { pathname } = useLocation();
+  const { isSignedIn, setIsSignedIn } = useAuth();
+  const { displayPopupMessage } = usePopupMessage();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
+
+  async function handleSignOut(): Promise<void> {
+    if (!isSignedIn) {
+      displayPopupMessage('Already signed out.', 'success');
+      return;
+    }
+
+    displayLoadingOverlay();
+
+    try {
+      await signOutService();
+      setIsSignedIn(false);
+
+      displayPopupMessage('Signed out.', 'success');
+      pathname.startsWith('/account') && navigate('/home');
+    } catch (err: unknown) {
+      console.log(err);
+      displayPopupMessage('Sign out failed.', 'success');
+    } finally {
+      removeLoadingOverlay();
+    }
+  }
+
   return (
     <div
       className={`account-menu ${isOpen ? 'open' : ''}`}
@@ -121,10 +152,7 @@ function TopNavbarAccountMenu(): JSX.Element {
         <Link to='/account/wishlists'>Wishlists</Link>
         <button
           type='button'
-          onClick={() => {
-            console.log(true);
-            // TODO: implement an abstracted signout process
-          }}
+          onClick={handleSignOut}
         >
           Sign out
         </button>
