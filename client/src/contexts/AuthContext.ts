@@ -1,8 +1,8 @@
-import { createContext } from 'react';
+import { createContext, Dispatch } from 'react';
 
 export interface AuthContextInterface {
   isSignedIn: boolean;
-  setIsSignedIn: (newValue: boolean) => void;
+  setIsSignedIn: Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContextInterface | null>(null);
