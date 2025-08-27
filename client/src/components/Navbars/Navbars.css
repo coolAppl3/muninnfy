@@ -16,7 +16,7 @@
   }
 
   .account-menu {
-    @apply relative;
+    @apply relative hidden md:block;
 
     &.open {
       button.account-menu-btn {
