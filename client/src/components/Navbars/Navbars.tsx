@@ -12,12 +12,52 @@ import useAuth from '../../hooks/useAuth';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { signOutService } from '../../services/authServices';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
+import useConfirmModal from '../../hooks/useConfirmModal';
 
 export default function Navbars(): JSX.Element {
   const routerLocation: Location = useLocation();
   const navigate: NavigateFunction = useNavigate();
 
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, setIsSignedIn } = useAuth();
+  const { displayPopupMessage } = usePopupMessage();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
+  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
+
+  async function handleSignOut(): Promise<void> {
+    if (!isSignedIn) {
+      displayPopupMessage('Already signed out.', 'success');
+      return;
+    }
+
+    displayConfirmModal({
+      title: 'Are you sure you want to sign out?',
+      confirmBtnTitle: 'Confirm',
+      cancelBtnTitle: 'Cancel',
+      isDangerous: true,
+      onConfirm: async () => {
+        await signOut();
+        removeConfirmModal();
+      },
+      onCancel: removeConfirmModal,
+    });
+  }
+
+  async function signOut(): Promise<void> {
+    displayLoadingOverlay();
+
+    try {
+      await signOutService();
+      setIsSignedIn(false);
+
+      displayPopupMessage('Signed out.', 'success');
+      routerLocation.pathname.startsWith('/account') && navigate('/home');
+    } catch (err: unknown) {
+      console.log(err);
+      displayPopupMessage('Sign out failed.', 'success');
+    } finally {
+      removeLoadingOverlay();
+    }
+  }
 
   return (
     <>
@@ -25,12 +65,14 @@ export default function Navbars(): JSX.Element {
         routerLocation={routerLocation}
         navigate={navigate}
         isSignedIn={isSignedIn}
+        handleSignOut={handleSignOut}
       />
 
       <BottomNavbar
         routerLocation={routerLocation}
         navigate={navigate}
         isSignedIn={isSignedIn}
+        handleSignOut={handleSignOut}
       />
     </>
   );
@@ -40,10 +82,12 @@ function TopNavbar({
   routerLocation,
   navigate,
   isSignedIn,
+  handleSignOut,
 }: {
   routerLocation: Location;
   navigate: NavigateFunction;
   isSignedIn: boolean;
+  handleSignOut: () => Promise<void>;
 }): JSX.Element {
   return (
     <nav className='top-navbar'>
@@ -75,7 +119,7 @@ function TopNavbar({
         </div>
 
         {isSignedIn ? (
-          <TopNavbarAccountMenu />
+          <TopNavbarAccountMenu handleSignOut={handleSignOut} />
         ) : (
           <div className='hidden md:flex justify-center items-end gap-1'>
             {routerLocation.pathname === '/sign-in' || (
@@ -102,36 +146,8 @@ function TopNavbar({
   );
 }
 
-function TopNavbarAccountMenu(): JSX.Element {
+function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<void> }): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const navigate: NavigateFunction = useNavigate();
-  const { pathname } = useLocation();
-  const { isSignedIn, setIsSignedIn } = useAuth();
-  const { displayPopupMessage } = usePopupMessage();
-  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-
-  async function handleSignOut(): Promise<void> {
-    if (!isSignedIn) {
-      displayPopupMessage('Already signed out.', 'success');
-      return;
-    }
-
-    displayLoadingOverlay();
-
-    try {
-      await signOutService();
-      setIsSignedIn(false);
-
-      displayPopupMessage('Signed out.', 'success');
-      pathname.startsWith('/account') && navigate('/home');
-    } catch (err: unknown) {
-      console.log(err);
-      displayPopupMessage('Sign out failed.', 'success');
-    } finally {
-      removeLoadingOverlay();
-    }
-  }
 
   return (
     <div
@@ -165,10 +181,12 @@ function BottomNavbar({
   routerLocation,
   navigate,
   isSignedIn,
+  handleSignOut,
 }: {
   routerLocation: Location;
   navigate: NavigateFunction;
   isSignedIn: boolean;
+  handleSignOut: () => Promise<void>;
 }): JSX.Element {
   return (
     <nav className='bottom-navbar md:hidden'>
@@ -190,7 +208,7 @@ function BottomNavbar({
         </NavLink>
 
         {isSignedIn ? (
-          <BottomNavbarAccountMenu />
+          <BottomNavbarAccountMenu handleSignOut={handleSignOut} />
         ) : (
           <NavLink
             to='sign-in'
@@ -205,36 +223,8 @@ function BottomNavbar({
   );
 }
 
-function BottomNavbarAccountMenu(): JSX.Element {
+function BottomNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<void> }): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const navigate: NavigateFunction = useNavigate();
-  const { pathname } = useLocation();
-  const { isSignedIn, setIsSignedIn } = useAuth();
-  const { displayPopupMessage } = usePopupMessage();
-  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-
-  async function handleSignOut(): Promise<void> {
-    if (!isSignedIn) {
-      displayPopupMessage('Already signed out.', 'success');
-      return;
-    }
-
-    displayLoadingOverlay();
-
-    try {
-      await signOutService();
-      setIsSignedIn(false);
-
-      displayPopupMessage('Signed out.', 'success');
-      pathname.startsWith('/account') && navigate('/home');
-    } catch (err: unknown) {
-      console.log(err);
-      displayPopupMessage('Sign out failed.', 'success');
-    } finally {
-      removeLoadingOverlay();
-    }
-  }
 
   return (
     <div
