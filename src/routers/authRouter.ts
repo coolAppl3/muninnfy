@@ -114,6 +114,7 @@ authRouter.delete('/session', async (req: Request, res: Response) => {
   }
 
   removeRequestCookie(res, 'authSessionId', true);
+  res.json({});
 
   try {
     const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
@@ -125,10 +126,8 @@ authRouter.delete('/session', async (req: Request, res: Response) => {
     );
 
     if (resultSetHeader.affectedRows === 0) {
-      res.on('finish', async () => await logUnexpectedError(req, null, 'Failed to delete auth_sessions row on sign out.'));
+      await logUnexpectedError(req, null, 'Failed to delete auth_sessions row on sign out.');
     }
-
-    res.json({});
   } catch (err: unknown) {
     console.log(err);
 
