@@ -7,7 +7,7 @@ interface GetAuthSessionServiceData {
   isValidAuthSession: boolean;
 }
 
-export function getAuthSessionService(): Promise<AxiosResponse<GetAuthSessionServiceData>> {
+export function checkForAuthSessionService(): Promise<AxiosResponse<GetAuthSessionServiceData>> {
   return axios.get(`${authApiUrl}/session`);
 }
 

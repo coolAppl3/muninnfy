@@ -1,6 +1,6 @@
 import { JSX, ReactNode, useEffect, useState } from 'react';
 import AuthContext from '../contexts/AuthContext';
-import { getAuthSessionService } from '../services/authServices';
+import { checkForAuthSessionService } from '../services/authServices';
 
 export default function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
   const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
@@ -8,7 +8,7 @@ export default function AuthProvider({ children }: { children: ReactNode }): JSX
   useEffect(() => {
     const checkForAuthSession = async (): Promise<void> => {
       try {
-        const isValidAuthSession: boolean = (await getAuthSessionService()).data.isValidAuthSession;
+        const isValidAuthSession: boolean = (await checkForAuthSessionService()).data.isValidAuthSession;
         setIsSignedIn(isValidAuthSession);
       } catch (err: unknown) {
         setIsSignedIn(false);
