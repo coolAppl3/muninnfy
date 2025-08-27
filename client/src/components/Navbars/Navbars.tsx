@@ -15,7 +15,7 @@ import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import useConfirmModal from '../../hooks/useConfirmModal';
 
 export default function Navbars(): JSX.Element {
-  const routerLocation: Location = useLocation();
+  const { pathname }: Location = useLocation();
   const navigate: NavigateFunction = useNavigate();
 
   const { isSignedIn, setIsSignedIn } = useAuth();
@@ -50,7 +50,7 @@ export default function Navbars(): JSX.Element {
       setIsSignedIn(false);
 
       displayPopupMessage('Signed out.', 'success');
-      routerLocation.pathname.startsWith('/account') && navigate('/home');
+      pathname.startsWith('/account') && navigate('/home');
     } catch (err: unknown) {
       console.log(err);
       displayPopupMessage('Sign out failed.', 'success');
@@ -62,14 +62,14 @@ export default function Navbars(): JSX.Element {
   return (
     <>
       <TopNavbar
-        routerLocation={routerLocation}
+        pathname={pathname}
         navigate={navigate}
         isSignedIn={isSignedIn}
         handleSignOut={handleSignOut}
       />
 
       <BottomNavbar
-        routerLocation={routerLocation}
+        pathname={pathname}
         isSignedIn={isSignedIn}
         handleSignOut={handleSignOut}
       />
@@ -78,12 +78,12 @@ export default function Navbars(): JSX.Element {
 }
 
 function TopNavbar({
-  routerLocation,
+  pathname,
   navigate,
   isSignedIn,
   handleSignOut,
 }: {
-  routerLocation: Location;
+  pathname: string;
   navigate: NavigateFunction;
   isSignedIn: boolean;
   handleSignOut: () => Promise<void>;
@@ -104,7 +104,7 @@ function TopNavbar({
         <div className='links-container'>
           <NavLink
             to='/home'
-            className={({ isActive }) => (isActive || routerLocation.pathname === '/' ? 'isActive' : '')}
+            className={({ isActive }) => (isActive || pathname === '/' ? 'isActive' : '')}
           >
             Home
           </NavLink>
@@ -121,7 +121,7 @@ function TopNavbar({
           <TopNavbarAccountMenu handleSignOut={handleSignOut} />
         ) : (
           <div className='hidden md:flex justify-center items-end gap-1'>
-            {routerLocation.pathname === '/sign-in' || (
+            {pathname === '/sign-in' || (
               <Button
                 className='bg-description border-description text-dark'
                 onClick={() => navigate('/sign-in')}
@@ -130,7 +130,7 @@ function TopNavbar({
               </Button>
             )}
 
-            {routerLocation.pathname === '/sign-up' || (
+            {pathname === '/sign-up' || (
               <Button
                 className='bg-cta border-cta text-dark'
                 onClick={() => navigate('/sign-up')}
@@ -177,11 +177,11 @@ function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<
 }
 
 function BottomNavbar({
-  routerLocation,
+  pathname,
   isSignedIn,
   handleSignOut,
 }: {
-  routerLocation: Location;
+  pathname: string;
   isSignedIn: boolean;
   handleSignOut: () => Promise<void>;
 }): JSX.Element {
@@ -190,7 +190,7 @@ function BottomNavbar({
       <div>
         <NavLink
           to='/home'
-          className={({ isActive }) => (isActive || routerLocation.pathname === '/' ? 'isActive' : '')}
+          className={({ isActive }) => (isActive || pathname === '/' ? 'isActive' : '')}
         >
           <HomeIcon className='w-[2.4rem] h-[2.4rem]' />
           <span>Home</span>
