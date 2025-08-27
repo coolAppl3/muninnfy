@@ -132,6 +132,8 @@ async function createAuthSessionsTable(): Promise<void> {
         account_id INT NOT NULL,
         created_on_timestamp BIGINT NOT NULL,
         expiry_timestamp BIGINT NOT NULL,
+        keep_signed_in BOOLEAN NOT NULL,
+        extensions_count INT NOT NULL CHECK(extensions_count <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
@@ -142,7 +144,6 @@ async function createAuthSessionsTable(): Promise<void> {
 
 async function createRateTrackerTable(): Promise<void> {
   try {
-    // TODO: remove chat request limiters
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS rate_tracker (
         rate_limit_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,

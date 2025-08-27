@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.12] (2024-08-28)
+
+### Features
+
+- Added `authRouter`.
+  - Added GET `auth/session`.
+  - Added DELETE `auth/session`.
+- Added `authServices`.
+  - Added `checkForAuthSessionService()`.
+  - Added `signOutService()`.
+- Added `AuthContext`, `AuthProvider` and `useAuth()` custom hook.
+- Added `keep_signed_in` and `extensions_count` to `auth_sessions` table.
+  - These fields are meant to be used by GET `auth/session` to prolong an auth session's lifetime by another day, if it's set to expire within less than 24 hours, for up to 3 extensions.
+- Added `ChevronIcon` SVG.
+- Added `TopNavbarAccountMenu` and `BottomNavbarAccountMenu` as local components under `Navbars` to be conditionally rendered if the user is signed in.
+
+
+### Changes
+
+- Changed auth logic to set the `authSessionId` as a session cookie, unless the user wants to stay signed in.
+
+
+### Code Refactoring
+
+- Redefined a few browser routes.
+- Other minor refactors.
+
+
 ## [0.0.11] (2024-08-26)
 
 ### Features

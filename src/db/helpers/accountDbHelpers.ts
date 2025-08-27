@@ -21,7 +21,11 @@ export async function deleteAccountById(accountId: number, executor: Pool | Pool
   }
 }
 
-export async function incrementVerificationEmailsSent(verificationId: Readonly<number>, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+export async function incrementVerificationEmailsSent(
+  verificationId: Readonly<number>,
+  executor: Pool | PoolConnection,
+  req: Request
+): Promise<boolean> {
   try {
     const [resultSetHeader] = await executor.execute<ResultSetHeader>(
       `UPDATE
@@ -42,7 +46,11 @@ export async function incrementVerificationEmailsSent(verificationId: Readonly<n
   }
 }
 
-export async function incrementFailedVerificationAttempts(verificationId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+export async function incrementFailedVerificationAttempts(
+  verificationId: number,
+  executor: Pool | PoolConnection,
+  req: Request
+): Promise<boolean> {
   try {
     const [resultSetHeader] = await executor.execute<ResultSetHeader>(
       `UPDATE
