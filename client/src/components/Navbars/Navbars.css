@@ -1,7 +1,7 @@
 @reference '../../index.css';
 
 .top-navbar {
-  @apply sticky top-0 left-0 w-full h-6 bg-dark border-b-1 border-b-cta text-title z-15;
+  @apply sticky top-0 left-0 w-full h-6 bg-dark border-b-1 border-b-cta/40 text-title z-15;
 
   .links-container {
     @apply font-bold hidden md:flex justify-center items-center absolute w-fit h-fit left-0 right-0 mx-auto;
@@ -60,7 +60,7 @@
 }
 
 .bottom-navbar {
-  @apply fixed bottom-0 left-0 w-full h-6 bg-dark border-t-1 border-t-cta/39 text-title font-medium text-sm z-15;
+  @apply fixed bottom-0 left-0 w-full h-6 bg-dark border-t-1 border-t-cta/49 text-title font-medium text-sm z-15;
 
   & > div {
     @apply h-full w-full grid grid-cols-3;
