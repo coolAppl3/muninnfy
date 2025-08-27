@@ -70,7 +70,6 @@ export default function Navbars(): JSX.Element {
 
       <BottomNavbar
         routerLocation={routerLocation}
-        navigate={navigate}
         isSignedIn={isSignedIn}
         handleSignOut={handleSignOut}
       />
@@ -179,12 +178,10 @@ function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<
 
 function BottomNavbar({
   routerLocation,
-  navigate,
   isSignedIn,
   handleSignOut,
 }: {
   routerLocation: Location;
-  navigate: NavigateFunction;
   isSignedIn: boolean;
   handleSignOut: () => Promise<void>;
 }): JSX.Element {
