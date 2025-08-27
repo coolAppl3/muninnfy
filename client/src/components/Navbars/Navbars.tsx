@@ -168,6 +168,7 @@ function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<
         <button
           type='button'
           onClick={handleSignOut}
+          className='!text-danger'
         >
           Sign out
         </button>
@@ -244,6 +245,7 @@ function BottomNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promi
         <button
           type='button'
           onClick={handleSignOut}
+          className='!text-danger'
         >
           Sign out
         </button>
