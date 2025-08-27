@@ -89,6 +89,11 @@ authRouter.get('/session', async (req: Request, res: Response) => {
     res.json({ isValidAuthSession: true });
   } catch (err: unknown) {
     console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
     res.json({ isValidAuthSession: false });
   }
 });
@@ -126,6 +131,11 @@ authRouter.delete('/session', async (req: Request, res: Response) => {
     res.json({});
   } catch (err: unknown) {
     console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
