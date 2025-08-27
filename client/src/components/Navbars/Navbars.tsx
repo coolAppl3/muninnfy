@@ -189,14 +189,78 @@ function BottomNavbar({
           <span>New wishlist</span>
         </NavLink>
 
-        <NavLink
-          to='sign-in'
-          className={({ isActive }) => (isActive ? 'isActive' : '')}
-        >
-          <SignInIcon className='w-[2.4rem] h-[2.4rem]' />
-          <span>Sign in</span>
-        </NavLink>
+        {isSignedIn ? (
+          <BottomNavbarAccountMenu />
+        ) : (
+          <NavLink
+            to='sign-in'
+            className={({ isActive }) => (isActive ? 'isActive' : '')}
+          >
+            <SignInIcon className='w-[2.4rem] h-[2.4rem]' />
+            <span>Sign in</span>
+          </NavLink>
+        )}
       </div>
     </nav>
+  );
+}
+
+function BottomNavbarAccountMenu(): JSX.Element {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const navigate: NavigateFunction = useNavigate();
+  const { pathname } = useLocation();
+  const { isSignedIn, setIsSignedIn } = useAuth();
+  const { displayPopupMessage } = usePopupMessage();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
+
+  async function handleSignOut(): Promise<void> {
+    if (!isSignedIn) {
+      displayPopupMessage('Already signed out.', 'success');
+      return;
+    }
+
+    displayLoadingOverlay();
+
+    try {
+      await signOutService();
+      setIsSignedIn(false);
+
+      displayPopupMessage('Signed out.', 'success');
+      pathname.startsWith('/account') && navigate('/home');
+    } catch (err: unknown) {
+      console.log(err);
+      displayPopupMessage('Sign out failed.', 'success');
+    } finally {
+      removeLoadingOverlay();
+    }
+  }
+
+  return (
+    <div
+      className={`account-menu ${isOpen ? 'open' : ''}`}
+      tabIndex={0}
+      onBlur={() => setIsOpen(false)}
+    >
+      <button
+        type='button'
+        className='account-menu-btn'
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <span>Menu</span>
+        <ChevronIcon />
+      </button>
+
+      <div className='account-menu-container'>
+        <Link to='/account'>My account</Link>
+        <Link to='/account/wishlists'>Wishlists</Link>
+        <button
+          type='button'
+          onClick={handleSignOut}
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
   );
 }
