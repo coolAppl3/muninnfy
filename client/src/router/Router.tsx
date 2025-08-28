@@ -7,6 +7,7 @@ import SignIn from '../pages/SignIn/SignIn';
 import NewWishlist from '../pages/NewWishlist/NewWishlist';
 import Wishlists from '../pages/Wishlists/Wishlists';
 import AccountVerification from '../pages/AccountVerification/AccountVerification';
+import Account from '../pages/Account/Account';
 
 export function Router(): JSX.Element {
   return (
@@ -38,6 +39,11 @@ export function Router(): JSX.Element {
         <Route
           path='/sign-in'
           element={<SignIn />}
+        />
+
+        <Route
+          path='/account'
+          element={<Account />}
         />
 
         <Route
