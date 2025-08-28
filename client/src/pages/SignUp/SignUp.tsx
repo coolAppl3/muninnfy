@@ -10,6 +10,7 @@ import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
+import useAuth from '../../hooks/useAuth';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -18,6 +19,7 @@ export default function SignUp(): JSX.Element {
 
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
+  const { setIsSignedIn } = useAuth();
 
   async function handleSubmit(): Promise<void> {
     const { displayName, username, email, password } = formData;
@@ -40,7 +42,7 @@ export default function SignUp(): JSX.Element {
       displayPopupMessage(errMessage, 'error');
 
       if (status === 403) {
-        // TODO: update auth status in the to-be-implemented provider
+        setIsSignedIn(true);
         return;
       }
 
