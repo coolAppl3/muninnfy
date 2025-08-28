@@ -22,8 +22,26 @@ app.use(cookieParser());
 
 // cors policy
 if (process.env.NODE_ENV?.toLowerCase() === 'development') {
-  const whitelist = ['http://localhost:3000', 'http://localhost:5000'];
-  app.use(cors({ origin: whitelist, credentials: true }));
+  app.use(
+    cors({
+      origin: (origin: string | undefined, callback) => {
+        if (!origin) {
+          return callback(new Error('Not allowed by CORS.'));
+        }
+
+        if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+          return callback(null, true);
+        }
+
+        if (/^http:\/\/192\.168\.0\.\d{2}:3000$/.test(origin)) {
+          return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS.'));
+      },
+      credentials: true,
+    })
+  );
 }
 
 // CSP
