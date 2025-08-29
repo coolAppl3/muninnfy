@@ -23,7 +23,7 @@ async function createAccountsTable(): Promise<void> {
         account_id INT PRIMARY KEY AUTO_INCREMENT,
         public_account_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
         email VARCHAR(254) NOT NULL UNIQUE,
-        hashed_password VARCHAR(255) NOT NULL,
+        hashed_password VARCHAR(128) NOT NULL,
         username VARCHAR(40) NOT NULL UNIQUE,
         display_name VARCHAR(40) NOT NULL,
         created_on_timestamp BIGINT NOT NULL,
@@ -177,11 +177,11 @@ async function createUnexpectedErrorsTable(): Promise<void> {
       `CREATE TABLE IF NOT EXISTS unexpected_errors (
         error_id INT PRIMARY KEY AUTO_INCREMENT,
         request_method VARCHAR(10),
-        request_path VARCHAR(255),
+        request_path VARCHAR(400),
         error_timestamp BIGINT NOT NULL,
         error_message TEXT,
         stack_trace TEXT,
-        description VARCHAR(255)
+        description VARCHAR(254)
       );`
     );
   } catch (err: unknown) {
