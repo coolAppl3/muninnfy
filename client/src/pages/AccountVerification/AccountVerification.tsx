@@ -372,7 +372,7 @@ function ConfirmAccountVerification({
       ignore = true;
       abortController.abort();
     };
-  }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord]);
+  }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord, setIsSignedIn]);
 
   return (
     <>
