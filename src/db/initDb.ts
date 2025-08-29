@@ -154,7 +154,7 @@ async function createWishlistsTable(): Promise<void> {
         account_id INT UNSIGNED,
         privacy_level TINYINT UNSIGNED NOT NULL CHECK (privacy_level IN (0, 1, 2)),
         title VARCHAR(100) NOT NULL,
-        description VARCHAR(500),
+        description VARCHAR(600),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
