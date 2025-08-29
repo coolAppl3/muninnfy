@@ -328,7 +328,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       FROM
         accounts
       LEFT JOIN
-        account_verification ON accounts.account_id = account_verification.account_id
+        account_verification USING(account_id)
       WHERE
         accounts.public_account_id = ?;`,
       [requestData.publicAccountId]
@@ -434,7 +434,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       FROM
         accounts
       LEFT JOIN
-        account_verification ON accounts.account_id = account_verification.account_id
+        account_verification USING(account_id)
       WHERE
         accounts.public_account_id = ?;`,
       [requestData.publicAccountId]
