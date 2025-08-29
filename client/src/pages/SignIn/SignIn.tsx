@@ -39,6 +39,7 @@ export default function SignIn(): JSX.Element {
 
     try {
       await signInService({ email, password, keepSignedIn });
+      setIsSignedIn(true);
 
       displayPopupMessage('Signed in.', 'success');
       navigate('/account');
