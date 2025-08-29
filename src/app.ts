@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import { rateLimiter } from './middleware/rateLimiter';
 import { accountsRouter } from './routers/accountsRouter';
 import { authRouter } from './routers/authRouter';
+import { wishlistsRouter } from './routers/wishlistsRouter';
 
 // router imports
 
@@ -59,6 +60,7 @@ app.use('/api/', rateLimiter);
 // routes
 app.use('/api/accounts', accountsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/wishlists', wishlistsRouter);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
