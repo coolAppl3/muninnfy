@@ -16,10 +16,12 @@ export default function Hero(): JSX.Element {
           <h1 className='text-title font-bold text-[4.6rem] leading-[1]'>
             Your Wishlists, <span className='text-cta italic'>Reimagined.</span>
           </h1>
-          <p className='text-description font-medium text-lg leading-[1.2]'>The app you always wished existed! Flexible, shareable, and built to do more.</p>
+          <p className='text-description font-medium text-lg leading-[1.2]'>
+            The app you always wished existed! Flexible, shareable, and built to do more.
+          </p>
           <Button
             className='bg-cta border-cta text-dark mt-1 w-full xs:w-fit'
-            onClick={() => navigate('/new-wishlist')}
+            onClick={() => navigate('/wishlist/new')}
           >
             Create a wishlist
           </Button>

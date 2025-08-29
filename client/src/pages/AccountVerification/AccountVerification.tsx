@@ -257,7 +257,7 @@ function ConfirmAccountVerification({
     () => ({
       400: {
         description: `Your verification link is invalid or malformed.Make sure you've copied the correct link.`,
-        onClick: () => navigate('/verification'),
+        onClick: () => navigate('/sign-up/verification'),
       },
 
       403: {
