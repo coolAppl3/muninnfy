@@ -15,6 +15,7 @@ import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import { validateEmail } from '../../utils/validation';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { CanceledError } from 'axios';
+import useAuth from '../../hooks/useAuth';
 
 export default function AccountVerification(): JSX.Element {
   const [searchParams] = useSearchParams();
@@ -45,6 +46,7 @@ function ContinueAccountVerificationForm(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
+  const { setIsSignedIn } = useAuth();
 
   async function continueAccountVerification(): Promise<void> {
     const email: string = emailValue;
@@ -71,6 +73,11 @@ function ContinueAccountVerificationForm(): JSX.Element {
 
       const { status, errMessage, errReason } = asyncErrorData;
       displayPopupMessage(errMessage, 'error');
+
+      if (status === 403) {
+        setIsSignedIn(true);
+        return;
+      }
 
       if (!errReason || ![400, 404].includes(status)) {
         return;
@@ -135,6 +142,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
+  const { setIsSignedIn } = useAuth();
 
   async function resendAccountVerificationEmail(): Promise<void> {
     try {
@@ -153,6 +161,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
       displayPopupMessage(errMessage, 'error');
 
       if (status === 403 && errReason === 'signedIn') {
+        setIsSignedIn(true);
         return;
       }
 
@@ -242,12 +251,13 @@ function ConfirmAccountVerification({
 
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
+  const { setIsSignedIn } = useAuth();
 
   const verificationErrorRecord: Record<number, { description: string | undefined; btnTitle?: string; onClick?: () => void }> = useMemo(
     () => ({
       400: {
         description: `Your verification link is invalid or malformed.Make sure you've copied the correct link.`,
-        onClick: () => navigate('/verification'),
+        onClick: () => navigate('/sign-up/verification'),
       },
 
       403: {
@@ -339,6 +349,10 @@ function ConfirmAccountVerification({
           return;
         }
 
+        if (status === 403) {
+          setIsSignedIn(true);
+        }
+
         const description: string | undefined = verificationErrorRecord[status]?.description;
         const onClick: (() => void) | undefined = verificationErrorRecord[status]?.onClick;
         const btnTitle: string | undefined = verificationErrorRecord[status]?.btnTitle;
@@ -358,7 +372,7 @@ function ConfirmAccountVerification({
       ignore = true;
       abortController.abort();
     };
-  }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord]);
+  }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord, setIsSignedIn]);
 
   return (
     <>

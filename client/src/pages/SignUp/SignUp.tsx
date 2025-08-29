@@ -10,7 +10,7 @@ import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
-import useInfoModal from '../../hooks/useInfoModal';
+import useAuth from '../../hooks/useAuth';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -19,7 +19,7 @@ export default function SignUp(): JSX.Element {
 
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
-  const { displayInfoModal, removeInfoModal } = useInfoModal();
+  const { setIsSignedIn } = useAuth();
 
   async function handleSubmit(): Promise<void> {
     const { displayName, username, email, password } = formData;
@@ -42,19 +42,7 @@ export default function SignUp(): JSX.Element {
       displayPopupMessage(errMessage, 'error');
 
       if (status === 403) {
-        // TODO: update auth status in the to-be-implemented provider
-        return;
-      }
-
-      if (status === 429) {
-        displayPopupMessage('Too many requests.', 'error');
-        displayInfoModal({
-          title: 'Please slow down.',
-          description: `You're sending too many requests and have been suspended as a result.\nYou'll be able to send new requests again within 30 to 60 seconds.`,
-          btnTitle: 'Okay',
-          onClick: removeInfoModal,
-        });
-
+        setIsSignedIn(true);
         return;
       }
 

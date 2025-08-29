@@ -91,7 +91,7 @@ function TopNavbar({
   return (
     <nav className='top-navbar'>
       <Container className='flex justify-between items-center'>
-        <Link to={'/home'}>
+        <Link to='/home'>
           <div className='flex justify-start items-center gap-1'>
             <img
               className='w-4 h-4'
@@ -110,7 +110,7 @@ function TopNavbar({
           </NavLink>
 
           <NavLink
-            to={isSignedIn ? '/account/new-wishlist' : '/guest/new-wishlist'}
+            to='/wishlist/new'
             className={({ isActive }) => (isActive ? 'isActive' : '')}
           >
             New wishlist
@@ -198,7 +198,7 @@ function BottomNavbar({
         </NavLink>
 
         <NavLink
-          to={isSignedIn ? '/account/new-wishlist' : '/guest/new-wishlist'}
+          to='/wishlist/new'
           className={({ isActive }) => (isActive ? 'isActive' : '')}
         >
           <AddIcon className='w-[2.4rem] h-[2.4rem]' />
@@ -209,7 +209,7 @@ function BottomNavbar({
           <BottomNavbarAccountMenu handleSignOut={handleSignOut} />
         ) : (
           <NavLink
-            to='sign-in'
+            to='/sign-in'
             className={({ isActive }) => (isActive ? 'isActive' : '')}
           >
             <SignInIcon className='w-[2.4rem] h-[2.4rem]' />

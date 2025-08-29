@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.0.13] (2024-08-30)
+
+### Features
+
+- Improved CORS policy in the development environment.
+- Added the following page component stubs:
+  - `Account`.
+  - `Wishlist`.
+  - `NewWishlist`.
+  - `ViewWishlist`.
+- Added the following tables:
+  - `wishlists`.
+  - `wishlist_items`.
+  - `wishlist_item_tags`.
+- Added the following router stubs:
+  - `wishlistsRouter`.
+  - `wishlistItemsRouter`.
+  - `wishlistItemTagsRouter`.
+
+
+### Bug Fixes
+
+- Added missing dependency in the useEffect of `ConfirmAccountVerification`.
+
+
+### Improvements
+
+- Optimized integer fields throughout the database to better align with the expected data, and added `UNSIGNED` accordingly.
+
+
+### Code Refactoring
+
+- Refactored routing to align with the newly-added page component stubs and general structure.
+- Refactored `VARCHAR()` values throughout the database to better align with the expected data.
+- Simplified JON statements by implementing the `USING()` keyword.
+- Other minor refactors
+
+
 ## [0.0.12] (2024-08-28)
 
 ### Features

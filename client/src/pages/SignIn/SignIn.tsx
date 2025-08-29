@@ -13,6 +13,7 @@ import { signInService } from '../../services/accountServices';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useInfoModal from '../../hooks/useInfoModal';
 import useConfirmModal from '../../hooks/useConfirmModal';
+import useAuth from '../../hooks/useAuth';
 
 export default function SignIn(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -29,6 +30,7 @@ export default function SignIn(): JSX.Element {
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
+  const { setIsSignedIn } = useAuth();
 
   async function handleSubmit(): Promise<void> {
     const email: string = emailValue;
@@ -37,6 +39,7 @@ export default function SignIn(): JSX.Element {
 
     try {
       await signInService({ email, password, keepSignedIn });
+      setIsSignedIn(true);
 
       displayPopupMessage('Signed in.', 'success');
       navigate('/account');
@@ -68,6 +71,7 @@ export default function SignIn(): JSX.Element {
       }
 
       if (errReason === 'alreadySignedIn') {
+        setIsSignedIn(true);
         displayInfoModal({
           title: errMessage,
           btnTitle: 'Go to my account',

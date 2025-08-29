@@ -7,6 +7,9 @@ import SignIn from '../pages/SignIn/SignIn';
 import NewWishlist from '../pages/NewWishlist/NewWishlist';
 import Wishlists from '../pages/Wishlists/Wishlists';
 import AccountVerification from '../pages/AccountVerification/AccountVerification';
+import Account from '../pages/Account/Account';
+import Wishlist from '../pages/Wishlist/Wishlist';
+import ViewWishlist from '../pages/ViewWishlist/ViewWishlist';
 
 export function Router(): JSX.Element {
   return (
@@ -41,13 +44,28 @@ export function Router(): JSX.Element {
         />
 
         <Route
-          path='/new-wishlist'
+          path='/account'
+          element={<Account />}
+        />
+
+        <Route
+          path='/account/wishlists'
+          element={<Wishlists />}
+        />
+
+        <Route
+          path='/wishlist/new'
           element={<NewWishlist />}
         />
 
         <Route
-          path='/wishlists'
-          element={<Wishlists />}
+          path='/wishlist'
+          element={<Wishlist />}
+        />
+
+        <Route
+          path='/wishlist/view'
+          element={<ViewWishlist />}
         />
       </Route>
     </Routes>
