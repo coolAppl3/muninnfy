@@ -17,12 +17,12 @@ interface FormErrors {
   confirmPassword: string | null;
 }
 
-export interface FormValidationState {
+interface SignUpFormValidationState {
   formData: FormData;
   formErrors: FormErrors;
 }
 
-export const initialSignUpFormValidationState: FormValidationState = {
+export const initialSignUpFormValidationState: SignUpFormValidationState = {
   formData: {
     displayName: '',
     username: '',
@@ -56,15 +56,15 @@ interface AddFieldError {
 }
 
 export function signUpFormValidationReducer(
-  state: FormValidationState,
+  state: SignUpFormValidationState,
   action: ValidateField | ValidateAllFields | AddFieldError
-): FormValidationState {
+): SignUpFormValidationState {
   const { type, payload } = action;
 
   if (type === 'VALIDATE_ALL_FIELDS') {
     const { displayName, username, email, password, confirmPassword } = state.formData;
 
-    const updatedState: FormValidationState = {
+    const updatedState: SignUpFormValidationState = {
       ...state,
       formErrors: {
         displayName: validateDisplayName(displayName),
@@ -98,7 +98,7 @@ export function signUpFormValidationReducer(
       return state;
     }
 
-    const updatedState: FormValidationState = {
+    const updatedState: SignUpFormValidationState = {
       ...state,
       formErrors: {
         ...state.formErrors,
@@ -112,7 +112,7 @@ export function signUpFormValidationReducer(
   const { name, value } = payload.target;
 
   if (name === 'displayName' || name === 'username' || name === 'email') {
-    const updatedState: FormValidationState = {
+    const updatedState: SignUpFormValidationState = {
       formData: {
         ...state.formData,
         [name]: value,
@@ -128,7 +128,7 @@ export function signUpFormValidationReducer(
   }
 
   if (name === 'password') {
-    const updatedState: FormValidationState = {
+    const updatedState: SignUpFormValidationState = {
       formData: {
         ...state.formData,
         password: value,
@@ -145,7 +145,7 @@ export function signUpFormValidationReducer(
   }
 
   if (name === 'confirmPassword') {
-    const updatedState: FormValidationState = {
+    const updatedState: SignUpFormValidationState = {
       formData: {
         ...state.formData,
         confirmPassword: value,
