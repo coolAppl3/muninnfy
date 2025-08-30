@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { validateDisplayName, validateEmail, validateNewPassword, validateUsername } from '../../utils/validation';
+import { validateDisplayName, validateEmail, validateNewPassword, validateUsername } from '../../utils/validation/userValidation';
 
 interface FormData {
   displayName: string;

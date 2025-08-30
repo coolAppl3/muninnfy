@@ -12,7 +12,7 @@ import usePopupMessage from '../../hooks/usePopupMessage';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useInfoModal from '../../hooks/useInfoModal';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
-import { validateEmail } from '../../utils/validation';
+import { validateEmail } from '../../utils/validation/userValidation';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { CanceledError } from 'axios';
 import useAuth from '../../hooks/useAuth';
