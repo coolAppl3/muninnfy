@@ -18,3 +18,17 @@ export async function createWishlistAsAccountService(
 ): Promise<AxiosResponse<CreateWishListAsAccountServiceData>> {
   return axios.post(wishlistsApiUrl, body);
 }
+
+interface CreateWishListAsGuestServicePayload {
+  title: string;
+}
+
+interface CreateWishListAsGuestServiceData {
+  wishlistId: string;
+}
+
+export async function createWishlistAsGuestService(
+  body: CreateWishListAsGuestServicePayload
+): Promise<AxiosResponse<CreateWishListAsGuestServiceData>> {
+  return axios.post(`${wishlistsApiUrl}/guest`, body);
+}
