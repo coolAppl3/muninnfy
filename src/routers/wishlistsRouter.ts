@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from 'express';
 import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
-import { isValidWishlistDescription, isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
+import { isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
@@ -30,7 +30,6 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   interface RequestData {
     privacyLevel: number;
     title: string;
-    description: string | null;
   }
 
   const requestData: RequestData = req.body;
@@ -48,11 +47,6 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 
   if (!isValidWishlistTitle(requestData.title)) {
     res.status(400).json({ message: 'Invalid title.', reason: 'invalidTitle' });
-    return;
-  }
-
-  if (!isValidWishlistDescription(requestData.description)) {
-    res.status(400).json({ message: 'Invalid description.', reason: 'invalidDescription' });
     return;
   }
 
@@ -98,10 +92,9 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         account_id,
         privacy_level,
         title,
-        description,
         created_on_timestamp
-      ) VALUES (${generatePlaceHolders(6)});`,
-      [wishlistId, accountId, requestData.privacyLevel, requestData.title, requestData.description, currentTimestamp]
+      ) VALUES (${generatePlaceHolders(5)});`,
+      [wishlistId, accountId, requestData.privacyLevel, requestData.title, currentTimestamp]
     );
 
     res.status(201).json({ wishlistId });
@@ -130,7 +123,6 @@ wishlistsRouter.post('/guest', async (req: Request, res: Response) => {
 
   interface RequestData {
     title: string;
-    description: string | null;
   }
 
   const requestData: RequestData = req.body;
@@ -146,11 +138,6 @@ wishlistsRouter.post('/guest', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidWishlistDescription(requestData.description)) {
-    res.status(400).json({ message: 'Invalid description.', reason: 'invalidDescription' });
-    return;
-  }
-
   try {
     const wishlistId: string = generateCryptoUuid();
     const currentTimestamp: number = Date.now();
@@ -161,10 +148,9 @@ wishlistsRouter.post('/guest', async (req: Request, res: Response) => {
         account_id,
         privacy_level,
         title,
-        description,
         created_on_timestamp
-      ) VALUES (${generatePlaceHolders(6)});`,
-      [wishlistId, null, PUBLIC_WISHLIST_PRIVACY_LEVEL, requestData.title, requestData.description, currentTimestamp]
+      ) VALUES (${generatePlaceHolders(5)});`,
+      [wishlistId, null, PUBLIC_WISHLIST_PRIVACY_LEVEL, requestData.title, currentTimestamp]
     );
 
     res.status(201).json({ wishlistId });

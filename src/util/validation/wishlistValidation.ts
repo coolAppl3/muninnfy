@@ -29,20 +29,3 @@ export function isValidWishlistTitle(title: any): boolean {
   const regex: RegExp = /^(?=.{1,50}$)(?!.*  )[\x00-\x7F]+(?: [\x00-\x7F]+)*$/;
   return regex.test(title);
 }
-
-export function isValidWishlistDescription(description: any): boolean {
-  if (description === null) {
-    return true;
-  }
-
-  if (typeof description !== 'string') {
-    return false;
-  }
-
-  if (containsInvalidWhitespace(description)) {
-    return false;
-  }
-
-  const regex: RegExp = /^(?=.{1,500}$)(?!.*  )[\x00-\x7F]+(?: [\x00-\x7F]+)*$/;
-  return regex.test(description);
-}
