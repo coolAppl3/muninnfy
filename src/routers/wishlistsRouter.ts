@@ -7,7 +7,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
-import { TOTAL_WISHLISTS_LIMIT } from '../util/constants';
+import { PUBLIC_WISHLIST_PRIVACY_LEVEL, TOTAL_WISHLISTS_LIMIT } from '../util/constants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 
 export const wishlistsRouter: Router = express.Router();
@@ -102,6 +102,69 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         created_on_timestamp
       ) VALUES (${generatePlaceHolders(6)});`,
       [wishlistId, accountId, requestData.privacyLevel, requestData.title, requestData.description, currentTimestamp]
+    );
+
+    res.status(201).json({ wishlistId });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    logUnexpectedError(req, err);
+  }
+});
+
+wishlistsRouter.post('/guest', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  if (authSessionId) {
+    if (isValidUuid(authSessionId)) {
+      res.status(403).json({ message: `You're signed in.`, reason: 'signedIn' });
+      return;
+    }
+
+    removeRequestCookie(res, 'authSessionId', true);
+  }
+
+  interface RequestData {
+    title: string;
+    description: string | null;
+  }
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['title', 'description'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  if (!isValidWishlistTitle(requestData.title)) {
+    res.status(400).json({ message: 'Invalid title.', reason: 'invalidTitle' });
+    return;
+  }
+
+  if (!isValidWishlistDescription(requestData.description)) {
+    res.status(400).json({ message: 'Invalid description.', reason: 'invalidDescription' });
+    return;
+  }
+
+  try {
+    const wishlistId: string = generateCryptoUuid();
+    const currentTimestamp: number = Date.now();
+
+    await dbPool.execute<ResultSetHeader>(
+      `INSERT INTO wishlists (
+        wishlist_id,
+        account_id,
+        privacy_level,
+        title,
+        description,
+        created_on_timestamp
+      ) VALUES (${generatePlaceHolders(6)});`,
+      [wishlistId, null, PUBLIC_WISHLIST_PRIVACY_LEVEL, requestData.title, requestData.description, currentTimestamp]
     );
 
     res.status(201).json({ wishlistId });
