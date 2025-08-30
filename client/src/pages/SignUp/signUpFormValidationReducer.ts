@@ -55,7 +55,7 @@ interface AddFieldError {
   payload: { errMessage: string; errReason: string };
 }
 
-export function signUpFormValidationReducer(
+export default function signUpFormValidationReducer(
   state: SignUpFormValidationState,
   action: ValidateField | ValidateAllFields | AddFieldError
 ): SignUpFormValidationState {
