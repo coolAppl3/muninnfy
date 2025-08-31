@@ -31,7 +31,7 @@ export default function Footer(): JSX.Element {
             title='Pages'
             links={[
               { title: 'Home', path: '/home' },
-              { title: 'New wishlist', path: isSignedIn ? '/account/new-wishlist' : '/guest/new-wishlist' },
+              { title: 'New wishlist', path: isSignedIn ? '/wishlist/new' : '/guest/wishlist/new' },
               { title: 'Sign up', path: '/sign-up' },
               { title: 'Sign in', path: '/sign-in' },
             ]}

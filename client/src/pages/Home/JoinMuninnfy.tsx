@@ -29,7 +29,7 @@ export default function JoinMuninnfy(): JSX.Element {
               </Button>
               <Button
                 className='bg-secondary/50 border-title text-title w-full sm:w-fit'
-                onClick={() => navigate('/wishlist/new')}
+                onClick={() => navigate('/guest/wishlist/new')}
               >
                 Try it as a guest
               </Button>
