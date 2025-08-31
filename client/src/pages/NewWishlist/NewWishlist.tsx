@@ -149,7 +149,6 @@ export default function NewWishlist(): JSX.Element {
               className='grid grid-cols-1 gap-2'
               onSubmit={async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
-                console.log(true);
 
                 if (isSubmitting || !allFieldsValid()) {
                   return;
