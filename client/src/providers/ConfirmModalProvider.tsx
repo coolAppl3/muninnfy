@@ -46,7 +46,7 @@ export default function ConfirmModalProvider({ children }: { children: ReactNode
   }, []);
 
   useEffect(() => {
-    removeConfirmModal();
+    return removeConfirmModal;
   }, [routerLocation, removeConfirmModal]);
 
   return (

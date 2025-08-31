@@ -30,7 +30,7 @@ export default function InfoModalProvider({ children }: { children: ReactNode })
   }, []);
 
   useEffect(() => {
-    removeInfoModal();
+    return removeInfoModal;
   }, [routerLocation, removeInfoModal]);
 
   const { title, description, btnTitle, onClick } = InfoModalState;
