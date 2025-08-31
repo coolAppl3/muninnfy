@@ -56,7 +56,7 @@ export default function NewWishlist(): JSX.Element {
       const wishlistId: string = (await createWishlistAsAccountService({ title, privacyLevel })).data.wishlistId;
 
       displayPopupMessage('Wishlist created.', 'success');
-      navigate(`/wishlist?id=${wishlistId}`);
+      navigate(`/wishlist/${wishlistId}`);
     } catch (err: unknown) {
       console.log(err);
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
@@ -94,7 +94,7 @@ export default function NewWishlist(): JSX.Element {
         title: 'Wishlist created as a guest.',
         description: 'Make sure to store the wishlist link to view the list later if needed.',
         btnTitle: 'Proceed to wishlist',
-        onClick: () => navigate(`/wishlist?id=${wishlistId}`),
+        onClick: () => navigate(`/wishlist/${wishlistId}`),
       });
     } catch (err: unknown) {
       console.log(err);
