@@ -34,7 +34,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['privacyLevel', 'title', 'description'];
+  const expectedKeys: string[] = ['privacyLevel', 'title'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
@@ -127,7 +127,7 @@ wishlistsRouter.post('/guest', async (req: Request, res: Response) => {
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['title', 'description'];
+  const expectedKeys: string[] = ['title'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
