@@ -6,7 +6,7 @@ import Button from '../../components/Button/Button';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
-import { validateEmail, validatePassword } from '../../utils/validation';
+import { validateEmail, validatePassword } from '../../utils/validation/userValidation';
 import CheckboxFormGroup from '../../components/FormGroups/CheckboxFormGroup';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { signInService } from '../../services/accountServices';

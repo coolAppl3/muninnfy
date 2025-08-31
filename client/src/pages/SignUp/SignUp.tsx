@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, JSX, useReducer, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
-import { initialSignUpFormValidationState, signUpFormValidationReducer } from './signUpFormValidationReducer';
+import signUpFormValidationReducer, { initialSignUpFormValidationState } from './signUpFormValidationReducer';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { signUpService } from '../../services/accountServices';
