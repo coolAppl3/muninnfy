@@ -28,7 +28,7 @@ export default function JoinMuninnfy(): JSX.Element {
                 Create an account
               </Button>
               <Button
-                className='bg-primary border-title text-title w-full sm:w-fit'
+                className='bg-secondary/50 border-title text-title w-full sm:w-fit'
                 onClick={() => navigate('/wishlist/new')}
               >
                 Try it as a guest
