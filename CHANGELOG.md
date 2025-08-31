@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.0.14] (2024-08-31)
+
+### Features
+
+- Added `PRIVATE_WISHLIST_PRIVACY_LEVEL`, `FOLLOWERS_WISHLIST_PRIVACY_LEVEL`, `PUBLIC_WISHLIST_PRIVACY_LEVEL`, and `TOTAL_WISHLISTS_LIMIT` to `constants`.
+- Added `clientConstants` with the following constants: `PRIVATE_WISHLIST_PRIVACY_LEVEL`, `FOLLOWERS_WISHLIST_PRIVACY_LEVEL`, `PUBLIC_WISHLIST_PRIVACY_LEVEL`.
+- Added a `wishlistValidation` module on both the front and back ends.
+- Added `created_on_timestamp` to the `wishlists` table.
+- Added `authDbHelpers` with `getAccountIdByAuthSessionId()`.
+- Added POST `wishlists`.
+- Added POST `wishlists/guest`.
+- Added `wishlistServices` with `createWishlistAsAccountService()` and `createWishlistAsGuestService()`.
+- Added `light` to the color pallette in `tailwind.config.js`.
+- Implemented `NewWishlist` page component.
+
+
+### Changes
+
+- Removed the `description` column in the `wishlists` table.
+
+
+### Bug Fixes
+
+- Fixed the CORS policy in the development blocking local requests with an undefined origin.
+
+
+### Code Refactoring
+
+- Refactored `signUpFormValidationReducer` to be a default export.
+- Renamed `FormValidationState` interface to `SignUpFormValidationState` in `signUpFormValidationReducer` and stopped it from being exported unnecessarily.
+- Split `validation` utility module into detected `userValidation` and `generalValidation` modules, and refactor components accordingly.
+
+
 ## [0.0.13] (2024-08-30)
 
 ### Features
