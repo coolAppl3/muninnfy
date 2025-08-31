@@ -10,6 +10,7 @@ import AccountVerification from '../pages/AccountVerification/AccountVerificatio
 import Account from '../pages/Account/Account';
 import Wishlist from '../pages/Wishlist/Wishlist';
 import ViewWishlist from '../pages/ViewWishlist/ViewWishlist';
+import NotFound from '../pages/NotFound/NotFound';
 
 export function Router(): JSX.Element {
   return (
@@ -66,6 +67,11 @@ export function Router(): JSX.Element {
         <Route
           path='/wishlist/view/:wishlistId'
           element={<ViewWishlist />}
+        />
+
+        <Route
+          path='*'
+          element={<NotFound />}
         />
       </Route>
     </Routes>
