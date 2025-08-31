@@ -165,3 +165,144 @@ wishlistsRouter.post('/guest', async (req: Request, res: Response) => {
     logUnexpectedError(req, err);
   }
 });
+
+wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+
+  if (!authSessionId) {
+    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
+    return;
+  }
+
+  if (!isValidUuid(authSessionId)) {
+    removeRequestCookie(res, 'authSessionId', true);
+    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
+
+    return;
+  }
+
+  const wishlistId: string | undefined = req.params.wishlistId;
+
+  if (!wishlistId || !isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  try {
+    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+    if (!accountId) {
+      return;
+    }
+
+    interface WishlistDetails extends RowDataPacket {
+      privacy_level: number;
+      title: string;
+      created_on_timestamp: number;
+    }
+
+    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+      `SELECT
+        privacy_level,
+        title,
+        created_on_timestamp
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ?
+        AND account_id = ?;`,
+      [wishlistId, accountId]
+    );
+
+    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+
+    if (!wishlistDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    interface WishlistItem extends RowDataPacket {
+      item_id: number;
+      added_on_timestamp: number;
+      title: string;
+      description: string | null;
+      link: string | null;
+      tag_id: number;
+      tag_name: string;
+    }
+
+    const [wishlistItems] = await dbPool.execute<WishlistItem[]>(
+      `SELECT
+        wishlist_items.item_id,
+        wishlist_items.added_on_timestamp,
+        wishlist_items.title,
+        wishlist_items.description,
+        wishlist_items.link,
+        wishlist_item_tags.tag_id,
+        wishlist_item_tags.tag_name
+      FROM 
+        wishlist_items
+      LEFT JOIN
+        wishlist_item_tags USING(item_id)
+      WHERE
+        wishlist_items.wishlist_id = ?;`,
+      [wishlistId]
+    );
+
+    interface Tag {
+      id: number;
+      name: string;
+    }
+
+    interface MappedWishlistItem {
+      item_id: number;
+      added_on_timestamp: number;
+      title: string;
+      description: string | null;
+      link: string | null;
+      tags: {
+        id: number;
+        name: string;
+      }[];
+    }
+
+    const mappedWishlistItems: MappedWishlistItem[] = [];
+    let currentItemId: number = 0;
+
+    for (const item of wishlistItems) {
+      const { tag_id, tag_name, ...rest } = item;
+
+      if (item.item_id === currentItemId) {
+        const mappedWishlistItem: MappedWishlistItem | undefined = mappedWishlistItems[mappedWishlistItems.length - 1];
+        mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
+
+        continue;
+      }
+
+      currentItemId = item.item_id;
+      const mappedItem: MappedWishlistItem = {
+        ...rest,
+        tags: tag_id
+          ? [
+              {
+                id: tag_id,
+                name: tag_name,
+              },
+            ]
+          : [],
+      };
+
+      mappedWishlistItems.push(mappedItem);
+    }
+
+    res.json({ wishlistDetails, wishlistItems: mappedWishlistItems });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
