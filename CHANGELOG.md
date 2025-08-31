@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.0.15] (2024-09-01)
+
+### Features
+
+- Added GET `wishlists:wishlistId`.
+
+
+### Changes
+
+- Changed `title` and `description` columns in `wishlist_items` table to `VARCHAR(199)` AND `VARCHAR(600)` respectively.
+- Completely removed guest functionality.
+  - This is a temporary measure for now, as the logic behind it had flaws. Guest functionality will be reintroduced with a different approach in future patches.
+
+
+### Bug Fixes
+
+- Fixed `InfoModal` and `ConfirmModal` not being focused after mounting. 
+
+
+### Code Refactoring
+
+- Improved usage of `useEffect` for `InfoModalProvider` and `ConfirmModalProvider`.
+- Refactored wishlist-related routing structure.
+
+
 ## [0.0.14] (2024-08-31)
 
 ### Features
