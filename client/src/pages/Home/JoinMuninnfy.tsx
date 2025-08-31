@@ -28,8 +28,8 @@ export default function JoinMuninnfy(): JSX.Element {
                 Create an account
               </Button>
               <Button
-                className='bg-primary border-title text-title w-full sm:w-fit'
-                onClick={() => navigate('/wishlist/new')}
+                className='bg-secondary/50 border-title text-title w-full sm:w-fit'
+                onClick={() => navigate('/guest/wishlist/new')}
               >
                 Try it as a guest
               </Button>

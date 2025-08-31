@@ -13,10 +13,11 @@ import {
 import Button from '../../components/Button/Button';
 import { validateWishlistTitle } from '../../utils/validation/wishlistValidation';
 import usePopupMessage from '../../hooks/usePopupMessage';
-import { createWishlistAsAccountService, createWishlistAsGuestService } from '../../services/wishlistServices';
+import { createWishlistAsAccountService } from '../../services/wishlistServices';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useInfoModal from '../../hooks/useInfoModal';
+import useConfirmModal from '../../hooks/useConfirmModal';
 
 export default function NewWishlist(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -30,25 +31,28 @@ export default function NewWishlist(): JSX.Element {
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
+  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   useEffect(() => {
     if (isSignedIn) {
       return;
     }
 
-    setPrivacyLevelValue(PUBLIC_WISHLIST_PRIVACY_LEVEL);
-  }, [isSignedIn]);
+    displayConfirmModal({
+      title: 'Not signed in.',
+      description:
+        'You must sign in before creating a fully-featured wishlist.\nAlternatively, you can create a temporary wishlist as a guest.',
+      confirmBtnTitle: 'Sign in',
+      cancelBtnTitle: 'Create guest wishlist',
+      extraBtnTitle: 'Back to homepage',
+      onConfirm: () => navigate('/sign-in'),
+      onCancel: () => navigate('/guest/wishlist/new'),
+      onExtraAction: () => navigate('/home'),
+      isDangerous: false,
+    });
+  }, [isSignedIn, navigate, displayConfirmModal, removeConfirmModal]);
 
   async function handleSubmit(): Promise<void> {
-    if (isSignedIn) {
-      await createWishlistAsAccount();
-      return;
-    }
-
-    await createWishlistAsGuest();
-  }
-
-  async function createWishlistAsAccount(): Promise<void> {
     const title: string = titleValue;
     const privacyLevel: number = privacyLevelValue;
 
@@ -56,7 +60,7 @@ export default function NewWishlist(): JSX.Element {
       const wishlistId: string = (await createWishlistAsAccountService({ title, privacyLevel })).data.wishlistId;
 
       displayPopupMessage('Wishlist created.', 'success');
-      navigate(`/wishlist?id=${wishlistId}`);
+      navigate(`/wishlist/${wishlistId}`);
     } catch (err: unknown) {
       console.log(err);
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
@@ -76,46 +80,7 @@ export default function NewWishlist(): JSX.Element {
       setIsSignedIn(false);
       displayInfoModal({
         title: errMessage,
-        description: 'You can either sign in and try again, or create a wishlist as a guest.',
-        btnTitle: 'Okay',
-        onClick: removeInfoModal,
-      });
-    }
-  }
-
-  async function createWishlistAsGuest(): Promise<void> {
-    const title: string = titleValue;
-
-    try {
-      const wishlistId: string = (await createWishlistAsGuestService({ title })).data.wishlistId;
-
-      displayPopupMessage('Wishlist created.', 'success');
-      displayInfoModal({
-        title: 'Wishlist created as a guest.',
-        description: 'Make sure to store the wishlist link to view the list later if needed.',
-        btnTitle: 'Proceed to wishlist',
-        onClick: () => navigate(`/wishlist?id=${wishlistId}`),
-      });
-    } catch (err: unknown) {
-      console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
-
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
-        return;
-      }
-
-      const { status, errMessage } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status !== 403) {
-        return;
-      }
-
-      setIsSignedIn(true);
-      displayInfoModal({
-        title: errMessage,
-        description: `Sign in status wasn't detected earlier.\nChoose a suitable privacy level before proceeding.`,
+        description: 'You can either sign in and try again, or create a guest wishlist.',
         btnTitle: 'Okay',
         onClick: removeInfoModal,
       });
@@ -149,7 +114,6 @@ export default function NewWishlist(): JSX.Element {
               className='grid grid-cols-1 gap-2'
               onSubmit={async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
-                console.log(true);
 
                 if (isSubmitting || !allFieldsValid()) {
                   return;
@@ -181,44 +145,31 @@ export default function NewWishlist(): JSX.Element {
               <div id='wishlist-privacy-level'>
                 <span>Privacy level</span>
 
-                <div className={`btn-container ${isSignedIn ? '' : 'guest'}`}>
+                <div className='btn-container'>
                   <button
                     type='button'
-                    disabled={!isSignedIn}
                     className={privacyLevelValue === PRIVATE_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
-                    onClick={() => {
-                      isSignedIn && setPrivacyLevelValue(PRIVATE_WISHLIST_PRIVACY_LEVEL);
-                    }}
+                    onClick={() => setPrivacyLevelValue(PRIVATE_WISHLIST_PRIVACY_LEVEL)}
                   >
                     Private
                   </button>
                   <button
                     type='button'
-                    disabled={!isSignedIn}
                     className={privacyLevelValue === FOLLOWERS_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
-                    onClick={() => {
-                      isSignedIn && setPrivacyLevelValue(FOLLOWERS_WISHLIST_PRIVACY_LEVEL);
-                    }}
+                    onClick={() => setPrivacyLevelValue(FOLLOWERS_WISHLIST_PRIVACY_LEVEL)}
                   >
                     Followers
                   </button>
                   <button
                     type='button'
-                    disabled={!isSignedIn}
                     className={privacyLevelValue === PUBLIC_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
-                    onClick={() => {
-                      isSignedIn && setPrivacyLevelValue(PUBLIC_WISHLIST_PRIVACY_LEVEL);
-                    }}
+                    onClick={() => setPrivacyLevelValue(PUBLIC_WISHLIST_PRIVACY_LEVEL)}
                   >
                     Public
                   </button>
                 </div>
 
-                <p className='text-description text-sm m'>
-                  {isSignedIn
-                    ? 'Privacy settings can be changed later if needed.'
-                    : 'As a guest, you can only create public wishlists, with some feature limitations.'}
-                </p>
+                <p className='text-description text-sm m'>Privacy settings can be changed later if needed.</p>
               </div>
 
               <Button

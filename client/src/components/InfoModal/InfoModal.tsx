@@ -1,4 +1,4 @@
-import { JSX, MouseEventHandler, useEffect, useState } from 'react';
+import { JSX, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import './InfoModal.css';
 import Button from '../Button/Button';
 
@@ -11,12 +11,18 @@ export interface InfoModalProps {
 
 export default function InfoModal({ title, description, btnTitle, onClick }: InfoModalProps): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  useEffect(() => setIsVisible(true), []);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setIsVisible(true);
+    modalRef.current?.focus();
+  }, []);
 
   return (
     <div
       className={`info-modal ${isVisible ? 'visible' : ''}`}
       tabIndex={0}
+      ref={modalRef}
     >
       <div className={`info-modal-container ${title ? '' : 'no-title'}`}>
         {title && <h4>{title}</h4>}

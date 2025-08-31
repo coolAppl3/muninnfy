@@ -1,4 +1,4 @@
-import { JSX, MouseEventHandler, useEffect, useState } from 'react';
+import { JSX, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import './ConfirmModal.css';
 import Button from '../Button/Button';
 
@@ -32,12 +32,18 @@ export default function ConfirmModal({
   isDangerous,
 }: ConfirmModalProps): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  useEffect(() => setIsVisible(true), []);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setIsVisible(true);
+    modalRef.current?.focus();
+  }, []);
 
   return (
     <div
       className={`confirm-modal ${isVisible ? 'visible' : ''}`}
       tabIndex={0}
+      ref={modalRef}
     >
       <div className={`confirm-modal-container ${title ? '' : 'no-title'}`}>
         {title && <h4>{title}</h4>}

@@ -151,7 +151,7 @@ async function createWishlistsTable(): Promise<void> {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS wishlists (
         wishlist_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY,
-        account_id INT UNSIGNED,
+        account_id INT UNSIGNED NOT NULL,
         privacy_level TINYINT UNSIGNED NOT NULL CHECK (privacy_level IN (0, 1, 2)),
         title VARCHAR(100) NOT NULL,
         created_on_timestamp BIGINT UNSIGNED NOT NULL,
@@ -170,8 +170,8 @@ async function createWishlistItemsTable(): Promise<void> {
         item_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         wishlist_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
         added_on_timestamp BIGINT UNSIGNED NOT NULL,
-        title VARCHAR(254) NOT NULL,
-        description VARCHAR(500),
+        title VARCHAR(100) NOT NULL,
+        description VARCHAR(600),
         link VARCHAR(2048),
         FOREIGN KEY (wishlist_id) REFERENCES wishlists(wishlist_id) ON DELETE CASCADE
       );`

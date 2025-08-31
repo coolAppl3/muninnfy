@@ -59,12 +59,12 @@ export function Router(): JSX.Element {
         />
 
         <Route
-          path='/wishlist'
+          path='/wishlist/:wishlistId'
           element={<Wishlist />}
         />
 
         <Route
-          path='/wishlist/view'
+          path='/wishlist/view/:wishlistId'
           element={<ViewWishlist />}
         />
       </Route>
