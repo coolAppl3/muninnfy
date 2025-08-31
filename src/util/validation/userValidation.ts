@@ -1,60 +1,60 @@
 import { containsInvalidWhitespace } from '../globalUtils';
 
-export function isValidEmail(email: any): boolean {
-  if (typeof email !== 'string') {
+export function isValidEmail(value: any): boolean {
+  if (typeof value !== 'string') {
     return false;
   }
 
   const regex: RegExp =
     /^(?=.{6,254}$)[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]{0,64}@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.[a-zA-Z]{2,}?(?:\.[a-zA-Z]{2,})*$/;
-  return regex.test(email);
+  return regex.test(value);
 }
 
-export function isValidNewPassword(password: any): boolean {
-  if (typeof password !== 'string') {
+export function isValidNewPassword(value: any): boolean {
+  if (typeof value !== 'string') {
     return false;
   }
 
   const regex: RegExp = /^[A-Za-z0-9_.!#$&]{8,40}$/;
-  return regex.test(password);
+  return regex.test(value);
 }
 
-export function isValidPassword(password: any): boolean {
+export function isValidPassword(value: any): boolean {
   // meant for sign in attempts - doesn't over-validate
 
-  if (typeof password !== 'string') {
+  if (typeof value !== 'string') {
     return false;
   }
 
-  if (password.trim() === '' || password.includes(' ')) {
+  if (value.trim() === '' || value.includes(' ')) {
     return false;
   }
 
-  if (password.length > 40) {
+  if (value.length > 40) {
     return false;
   }
 
   return true;
 }
 
-export function isValidUsername(username: any): boolean {
-  if (typeof username !== 'string') {
+export function isValidUsername(value: any): boolean {
+  if (typeof value !== 'string') {
     return false;
   }
 
   const regex: RegExp = /^[A-Za-z0-9_.]{5,25}$/;
-  return regex.test(username);
+  return regex.test(value);
 }
 
-export function isValidDisplayName(displayName: any): boolean {
-  if (typeof displayName !== 'string') {
+export function isValidDisplayName(value: any): boolean {
+  if (typeof value !== 'string') {
     return false;
   }
 
-  if (containsInvalidWhitespace(displayName)) {
+  if (containsInvalidWhitespace(value)) {
     return false;
   }
 
   const regex: RegExp = /^(?=.{1,25}$)(?!.*  )[A-Za-z]+(?: [A-Za-z]+)*$/;
-  return regex.test(displayName);
+  return regex.test(value);
 }
