@@ -10,7 +10,7 @@ import {
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { ResultSetHeader } from 'mysql2/promise';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 
@@ -70,6 +70,22 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
 
     if (!accountId) {
+      return;
+    }
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        1
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [requestData.wishlistId, accountId]
+    );
+
+    if (wishlistRows.length === 0) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
