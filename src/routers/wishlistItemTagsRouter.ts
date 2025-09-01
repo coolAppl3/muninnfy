@@ -5,7 +5,7 @@ import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidWishlistItemTagName } from '../util/validation/wishlistItemTagValidation';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { dbPool } from '../db/db';
-import { ResultSetHeader } from 'mysql2/promise';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
@@ -28,6 +28,7 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   interface RequestData {
+    wishlistId: string;
     itemId: number;
     tagName: string;
   }
@@ -54,6 +55,32 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
     const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
 
     if (!accountId) {
+      return;
+    }
+
+    interface WishlistDetails extends RowDataPacket {
+      account_id: number;
+    }
+
+    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+      `SELECT
+        account_id
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ?;`,
+      [requestData.wishlistId]
+    );
+
+    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+
+    if (!wishlistDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    if (wishlistDetails.account_id !== accountId) {
+      res.status(401).json({ message: `Wishlist doesn't belong to your account.`, reason: 'notWishlistOwner' });
       return;
     }
 
