@@ -9,7 +9,7 @@ import {
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
   FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
-} from '../../utils/clientConstants';
+} from '../../utils/constants/wishlistConstants';
 import Button from '../../components/Button/Button';
 import { validateWishlistTitle } from '../../utils/validation/wishlistValidation';
 import usePopupMessage from '../../hooks/usePopupMessage';
