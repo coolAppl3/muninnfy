@@ -88,8 +88,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       [wishlistId, currentTimestamp, title, description, link, false]
     );
 
-    const wishlistItemId: number = resultSetHeader.insertId;
-    res.json({ wishlistItemId });
+    res.status(201).json({ wishlistItemId: resultSetHeader.insertId });
   } catch (err: unknown) {
     console.log(err);
 
