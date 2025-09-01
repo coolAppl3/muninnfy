@@ -153,8 +153,8 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       FROM
         wishlists
       WHERE
-        wishlist_id = ?
-        AND account_id = ?;`,
+        wishlist_id = ? AND
+        account_id = ?;`,
       [wishlistId, accountId]
     );
 
