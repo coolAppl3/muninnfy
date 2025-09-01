@@ -174,7 +174,8 @@ async function createWishlistItemsTable(): Promise<void> {
         description VARCHAR(600),
         link VARCHAR(2048),
         is_purchased BOOLEAN NOT NULL,
-        FOREIGN KEY (wishlist_id) REFERENCES wishlists(wishlist_id) ON DELETE CASCADE
+        FOREIGN KEY (wishlist_id) REFERENCES wishlists(wishlist_id) ON DELETE CASCADE,
+        UNIQUE(title, wishlist_id)
       );`
     );
   } catch (err: unknown) {
