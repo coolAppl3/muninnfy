@@ -1,4 +1,5 @@
-import { ACCOUNT_VERIFICATION_WINDOW, minuteMilliseconds } from '../../constants';
+import { minuteMilliseconds } from '../../constants/globalConstants';
+import { ACCOUNT_VERIFICATION_WINDOW } from '../../constants/accountConstants';
 
 interface AccountVerificationEmailTemplate {
   displayName: string;

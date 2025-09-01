@@ -1,5 +1,5 @@
 import { dbPool } from '../db/db';
-import { dayMilliseconds } from '../util/constants';
+import { dayMilliseconds } from '../util/constants/globalConstants';
 
 export async function clearErrorLogsCron(currentTimestamp: number): Promise<void> {
   try {

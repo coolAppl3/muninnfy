@@ -1,5 +1,5 @@
 import { dbPool } from '../db/db';
-import { minuteMilliseconds } from '../util/constants';
+import { minuteMilliseconds } from '../util/constants/globalConstants';
 
 export async function deleteUnverifiedAccountsCron(currentTimestamp: number): Promise<void> {
   try {

@@ -1,9 +1,9 @@
 import cron from 'node-cron';
 
 import { removeLightRateAbusersCron, removeStaleRateTrackerRowsCron, replenishRateRequestsCron } from './rateLimiterCronJobs';
-import { minuteMilliseconds } from '../util/constants';
 import { clearErrorLogsCron } from '../logs/errorLoggerCronJobs';
 import { deleteStaleAccountVerificationRequestsCron, deleteUnverifiedAccountsCron } from './accountCronJobs';
+import { minuteMilliseconds } from '../util/constants/globalConstants';
 
 export function initCronJobs(): void {
   // every 30 seconds
