@@ -14,8 +14,8 @@ export default function NotFound(): JSX.Element {
       <section className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
-            <h1 className='text-title text-lg font-bold mb-1'>Page not found</h1>
-            <p className='text-description mb-2'>Double-check the link you've entered and try again.</p>
+            <h1 className='text-title font-medium mb-1'>Page not found</h1>
+            <p className='text-description text-sm mb-2'>Double-check the link you've entered and try again.</p>
 
             <Button
               className='bg-cta border-cta w-full'
