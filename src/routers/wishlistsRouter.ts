@@ -248,5 +248,6 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
