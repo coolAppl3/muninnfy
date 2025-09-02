@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.0.16] (2024-09-02)
+
+### Features
+
+- Added `NotFound` page component and set it up as a catch-all fallback route in `Router`.
+- Added `is_purchased` column to `wishlist_items` table.
+- Added `UNIQUE(title, wishlist_id)` to `wishlist_items`.
+- Added `wishlistValidation` module with the following functions:
+  - `isValidWishlistItemTitle()`.
+  - `isValidWishlistItemDescription()`.
+  - `isValidWishlistItemLink()`.
+- Added POST `wishlistItems`.
+- Added POST `wishlistItemTags`.
+- Added `WISHLIST_ITEMS_LIMIT` AND `WISHLIST_ITEM_TAGS_LIMIT`.
+
+
+### Bug Fixes
+
+- Added missing error logging in GET `wishlists/:wishlistId`.
+
+
+### Code Refactoring
+
+- Renamed validation function parameters to `value` to improve readability.
+- Refactored `constants` and `clientConstants` into split, dedicated modules for better readability and modularity.
+
+
 ## [0.0.15] (2024-09-01)
 
 ### Features
