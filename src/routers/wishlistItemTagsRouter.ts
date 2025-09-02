@@ -74,13 +74,8 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
 
     const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
 
-    if (!wishlistDetails) {
+    if (!wishlistDetails || wishlistDetails.account_id !== accountId) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
-      return;
-    }
-
-    if (wishlistDetails.account_id !== accountId) {
-      res.status(401).json({ message: `Wishlist doesn't belong to your account.`, reason: 'notWishlistOwner' });
       return;
     }
 
