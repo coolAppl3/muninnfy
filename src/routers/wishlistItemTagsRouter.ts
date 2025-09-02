@@ -9,6 +9,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
+import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
 
 export const wishlistItemTagsRouter: Router = express.Router();
 
@@ -60,22 +61,29 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
 
     interface WishlistDetails extends RowDataPacket {
       account_id: number;
+      wishlist_item_tags_count: number;
     }
 
     const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
       `SELECT
-        account_id
+        account_id,
+        (SELECT COUNT(*) FROM wishlist_item_tags WHERE item_id = ?) AS wishlist_item_tags_count
       FROM
         wishlists
       WHERE
         wishlist_id = ?;`,
-      [requestData.wishlistId]
+      [requestData.itemId, requestData.wishlistId]
     );
 
     const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
 
     if (!wishlistDetails || wishlistDetails.account_id !== accountId) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    if (wishlistDetails.wishlist_item_tags_count >= WISHLIST_ITEM_TAGS_LIMIT) {
+      res.status(409).json({ message: 'Wishlist item tags limit reached.', reason: 'itemTagsLimitReached' });
       return;
     }
 
