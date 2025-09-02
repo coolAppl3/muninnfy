@@ -13,6 +13,7 @@ import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
+import { WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 
 export const wishlistItemsRouter: Router = express.Router();
 
@@ -73,19 +74,31 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+    interface WishlistDetails extends RowDataPacket {
+      account_id: number;
+      wishlist_items_count: number;
+    }
+
+    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
       `SELECT
-        1
+        account_id,
+        (SELECT COUNT(*) FROM wishlist_items WHERE wishlist_id = :wishlistId) AS wishlist_items_count
       FROM
         wishlists
       WHERE
-        wishlist_id = ? AND
-        account_id = ?;`,
-      [requestData.wishlistId, accountId]
+        wishlist_id = :wishlistId;`,
+      { wishlistId: requestData.wishlistId }
     );
 
-    if (wishlistRows.length === 0) {
-      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+
+    if (!wishlistDetails || wishlistDetails.account_id !== accountId) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound.' });
+      return;
+    }
+
+    if (wishlistDetails.wishlist_items_count >= WISHLIST_ITEMS_LIMIT) {
+      res.status(403).json({ message: 'Wishlist items limit reached.', reason: 'itemLimitReached' });
       return;
     }
 
