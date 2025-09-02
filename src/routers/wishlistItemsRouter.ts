@@ -98,7 +98,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (wishlistDetails.wishlist_items_count >= WISHLIST_ITEMS_LIMIT) {
-      res.status(403).json({ message: 'Wishlist items limit reached.', reason: 'itemLimitReached' });
+      res.status(409).json({ message: 'Wishlist items limit reached.', reason: 'itemLimitReached' });
       return;
     }
 
