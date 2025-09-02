@@ -1,31 +1,31 @@
-import { PRIVATE_WISHLIST_PRIVACY_LEVEL, PUBLIC_WISHLIST_PRIVACY_LEVEL } from '../constants';
+import { PRIVATE_WISHLIST_PRIVACY_LEVEL, PUBLIC_WISHLIST_PRIVACY_LEVEL } from '../constants/wishlistConstants';
 import { containsInvalidWhitespace } from '../globalUtils';
 
-export function isValidWishlistPrivacyLevel(privacyLevel: any): boolean {
-  if (typeof privacyLevel !== 'number') {
+export function isValidWishlistPrivacyLevel(value: any): boolean {
+  if (typeof value !== 'number') {
     return false;
   }
 
-  if (!Number.isInteger(privacyLevel)) {
+  if (!Number.isInteger(value)) {
     return false;
   }
 
-  if (privacyLevel < PRIVATE_WISHLIST_PRIVACY_LEVEL || privacyLevel > PUBLIC_WISHLIST_PRIVACY_LEVEL) {
+  if (value < PRIVATE_WISHLIST_PRIVACY_LEVEL || value > PUBLIC_WISHLIST_PRIVACY_LEVEL) {
     return false;
   }
 
   return true;
 }
 
-export function isValidWishlistTitle(title: any): boolean {
-  if (typeof title !== 'string') {
+export function isValidWishlistTitle(value: any): boolean {
+  if (typeof value !== 'string') {
     return false;
   }
 
-  if (containsInvalidWhitespace(title)) {
+  if (containsInvalidWhitespace(value)) {
     return false;
   }
 
   const regex: RegExp = /^(?=.{1,50}$)(?!.*  )[\x00-\x7F]+(?: [\x00-\x7F]+)*$/;
-  return regex.test(title);
+  return regex.test(value);
 }

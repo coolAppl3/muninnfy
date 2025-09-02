@@ -12,7 +12,7 @@ import {
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
   ACCOUNT_FAILED_UPDATE_LIMIT,
   ACCOUNT_VERIFICATION_WINDOW,
-} from '../util/constants';
+} from '../util/constants/accountConstants';
 import { sendAccountVerificationEmail } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';

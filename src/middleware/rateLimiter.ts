@@ -3,7 +3,8 @@ import { getRequestCookie, setResponseCookie } from '../util/cookieUtils';
 import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { RowDataPacket } from 'mysql2/promise';
-import { REQUESTS_RATE_LIMIT, hourMilliseconds } from '../util/constants';
+import { hourMilliseconds } from '../util/constants/globalConstants';
+import { REQUESTS_RATE_LIMIT } from '../util/constants/rateLimitingConstants';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 
 export async function rateLimiter(req: Request, res: Response, next: NextFunction): Promise<void> {

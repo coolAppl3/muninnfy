@@ -4,7 +4,8 @@ import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { dbPool } from '../db/db';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { destroyAuthSession } from '../auth/authSessions';
-import { AUTH_EXTENSIONS_LIMIT, dayMilliseconds } from '../util/constants';
+import { dayMilliseconds } from '../util/constants/globalConstants';
+import { AUTH_EXTENSIONS_LIMIT } from '../util/constants/authConstants';
 import { logUnexpectedError } from '../logs/errorLogger';
 
 export const authRouter: Router = express.Router();
