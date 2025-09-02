@@ -18,3 +18,33 @@ export async function createWishlistAsAccountService(
 ): Promise<AxiosResponse<CreateWishListAsAccountServiceData>> {
   return axios.post(wishlistsApiUrl, body);
 }
+
+export interface WishlistDetails {
+  privacy_level: number;
+  title: string;
+  created_on_timestamp: number;
+}
+
+export interface WishlistItem {
+  item_id: number;
+  added_on_timestamp: number;
+  title: string;
+  description: string | null;
+  link: string | null;
+  tags: {
+    id: number;
+    name: string;
+  }[];
+}
+
+interface getWishlistDetailsData {
+  wishlistDetails: WishlistDetails;
+  wishlistItems: WishlistItem[];
+}
+
+export async function getWishlistDetailsService(
+  wishlistId: string,
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<getWishlistDetailsData>> {
+  return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
+}
