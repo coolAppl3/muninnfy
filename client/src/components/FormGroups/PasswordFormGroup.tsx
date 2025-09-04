@@ -9,9 +9,10 @@ interface PasswordFormGroupProps {
   value: string;
   errorMessage: string | null;
   onChange: ChangeEventHandler<HTMLInputElement>;
+  className?: string;
 }
 
-export default function PasswordFormGroup({ id, label, value, errorMessage, onChange }: PasswordFormGroupProps): JSX.Element {
+export default function PasswordFormGroup({ id, label, value, errorMessage, onChange, className }: PasswordFormGroupProps): JSX.Element {
   const [isPasswordType, setIsPasswordType] = useState<boolean>(true);
 
   function handleClick(): void {
@@ -19,7 +20,7 @@ export default function PasswordFormGroup({ id, label, value, errorMessage, onCh
   }
 
   return (
-    <div className={`form-group ${errorMessage ? 'error' : ''}`}>
+    <div className={`form-group ${errorMessage ? 'error' : ''} ${className ? className : ''}`}>
       <label htmlFor={id}>{label}</label>
       <div className='password-input-container'>
         <input

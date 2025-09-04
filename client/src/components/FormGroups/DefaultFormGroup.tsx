@@ -8,11 +8,20 @@ interface DefaultFormGroupProps {
   value: string;
   errorMessage: string | null;
   onChange: ChangeEventHandler<HTMLInputElement>;
+  className?: string;
 }
 
-export default function DefaultFormGroup({ id, label, autoComplete, value, errorMessage, onChange }: DefaultFormGroupProps): JSX.Element {
+export default function DefaultFormGroup({
+  id,
+  label,
+  autoComplete,
+  value,
+  errorMessage,
+  onChange,
+  className,
+}: DefaultFormGroupProps): JSX.Element {
   return (
-    <div className={`form-group ${errorMessage ? 'error' : ''}`}>
+    <div className={`form-group ${errorMessage ? 'error' : ''} ${className ? className : ''}`}>
       <label htmlFor={id}>{label}</label>
       <input
         type='text'
