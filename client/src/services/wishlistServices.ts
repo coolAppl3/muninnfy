@@ -66,3 +66,7 @@ interface ChangeWishlistPrivacyLevelServicePayload {
 export async function changePrivacyLevelService(body: ChangeWishlistPrivacyLevelServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);
 }
+
+export async function deleteWishlistService(wishlistId: string): Promise<AxiosResponse> {
+  return axios.delete(`${wishlistsApiUrl}/${wishlistId}`);
+}
