@@ -1,4 +1,4 @@
-import { JSX, useCallback, useEffect, useMemo, useState } from 'react';
+import { JSX, useCallback, useEffect, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { NavigateFunction, useLocation, useNavigate } from 'react-router-dom';
@@ -8,6 +8,8 @@ import { getWishlistDetailsService, WishlistDetails, WishlistItem } from '../../
 import { CanceledError } from 'axios';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
+import WishlistHeader from './WishlistHeader';
+import { FOLLOWERS_WISHLIST_PRIVACY_LEVEL } from '../../utils/constants/wishlistConstants';
 
 export default function Wishlist(): JSX.Element {
   const [wishlistId, setWishlistId] = useState<string | null>(null);
@@ -97,6 +99,13 @@ export default function Wishlist(): JSX.Element {
   return (
     <>
       <Head title={`${wishlistDetails ? wishlistDetails.title : 'Wishlist'} - Muninnfy`} />
+
+      <main className='py-4'>
+        <WishlistHeader
+          privacyLevel={wishlistDetails?.privacy_level || FOLLOWERS_WISHLIST_PRIVACY_LEVEL}
+          wishlistId={wishlistId || ''}
+        />
+      </main>
     </>
   );
 }
