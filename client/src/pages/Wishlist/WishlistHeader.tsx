@@ -53,15 +53,15 @@ export default function WishlistHeader({
     });
   }
 
+  async function updateWishlistTitle(): Promise<void> {
+    // TODO: continue implementation
+  }
+
   async function updateWishlistPrivacyLevel(newPrivacyLevel: number): Promise<void> {
     // TODO: continue implementation
   }
 
   async function deleteWishlist(): Promise<void> {
-    // TODO: continue implementation
-  }
-
-  async function updateWishlistTitle(): Promise<void> {
     // TODO: continue implementation
   }
 
