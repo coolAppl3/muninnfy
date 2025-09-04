@@ -251,3 +251,102 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
     await logUnexpectedError(req, err);
   }
 });
+
+wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+
+  if (!authSessionId) {
+    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
+    return;
+  }
+
+  if (!isValidUuid(authSessionId)) {
+    removeRequestCookie(res, 'authSessionId', true);
+    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
+
+    return;
+  }
+
+  interface RequestData {
+    wishlistId: string;
+    newTitle: string;
+  }
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['wishlistId', 'newTitle'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  if (!isValidUuid(requestData.wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (!isValidWishlistTitle(requestData.newTitle)) {
+    res.status(400).json({ message: 'Invalid wishlist title.', reason: 'invalidTitle' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    interface WishlistDetails extends RowDataPacket {
+      title: string;
+    }
+
+    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+      `SELECT
+        title
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [requestData.wishlistId, accountId]
+    );
+
+    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+
+    if (!wishlistDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
+      return;
+    }
+
+    if (wishlistDetails.title === requestData.newTitle) {
+      res.status(409).json({ message: 'Wishlist already has this title.', reason: 'identicalTitle' });
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        wishlists
+      SET
+        title = ?
+      WHERE
+        wishlist_id = ?;`,
+      [requestData.newTitle, requestData.wishlistId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
