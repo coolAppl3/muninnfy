@@ -27,7 +27,6 @@ export default function WishlistHeader({
   const [editMode, setEditMode] = useState<'TITLE' | 'PRIVACY_LEVEL' | null>(null);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
 
-  const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
@@ -36,13 +35,13 @@ export default function WishlistHeader({
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
-  function handlePrivacyLevelBtnClick(newPrivacyLevel: number, newPrivacyLevelName: string): void {
+  function handlePrivacyLevelBtnClick(newPrivacyLevel: number): void {
     if (newPrivacyLevel === wishlistDetails.privacy_level) {
       return;
     }
 
     displayConfirmModal({
-      description: `Are you sure you want to set the privacy level to ${newPrivacyLevelName}?`,
+      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel)}?`,
       confirmBtnTitle: 'Confirm',
       cancelBtnTitle: 'Cancel',
       isDangerous: true,
@@ -243,21 +242,21 @@ export default function WishlistHeader({
                   <button
                     type='button'
                     className={wishlistDetails?.privacy_level === PRIVATE_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
-                    onClick={() => handlePrivacyLevelBtnClick(PRIVATE_WISHLIST_PRIVACY_LEVEL, 'private')}
+                    onClick={() => handlePrivacyLevelBtnClick(PRIVATE_WISHLIST_PRIVACY_LEVEL)}
                   >
                     Private
                   </button>
                   <button
                     type='button'
                     className={wishlistDetails?.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
-                    onClick={() => handlePrivacyLevelBtnClick(FOLLOWERS_WISHLIST_PRIVACY_LEVEL, 'followers only')}
+                    onClick={() => handlePrivacyLevelBtnClick(FOLLOWERS_WISHLIST_PRIVACY_LEVEL)}
                   >
                     Followers
                   </button>
                   <button
                     type='button'
                     className={wishlistDetails?.privacy_level === PUBLIC_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
-                    onClick={() => handlePrivacyLevelBtnClick(PUBLIC_WISHLIST_PRIVACY_LEVEL, 'public')}
+                    onClick={() => handlePrivacyLevelBtnClick(PUBLIC_WISHLIST_PRIVACY_LEVEL)}
                   >
                     Public
                   </button>
