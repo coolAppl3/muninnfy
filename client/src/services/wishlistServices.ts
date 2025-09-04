@@ -48,3 +48,12 @@ export async function getWishlistDetailsService(
 ): Promise<AxiosResponse<getWishlistDetailsData>> {
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
 }
+
+interface ChangeWishlistTitlePayload {
+  wishlistId: string;
+  newTitle: string;
+}
+
+export async function changeWishlistTitleService(body: ChangeWishlistTitlePayload): Promise<AxiosResponse> {
+  return axios.patch(`${wishlistsApiUrl}/change/title`, body);
+}
