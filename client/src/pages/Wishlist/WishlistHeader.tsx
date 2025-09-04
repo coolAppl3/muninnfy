@@ -8,16 +8,22 @@ import {
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../utils/constants/wishlistConstants';
 import useConfirmModal from '../../hooks/useConfirmModal';
-import { copyToClipboard } from '../../utils/globalUtils';
+import { copyToClipboard, getFullDateString } from '../../utils/globalUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import Button from '../../components/Button/Button';
 import { validateWishlistTitle } from '../../utils/validation/wishlistValidation';
+import { WishlistDetails } from '../../services/wishlistServices';
+import { getWishlistPrivacyLevelName } from '../../utils/wishlistUtils';
 
-export default function WishlistHeader({ privacyLevel, wishlistId }: { privacyLevel: number; wishlistId: string }): JSX.Element {
-  const [privacyLevelValue, setPrivacyLevelValue] = useState<number>(privacyLevel);
-
+export default function WishlistHeader({
+  wishlistDetails,
+  wishlistId,
+}: {
+  wishlistDetails: WishlistDetails;
+  wishlistId: string;
+}): JSX.Element {
   const [editMode, setEditMode] = useState<'TITLE' | 'PRIVACY_LEVEL' | null>(null);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
 
@@ -31,7 +37,7 @@ export default function WishlistHeader({ privacyLevel, wishlistId }: { privacyLe
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   function handlePrivacyLevelBtnClick(newPrivacyLevel: number, newPrivacyLevelName: string): void {
-    if (newPrivacyLevel === privacyLevelValue) {
+    if (newPrivacyLevel === wishlistDetails.privacy_level) {
       return;
     }
 
@@ -114,7 +120,7 @@ export default function WishlistHeader({ privacyLevel, wishlistId }: { privacyLe
                 setMenuIsOpen(false);
               }}
             >
-              <h3>Some very long wishlist title for some reason lmao</h3>
+              <h3>{wishlistDetails.title}</h3>
 
               <button
                 type='button'
@@ -163,10 +169,10 @@ export default function WishlistHeader({ privacyLevel, wishlistId }: { privacyLe
             </div>
 
             <p>
-              Created on: <span>September 23nd, 2025</span>
+              Created on: <span>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
             </p>
             <p>
-              Privacy level: <span>Followers only</span>
+              Privacy level: <span>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
             </p>
           </div>
 
@@ -236,21 +242,21 @@ export default function WishlistHeader({ privacyLevel, wishlistId }: { privacyLe
                 <div className='btn-container'>
                   <button
                     type='button'
-                    className={privacyLevelValue === PRIVATE_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
+                    className={wishlistDetails?.privacy_level === PRIVATE_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
                     onClick={() => handlePrivacyLevelBtnClick(PRIVATE_WISHLIST_PRIVACY_LEVEL, 'private')}
                   >
                     Private
                   </button>
                   <button
                     type='button'
-                    className={privacyLevelValue === FOLLOWERS_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
+                    className={wishlistDetails?.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
                     onClick={() => handlePrivacyLevelBtnClick(FOLLOWERS_WISHLIST_PRIVACY_LEVEL, 'followers only')}
                   >
                     Followers
                   </button>
                   <button
                     type='button'
-                    className={privacyLevelValue === PUBLIC_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
+                    className={wishlistDetails?.privacy_level === PUBLIC_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
                     onClick={() => handlePrivacyLevelBtnClick(PUBLIC_WISHLIST_PRIVACY_LEVEL, 'public')}
                   >
                     Public

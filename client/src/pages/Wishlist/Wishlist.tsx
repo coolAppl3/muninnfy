@@ -101,10 +101,12 @@ export default function Wishlist(): JSX.Element {
       <Head title={`${wishlistDetails ? wishlistDetails.title : 'Wishlist'} - Muninnfy`} />
 
       <main className='py-4'>
-        <WishlistHeader
-          privacyLevel={wishlistDetails?.privacy_level || FOLLOWERS_WISHLIST_PRIVACY_LEVEL}
-          wishlistId={wishlistId || ''}
-        />
+        {wishlistDetails && (
+          <WishlistHeader
+            wishlistDetails={wishlistDetails}
+            wishlistId={wishlistId || ''}
+          />
+        )}
       </main>
     </>
   );
