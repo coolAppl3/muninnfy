@@ -57,3 +57,12 @@ interface ChangeWishlistTitlePayload {
 export async function changeWishlistTitleService(body: ChangeWishlistTitlePayload): Promise<AxiosResponse> {
   return axios.patch(`${wishlistsApiUrl}/change/title`, body);
 }
+
+interface ChangeWishlistPrivacyLevelPayload {
+  wishlistId: string;
+  newPrivacyLevel: number;
+}
+
+export async function changePrivacyLevelService(body: ChangeWishlistPrivacyLevelPayload): Promise<AxiosResponse> {
+  return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);
+}
