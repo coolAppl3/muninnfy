@@ -49,20 +49,20 @@ export async function getWishlistDetailsService(
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
 }
 
-interface ChangeWishlistTitlePayload {
+interface ChangeWishlistTitleServicePayload {
   wishlistId: string;
   newTitle: string;
 }
 
-export async function changeWishlistTitleService(body: ChangeWishlistTitlePayload): Promise<AxiosResponse> {
+export async function changeWishlistTitleService(body: ChangeWishlistTitleServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${wishlistsApiUrl}/change/title`, body);
 }
 
-interface ChangeWishlistPrivacyLevelPayload {
+interface ChangeWishlistPrivacyLevelServicePayload {
   wishlistId: string;
   newPrivacyLevel: number;
 }
 
-export async function changePrivacyLevelService(body: ChangeWishlistPrivacyLevelPayload): Promise<AxiosResponse> {
+export async function changePrivacyLevelService(body: ChangeWishlistPrivacyLevelServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);
 }
