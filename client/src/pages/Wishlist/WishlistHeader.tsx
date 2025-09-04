@@ -47,17 +47,17 @@ export default function WishlistHeader({
       isDangerous: true,
       onConfirm: async () => {
         removeConfirmModal();
-        await updateWishlistPrivacyLevel(newPrivacyLevel);
+        await changeWishlistPrivacyLevel(newPrivacyLevel);
       },
       onCancel: removeConfirmModal,
     });
   }
 
-  async function updateWishlistTitle(): Promise<void> {
+  async function changeWishlistTitle(): Promise<void> {
     // TODO: continue implementation
   }
 
-  async function updateWishlistPrivacyLevel(newPrivacyLevel: number): Promise<void> {
+  async function changeWishlistPrivacyLevel(newPrivacyLevel: number): Promise<void> {
     // TODO: continue implementation
   }
 
@@ -199,7 +199,7 @@ export default function WishlistHeader({
                   setIsSubmitting(true);
                   displayLoadingOverlay();
 
-                  await updateWishlistTitle();
+                  await changeWishlistTitle();
 
                   setIsSubmitting(false);
                   removeLoadingOverlay();
