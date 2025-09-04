@@ -235,7 +235,7 @@ export default function WishlistHeader({
           <div className='editing-container'>
             <div className='h-line'></div>
 
-            {editMode === 'TITLE' ? (
+            {editMode === 'TITLE' && (
               <form
                 className='grid gap-2 w-full'
                 onSubmit={async (e: FormEvent<HTMLFormElement>) => {
@@ -292,7 +292,9 @@ export default function WishlistHeader({
                   </Button>
                 </div>
               </form>
-            ) : (
+            )}
+
+            {editMode === 'PRIVACY_LEVEL' && (
               <div className='privacy-level'>
                 <span>Privacy level</span>
                 <div className='btn-container'>
