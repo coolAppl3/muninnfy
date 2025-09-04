@@ -9,7 +9,6 @@ import { CanceledError } from 'axios';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import WishlistHeader from './WishlistHeader';
-import { FOLLOWERS_WISHLIST_PRIVACY_LEVEL } from '../../utils/constants/wishlistConstants';
 
 export default function Wishlist(): JSX.Element {
   const [wishlistId, setWishlistId] = useState<string | null>(null);
