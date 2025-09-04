@@ -52,13 +52,13 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
   try {
-    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
-
-    if (!accountId) {
-      return;
-    }
-
     interface WishlistDetails extends RowDataPacket {
       account_id: number;
       wishlist_item_tags_count: number;

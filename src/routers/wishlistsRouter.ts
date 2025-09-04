@@ -50,13 +50,13 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
   try {
-    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
-
-    if (!accountId) {
-      return;
-    }
-
     interface AccountWishlistsDetails extends RowDataPacket {
       wishlists_created_count: number;
     }
@@ -132,13 +132,13 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
     return;
   }
 
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
   try {
-    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
-
-    if (!accountId) {
-      return;
-    }
-
     interface WishlistDetails extends RowDataPacket {
       privacy_level: number;
       title: string;
