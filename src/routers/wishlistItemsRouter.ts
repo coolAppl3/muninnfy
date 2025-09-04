@@ -75,24 +75,23 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
   try {
     interface WishlistDetails extends RowDataPacket {
-      account_id: number;
       wishlist_items_count: number;
     }
 
     const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
       `SELECT
-        account_id,
         (SELECT COUNT(*) FROM wishlist_items WHERE wishlist_id = :wishlistId) AS wishlist_items_count
       FROM
         wishlists
       WHERE
-        wishlist_id = :wishlistId;`,
-      { wishlistId: requestData.wishlistId }
+        wishlist_id = :wishlistId AND
+        account_id = :accountId;`,
+      { wishlistId: requestData.wishlistId, accountId }
     );
 
     const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
 
-    if (!wishlistDetails || wishlistDetails.account_id !== accountId) {
+    if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound.' });
       return;
     }
