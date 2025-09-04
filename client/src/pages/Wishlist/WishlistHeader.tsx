@@ -214,7 +214,7 @@ export default function WishlistHeader({
                   onChange={(e) => {
                     const newValue: string = e.target.value;
 
-                    // TODO: validate new value
+                    setTitleErrorMessage(validateWishlistTitle(newValue));
                     setTitleValue(newValue);
                   }}
                 />
