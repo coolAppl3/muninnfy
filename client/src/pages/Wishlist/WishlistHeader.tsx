@@ -29,7 +29,9 @@ export default function WishlistHeader({
   wishlistDetails: WishlistDetails;
   setWishlistDetails: Dispatch<SetStateAction<WishlistDetails | null>>;
 }): JSX.Element {
-  const [editMode, setEditMode] = useState<'TITLE' | 'PRIVACY_LEVEL' | null>(null);
+  type EditMode = 'TITLE' | 'PRIVACY_LEVEL' | 'DELETE_WISHLIST';
+
+  const [editMode, setEditMode] = useState<EditMode | null>(null);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
