@@ -456,3 +456,79 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     await logUnexpectedError(req, err);
   }
 });
+
+wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+
+  if (!authSessionId) {
+    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
+    return;
+  }
+
+  if (!isValidUuid(authSessionId)) {
+    removeRequestCookie(res, 'authSessionId', true);
+    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
+
+    return;
+  }
+
+  const wishlistId: string | undefined = req.params.wishlistId;
+
+  if (!wishlistId) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        1
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [wishlistId, accountId]
+    );
+
+    if (wishlistRows.length === 0) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `DELETE FROM
+        wishlists
+      WHERE
+        wishlist_id = ?;`,
+      [wishlistId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
