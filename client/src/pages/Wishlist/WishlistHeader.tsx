@@ -41,7 +41,7 @@ export default function WishlistHeader({
     }
 
     displayConfirmModal({
-      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel)}?`,
+      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}?`,
       confirmBtnTitle: 'Confirm',
       cancelBtnTitle: 'Cancel',
       isDangerous: true,
