@@ -104,8 +104,9 @@ export default function Wishlist(): JSX.Element {
       <main className='py-4'>
         {wishlistDetails && (
           <WishlistHeader
-            wishlistDetails={wishlistDetails}
             wishlistId={wishlistId || ''}
+            wishlistDetails={wishlistDetails}
+            setWishlistDetails={setWishlistDetails}
           />
         )}
       </main>

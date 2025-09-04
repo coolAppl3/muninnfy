@@ -1,4 +1,4 @@
-import { FocusEvent, FormEvent, JSX, MouseEvent, useState } from 'react';
+import { Dispatch, FocusEvent, FormEvent, JSX, MouseEvent, SetStateAction, useState } from 'react';
 import Container from '../../components/Container/Container';
 import TripleDoteMenuIcon from '../../assets/svg/TripleDotMenuIcon.svg?react';
 import './Wishlist.css';
@@ -14,15 +14,20 @@ import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import Button from '../../components/Button/Button';
 import { validateWishlistTitle } from '../../utils/validation/wishlistValidation';
-import { WishlistDetails } from '../../services/wishlistServices';
+import { changeWishlistTitleService, WishlistDetails } from '../../services/wishlistServices';
 import { getWishlistPrivacyLevelName } from '../../utils/wishlistUtils';
+import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
+import useInfoModal from '../../hooks/useInfoModal';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 export default function WishlistHeader({
-  wishlistDetails,
   wishlistId,
+  wishlistDetails,
+  setWishlistDetails,
 }: {
-  wishlistDetails: WishlistDetails;
   wishlistId: string;
+  wishlistDetails: WishlistDetails;
+  setWishlistDetails: Dispatch<SetStateAction<WishlistDetails | null>>;
 }): JSX.Element {
   const [editMode, setEditMode] = useState<'TITLE' | 'PRIVACY_LEVEL' | null>(null);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
@@ -31,6 +36,8 @@ export default function WishlistHeader({
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
+  const navigate: NavigateFunction = useNavigate();
+  const { displayInfoModal, removeInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
@@ -54,7 +61,57 @@ export default function WishlistHeader({
   }
 
   async function changeWishlistTitle(): Promise<void> {
-    // TODO: continue implementation
+    const newTitle: string = titleValue;
+
+    try {
+      await changeWishlistTitleService({ newTitle, wishlistId });
+      setWishlistDetails({
+        ...wishlistDetails,
+        title: newTitle,
+      });
+
+      setTitleValue('');
+      setEditMode(null);
+
+      displayPopupMessage('Title updated.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+
+      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+
+      if (!asyncErrorData) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      const { status, errMessage, errReason } = asyncErrorData;
+      displayPopupMessage(errMessage, 'error');
+
+      if (!errReason) {
+        return;
+      }
+
+      if (status === 400) {
+        if (errReason === 'invalidTitle') {
+          setTitleErrorMessage(errMessage);
+          return;
+        }
+
+        displayInfoModal({
+          title: 'Invalid wishlist ID.',
+          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
+          btnTitle: 'Go to homepage',
+          onClick: removeInfoModal,
+        });
+
+        return;
+      }
+
+      if ([401, 404].includes(status)) {
+        navigate('/home');
+        return;
+      }
+    }
   }
 
   async function changeWishlistPrivacyLevel(newPrivacyLevel: number): Promise<void> {
