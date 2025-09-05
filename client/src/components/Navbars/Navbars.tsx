@@ -1,4 +1,4 @@
-import { JSX, useState } from 'react';
+import { FocusEvent, JSX, useState } from 'react';
 import { Link, NavLink, NavigateFunction, useNavigate, Location, useLocation } from 'react-router-dom';
 import Button from '../Button/Button';
 import Container from '../Container/Container';
@@ -162,7 +162,7 @@ function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<
   return (
     <div
       className={`account-menu ${isVisible ? 'visible' : ''} ${isOpen ? 'open' : ''}`}
-      onBlur={(e) => {
+      onBlur={(e: FocusEvent<HTMLDivElement>) => {
         if (e.relatedTarget) {
           return;
         }
@@ -279,7 +279,7 @@ function BottomNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promi
     <div
       className={`account-menu ${isVisible ? 'visible' : ''} ${isOpen ? 'open' : ''}`}
       tabIndex={0}
-      onBlur={(e) => {
+      onBlur={(e: FocusEvent<HTMLDivElement>) => {
         if (e.relatedTarget) {
           return;
         }

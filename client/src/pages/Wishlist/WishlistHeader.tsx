@@ -1,4 +1,4 @@
-import { Dispatch, FocusEvent, FormEvent, JSX, MouseEvent, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, FocusEvent, FormEvent, JSX, MouseEvent, SetStateAction, useState } from 'react';
 import Container from '../../components/Container/Container';
 import TripleDoteMenuIcon from '../../assets/svg/TripleDotMenuIcon.svg?react';
 import './Wishlist.css';
@@ -340,7 +340,7 @@ export default function WishlistHeader({
                   autoComplete='name'
                   value={titleValue}
                   errorMessage={titleErrorMessage}
-                  onChange={(e) => {
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     const newValue: string = e.target.value;
 
                     setTitleErrorMessage(validateWishlistTitle(newValue));
@@ -442,7 +442,7 @@ export default function WishlistHeader({
                   autoComplete='name'
                   value={deletionConfirmationTitleValue}
                   errorMessage={null}
-                  onChange={(e) => setDeletionConfirmationTitleValue(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setDeletionConfirmationTitleValue(e.target.value)}
                 />
 
                 <div className='flex flex-col justify-start items-center gap-1 sm:flex-row'>
