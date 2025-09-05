@@ -45,7 +45,6 @@ export default function SignIn(): JSX.Element {
       navigate('/account');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {

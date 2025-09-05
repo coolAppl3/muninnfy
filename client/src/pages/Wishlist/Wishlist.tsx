@@ -62,7 +62,6 @@ export default function Wishlist(): JSX.Element {
         }
 
         console.log(err);
-
         const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
         if (!asyncErrorData) {

@@ -31,7 +31,6 @@ export default function SignUp(): JSX.Element {
       displayPopupMessage('Account created.', 'success');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {

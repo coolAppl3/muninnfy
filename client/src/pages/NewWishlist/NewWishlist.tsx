@@ -63,7 +63,6 @@ export default function NewWishlist(): JSX.Element {
       navigate(`/wishlist/${wishlistId}`);
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {

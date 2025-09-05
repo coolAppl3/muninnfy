@@ -66,7 +66,6 @@ export default function WishlistHeader({
       displayPopupMessage('Title updated.', 'success');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -115,7 +114,6 @@ export default function WishlistHeader({
       displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}.`, 'success');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -155,7 +153,6 @@ export default function WishlistHeader({
       navigate('/wishlists');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
