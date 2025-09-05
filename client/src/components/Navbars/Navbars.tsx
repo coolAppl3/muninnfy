@@ -146,28 +146,68 @@ function TopNavbar({
 }
 
 function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<void> }): JSX.Element {
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  function handleClick(): void {
+    setIsVisible((prev) => !prev);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setIsOpen((prev) => !prev);
+      });
+    });
+  }
 
   return (
     <div
-      className={`account-menu ${isOpen ? 'open' : ''}`}
-      onBlur={() => setIsOpen(false)}
+      className={`account-menu ${isVisible ? 'visible' : ''} ${isOpen ? 'open' : ''}`}
+      onBlur={(e) => {
+        if (e.relatedTarget) {
+          return;
+        }
+
+        setIsVisible(false);
+        setIsOpen(false);
+      }}
     >
       <button
         type='button'
         className='account-menu-btn'
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={handleClick}
       >
         <span>Menu</span>
         <ChevronIcon />
       </button>
 
       <div className='account-menu-container'>
-        <Link to='/account'>My account</Link>
-        <Link to='/account/wishlists'>Wishlists</Link>
+        <Link
+          to='/account'
+          onClick={() => {
+            setIsVisible(false);
+            setIsOpen(false);
+          }}
+        >
+          My account
+        </Link>
+        <Link
+          to='/account/wishlists'
+          onClick={() => {
+            setIsVisible(false);
+            setIsOpen(false);
+          }}
+        >
+          Wishlists
+        </Link>
+
         <button
           type='button'
-          onClick={handleSignOut}
+          onClick={() => {
+            handleSignOut();
+
+            setIsVisible(false);
+            setIsOpen(false);
+          }}
           className='!text-danger'
         >
           Sign out
@@ -222,29 +262,69 @@ function BottomNavbar({
 }
 
 function BottomNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<void> }): JSX.Element {
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  function handleClick(): void {
+    setIsVisible((prev) => !prev);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setIsOpen((prev) => !prev);
+      });
+    });
+  }
 
   return (
     <div
-      className={`account-menu ${isOpen ? 'open' : ''}`}
+      className={`account-menu ${isVisible ? 'visible' : ''} ${isOpen ? 'open' : ''}`}
       tabIndex={0}
-      onBlur={() => setIsOpen(false)}
+      onBlur={(e) => {
+        if (e.relatedTarget) {
+          return;
+        }
+
+        setIsVisible(false);
+        setIsOpen(false);
+      }}
     >
       <button
         type='button'
         className='account-menu-btn'
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={handleClick}
       >
         <span>Menu</span>
         <ChevronIcon />
       </button>
 
       <div className='account-menu-container'>
-        <Link to='/account'>My account</Link>
-        <Link to='/account/wishlists'>Wishlists</Link>
+        <Link
+          to='/account'
+          onClick={() => {
+            setIsVisible(false);
+            setIsOpen(false);
+          }}
+        >
+          My account
+        </Link>
+        <Link
+          to='/account/wishlists'
+          onClick={() => {
+            setIsVisible(false);
+            setIsOpen(false);
+          }}
+        >
+          Wishlists
+        </Link>
+
         <button
           type='button'
-          onClick={handleSignOut}
+          onClick={() => {
+            handleSignOut();
+
+            setIsVisible(false);
+            setIsOpen(false);
+          }}
           className='!text-danger'
         >
           Sign out

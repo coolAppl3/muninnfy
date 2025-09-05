@@ -55,7 +55,7 @@
   }
 
   body {
-    @apply font-main text-base bg-primary relative pb-6 md:pb-0;
+    @apply font-main text-base bg-primary relative mb-6 md:mb-0;
   }
 
   h1,

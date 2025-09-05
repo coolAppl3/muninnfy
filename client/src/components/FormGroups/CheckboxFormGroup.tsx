@@ -7,11 +7,12 @@ interface CheckboxFormGroupProps {
   id: string;
   isChecked: boolean;
   onClick: MouseEventHandler<HTMLButtonElement>;
+  className?: string;
 }
 
-export default function CheckboxFormGroup({ label, id, isChecked, onClick }: CheckboxFormGroupProps): JSX.Element {
+export default function CheckboxFormGroup({ label, id, isChecked, onClick, className }: CheckboxFormGroupProps): JSX.Element {
   return (
-    <div className={`checkbox-form-group ${isChecked ? 'checked' : ''}`}>
+    <div className={`checkbox-form-group ${isChecked ? 'checked' : ''} ${className ? className : ''}`}>
       <button
         type='button'
         aria-label={isChecked ? 'Checked.' : 'Unchecked.'}

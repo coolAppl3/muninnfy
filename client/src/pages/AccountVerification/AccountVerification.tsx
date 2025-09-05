@@ -64,6 +64,7 @@ function ContinueAccountVerificationForm(): JSX.Element {
       displayPopupMessage('Verification request found.', 'success');
     } catch (err: unknown) {
       console.log(err);
+
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -150,6 +151,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
       displayPopupMessage('Email resent.', 'success');
     } catch (err: unknown) {
       console.log(err);
+
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -305,6 +307,7 @@ function ConfirmAccountVerification({
         }
 
         console.log(err);
+
         const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
         if (!asyncErrorData) {

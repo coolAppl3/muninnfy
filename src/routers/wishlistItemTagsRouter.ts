@@ -52,32 +52,31 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
   try {
-    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
-
-    if (!accountId) {
-      return;
-    }
-
     interface WishlistDetails extends RowDataPacket {
-      account_id: number;
       wishlist_item_tags_count: number;
     }
 
     const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
       `SELECT
-        account_id,
         (SELECT COUNT(*) FROM wishlist_item_tags WHERE item_id = ?) AS wishlist_item_tags_count
       FROM
         wishlists
       WHERE
-        wishlist_id = ?;`,
-      [requestData.itemId, requestData.wishlistId]
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [requestData.itemId, requestData.wishlistId, accountId]
     );
 
     const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
 
-    if (!wishlistDetails || wishlistDetails.account_id !== accountId) {
+    if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
