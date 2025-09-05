@@ -14,7 +14,7 @@ import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import Button from '../../components/Button/Button';
 import { validateWishlistTitle } from '../../utils/validation/wishlistValidation';
-import { changeWishlistTitleService, WishlistDetails } from '../../services/wishlistServices';
+import { changeWishlistTitleService, deleteWishlistService, WishlistDetails } from '../../services/wishlistServices';
 import { getWishlistPrivacyLevelName } from '../../utils/wishlistUtils';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useInfoModal from '../../hooks/useInfoModal';
@@ -104,7 +104,39 @@ export default function WishlistHeader({
   }
 
   async function deleteWishlist(): Promise<void> {
-    // TODO: continue implementation
+    try {
+      await deleteWishlistService(wishlistId);
+
+      displayPopupMessage('Wishlist deleted.', 'success');
+      navigate('/wishlists');
+    } catch (err: unknown) {
+      console.log(err);
+
+      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+
+      if (!asyncErrorData) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      const { status, errMessage, errReason } = asyncErrorData;
+      displayPopupMessage(errMessage, 'error');
+
+      if (status === 400 && errReason === 'invalidWishlistId') {
+        displayInfoModal({
+          title: 'Invalid wishlist ID.',
+          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
+          btnTitle: 'Go to homepage',
+          onClick: removeInfoModal,
+        });
+
+        return;
+      }
+
+      if ([401, 404].includes(status)) {
+        navigate('/home');
+      }
+    }
   }
 
   async function handleContentMenuClick(id: string): Promise<void> {
