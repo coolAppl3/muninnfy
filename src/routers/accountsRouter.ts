@@ -89,7 +89,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       `SELECT
         EXISTS (SELECT 1 FROM accounts WHERE email = ?) AS email_taken,
         EXISTS (SELECT 1 FROM accounts WHERE username = ?) AS username_taken;`,
-      [requestData.email, requestData.email]
+      [requestData.email, requestData.username]
     );
 
     const takenStatus: TakenStatus | undefined = takenStatusRows[0];
