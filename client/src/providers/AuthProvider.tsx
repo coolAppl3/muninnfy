@@ -6,9 +6,11 @@ export default function AuthProvider({ children }: { children: ReactNode }): JSX
   const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
   useEffect(() => {
+    const abortController: AbortController = new AbortController();
+
     const checkForAuthSession = async (): Promise<void> => {
       try {
-        const isValidAuthSession: boolean = (await checkForAuthSessionService()).data.isValidAuthSession;
+        const isValidAuthSession: boolean = (await checkForAuthSessionService(abortController.signal)).data.isValidAuthSession;
         setIsSignedIn(isValidAuthSession);
       } catch (err: unknown) {
         setIsSignedIn(false);
@@ -16,6 +18,10 @@ export default function AuthProvider({ children }: { children: ReactNode }): JSX
     };
 
     checkForAuthSession();
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   return <AuthContext.Provider value={{ isSignedIn, setIsSignedIn }}>{children}</AuthContext.Provider>;
