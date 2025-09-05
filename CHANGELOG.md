@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.0.17] (2024-09-05)
+
+### Features
+
+- Added `WishlistHeader` component under the `Wishlist` page directory.
+  - Further polishing to be implemented in future patches.
+- Added the following endpoints:
+  - PATCH `wishlists/change/title`.
+  - PATCH `wishlists/change/privacyLevel`.
+  - DELETE `wishlists/:wishlistId`.
+- Added the following services:
+  - `changeWishlistTitleService()`.
+  - `changeWishlistPrivacyLevelService()`.
+  - `deleteWishlistService()`.
+- Added `globalUtils` module with `copyToClipboard()` and `getFullDateString()`, alongside a few local helper functions.
+- Added `wishlistUtils` module with `getWishlistPrivacyLevelName()`.
+- Added `TripleDotMenuIcon` SVG.
+
+
+### Bug Fixes
+
+- Fixed padding being used instead of margin being used for the body, which is supposed to account for the bottom navbar, causing visual bugs for shorter pages.
+- Fixed both navbar menus not being clickable while closed due to a flaw in how they would be closed.
+
+
+### Changes
+
+- Reduced `PopupMessage` font size on smaller devices.
+
+
+### Code Refactoring
+
+- Pulled `getAccountByAuthSessionId()` calls outside of try-catch blocks in the endpoints they're used in, to improve readability and reduce the block's size, since the function contains a try-catch block for its async call.
+- Moved the account ID verification in some endpoints to the SQL query's conditional to improve readability.
+
+
 ## [0.0.16] (2024-09-02)
 
 ### Features
