@@ -33,34 +33,17 @@ export default function WishlistHeader({
 
   const [editMode, setEditMode] = useState<EditMode | null>(null);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
-
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
+  const [deletionConfirmationTitleValue, setDeletionConfirmationTitleValue] = useState<string>('');
 
   const navigate: NavigateFunction = useNavigate();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-
-  function handlePrivacyLevelBtnClick(newPrivacyLevel: number): void {
-    if (newPrivacyLevel === wishlistDetails.privacy_level) {
-      return;
-    }
-
-    displayConfirmModal({
-      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}?`,
-      confirmBtnTitle: 'Confirm',
-      cancelBtnTitle: 'Cancel',
-      isDangerous: true,
-      onConfirm: async () => {
-        removeConfirmModal();
-        await changeWishlistPrivacyLevel(newPrivacyLevel);
-      },
-      onCancel: removeConfirmModal,
-    });
-  }
 
   async function changeWishlistTitle(): Promise<void> {
     const newTitle: string = titleValue;
@@ -148,19 +131,27 @@ export default function WishlistHeader({
     }
 
     if (id === 'delete-wishlist-btn') {
-      displayConfirmModal({
-        title: 'Are you sure you want to delete this wishlist?',
-        description: 'This action is irreversible.',
-        confirmBtnTitle: 'Confirm',
-        cancelBtnTitle: 'Cancel',
-        isDangerous: true,
-        onConfirm: async () => {
-          removeConfirmModal();
-          await deleteWishlist();
-        },
-        onCancel: removeConfirmModal,
-      });
+      setDeletionConfirmationTitleValue('');
+      setEditMode('DELETE_WISHLIST');
     }
+  }
+
+  function handlePrivacyLevelBtnClick(newPrivacyLevel: number): void {
+    if (newPrivacyLevel === wishlistDetails.privacy_level) {
+      return;
+    }
+
+    displayConfirmModal({
+      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}?`,
+      confirmBtnTitle: 'Confirm',
+      cancelBtnTitle: 'Cancel',
+      isDangerous: true,
+      onConfirm: async () => {
+        removeConfirmModal();
+        await changeWishlistPrivacyLevel(newPrivacyLevel);
+      },
+      onCancel: removeConfirmModal,
+    });
   }
 
   return (
@@ -336,6 +327,65 @@ export default function WishlistHeader({
                   Collapse
                 </button>
               </div>
+            )}
+
+            {editMode === 'DELETE_WISHLIST' && (
+              <form
+                className='grid gap-2 w-full'
+                onSubmit={async (e: FormEvent<HTMLFormElement>) => {
+                  e.preventDefault();
+
+                  if (isSubmitting || deletionConfirmationTitleValue !== wishlistDetails.title) {
+                    return;
+                  }
+
+                  console.log(true);
+
+                  setIsSubmitting(true);
+                  displayLoadingOverlay();
+
+                  await deleteWishlist();
+
+                  setIsSubmitting(false);
+                  removeLoadingOverlay();
+                }}
+              >
+                <div className='text-description'>
+                  <p className='font-medium mb-[6px]'>Are you sure you want to delete this wishlist?</p>
+                  <p className='text-sm'>
+                    <span className='text-danger'>This action is irreversible.</span> To proceed, confirm your wishlist title below:
+                  </p>
+                </div>
+
+                <DefaultFormGroup
+                  id='confirm-wishlist-title'
+                  label={`Enter "${wishlistDetails.title}"`}
+                  autoComplete='name'
+                  value={deletionConfirmationTitleValue}
+                  errorMessage={null}
+                  onChange={(e) => setDeletionConfirmationTitleValue(e.target.value)}
+                />
+
+                <div className='flex flex-col justify-start items-center gap-1 sm:flex-row'>
+                  <Button
+                    isSubmitBtn={true}
+                    className='bg-danger border-danger order-1 sm:order-2 w-full sm:w-fit'
+                    disabled={editMode === 'DELETE_WISHLIST' ? deletionConfirmationTitleValue !== wishlistDetails.title : true}
+                  >
+                    Delete wishlist
+                  </Button>
+
+                  <Button
+                    className='bg-secondary border-title text-title order-2 sm:order-1 w-full sm:w-fit'
+                    onClick={() => {
+                      setEditMode(null);
+                      setMenuIsOpen(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
             )}
           </div>
         </div>
