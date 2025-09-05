@@ -14,7 +14,12 @@ import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import Button from '../../components/Button/Button';
 import { validateWishlistTitle } from '../../utils/validation/wishlistValidation';
-import { changeWishlistTitleService, deleteWishlistService, WishlistDetails } from '../../services/wishlistServices';
+import {
+  changeWishlistPrivacyLevelService,
+  changeWishlistTitleService,
+  deleteWishlistService,
+  WishlistDetails,
+} from '../../services/wishlistServices';
 import { getWishlistPrivacyLevelName } from '../../utils/wishlistUtils';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useInfoModal from '../../hooks/useInfoModal';
@@ -100,7 +105,46 @@ export default function WishlistHeader({
   }
 
   async function changeWishlistPrivacyLevel(newPrivacyLevel: number): Promise<void> {
-    // TODO: continue implementation
+    try {
+      await changeWishlistPrivacyLevelService({ wishlistId, newPrivacyLevel });
+      setWishlistDetails({
+        ...wishlistDetails,
+        privacy_level: newPrivacyLevel,
+      });
+
+      displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}.`, 'success');
+    } catch (err: unknown) {
+      console.log(err);
+
+      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+
+      if (!asyncErrorData) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      const { status, errMessage, errReason } = asyncErrorData;
+      displayPopupMessage(errMessage, 'error');
+
+      if (!errReason) {
+        return;
+      }
+
+      if (status === 400 && errReason === 'invalidWishlistId') {
+        displayInfoModal({
+          title: 'Invalid wishlist ID.',
+          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
+          btnTitle: 'Go to homepage',
+          onClick: () => navigate('/home'),
+        });
+
+        return;
+      }
+
+      if ([401, 404].includes(status)) {
+        navigate('/home');
+      }
+    }
   }
 
   async function deleteWishlist(): Promise<void> {
@@ -180,7 +224,10 @@ export default function WishlistHeader({
       isDangerous: true,
       onConfirm: async () => {
         removeConfirmModal();
+        displayLoadingOverlay();
+
         await changeWishlistPrivacyLevel(newPrivacyLevel);
+        removeLoadingOverlay();
       },
       onCancel: removeConfirmModal,
     });
