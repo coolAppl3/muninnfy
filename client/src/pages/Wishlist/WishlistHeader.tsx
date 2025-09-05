@@ -288,7 +288,10 @@ export default function WishlistHeader({
 
                   <Button
                     className='bg-secondary border-title text-title order-2 sm:order-1 w-full sm:w-fit'
-                    onClick={() => setEditMode(null)}
+                    onClick={() => {
+                      setEditMode(null);
+                      setMenuIsOpen(false);
+                    }}
                   >
                     Cancel
                   </Button>
@@ -325,7 +328,10 @@ export default function WishlistHeader({
 
                 <button
                   className='link'
-                  onClick={() => setEditMode(null)}
+                  onClick={() => {
+                    setEditMode(null);
+                    setMenuIsOpen(false);
+                  }}
                 >
                   Collapse
                 </button>
