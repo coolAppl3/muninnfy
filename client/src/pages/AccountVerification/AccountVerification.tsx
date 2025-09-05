@@ -202,7 +202,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
     },
 
     409: {
-      description: 'You can simply proceed with singing in.',
+      description: 'You can simply proceed with signing in.',
       btnTitle: 'Sign in',
       onClick: () => navigate('/sign-in'),
     },
@@ -274,7 +274,7 @@ function ConfirmAccountVerification({
       },
 
       409: {
-        description: 'You may proceed with singing in.',
+        description: 'You may proceed with signing in.',
         btnTitle: 'Sign in',
         onClick: () => navigate('/sign-in'),
       },
@@ -297,7 +297,7 @@ function ConfirmAccountVerification({
         displayPopupMessage('Account verified.', 'success');
         setVerificationState({
           title: 'Account verified',
-          description: 'You may now proceed with singing in.',
+          description: 'You may now proceed with signing in.',
           btnTitle: 'Sign in',
           onClick: () => navigate('/sign-in'),
         });
