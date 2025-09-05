@@ -1,7 +1,7 @@
 import { JSX, useCallback, useEffect, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
-import { NavigateFunction, useLocation, useNavigate } from 'react-router-dom';
+import { NavigateFunction, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';
 import useInfoModal from '../../hooks/useInfoModal';
 import { getWishlistDetailsService, WishlistDetails, WishlistItem } from '../../services/wishlistServices';
@@ -16,6 +16,7 @@ export default function Wishlist(): JSX.Element {
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
 
   const { pathname } = useLocation();
+  const routerParams = useParams();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
@@ -32,9 +33,9 @@ export default function Wishlist(): JSX.Element {
 
   useEffect(() => {
     displayLoadingOverlay();
-    const wishlistId: string = pathname.slice(10);
+    const wishlistId: string | undefined = routerParams.wishlistId;
 
-    if (!isValidUuid(wishlistId)) {
+    if (!wishlistId || !isValidUuid(wishlistId)) {
       removeLoadingOverlay();
       handleInvalidWishlistId();
 
