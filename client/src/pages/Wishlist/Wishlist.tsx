@@ -26,7 +26,7 @@ export default function Wishlist(): JSX.Element {
       title: 'Invalid wishlist ID.',
       description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
       btnTitle: 'Go to homepage',
-      onClick: removeInfoModal,
+      onClick: () => navigate('/home'),
     });
   }, [displayInfoModal, removeInfoModal]);
 
