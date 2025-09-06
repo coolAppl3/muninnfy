@@ -113,12 +113,12 @@ export default function SignIn(): JSX.Element {
   }
 
   const errFieldRecord: Record<string, (errorMessage: string | null) => void> = {
-    invalidPassword: setPasswordErrorMessage,
-
     invalidEmail: setEmailErrorMessage,
-    incorrectPassword: setEmailErrorMessage,
-    incorrectPassword_locked: setEmailErrorMessage,
     accountNotFound: setEmailErrorMessage,
+
+    invalidPassword: setPasswordErrorMessage,
+    incorrectPassword_locked: setPasswordErrorMessage,
+    incorrectPassword: setPasswordErrorMessage,
   };
 
   return (
