@@ -25,7 +25,7 @@ export default function Navbars(): JSX.Element {
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   async function handleSignOut(): Promise<void> {
-    if (authStatus === 'authenticated') {
+    if (authStatus === 'unauthenticated') {
       displayPopupMessage('Already signed out.', 'success');
       return;
     }
