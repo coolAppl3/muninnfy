@@ -8,16 +8,16 @@ import HistoryProvider from './providers/HistoryProvider';
 
 export default function Providers({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <AuthProvider>
-      <HistoryProvider>
-        <LoadingOverlayProvider>
-          <PopupMessageProvider>
+    <LoadingOverlayProvider>
+      <PopupMessageProvider>
+        <AuthProvider>
+          <HistoryProvider>
             <ConfirmModalProvider>
               <InfoModalProvider>{children}</InfoModalProvider>
             </ConfirmModalProvider>
-          </PopupMessageProvider>
-        </LoadingOverlayProvider>
-      </HistoryProvider>
-    </AuthProvider>
+          </HistoryProvider>
+        </AuthProvider>
+      </PopupMessageProvider>
+    </LoadingOverlayProvider>
   );
 }
