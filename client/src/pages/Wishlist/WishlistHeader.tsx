@@ -415,8 +415,6 @@ export default function WishlistHeader({
                     return;
                   }
 
-                  console.log(true);
-
                   setIsSubmitting(true);
                   displayLoadingOverlay();
 
