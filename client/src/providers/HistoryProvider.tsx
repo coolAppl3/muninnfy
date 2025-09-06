@@ -3,16 +3,19 @@ import HistoryContext from '../contexts/HistoryContext';
 import { useLocation } from 'react-router-dom';
 
 export default function HistoryProvider({ children }: { children: ReactNode }): JSX.Element {
-  const { pathname } = useLocation();
-
-  const [referrerPathname, setReferrerPathname] = useState<string | null>(pathname);
+  const [referrerPathname, setReferrerPathname] = useState<string | null>(null);
   const [postAuthRedirectPathname, setPostAuthRedirectPathname] = useState<string | null>(null);
 
-  const prevPathRef = useRef<string | null>(null);
+  const { pathname } = useLocation();
+  const pathnameRef = useRef<string>(pathname);
 
   useEffect(() => {
-    setReferrerPathname(prevPathRef.current);
-    prevPathRef.current = pathname;
+    if (pathname === pathnameRef.current) {
+      return;
+    }
+
+    setReferrerPathname(pathnameRef.current);
+    pathnameRef.current = pathname;
   }, [pathname]);
 
   const contextValue = useMemo(
