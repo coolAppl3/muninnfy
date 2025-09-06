@@ -1,7 +1,7 @@
 import { JSX, useCallback, useEffect, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
-import { NavigateFunction, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';
 import useInfoModal from '../../hooks/useInfoModal';
 import { getWishlistDetailsService, WishlistDetails, WishlistItem } from '../../services/wishlistServices';
@@ -15,11 +15,10 @@ export default function Wishlist(): JSX.Element {
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetails | null>(null);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
 
-  const { pathname } = useLocation();
-  const routerParams = useParams();
+  const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayInfoModal, removeInfoModal } = useInfoModal();
+  const { displayInfoModal } = useInfoModal();
   const { displayPopupMessage } = usePopupMessage();
 
   const handleInvalidWishlistId: () => void = useCallback(() => {
@@ -29,11 +28,11 @@ export default function Wishlist(): JSX.Element {
       btnTitle: 'Go to homepage',
       onClick: () => navigate('/home'),
     });
-  }, [displayInfoModal, removeInfoModal]);
+  }, [displayInfoModal, navigate]);
 
   useEffect(() => {
     displayLoadingOverlay();
-    const wishlistId: string | undefined = routerParams.wishlistId;
+    const wishlistId: string | undefined = urlParams.wishlistId;
 
     if (!wishlistId || !isValidUuid(wishlistId)) {
       removeLoadingOverlay();
@@ -94,7 +93,7 @@ export default function Wishlist(): JSX.Element {
 
       removeLoadingOverlay();
     };
-  }, [displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage, handleInvalidWishlistId, pathname, navigate]);
+  }, [displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage, handleInvalidWishlistId, urlParams, navigate]);
 
   return (
     <>
