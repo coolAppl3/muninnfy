@@ -1,5 +1,5 @@
-import { JSX, ReactNode, useCallback, useEffect, useState } from 'react';
-import AuthContext from '../contexts/AuthContext';
+import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import AuthContext, { AuthContextInterface } from '../contexts/AuthContext';
 import { checkForAuthSessionService, signOutService } from '../services/authServices';
 import useLoadingOverlay from '../hooks/useLoadingOverlay';
 import usePopupMessage from '../hooks/usePopupMessage';
@@ -45,5 +45,6 @@ export default function AuthProvider({ children }: { children: ReactNode }): JSX
     }
   }, [displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage]);
 
-  return <AuthContext.Provider value={{ isSignedIn, setIsSignedIn, signOut }}>{children}</AuthContext.Provider>;
+  const contextValue: AuthContextInterface = useMemo(() => ({ isSignedIn, setIsSignedIn, signOut }), [isSignedIn, signOut]);
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }
