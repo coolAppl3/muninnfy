@@ -27,14 +27,14 @@ export default function NewWishlist(): JSX.Element {
   const [titleError, setTitleError] = useState<string | null>(null);
 
   const navigate: NavigateFunction = useNavigate();
-  const { isSignedIn, setIsSignedIn } = useAuth();
+  const { authStatus, setAuthStatus } = useAuth();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (authStatus === 'authenticated') {
       return;
     }
 
@@ -50,7 +50,7 @@ export default function NewWishlist(): JSX.Element {
       onExtraAction: () => navigate('/home'),
       isDangerous: false,
     });
-  }, [isSignedIn, navigate, displayConfirmModal, removeConfirmModal]);
+  }, [authStatus, navigate, displayConfirmModal, removeConfirmModal]);
 
   async function handleSubmit(): Promise<void> {
     const title: string = titleValue;
@@ -77,7 +77,7 @@ export default function NewWishlist(): JSX.Element {
         return;
       }
 
-      setIsSignedIn(false);
+      setAuthStatus('unauthenticated');
       displayInfoModal({
         title: errMessage,
         description: 'You can either sign in and try again, or create a guest wishlist.',

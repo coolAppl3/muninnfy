@@ -6,7 +6,7 @@ import usePopupMessage from '../hooks/usePopupMessage';
 import { signOutService } from '../services/authServices';
 
 export default function AuthSessionProvider({ children }: { children: ReactNode }): JSX.Element {
-  const { setIsSignedIn } = useAuth();
+  const { setAuthStatus } = useAuth();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
 
@@ -15,7 +15,7 @@ export default function AuthSessionProvider({ children }: { children: ReactNode 
 
     try {
       await signOutService();
-      setIsSignedIn(false);
+      setAuthStatus('unauthenticated');
 
       displayPopupMessage('Signed out', 'success');
     } catch (err: unknown) {
@@ -24,7 +24,7 @@ export default function AuthSessionProvider({ children }: { children: ReactNode 
     } finally {
       removeLoadingOverlay();
     }
-  }, [setIsSignedIn, displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage]);
+  }, [setAuthStatus, displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage]);
 
   const contextValue: AuthSessionContextInterface = useMemo(() => ({ signOut }), [signOut]);
   return <AuthSessionContext.Provider value={contextValue}>{children}</AuthSessionContext.Provider>;

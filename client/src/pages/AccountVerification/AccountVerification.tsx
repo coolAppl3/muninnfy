@@ -46,7 +46,7 @@ function ContinueAccountVerificationForm(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
-  const { setIsSignedIn } = useAuth();
+  const { setAuthStatus } = useAuth();
 
   async function continueAccountVerification(): Promise<void> {
     const email: string = emailValue;
@@ -75,7 +75,7 @@ function ContinueAccountVerificationForm(): JSX.Element {
       displayPopupMessage(errMessage, 'error');
 
       if (status === 403) {
-        setIsSignedIn(true);
+        setAuthStatus('authenticated');
         return;
       }
 
@@ -142,7 +142,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
-  const { setIsSignedIn } = useAuth();
+  const { setAuthStatus } = useAuth();
 
   async function resendAccountVerificationEmail(): Promise<void> {
     try {
@@ -161,7 +161,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
       displayPopupMessage(errMessage, 'error');
 
       if (status === 403 && errReason === 'signedIn') {
-        setIsSignedIn(true);
+        setAuthStatus('authenticated');
         return;
       }
 
@@ -251,7 +251,7 @@ function ConfirmAccountVerification({
 
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
-  const { setIsSignedIn } = useAuth();
+  const { setAuthStatus } = useAuth();
 
   const verificationErrorRecord: Record<number, { description: string | undefined; btnTitle?: string; onClick?: () => void }> = useMemo(
     () => ({
@@ -350,7 +350,7 @@ function ConfirmAccountVerification({
         }
 
         if (status === 403) {
-          setIsSignedIn(true);
+          setAuthStatus('authenticated');
         }
 
         const description: string | undefined = verificationErrorRecord[status]?.description;
@@ -372,7 +372,7 @@ function ConfirmAccountVerification({
       ignore = true;
       abortController.abort();
     };
-  }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord, setIsSignedIn]);
+  }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord, setAuthStatus]);
 
   return (
     <>

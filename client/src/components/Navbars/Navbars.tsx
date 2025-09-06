@@ -13,18 +13,19 @@ import usePopupMessage from '../../hooks/usePopupMessage';
 import { signOutService } from '../../services/authServices';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import useConfirmModal from '../../hooks/useConfirmModal';
+import { AuthStatus } from '../../contexts/AuthContext';
 
 export default function Navbars(): JSX.Element {
   const { pathname }: Location = useLocation();
   const navigate: NavigateFunction = useNavigate();
 
-  const { isSignedIn, setIsSignedIn } = useAuth();
+  const { authStatus, setAuthStatus } = useAuth();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   async function handleSignOut(): Promise<void> {
-    if (!isSignedIn) {
+    if (authStatus === 'authenticated') {
       displayPopupMessage('Already signed out.', 'success');
       return;
     }
@@ -47,7 +48,7 @@ export default function Navbars(): JSX.Element {
 
     try {
       await signOutService();
-      setIsSignedIn(false);
+      setAuthStatus('unauthenticated');
 
       displayPopupMessage('Signed out.', 'success');
       pathname.startsWith('/account') && navigate('/home');
@@ -64,13 +65,13 @@ export default function Navbars(): JSX.Element {
       <TopNavbar
         pathname={pathname}
         navigate={navigate}
-        isSignedIn={isSignedIn}
+        authStatus={authStatus}
         handleSignOut={handleSignOut}
       />
 
       <BottomNavbar
         pathname={pathname}
-        isSignedIn={isSignedIn}
+        authStatus={authStatus}
         handleSignOut={handleSignOut}
       />
     </>
@@ -80,12 +81,12 @@ export default function Navbars(): JSX.Element {
 function TopNavbar({
   pathname,
   navigate,
-  isSignedIn,
+  authStatus,
   handleSignOut,
 }: {
   pathname: string;
   navigate: NavigateFunction;
-  isSignedIn: boolean;
+  authStatus: AuthStatus;
   handleSignOut: () => Promise<void>;
 }): JSX.Element {
   return (
@@ -117,7 +118,7 @@ function TopNavbar({
           </NavLink>
         </div>
 
-        {isSignedIn ? (
+        {authStatus === 'authenticated' ? (
           <TopNavbarAccountMenu handleSignOut={handleSignOut} />
         ) : (
           <div className='hidden md:flex justify-center items-end gap-1'>
@@ -219,11 +220,11 @@ function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<
 
 function BottomNavbar({
   pathname,
-  isSignedIn,
+  authStatus,
   handleSignOut,
 }: {
   pathname: string;
-  isSignedIn: boolean;
+  authStatus: AuthStatus;
   handleSignOut: () => Promise<void>;
 }): JSX.Element {
   return (
@@ -245,7 +246,7 @@ function BottomNavbar({
           <span>New wishlist</span>
         </NavLink>
 
-        {isSignedIn ? (
+        {authStatus === 'authenticated' ? (
           <BottomNavbarAccountMenu handleSignOut={handleSignOut} />
         ) : (
           <NavLink

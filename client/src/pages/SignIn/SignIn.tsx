@@ -30,7 +30,7 @@ export default function SignIn(): JSX.Element {
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
-  const { setIsSignedIn } = useAuth();
+  const { setAuthStatus } = useAuth();
 
   async function handleSubmit(): Promise<void> {
     const email: string = emailValue;
@@ -39,7 +39,7 @@ export default function SignIn(): JSX.Element {
 
     try {
       await signInService({ email, password, keepSignedIn });
-      setIsSignedIn(true);
+      setAuthStatus('authenticated');
 
       displayPopupMessage('Signed in.', 'success');
       navigate('/account');
@@ -71,7 +71,7 @@ export default function SignIn(): JSX.Element {
       }
 
       if (errReason === 'alreadySignedIn') {
-        setIsSignedIn(true);
+        setAuthStatus('authenticated');
         displayInfoModal({
           title: errMessage,
           btnTitle: 'Go to my account',
