@@ -5,19 +5,22 @@ import ConfirmModalProvider from './providers/ConfirmModalProvider';
 import InfoModalProvider from './providers/InfoModalProvider';
 import AuthProvider from './providers/AuthProvider';
 import HistoryProvider from './providers/HistoryProvider';
+import AuthSessionProvider from './providers/AuthSessionProvider';
 
 export default function Providers({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <LoadingOverlayProvider>
-      <PopupMessageProvider>
-        <AuthProvider>
-          <HistoryProvider>
-            <ConfirmModalProvider>
-              <InfoModalProvider>{children}</InfoModalProvider>
-            </ConfirmModalProvider>
-          </HistoryProvider>
-        </AuthProvider>
-      </PopupMessageProvider>
-    </LoadingOverlayProvider>
+    <AuthProvider>
+      <HistoryProvider>
+        <LoadingOverlayProvider>
+          <PopupMessageProvider>
+            <AuthSessionProvider>
+              <ConfirmModalProvider>
+                <InfoModalProvider>{children}</InfoModalProvider>
+              </ConfirmModalProvider>
+            </AuthSessionProvider>
+          </PopupMessageProvider>
+        </LoadingOverlayProvider>
+      </HistoryProvider>
+    </AuthProvider>
   );
 }
