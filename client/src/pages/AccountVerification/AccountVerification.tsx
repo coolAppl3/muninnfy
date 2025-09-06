@@ -18,10 +18,10 @@ import { CanceledError } from 'axios';
 import useAuth from '../../hooks/useAuth';
 
 export default function AccountVerification(): JSX.Element {
-  const [searchParams] = useSearchParams();
+  const [urlSearchParams] = useSearchParams();
 
-  const publicAccountId: string | null = searchParams.get('publicAccountId');
-  const verificationToken: string | null = searchParams.get('verificationToken');
+  const publicAccountId: string | null = urlSearchParams.get('publicAccountId');
+  const verificationToken: string | null = urlSearchParams.get('verificationToken');
 
   const renderedJsx: JSX.Element = determineRenderedJsx(publicAccountId, verificationToken);
 
