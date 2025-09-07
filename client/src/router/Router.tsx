@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { JSX, useEffect } from 'react';
 import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import App from '../App';
 import Home from '../pages/Home/Home';
@@ -19,6 +19,10 @@ function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: Au
   const { setPostAuthNavigate } = useHistory();
   const { pathname, search } = useLocation();
 
+  useEffect(() => {
+    authStatus === 'unauthenticated' && setPostAuthNavigate(pathname + search);
+  }, [authStatus, pathname, search, setPostAuthNavigate]);
+
   if (authStatus === 'loading') {
     return <>{/* TODO: implement loading skeleton */}</>;
   }
@@ -27,7 +31,6 @@ function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: Au
     return <Outlet />;
   }
 
-  setPostAuthNavigate(pathname + search);
   return <Navigate to={redirectTo} />;
 }
 
