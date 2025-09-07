@@ -77,7 +77,7 @@ export default function SignIn(): JSX.Element {
         displayConfirmModal({
           title: errMessage,
           description: 'You can regain access by following the account recovery process.',
-          confirmBtnTitle: 'Proceed',
+          confirmBtnTitle: 'Recover account',
           cancelBtnTitle: 'Go to homepage',
           isDangerous: false,
           onConfirm: () => navigate('/account/recovery'),

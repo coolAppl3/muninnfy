@@ -49,7 +49,7 @@ export default function WishlistHeader({
   const { setAuthStatus } = useAuth();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
-  const { displayInfoModal, removeInfoModal } = useInfoModal();
+  const { displayInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
@@ -59,10 +59,13 @@ export default function WishlistHeader({
 
     try {
       await changeWishlistTitleService({ newTitle, wishlistId });
-      setWishlistDetails({
-        ...wishlistDetails,
-        title: newTitle,
-      });
+      setWishlistDetails(
+        (prev) =>
+          prev && {
+            ...prev,
+            title: newTitle,
+          }
+      );
 
       setTitleValue('');
       setEditMode(null);
@@ -90,13 +93,7 @@ export default function WishlistHeader({
           return;
         }
 
-        displayInfoModal({
-          title: 'Invalid wishlist ID.',
-          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
-          btnTitle: 'Go to homepage',
-          onClick: () => navigate('/home'),
-        });
-
+        navigate(referrerLocation ? referrerLocation : '/account');
         return;
       }
 
@@ -106,7 +103,7 @@ export default function WishlistHeader({
       }
 
       if (status === 404) {
-        referrerLocation ? navigate(referrerLocation) : navigate('/home');
+        navigate(referrerLocation ? referrerLocation : '/account');
       }
     }
   }
@@ -114,10 +111,13 @@ export default function WishlistHeader({
   async function changeWishlistPrivacyLevel(newPrivacyLevel: number): Promise<void> {
     try {
       await changeWishlistPrivacyLevelService({ wishlistId, newPrivacyLevel });
-      setWishlistDetails({
-        ...wishlistDetails,
-        privacy_level: newPrivacyLevel,
-      });
+      setWishlistDetails(
+        (prev) =>
+          prev && {
+            ...wishlistDetails,
+            privacy_level: newPrivacyLevel,
+          }
+      );
 
       displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}.`, 'success');
     } catch (err: unknown) {
@@ -137,13 +137,7 @@ export default function WishlistHeader({
       }
 
       if (status === 400 && errReason === 'invalidWishlistId') {
-        displayInfoModal({
-          title: 'Invalid wishlist ID.',
-          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
-          btnTitle: 'Go to homepage',
-          onClick: () => navigate('/home'),
-        });
-
+        navigate(referrerLocation ? referrerLocation : '/account');
         return;
       }
 
@@ -153,7 +147,7 @@ export default function WishlistHeader({
       }
 
       if (status === 404) {
-        referrerLocation ? navigate(referrerLocation) : navigate('/home');
+        navigate(referrerLocation ? referrerLocation : '/account');
       }
     }
   }
@@ -177,13 +171,7 @@ export default function WishlistHeader({
       displayPopupMessage(errMessage, 'error');
 
       if (status === 400 && errReason === 'invalidWishlistId') {
-        displayInfoModal({
-          title: 'Invalid wishlist ID.',
-          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
-          btnTitle: 'Go to homepage',
-          onClick: () => navigate('/home'),
-        });
-
+        navigate(referrerLocation ? referrerLocation : '/account');
         return;
       }
 
@@ -193,7 +181,7 @@ export default function WishlistHeader({
       }
 
       if (status === 404) {
-        referrerLocation ? navigate(referrerLocation) : navigate('/home');
+        navigate(referrerLocation ? referrerLocation : '/account');
       }
     }
   }

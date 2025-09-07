@@ -1,9 +1,8 @@
-import { JSX, useCallback, useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';
-import useInfoModal from '../../hooks/useInfoModal';
 import { getWishlistDetailsService, WishlistDetails, WishlistItem } from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
@@ -22,26 +21,17 @@ export default function Wishlist(): JSX.Element {
   const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayInfoModal } = useInfoModal();
   const { displayPopupMessage } = usePopupMessage();
-
-  const handleInvalidWishlistId: () => void = useCallback(() => {
-    displayInfoModal({
-      title: 'Invalid wishlist ID.',
-      description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
-      btnTitle: 'Go to homepage',
-      onClick: () => navigate('/home'),
-    });
-  }, [displayInfoModal, navigate]);
 
   useEffect(() => {
     displayLoadingOverlay();
     const wishlistId: string | undefined = urlParams.wishlistId;
 
     if (!wishlistId || !isValidUuid(wishlistId)) {
+      displayPopupMessage('Wishlist not found.', 'error');
       removeLoadingOverlay();
-      handleInvalidWishlistId();
 
+      navigate(referrerLocation ? referrerLocation : '/account');
       return;
     }
 
@@ -77,7 +67,7 @@ export default function Wishlist(): JSX.Element {
         displayPopupMessage(errMessage, 'error');
 
         if (status === 400) {
-          handleInvalidWishlistId();
+          navigate(referrerLocation ? referrerLocation : '/account');
           return;
         }
 
@@ -87,7 +77,7 @@ export default function Wishlist(): JSX.Element {
         }
 
         if (status === 404) {
-          referrerLocation ? navigate(referrerLocation) : navigate('/home');
+          navigate(referrerLocation ? referrerLocation : '/account');
         }
       } finally {
         removeLoadingOverlay();
@@ -102,7 +92,7 @@ export default function Wishlist(): JSX.Element {
 
       removeLoadingOverlay();
     };
-  }, [displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage, handleInvalidWishlistId, urlParams, navigate]);
+  }, [displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage, setAuthStatus, referrerLocation, urlParams, navigate]);
 
   return (
     <>
