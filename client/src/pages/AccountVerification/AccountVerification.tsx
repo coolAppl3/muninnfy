@@ -175,9 +175,12 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
         setBtnTitle('Go to homepage');
         setBtnNavigateLocation('/home');
 
-        status === 400
-          ? setDescription('Check your inbox for a verification email, or start the sign up process again.')
-          : setDescription(`If you still can't find the email, wait 20 minutes and start again.`);
+        setDescription(
+          status === 400
+            ? 'Check your inbox for a verification email, or start the sign up process again.'
+            : `If you still can't find the email, wait 20 minutes and start again.`
+        );
+
         return;
       }
 
