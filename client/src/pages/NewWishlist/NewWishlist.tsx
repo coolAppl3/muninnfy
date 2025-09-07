@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, JSX, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import './NewWishlist.css';
 import Container from '../../components/Container/Container';

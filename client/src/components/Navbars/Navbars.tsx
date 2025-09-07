@@ -172,7 +172,6 @@ function TopNavbarAccountMenu(): JSX.Element {
 function BottomNavbar(): JSX.Element {
   const { authStatus } = useAuth();
   const { pathname }: Location = useLocation();
-  const navigate: NavigateFunction = useNavigate();
 
   return (
     <nav className='bottom-navbar md:hidden'>

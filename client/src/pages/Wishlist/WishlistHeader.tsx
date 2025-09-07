@@ -22,7 +22,6 @@ import {
 } from '../../services/wishlistServices';
 import { getWishlistPrivacyLevelName } from '../../utils/wishlistUtils';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
-import useInfoModal from '../../hooks/useInfoModal';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import useHistory from '../../hooks/useHistory';
@@ -49,7 +48,6 @@ export default function WishlistHeader({
   const { setAuthStatus } = useAuth();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
-  const { displayInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
