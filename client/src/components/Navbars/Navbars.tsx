@@ -9,86 +9,23 @@ import AddIcon from '../../assets/svg/AddIcon.svg?react';
 import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
 import './Navbars.css';
 import useAuth from '../../hooks/useAuth';
-import usePopupMessage from '../../hooks/usePopupMessage';
-import { signOutService } from '../../services/authServices';
-import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import useConfirmModal from '../../hooks/useConfirmModal';
-import { AuthStatus } from '../../contexts/AuthContext';
+import useAuthSession from '../../hooks/useAuthSession';
 
 export default function Navbars(): JSX.Element {
-  const { pathname }: Location = useLocation();
-  const navigate: NavigateFunction = useNavigate();
-
-  const { authStatus, setAuthStatus } = useAuth();
-  const { displayPopupMessage } = usePopupMessage();
-  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
-
-  async function handleSignOut(): Promise<void> {
-    if (authStatus === 'unauthenticated') {
-      displayPopupMessage('Already signed out.', 'success');
-      return;
-    }
-
-    displayConfirmModal({
-      title: 'Are you sure you want to sign out?',
-      confirmBtnTitle: 'Confirm',
-      cancelBtnTitle: 'Cancel',
-      isDangerous: true,
-      onConfirm: async () => {
-        await signOut();
-        removeConfirmModal();
-      },
-      onCancel: removeConfirmModal,
-    });
-  }
-
-  async function signOut(): Promise<void> {
-    displayLoadingOverlay();
-
-    try {
-      await signOutService();
-      setAuthStatus('unauthenticated');
-
-      displayPopupMessage('Signed out.', 'success');
-      pathname.startsWith('/account') && navigate('/home');
-    } catch (err: unknown) {
-      console.log(err);
-      displayPopupMessage('Sign out failed.', 'success');
-    } finally {
-      removeLoadingOverlay();
-    }
-  }
-
   return (
     <>
-      <TopNavbar
-        pathname={pathname}
-        navigate={navigate}
-        authStatus={authStatus}
-        handleSignOut={handleSignOut}
-      />
-
-      <BottomNavbar
-        pathname={pathname}
-        authStatus={authStatus}
-        handleSignOut={handleSignOut}
-      />
+      <TopNavbar />
+      <BottomNavbar />
     </>
   );
 }
 
-function TopNavbar({
-  pathname,
-  navigate,
-  authStatus,
-  handleSignOut,
-}: {
-  pathname: string;
-  navigate: NavigateFunction;
-  authStatus: AuthStatus;
-  handleSignOut: () => Promise<void>;
-}): JSX.Element {
+function TopNavbar(): JSX.Element {
+  const { authStatus } = useAuth();
+  const { pathname }: Location = useLocation();
+  const navigate: NavigateFunction = useNavigate();
+
   return (
     <nav className='top-navbar'>
       <Container className='flex justify-between items-center'>
@@ -111,7 +48,7 @@ function TopNavbar({
           </NavLink>
 
           <NavLink
-            to='/wishlist/new'
+            to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
             className={({ isActive }) => (isActive ? 'isActive' : '')}
           >
             New wishlist
@@ -119,7 +56,7 @@ function TopNavbar({
         </div>
 
         {authStatus === 'authenticated' ? (
-          <TopNavbarAccountMenu handleSignOut={handleSignOut} />
+          <TopNavbarAccountMenu />
         ) : (
           <div className='hidden md:flex justify-center items-end gap-1'>
             {pathname === '/sign-in' || (
@@ -146,9 +83,12 @@ function TopNavbar({
   );
 }
 
-function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<void> }): JSX.Element {
+function TopNavbarAccountMenu(): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const { signOut } = useAuthSession();
+  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   function handleClick(): void {
     setIsVisible((prev) => !prev);
@@ -203,11 +143,22 @@ function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<
 
         <button
           type='button'
-          onClick={() => {
-            handleSignOut();
+          onClick={async () => {
+            displayConfirmModal({
+              title: 'Are you sure you want to sign out?',
+              confirmBtnTitle: 'Confirm',
+              cancelBtnTitle: 'Cancel',
+              isDangerous: true,
+              onConfirm: async () => {
+                removeConfirmModal();
 
-            setIsVisible(false);
-            setIsOpen(false);
+                setIsVisible(false);
+                setIsOpen(false);
+
+                await signOut();
+              },
+              onCancel: removeConfirmModal,
+            });
           }}
           className='!text-danger'
         >
@@ -218,15 +169,11 @@ function TopNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<
   );
 }
 
-function BottomNavbar({
-  pathname,
-  authStatus,
-  handleSignOut,
-}: {
-  pathname: string;
-  authStatus: AuthStatus;
-  handleSignOut: () => Promise<void>;
-}): JSX.Element {
+function BottomNavbar(): JSX.Element {
+  const { authStatus } = useAuth();
+  const { pathname }: Location = useLocation();
+  const navigate: NavigateFunction = useNavigate();
+
   return (
     <nav className='bottom-navbar md:hidden'>
       <div>
@@ -239,7 +186,7 @@ function BottomNavbar({
         </NavLink>
 
         <NavLink
-          to='/wishlist/new'
+          to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
           className={({ isActive }) => (isActive ? 'isActive' : '')}
         >
           <AddIcon className='w-[2.4rem] h-[2.4rem]' />
@@ -247,7 +194,7 @@ function BottomNavbar({
         </NavLink>
 
         {authStatus === 'authenticated' ? (
-          <BottomNavbarAccountMenu handleSignOut={handleSignOut} />
+          <BottomNavbarAccountMenu />
         ) : (
           <NavLink
             to='/sign-in'
@@ -262,9 +209,12 @@ function BottomNavbar({
   );
 }
 
-function BottomNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promise<void> }): JSX.Element {
+function BottomNavbarAccountMenu(): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const { signOut } = useAuthSession();
+  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   function handleClick(): void {
     setIsVisible((prev) => !prev);
@@ -320,11 +270,22 @@ function BottomNavbarAccountMenu({ handleSignOut }: { handleSignOut: () => Promi
 
         <button
           type='button'
-          onClick={() => {
-            handleSignOut();
+          onClick={async () => {
+            displayConfirmModal({
+              title: 'Are you sure you want to sign out?',
+              confirmBtnTitle: 'Confirm',
+              cancelBtnTitle: 'Cancel',
+              isDangerous: true,
+              onConfirm: async () => {
+                removeConfirmModal();
 
-            setIsVisible(false);
-            setIsOpen(false);
+                setIsVisible(false);
+                setIsOpen(false);
+
+                await signOut();
+              },
+              onCancel: removeConfirmModal,
+            });
           }}
           className='!text-danger'
         >

@@ -3,9 +3,11 @@ import { Head } from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useHistory from '../../hooks/useHistory';
 
 export default function NotFound(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
+  const { referrerLocation } = useHistory();
 
   return (
     <>
@@ -19,9 +21,9 @@ export default function NotFound(): JSX.Element {
 
             <Button
               className='bg-cta border-cta w-full'
-              onClick={() => navigate('/home')}
+              onClick={() => (referrerLocation ? navigate(referrerLocation) : navigate('/home'))}
             >
-              Back to homepage
+              {referrerLocation ? 'Go back' : 'Go to homepage'}
             </Button>
           </div>
         </Container>

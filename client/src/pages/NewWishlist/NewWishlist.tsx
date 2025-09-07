@@ -16,8 +16,6 @@ import usePopupMessage from '../../hooks/usePopupMessage';
 import { createWishlistAsAccountService } from '../../services/wishlistServices';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
-import useInfoModal from '../../hooks/useInfoModal';
-import useConfirmModal from '../../hooks/useConfirmModal';
 
 export default function NewWishlist(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -27,30 +25,9 @@ export default function NewWishlist(): JSX.Element {
   const [titleError, setTitleError] = useState<string | null>(null);
 
   const navigate: NavigateFunction = useNavigate();
-  const { authStatus, setAuthStatus } = useAuth();
+  const { setAuthStatus } = useAuth();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
-  const { displayInfoModal, removeInfoModal } = useInfoModal();
-  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
-
-  useEffect(() => {
-    if (authStatus === 'authenticated') {
-      return;
-    }
-
-    displayConfirmModal({
-      title: 'Not signed in.',
-      description:
-        'You must sign in before creating a fully-featured wishlist.\nAlternatively, you can create a temporary wishlist as a guest.',
-      confirmBtnTitle: 'Sign in',
-      cancelBtnTitle: 'Create guest wishlist',
-      extraBtnTitle: 'Back to homepage',
-      onConfirm: () => navigate('/sign-in'),
-      onCancel: () => navigate('/guest/wishlist/new'),
-      onExtraAction: () => navigate('/home'),
-      isDangerous: false,
-    });
-  }, [authStatus, navigate, displayConfirmModal, removeConfirmModal]);
 
   async function handleSubmit(): Promise<void> {
     const title: string = titleValue;
@@ -73,17 +50,9 @@ export default function NewWishlist(): JSX.Element {
       const { status, errMessage } = asyncErrorData;
       displayPopupMessage(errMessage, 'error');
 
-      if (status !== 401) {
-        return;
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
       }
-
-      setAuthStatus('unauthenticated');
-      displayInfoModal({
-        title: errMessage,
-        description: 'You can either sign in and try again, or create a guest wishlist.',
-        btnTitle: 'Okay',
-        onClick: removeInfoModal,
-      });
     }
   }
 

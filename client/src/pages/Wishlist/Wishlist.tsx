@@ -9,12 +9,16 @@ import { CanceledError } from 'axios';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import WishlistHeader from './WishlistHeader';
+import useAuth from '../../hooks/useAuth';
+import useHistory from '../../hooks/useHistory';
 
 export default function Wishlist(): JSX.Element {
   const [wishlistId, setWishlistId] = useState<string | null>(null);
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetails | null>(null);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
 
+  const { setAuthStatus } = useAuth();
+  const { referrerLocation } = useHistory();
   const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
@@ -77,8 +81,13 @@ export default function Wishlist(): JSX.Element {
           return;
         }
 
-        if ([401, 404].includes(status)) {
-          navigate('/home');
+        if (status === 401) {
+          setAuthStatus('unauthenticated');
+          return;
+        }
+
+        if (status === 404) {
+          referrerLocation ? navigate(referrerLocation) : navigate('/home');
         }
       } finally {
         removeLoadingOverlay();

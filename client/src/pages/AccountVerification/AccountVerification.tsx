@@ -79,11 +79,9 @@ function ContinueAccountVerificationForm(): JSX.Element {
         return;
       }
 
-      if (!errReason || ![400, 404].includes(status)) {
-        return;
+      if (errReason && [400, 404].includes(status)) {
+        setErrorMessage(errMessage);
       }
-
-      setErrorMessage(errMessage);
     }
   }
 
@@ -260,11 +258,6 @@ function ConfirmAccountVerification({
         onClick: () => navigate('/sign-up/verification'),
       },
 
-      403: {
-        description: undefined,
-        onClick: () => navigate('/home'),
-      },
-
       404: {
         description: `Account doesn't exist or may have been deleted after remaining unverified for longer than 20 minutes.`,
         btnTitle: 'Sign up',
@@ -351,6 +344,7 @@ function ConfirmAccountVerification({
 
         if (status === 403) {
           setAuthStatus('authenticated');
+          return;
         }
 
         const description: string | undefined = verificationErrorRecord[status]?.description;

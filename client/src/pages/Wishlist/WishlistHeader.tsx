@@ -24,6 +24,8 @@ import { getWishlistPrivacyLevelName } from '../../utils/wishlistUtils';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useInfoModal from '../../hooks/useInfoModal';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+import useHistory from '../../hooks/useHistory';
 
 export default function WishlistHeader({
   wishlistId,
@@ -44,6 +46,8 @@ export default function WishlistHeader({
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
   const [deletionConfirmationTitleValue, setDeletionConfirmationTitleValue] = useState<string>('');
 
+  const { setAuthStatus } = useAuth();
+  const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
@@ -96,9 +100,13 @@ export default function WishlistHeader({
         return;
       }
 
-      if ([401, 404].includes(status)) {
-        navigate('/home');
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
         return;
+      }
+
+      if (status === 404) {
+        referrerLocation ? navigate(referrerLocation) : navigate('/home');
       }
     }
   }
@@ -139,8 +147,13 @@ export default function WishlistHeader({
         return;
       }
 
-      if ([401, 404].includes(status)) {
-        navigate('/home');
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (status === 404) {
+        referrerLocation ? navigate(referrerLocation) : navigate('/home');
       }
     }
   }
@@ -174,8 +187,13 @@ export default function WishlistHeader({
         return;
       }
 
-      if ([401, 404].includes(status)) {
-        navigate('/home');
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (status === 404) {
+        referrerLocation ? navigate(referrerLocation) : navigate('/home');
       }
     }
   }
