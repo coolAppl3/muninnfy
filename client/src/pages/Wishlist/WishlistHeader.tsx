@@ -114,7 +114,7 @@ export default function WishlistHeader({
       setWishlistDetails(
         (prev) =>
           prev && {
-            ...wishlistDetails,
+            ...prev,
             privacy_level: newPrivacyLevel,
           }
       );
