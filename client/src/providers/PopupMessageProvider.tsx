@@ -6,7 +6,7 @@ export default function PopupMessageProvider({ children }: { children: React.Rea
   const [visible, setVisible] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [type, setType] = useState<'success' | 'error'>('success');
-  const [popupKey, setPopupKey] = useState(0);
+  const [popupKey, setPopupKey] = useState<number>(0);
 
   const displayPopupMessage = useCallback((message: string, type: 'success' | 'error'): void => {
     setMessage(message);

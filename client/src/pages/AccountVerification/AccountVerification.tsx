@@ -230,7 +230,7 @@ function ConfirmAccountVerification({
   publicAccountId: string;
   verificationToken: string;
 }): JSX.Element {
-  const [verificationFailed, setVerificationFailed] = useState(false);
+  const [verificationFailed, setVerificationFailed] = useState<boolean>(false);
   const [title, setTitle] = useState<string>('Ongoing account verification detected.');
   const [description, setDescription] = useState<string>('Find the verification email in your inbox, and click the link to continue.');
   const [btnTitle, setBtnTitle] = useState<string>('Resend email');
