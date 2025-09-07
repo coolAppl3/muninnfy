@@ -5,7 +5,7 @@ export default function useAuth(): AuthContextInterface {
   const context = useContext<AuthContextInterface | null>(AuthContext);
 
   if (!context) {
-    throw new Error('useContext must be used within AuthProvider.');
+    throw new Error('useAuth must be used within AuthProvider.');
   }
 
   return context;

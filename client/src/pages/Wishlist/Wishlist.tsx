@@ -1,43 +1,37 @@
-import { JSX, useCallback, useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
-import { NavigateFunction, useLocation, useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';
-import useInfoModal from '../../hooks/useInfoModal';
 import { getWishlistDetailsService, WishlistDetails, WishlistItem } from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import WishlistHeader from './WishlistHeader';
+import useAuth from '../../hooks/useAuth';
+import useHistory from '../../hooks/useHistory';
 
 export default function Wishlist(): JSX.Element {
   const [wishlistId, setWishlistId] = useState<string | null>(null);
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetails | null>(null);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
 
-  const { pathname } = useLocation();
+  const { setAuthStatus } = useAuth();
+  const { referrerLocation } = useHistory();
+  const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayInfoModal, removeInfoModal } = useInfoModal();
   const { displayPopupMessage } = usePopupMessage();
-
-  const handleInvalidWishlistId: () => void = useCallback(() => {
-    displayInfoModal({
-      title: 'Invalid wishlist ID.',
-      description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
-      btnTitle: 'Go to homepage',
-      onClick: () => navigate('/home'),
-    });
-  }, [displayInfoModal, removeInfoModal]);
 
   useEffect(() => {
     displayLoadingOverlay();
-    const wishlistId: string = pathname.slice(10);
+    const wishlistId: string | undefined = urlParams.wishlistId;
 
-    if (!isValidUuid(wishlistId)) {
+    if (!wishlistId || !isValidUuid(wishlistId)) {
+      displayPopupMessage('Wishlist not found.', 'error');
       removeLoadingOverlay();
-      handleInvalidWishlistId();
 
+      navigate(referrerLocation ? referrerLocation : '/account');
       return;
     }
 
@@ -62,7 +56,6 @@ export default function Wishlist(): JSX.Element {
         }
 
         console.log(err);
-
         const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
         if (!asyncErrorData) {
@@ -74,12 +67,17 @@ export default function Wishlist(): JSX.Element {
         displayPopupMessage(errMessage, 'error');
 
         if (status === 400) {
-          handleInvalidWishlistId();
+          navigate(referrerLocation ? referrerLocation : '/account');
           return;
         }
 
-        if ([401, 404].includes(status)) {
-          navigate('/home');
+        if (status === 401) {
+          setAuthStatus('unauthenticated');
+          return;
+        }
+
+        if (status === 404) {
+          navigate(referrerLocation ? referrerLocation : '/account');
         }
       } finally {
         removeLoadingOverlay();
@@ -94,7 +92,7 @@ export default function Wishlist(): JSX.Element {
 
       removeLoadingOverlay();
     };
-  }, [displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage, handleInvalidWishlistId, pathname, navigate]);
+  }, [displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage, setAuthStatus, referrerLocation, urlParams, navigate]);
 
   return (
     <>

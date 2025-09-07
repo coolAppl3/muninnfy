@@ -1,22 +1,29 @@
-import { JSX, ReactNode, useEffect, useState } from 'react';
-import AuthContext from '../contexts/AuthContext';
+import { JSX, ReactNode, useEffect, useMemo, useState } from 'react';
+import AuthContext, { AuthContextInterface, AuthStatus } from '../contexts/AuthContext';
 import { checkForAuthSessionService } from '../services/authServices';
 
 export default function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  const [authStatus, setAuthStatus] = useState<AuthStatus>('loading');
 
   useEffect(() => {
+    const abortController: AbortController = new AbortController();
+
     const checkForAuthSession = async (): Promise<void> => {
       try {
-        const isValidAuthSession: boolean = (await checkForAuthSessionService()).data.isValidAuthSession;
-        setIsSignedIn(isValidAuthSession);
+        const isValidAuthSession: boolean = (await checkForAuthSessionService(abortController.signal)).data.isValidAuthSession;
+        setAuthStatus(isValidAuthSession ? 'authenticated' : 'unauthenticated');
       } catch (err: unknown) {
-        setIsSignedIn(false);
+        setAuthStatus('unauthenticated');
       }
     };
 
     checkForAuthSession();
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
-  return <AuthContext.Provider value={{ isSignedIn, setIsSignedIn }}>{children}</AuthContext.Provider>;
+  const contextValue: AuthContextInterface = useMemo(() => ({ authStatus, setAuthStatus }), [authStatus]);
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }

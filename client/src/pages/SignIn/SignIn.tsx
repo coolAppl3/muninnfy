@@ -11,7 +11,6 @@ import CheckboxFormGroup from '../../components/FormGroups/CheckboxFormGroup';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { signInService } from '../../services/accountServices';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
-import useInfoModal from '../../hooks/useInfoModal';
 import useConfirmModal from '../../hooks/useConfirmModal';
 import useAuth from '../../hooks/useAuth';
 
@@ -28,9 +27,8 @@ export default function SignIn(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayInfoModal } = useInfoModal();
-  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
-  const { setIsSignedIn } = useAuth();
+  const { displayConfirmModal } = useConfirmModal();
+  const { setAuthStatus } = useAuth();
 
   async function handleSubmit(): Promise<void> {
     const email: string = emailValue;
@@ -39,13 +37,12 @@ export default function SignIn(): JSX.Element {
 
     try {
       await signInService({ email, password, keepSignedIn });
-      setIsSignedIn(true);
+      setAuthStatus('authenticated');
 
       displayPopupMessage('Signed in.', 'success');
       navigate('/account');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -61,8 +58,8 @@ export default function SignIn(): JSX.Element {
       }
 
       if ([400, 401, 404].includes(status)) {
-        const stateSetter: ((errorMessage: string | null) => void) | undefined = errFieldRecord[errReason];
-        stateSetter && stateSetter(errMessage);
+        const setErrorMessage: ((errorMessage: string | null) => void) | undefined = errFieldRecord[errReason];
+        setErrorMessage && setErrorMessage(errMessage);
 
         return;
       }
@@ -72,13 +69,7 @@ export default function SignIn(): JSX.Element {
       }
 
       if (errReason === 'alreadySignedIn') {
-        setIsSignedIn(true);
-        displayInfoModal({
-          title: errMessage,
-          btnTitle: 'Go to my account',
-          onClick: () => navigate('/account'),
-        });
-
+        setAuthStatus('authenticated');
         return;
       }
 
@@ -86,11 +77,11 @@ export default function SignIn(): JSX.Element {
         displayConfirmModal({
           title: errMessage,
           description: 'You can regain access by following the account recovery process.',
-          confirmBtnTitle: 'Proceed',
+          confirmBtnTitle: 'Recover account',
           cancelBtnTitle: 'Go to homepage',
           isDangerous: false,
           onConfirm: () => navigate('/account/recovery'),
-          onCancel: removeConfirmModal,
+          onCancel: () => navigate('/home'),
         });
       }
     }
@@ -114,12 +105,12 @@ export default function SignIn(): JSX.Element {
   }
 
   const errFieldRecord: Record<string, (errorMessage: string | null) => void> = {
-    invalidPassword: setPasswordErrorMessage,
-
     invalidEmail: setEmailErrorMessage,
-    incorrectPassword: setEmailErrorMessage,
-    incorrectPassword_locked: setEmailErrorMessage,
     accountNotFound: setEmailErrorMessage,
+
+    invalidPassword: setPasswordErrorMessage,
+    incorrectPassword_locked: setPasswordErrorMessage,
+    incorrectPassword: setPasswordErrorMessage,
   };
 
   return (

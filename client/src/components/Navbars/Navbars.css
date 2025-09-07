@@ -59,7 +59,7 @@
 
       a,
       button {
-        @apply block bg-secondary pl-1 pr-2 py-1 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
+        @apply block bg-secondary p-1 pr-3 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
       }
     }
   }
@@ -119,7 +119,7 @@
 
         a,
         button {
-          @apply block bg-secondary pl-1 pr-2 py-[1.4rem] text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
+          @apply block bg-secondary px-1 py-[1.4rem] text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
         }
       }
     }

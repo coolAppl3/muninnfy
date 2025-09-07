@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, MouseEventHandler, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, JSX, useCallback, useEffect, useState } from 'react';
 import { Head } from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import { NavigateFunction, useNavigate, useSearchParams } from 'react-router-dom';
@@ -10,7 +10,6 @@ import {
 } from '../../services/accountServices';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
-import useInfoModal from '../../hooks/useInfoModal';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import { validateEmail } from '../../utils/validation/userValidation';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
@@ -18,10 +17,10 @@ import { CanceledError } from 'axios';
 import useAuth from '../../hooks/useAuth';
 
 export default function AccountVerification(): JSX.Element {
-  const [searchParams] = useSearchParams();
+  const [urlSearchParams] = useSearchParams();
 
-  const publicAccountId: string | null = searchParams.get('publicAccountId');
-  const verificationToken: string | null = searchParams.get('verificationToken');
+  const publicAccountId: string | null = urlSearchParams.get('publicAccountId');
+  const verificationToken: string | null = urlSearchParams.get('verificationToken');
 
   const renderedJsx: JSX.Element = determineRenderedJsx(publicAccountId, verificationToken);
 
@@ -46,7 +45,7 @@ function ContinueAccountVerificationForm(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
-  const { setIsSignedIn } = useAuth();
+  const { setAuthStatus } = useAuth();
 
   async function continueAccountVerification(): Promise<void> {
     const email: string = emailValue;
@@ -64,7 +63,6 @@ function ContinueAccountVerificationForm(): JSX.Element {
       displayPopupMessage('Verification request found.', 'success');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -76,15 +74,13 @@ function ContinueAccountVerificationForm(): JSX.Element {
       displayPopupMessage(errMessage, 'error');
 
       if (status === 403) {
-        setIsSignedIn(true);
+        setAuthStatus('authenticated');
         return;
       }
 
-      if (!errReason || ![400, 404].includes(status)) {
-        return;
+      if (errReason && [400, 404].includes(status)) {
+        setErrorMessage(errMessage);
       }
-
-      setErrorMessage(errMessage);
     }
   }
 
@@ -137,21 +133,27 @@ function ContinueAccountVerificationForm(): JSX.Element {
 }
 
 function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: string }): JSX.Element {
-  const [isDisabled, setIsDisabled] = useState<boolean>(false);
-  const navigate: NavigateFunction = useNavigate();
+  const [title, setTitle] = useState<string>('Ongoing account verification detected.');
+  const [description, setDescription] = useState<string>('Find the verification email in your inbox, and click the link to continue.');
 
+  const [btnDisabled, setBtnDisabled] = useState<boolean>(false);
+  const [btnTitle, setBtnTitle] = useState<string>('Resend email');
+  const [btnNavigateLocation, setBtnNavigateLocation] = useState<string | null>(null);
+
+  const { setAuthStatus } = useAuth();
+  const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
-  const { displayInfoModal, removeInfoModal } = useInfoModal();
-  const { setIsSignedIn } = useAuth();
 
   async function resendAccountVerificationEmail(): Promise<void> {
+    displayLoadingOverlay();
+    setBtnDisabled(true);
+
     try {
       await resendAccountVerificationEmailService({ publicAccountId });
       displayPopupMessage('Email resent.', 'success');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -163,73 +165,62 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
       displayPopupMessage(errMessage, 'error');
 
       if (status === 403 && errReason === 'signedIn') {
-        setIsSignedIn(true);
+        setAuthStatus('authenticated');
         return;
       }
 
-      if (!errReason || ![400, 403, 404, 409].includes(status)) {
+      setTitle(errMessage);
+
+      if (status === 400 || status === 403) {
+        setBtnTitle('Go to homepage');
+        setBtnNavigateLocation('/home');
+
+        setDescription(
+          status === 400
+            ? 'Check your inbox for a verification email, or start the sign up process again.'
+            : `If you still can't find the email, wait 20 minutes and start again.`
+        );
+
         return;
       }
 
-      const description: string | undefined = infoModalErrorRecord[status]?.description;
-      const onClick: (() => void) | undefined = infoModalErrorRecord[status]?.onClick;
-      const btnTitle: string | undefined = infoModalErrorRecord[status]?.btnTitle;
+      if (status === 404) {
+        setBtnTitle('Sign up again');
+        setBtnNavigateLocation('/sign-up');
 
-      displayInfoModal({
-        title: errMessage,
-        description,
-        btnTitle: btnTitle || 'Okay',
-        onClick: onClick || removeInfoModal,
-      });
+        setDescription('Accounts are deleted within 20 minutes of being created if left unverified.');
+        return;
+      }
+
+      if (status === 409) {
+        setBtnTitle('Sign in');
+        setBtnNavigateLocation('/sign-in');
+
+        setDescription('You may simply proceed with signing in.');
+      }
+    } finally {
+      removeLoadingOverlay();
+      setBtnDisabled(false);
     }
   }
 
-  const infoModalErrorRecord: Record<number, { description: string | undefined; btnTitle?: string; onClick?: () => void }> = {
-    400: {
-      description: 'Check your inbox for a verification email, or start the sign up process again.',
-      onClick: () => navigate('/sign-up/verification'),
-    },
-
-    403: {
-      description: `Emails may take a minute to arrive, and could end up in your spam folder.\nIf you still can't find the email, wait 20 minutes and start again.`,
-      onClick: undefined,
-    },
-
-    404: {
-      description: `Accounts are deleted within 20 minutes of being created if left unverified.\nYou can always start the sign up process again.`,
-      btnTitle: 'Sign up again',
-      onClick: () => navigate('/sign-up'),
-    },
-
-    409: {
-      description: 'You can simply proceed with singing in.',
-      btnTitle: 'Sign in',
-      onClick: () => navigate('/sign-in'),
-    },
-  };
-
   return (
     <>
-      <h4 className='text-title font-medium mb-1'>Ongoing account verification detected.</h4>
-      <p className='text-description text-sm mb-2'>Find the verification email in your inbox, and click the link to continue.</p>
+      <h4 className='text-title font-medium mb-1'>{title}</h4>
+      <p className='text-description text-sm mb-2'>{description}</p>
       <Button
         className='bg-description border-description text-dark w-full'
+        disabled={btnDisabled}
         onClick={async () => {
-          if (isDisabled) {
+          if (btnNavigateLocation) {
+            navigate(btnNavigateLocation);
             return;
           }
 
-          setIsDisabled(true);
-          displayLoadingOverlay();
-
           await resendAccountVerificationEmail();
-
-          removeLoadingOverlay();
-          setTimeout(() => setIsDisabled(false), 3000);
         }}
-        disabled={isDisabled}
       >
-        Resend email
+        {btnTitle}
       </Button>
     </>
   );
@@ -242,82 +233,38 @@ function ConfirmAccountVerification({
   publicAccountId: string;
   verificationToken: string;
 }): JSX.Element {
-  interface ConfirmAccountVerificationState {
-    title: string;
-    description?: string;
-    btnTitle: string;
-    onClick: MouseEventHandler<HTMLButtonElement>;
-  }
-
-  const [verificationState, setVerificationState] = useState<ConfirmAccountVerificationState | null>(null);
+  const [verificationFailed, setVerificationFailed] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>('Ongoing account verification detected.');
+  const [description, setDescription] = useState<string>('Find the verification email in your inbox, and click the link to continue.');
+  const [btnTitle, setBtnTitle] = useState<string>('Resend email');
+  const [btnNavigateLocation, setBtnNavigateLocation] = useState<string | null>(null);
 
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
-  const { setIsSignedIn } = useAuth();
+  const { setAuthStatus } = useAuth();
 
-  const verificationErrorRecord: Record<number, { description: string | undefined; btnTitle?: string; onClick?: () => void }> = useMemo(
-    () => ({
-      400: {
-        description: `Your verification link is invalid or malformed.Make sure you've copied the correct link.`,
-        onClick: () => navigate('/sign-up/verification'),
-      },
-
-      403: {
-        description: undefined,
-        onClick: () => navigate('/home'),
-      },
-
-      404: {
-        description: `Account doesn't exist or may have been deleted after remaining unverified for longer than 20 minutes.`,
-        btnTitle: 'Sign up',
-        onClick: () => navigate('/sign-up'),
-      },
-
-      409: {
-        description: 'You may proceed with singing in.',
-        btnTitle: 'Sign in',
-        onClick: () => navigate('/sign-in'),
-      },
-    }),
-    [navigate]
-  );
-
-  useEffect(() => {
-    const abortController: AbortController = new AbortController();
-    let ignore: boolean = false;
-
-    const verifyAccount = async (): Promise<void> => {
+  const verifyAccount = useCallback(
+    async (abortSignal: AbortSignal = new AbortController().signal): Promise<void> => {
       try {
-        await verifyAccountService({ publicAccountId, verificationToken }, abortController.signal);
-
-        if (ignore) {
-          return;
-        }
+        await verifyAccountService({ publicAccountId, verificationToken }, abortSignal);
 
         displayPopupMessage('Account verified.', 'success');
-        setVerificationState({
-          title: 'Account verified',
-          description: 'You may now proceed with singing in.',
-          btnTitle: 'Sign in',
-          onClick: () => navigate('/sign-in'),
-        });
+        navigate('/sign-in');
       } catch (err: unknown) {
-        if (ignore || err instanceof CanceledError) {
+        if (err instanceof CanceledError) {
           return;
         }
 
         console.log(err);
-
         const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
-        if (!asyncErrorData) {
+        if (!asyncErrorData || !asyncErrorData.errReason || ![400, 403, 404, 409].includes(asyncErrorData.status)) {
+          setVerificationFailed(true);
           displayPopupMessage('Something went wrong.', 'error');
-          setVerificationState({
-            title: 'Something went wrong.',
-            description: 'Account verification failed due to an unexpected error.',
-            btnTitle: 'Okay',
-            onClick: () => navigate('/home'),
-          });
+
+          setTitle('Something went wrong.');
+          setDescription('Account verification failed due to an unexpected error.');
+          setBtnTitle('Try again');
 
           return;
         }
@@ -325,16 +272,13 @@ function ConfirmAccountVerification({
         const { status, errMessage, errReason } = asyncErrorData;
         displayPopupMessage(errMessage, 'error');
 
-        if (!errReason || ![400, 403, 404, 409].includes(status)) {
-          setVerificationState({
-            title: 'Something went wrong.',
-            description: 'Account verification failed due to an internal server error.',
-            btnTitle: 'Okay',
-            onClick: () => navigate('/home'),
-          });
-
+        if (status === 403) {
+          setAuthStatus('authenticated');
           return;
         }
+
+        setVerificationFailed(true);
+        setTitle(errMessage);
 
         if (status === 401) {
           const accountDeleted: boolean = errReason.includes('_deleted');
@@ -342,53 +286,67 @@ function ConfirmAccountVerification({
             ? 'Account deleted due to too many failed verification attempts.'
             : `Your verification link is invalid or malformed. Make sure you've copied the correct link.`;
 
-          setVerificationState({
-            title: errMessage,
-            description,
-            btnTitle: accountDeleted ? 'Sign up again' : 'Okay',
-            onClick: () => navigate(`/sign-up${accountDeleted ? '/verification' : ''}`),
-          });
+          setDescription(description);
+          setBtnTitle(accountDeleted ? 'Sign up again' : 'Go to homepage');
+          setBtnNavigateLocation('/sign-up');
 
           return;
         }
 
-        if (status === 403) {
-          setIsSignedIn(true);
+        if (status === 400) {
+          setDescription(`Your verification link is invalid or malformed. Make sure you've copied the correct link.`);
+          setBtnTitle('Go to homepage');
+          setBtnNavigateLocation('/home');
+
+          return;
         }
 
-        const description: string | undefined = verificationErrorRecord[status]?.description;
-        const onClick: (() => void) | undefined = verificationErrorRecord[status]?.onClick;
-        const btnTitle: string | undefined = verificationErrorRecord[status]?.btnTitle;
+        if (status === 404) {
+          setDescription(`Account doesn't exist or may have been deleted after remaining unverified for longer than 20 minutes.`);
+          setBtnTitle('Sign up');
+          setBtnNavigateLocation('/sign-up');
 
-        setVerificationState({
-          title: errMessage,
-          description,
-          btnTitle: btnTitle || 'Okay',
-          onClick: onClick || (() => navigate('/home')),
-        });
+          return;
+        }
+
+        if (status === 409) {
+          setDescription('You may proceed with signing in.');
+          setBtnTitle('Sign in');
+          setBtnNavigateLocation('/sign-in');
+        }
       }
-    };
+    },
+    [displayPopupMessage, navigate, publicAccountId, verificationToken, setAuthStatus]
+  );
 
-    verifyAccount();
+  useEffect(() => {
+    const abortController: AbortController = new AbortController();
+    verifyAccount(abortController.signal);
 
-    return () => {
-      ignore = true;
-      abortController.abort();
-    };
-  }, [displayPopupMessage, navigate, publicAccountId, verificationToken, verificationErrorRecord, setIsSignedIn]);
+    return () => abortController.abort();
+  }, [verifyAccount]);
 
   return (
     <>
-      {verificationState ? (
+      {verificationFailed ? (
         <>
-          <h4 className='text-title font-medium mb-1'>{verificationState.title}</h4>
-          <p className='text-description text-sm'>{verificationState?.description}</p>
+          <h4 className='text-title font-medium mb-1'>{title}</h4>
+          <p className='text-description text-sm'>{description}</p>
 
           <Button
             className='bg-description border-description text-dark w-full mt-2'
-            onClick={verificationState.onClick}
+            onClick={async () => {
+              if (btnNavigateLocation) {
+                navigate(btnNavigateLocation);
+                return;
+              }
+
+              setVerificationFailed(false);
+              await verifyAccount();
+              setVerificationFailed(true);
+            }}
           >
-            {verificationState.btnTitle}
+            {btnTitle}
           </Button>
         </>
       ) : (

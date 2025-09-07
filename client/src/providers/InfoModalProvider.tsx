@@ -1,5 +1,5 @@
-import { JSX, ReactNode, useCallback, useEffect, useState } from 'react';
-import InfoModalContext from '../contexts/InfoModalContext';
+import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import InfoModalContext, { InfoModalContextInterface } from '../contexts/InfoModalContext';
 import InfoModal, { InfoModalProps } from '../components/InfoModal/InfoModal';
 import { Location, useLocation } from 'react-router-dom';
 
@@ -34,8 +34,13 @@ export default function InfoModalProvider({ children }: { children: ReactNode })
   }, [routerLocation, removeInfoModal]);
 
   const { title, description, btnTitle, onClick } = InfoModalState;
+  const contextValue: InfoModalContextInterface = useMemo(
+    () => ({ displayInfoModal, removeInfoModal }),
+    [displayInfoModal, removeInfoModal]
+  );
+
   return (
-    <InfoModalContext.Provider value={{ displayInfoModal, removeInfoModal }}>
+    <InfoModalContext.Provider value={contextValue}>
       {children}
 
       {isVisible && (

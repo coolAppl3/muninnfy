@@ -1,4 +1,4 @@
-import { Dispatch, FocusEvent, FormEvent, JSX, MouseEvent, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, FocusEvent, FormEvent, JSX, MouseEvent, SetStateAction, useState } from 'react';
 import Container from '../../components/Container/Container';
 import TripleDoteMenuIcon from '../../assets/svg/TripleDotMenuIcon.svg?react';
 import './Wishlist.css';
@@ -22,8 +22,9 @@ import {
 } from '../../services/wishlistServices';
 import { getWishlistPrivacyLevelName } from '../../utils/wishlistUtils';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
-import useInfoModal from '../../hooks/useInfoModal';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+import useHistory from '../../hooks/useHistory';
 
 export default function WishlistHeader({
   wishlistId,
@@ -44,8 +45,9 @@ export default function WishlistHeader({
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
   const [deletionConfirmationTitleValue, setDeletionConfirmationTitleValue] = useState<string>('');
 
+  const { setAuthStatus } = useAuth();
+  const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
-  const { displayInfoModal, removeInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
@@ -55,10 +57,13 @@ export default function WishlistHeader({
 
     try {
       await changeWishlistTitleService({ newTitle, wishlistId });
-      setWishlistDetails({
-        ...wishlistDetails,
-        title: newTitle,
-      });
+      setWishlistDetails(
+        (prev) =>
+          prev && {
+            ...prev,
+            title: newTitle,
+          }
+      );
 
       setTitleValue('');
       setEditMode(null);
@@ -66,7 +71,6 @@ export default function WishlistHeader({
       displayPopupMessage('Title updated.', 'success');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -87,19 +91,17 @@ export default function WishlistHeader({
           return;
         }
 
-        displayInfoModal({
-          title: 'Invalid wishlist ID.',
-          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
-          btnTitle: 'Go to homepage',
-          onClick: () => navigate('/home'),
-        });
-
+        navigate(referrerLocation ? referrerLocation : '/account');
         return;
       }
 
-      if ([401, 404].includes(status)) {
-        navigate('/home');
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
         return;
+      }
+
+      if (status === 404) {
+        navigate(referrerLocation ? referrerLocation : '/account');
       }
     }
   }
@@ -107,15 +109,17 @@ export default function WishlistHeader({
   async function changeWishlistPrivacyLevel(newPrivacyLevel: number): Promise<void> {
     try {
       await changeWishlistPrivacyLevelService({ wishlistId, newPrivacyLevel });
-      setWishlistDetails({
-        ...wishlistDetails,
-        privacy_level: newPrivacyLevel,
-      });
+      setWishlistDetails(
+        (prev) =>
+          prev && {
+            ...prev,
+            privacy_level: newPrivacyLevel,
+          }
+      );
 
       displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}.`, 'success');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -131,18 +135,17 @@ export default function WishlistHeader({
       }
 
       if (status === 400 && errReason === 'invalidWishlistId') {
-        displayInfoModal({
-          title: 'Invalid wishlist ID.',
-          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
-          btnTitle: 'Go to homepage',
-          onClick: () => navigate('/home'),
-        });
-
+        navigate(referrerLocation ? referrerLocation : '/account');
         return;
       }
 
-      if ([401, 404].includes(status)) {
-        navigate('/home');
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (status === 404) {
+        navigate(referrerLocation ? referrerLocation : '/account');
       }
     }
   }
@@ -155,7 +158,6 @@ export default function WishlistHeader({
       navigate('/wishlists');
     } catch (err: unknown) {
       console.log(err);
-
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
 
       if (!asyncErrorData) {
@@ -167,18 +169,17 @@ export default function WishlistHeader({
       displayPopupMessage(errMessage, 'error');
 
       if (status === 400 && errReason === 'invalidWishlistId') {
-        displayInfoModal({
-          title: 'Invalid wishlist ID.',
-          description: `It looks like the wishlist ID in your URL is invalid.\nMake sure you're using the correct link.`,
-          btnTitle: 'Go to homepage',
-          onClick: () => navigate('/home'),
-        });
-
+        navigate(referrerLocation ? referrerLocation : '/account');
         return;
       }
 
-      if ([401, 404].includes(status)) {
-        navigate('/home');
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (status === 404) {
+        navigate(referrerLocation ? referrerLocation : '/account');
       }
     }
   }
@@ -340,7 +341,7 @@ export default function WishlistHeader({
                   autoComplete='name'
                   value={titleValue}
                   errorMessage={titleErrorMessage}
-                  onChange={(e) => {
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     const newValue: string = e.target.value;
 
                     setTitleErrorMessage(validateWishlistTitle(newValue));
@@ -418,8 +419,6 @@ export default function WishlistHeader({
                     return;
                   }
 
-                  console.log(true);
-
                   setIsSubmitting(true);
                   displayLoadingOverlay();
 
@@ -442,7 +441,7 @@ export default function WishlistHeader({
                   autoComplete='name'
                   value={deletionConfirmationTitleValue}
                   errorMessage={null}
-                  onChange={(e) => setDeletionConfirmationTitleValue(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setDeletionConfirmationTitleValue(e.target.value)}
                 />
 
                 <div className='flex flex-col justify-start items-center gap-1 sm:flex-row'>

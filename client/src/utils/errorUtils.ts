@@ -1,5 +1,4 @@
 import axios, { AxiosError } from 'axios';
-import usePopupMessage from '../hooks/usePopupMessage';
 
 interface AxiosErrorResponseData {
   message: string;

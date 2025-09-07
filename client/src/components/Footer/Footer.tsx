@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
 export default function Footer(): JSX.Element {
-  const { isSignedIn } = useAuth();
+  const { authStatus } = useAuth();
 
   return (
     <footer className='footer'>
@@ -31,7 +31,7 @@ export default function Footer(): JSX.Element {
             title='Pages'
             links={[
               { title: 'Home', path: '/home' },
-              { title: 'New wishlist', path: isSignedIn ? '/wishlist/new' : '/guest/wishlist/new' },
+              { title: 'New wishlist', path: authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new' },
               { title: 'Sign up', path: '/sign-up' },
               { title: 'Sign in', path: '/sign-in' },
             ]}
