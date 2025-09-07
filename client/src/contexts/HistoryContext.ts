@@ -1,8 +1,8 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 
 export interface HistoryContextInterface {
-  referrerPathname: string | null;
-  setReferrerPathname: Dispatch<SetStateAction<string | null>>;
+  referrerLocation: string | null;
+  setReferrerLocation: Dispatch<SetStateAction<string | null>>;
 
   postAuthNavigate: string | null;
   setPostAuthNavigate: Dispatch<SetStateAction<string | null>>;
