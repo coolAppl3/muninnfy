@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 
 export default function HistoryProvider({ children }: { children: ReactNode }): JSX.Element {
   const [referrerPathname, setReferrerPathname] = useState<string | null>(null);
-  const [postAuthRedirectPathname, setPostAuthRedirectPathname] = useState<string | null>(null);
+  const [postAuthNavigate, setPostAuthNavigate] = useState<string | null>(null);
 
   const { pathname } = useLocation();
   const pathnameRef = useRef<string>(pathname);
@@ -22,10 +22,10 @@ export default function HistoryProvider({ children }: { children: ReactNode }): 
     () => ({
       referrerPathname,
       setReferrerPathname,
-      postAuthRedirectPathname,
-      setPostAuthRedirectPathname,
+      postAuthNavigate,
+      setPostAuthNavigate,
     }),
-    [referrerPathname, postAuthRedirectPathname]
+    [referrerPathname, postAuthNavigate]
   );
 
   return <HistoryContext value={contextValue}>{children}</HistoryContext>;
