@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.0.18] (2024-09-08)
+
+### Features
+
+- Added `HistoryContext`, `HistoryProvider`, and `useHistory` custom hook.
+- Added `AuthSessionContext`, `AuthSessionProvider`, and `AuthSession` custom hook.
+  - This provider now supplies a try-catch-contained `signOut` function to be used wherever.
+  - `Navbars` has been refactored to use this function instead for handling signing out. 
+- Moved `AuthProvider` and `HistoryProvider` above the `Router`, and implemented `auth-only` and `non-auth-only` protected routes.
+  - This change carried plenty of refactors and overall improvements throughout multiple components.
+- Implemented the use of abort signals in `AuthProvider` and `checkForAuthSessionService()`.
+
+
+### Bug Fixes
+
+- Fixed incorrect placeholder assignment in POST `accounts/signUp` causing taken usernames to not be checked correctly.
+- Fixed incorrect reference in the error message in `useAuth`.
+- Fixed incorrect assignment in `errFieldRecord` in `SignIn`.
+
+
+### Code Refactoring
+
+- Added missing explicit type definitions in a few spots.
+- Simplified `Navbars` and its local components.
+
+
 ## [0.0.17] (2024-09-05)
 
 ### Features
