@@ -259,7 +259,7 @@ export default function WishlistHeader({
                 type='button'
                 onClick={() => setMenuIsOpen((prev) => !prev)}
               >
-                <TripleDoteMenuIcon className='' />
+                <TripleDoteMenuIcon />
               </button>
 
               <div
