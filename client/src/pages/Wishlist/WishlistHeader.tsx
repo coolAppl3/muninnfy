@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, FocusEvent, FormEvent, JSX, MouseEvent, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, FocusEvent, FormEvent, JSX, MouseEvent, SetStateAction, useRef, useState } from 'react';
 import Container from '../../components/Container/Container';
 import TripleDoteMenuIcon from '../../assets/svg/TripleDotMenuIcon.svg?react';
 import './Wishlist.css';
@@ -51,6 +51,8 @@ export default function WishlistHeader({
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
+
+  const titleRef = useRef<HTMLInputElement | null>(null);
 
   async function changeWishlistTitle(): Promise<void> {
     const newTitle: string = titleValue;
@@ -190,6 +192,8 @@ export default function WishlistHeader({
       setTitleErrorMessage(null);
 
       setEditMode('TITLE');
+      Promise.resolve().then(() => titleRef.current?.focus());
+
       return;
     }
 
@@ -336,6 +340,7 @@ export default function WishlistHeader({
                 }}
               >
                 <DefaultFormGroup
+                  ref={titleRef}
                   id='wishlist-title'
                   label='New wishlist title'
                   autoComplete='name'
