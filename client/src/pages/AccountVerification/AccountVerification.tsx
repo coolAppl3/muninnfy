@@ -53,6 +53,8 @@ function ContinueAccountVerificationForm(): JSX.Element {
 
     if (newErrorMessage) {
       setErrorMessage(newErrorMessage);
+      displayPopupMessage(newErrorMessage, 'error');
+
       return;
     }
 
