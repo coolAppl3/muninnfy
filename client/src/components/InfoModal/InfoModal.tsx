@@ -26,7 +26,7 @@ export default function InfoModal({ title, description, btnTitle, onClick }: Inf
     >
       <div className={`info-modal-container ${title ? '' : 'no-title'}`}>
         {title && <h4>{title}</h4>}
-        {description && description.split('\n').map((descriptionLine, index) => <p key={index}>{descriptionLine}</p>)}
+        {description && description.split('\n').map((descriptionLine: string, index: number) => <p key={index}>{descriptionLine}</p>)}
 
         <Button
           className='bg-description border-description'

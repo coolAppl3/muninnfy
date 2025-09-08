@@ -47,7 +47,7 @@ export default function ConfirmModal({
     >
       <div className={`confirm-modal-container ${title ? '' : 'no-title'}`}>
         {title && <h4>{title}</h4>}
-        {description && description.split('\n').map((descriptionLine, index) => <p key={index}>{descriptionLine}</p>)}
+        {description && description.split('\n').map((descriptionLine: string, index: number) => <p key={index}>{descriptionLine}</p>)}
 
         <div className='btn-container'>
           <Button

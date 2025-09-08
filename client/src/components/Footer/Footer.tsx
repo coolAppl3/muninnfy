@@ -73,7 +73,7 @@ function LinksContainer({ title, links }: LinksContainerProps): JSX.Element {
       <h3>{title}</h3>
 
       <ul className='links'>
-        {links.map((link) => (
+        {links.map((link: { title: string; path: string }) => (
           <li key={`${link.title}-${link.path}`}>
             <NavLink to={link.path}>{link.title}</NavLink>
           </li>
