@@ -40,7 +40,6 @@ export default function SignIn(): JSX.Element {
       setAuthStatus('authenticated');
 
       displayPopupMessage('Signed in.', 'success');
-      navigate('/account');
     } catch (err: unknown) {
       console.log(err);
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);

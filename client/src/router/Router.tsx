@@ -16,12 +16,16 @@ import useAuth from '../hooks/useAuth';
 import useHistory from '../hooks/useHistory';
 
 function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: AuthStatus; redirectTo?: string }): JSX.Element {
-  const { setPostAuthNavigate } = useHistory();
+  const { postAuthNavigate, setPostAuthNavigate } = useHistory();
   const { pathname, search } = useLocation();
 
   useEffect(() => {
     authStatus === 'unauthenticated' && setPostAuthNavigate(pathname + search);
-  }, [authStatus, pathname, search, setPostAuthNavigate]);
+
+    if (authStatus === 'authenticated' && pathname + search === postAuthNavigate) {
+      setPostAuthNavigate(null);
+    }
+  }, [authStatus, pathname, search, postAuthNavigate, setPostAuthNavigate]);
 
   if (authStatus === 'loading') {
     return <>{/* TODO: implement loading skeleton */}</>;
@@ -31,10 +35,17 @@ function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: Au
     return <Outlet />;
   }
 
-  return <Navigate to={redirectTo} />;
+  return (
+    <Navigate
+      to={redirectTo}
+      replace
+    />
+  );
 }
 
 function NonAuthOnlyRoute({ authStatus, redirectTo = '/account' }: { authStatus: AuthStatus; redirectTo?: string }): JSX.Element {
+  const { postAuthNavigate } = useHistory();
+
   if (authStatus === 'loading') {
     return <>{/* TODO: implement loading skeleton */}</>;
   }
@@ -43,7 +54,16 @@ function NonAuthOnlyRoute({ authStatus, redirectTo = '/account' }: { authStatus:
     return <Outlet />;
   }
 
-  return <Navigate to={redirectTo} />;
+  if (postAuthNavigate) {
+    return <Navigate to={postAuthNavigate}></Navigate>;
+  }
+
+  return (
+    <Navigate
+      to={redirectTo}
+      replace
+    />
+  );
 }
 
 export function Router(): JSX.Element {
