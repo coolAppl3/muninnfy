@@ -15,6 +15,84 @@ import { AuthStatus } from '../contexts/AuthContext';
 import useAuth from '../hooks/useAuth';
 import useHistory from '../hooks/useHistory';
 
+interface RouteDetails {
+  path: string;
+  element: JSX.Element;
+}
+
+export function Router(): JSX.Element {
+  const { authStatus } = useAuth();
+
+  const authOnlyRoutes: RouteDetails[] = [
+    { path: '/account', element: <Account /> },
+    { path: '/account/wishlists', element: <Wishlists /> },
+    { path: '/wishlist/new', element: <NewWishlist /> },
+    { path: '/wishlist/:wishlistId', element: <Wishlist /> },
+  ];
+
+  const nonAuthOnlyRoutes: RouteDetails[] = [
+    { path: '/sign-up', element: <SignUp /> },
+    { path: '/sign-up/verification', element: <AccountVerification /> },
+    { path: '/sign-in', element: <SignIn /> },
+  ];
+
+  const publicRoutes: RouteDetails[] = [
+    { path: '/home', element: <Home /> },
+    { path: '/wishlist/view/:wishlistId', element: <ViewWishlist /> },
+    { path: '*', element: <NotFound /> },
+  ];
+
+  return (
+    <Routes>
+      <Route
+        path='/'
+        element={<App />}
+      >
+        <Route
+          index
+          element={<Home />}
+        />
+
+        {/* auth-only routes */}
+        <Route element={<AuthOnlyRoute authStatus={authStatus} />}>
+          {authOnlyRoutes.map((route: RouteDetails) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={route.element}
+            />
+          ))}
+        </Route>
+
+        {/* non-auth-only routes */}
+        <Route element={<NonAuthOnlyRoute authStatus={authStatus} />}>
+          {nonAuthOnlyRoutes.map((route: RouteDetails) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={route.element}
+            />
+          ))}
+        </Route>
+
+        {/* public routes */}
+        <Route
+          path='/wishlist/view/:wishlistId'
+          element={<ViewWishlist />}
+        />
+
+        {publicRoutes.map((route: RouteDetails) => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={route.element}
+          />
+        ))}
+      </Route>
+    </Routes>
+  );
+}
+
 function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: AuthStatus; redirectTo?: string }): JSX.Element {
   const { postAuthNavigate, setPostAuthNavigate } = useHistory();
   const { pathname, search } = useLocation();
@@ -63,79 +141,5 @@ function NonAuthOnlyRoute({ authStatus, redirectTo = '/account' }: { authStatus:
       to={redirectTo}
       replace
     />
-  );
-}
-
-export function Router(): JSX.Element {
-  const { authStatus } = useAuth();
-
-  return (
-    <Routes>
-      <Route
-        path='/'
-        element={<App />}
-      >
-        <Route
-          index
-          element={<Home />}
-        />
-
-        <Route
-          path='/home'
-          element={<Home />}
-        />
-
-        {/* AUTH ONLY ROUTES */}
-        <Route element={<AuthOnlyRoute authStatus={authStatus} />}>
-          <Route
-            path='/account'
-            element={<Account />}
-          />
-
-          <Route
-            path='/account/wishlists'
-            element={<Wishlists />}
-          />
-
-          <Route
-            path='/wishlist/new'
-            element={<NewWishlist />}
-          />
-
-          <Route
-            path='/wishlist/:wishlistId'
-            element={<Wishlist />}
-          />
-        </Route>
-
-        {/* NON AUTH ONLY ROUTES */}
-        <Route element={<NonAuthOnlyRoute authStatus={authStatus} />}>
-          <Route
-            path='/sign-up'
-            element={<SignUp />}
-          />
-
-          <Route
-            path='/sign-up/verification'
-            element={<AccountVerification />}
-          />
-
-          <Route
-            path='/sign-in'
-            element={<SignIn />}
-          />
-        </Route>
-
-        <Route
-          path='/wishlist/view/:wishlistId'
-          element={<ViewWishlist />}
-        />
-
-        <Route
-          path='*'
-          element={<NotFound />}
-        />
-      </Route>
-    </Routes>
   );
 }
