@@ -470,6 +470,11 @@ export default function WishlistHeader({
                 </div>
               </form>
             )}
+
+            {!editMode && (
+              // meant to smooth out the menu collapse
+              <div className='h-[15rem] w-full'></div>
+            )}
           </div>
         </div>
       </Container>
