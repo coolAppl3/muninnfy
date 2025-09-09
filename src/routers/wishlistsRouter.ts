@@ -129,7 +129,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     res.status(500).json({ message: 'Internal server error.' });
-    logUnexpectedError(req, err);
+    await logUnexpectedError(req, err);
   }
 });
 
