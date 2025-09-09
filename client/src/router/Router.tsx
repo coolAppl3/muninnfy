@@ -14,6 +14,7 @@ import NotFound from '../pages/NotFound/NotFound';
 import { AuthStatus } from '../contexts/AuthContext';
 import useAuth from '../hooks/useAuth';
 import useHistory from '../hooks/useHistory';
+import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
 
 interface RouteDetails {
   path: string;
@@ -106,7 +107,7 @@ function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: Au
   }, [authStatus, pathname, search, postAuthNavigate, setPostAuthNavigate]);
 
   if (authStatus === 'loading') {
-    return <>{/* TODO: implement loading skeleton */}</>;
+    return <LoadingSkeleton />;
   }
 
   if (authStatus === 'authenticated') {
@@ -125,7 +126,7 @@ function NonAuthOnlyRoute({ authStatus, redirectTo = '/account' }: { authStatus:
   const { postAuthNavigate } = useHistory();
 
   if (authStatus === 'loading') {
-    return <>{/* TODO: implement loading skeleton */}</>;
+    return <LoadingSkeleton />;
   }
 
   if (authStatus === 'unauthenticated') {

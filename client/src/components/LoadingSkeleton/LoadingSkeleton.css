@@ -1,0 +1,41 @@
+@reference '../../index.css';
+
+#loading-skeleton {
+  @apply py-4;
+
+  .text {
+    @apply w-full h-3 bg-cta/15 rounded-pill animate-pulse;
+
+    &.skinny {
+      @apply h-2;
+    }
+
+    &.extra-skinny {
+      @apply h-1;
+    }
+  }
+
+  .skeleton-container {
+    @apply bg-dark p-2 rounded-sm shadow-simple-tiny;
+  }
+
+  .skeleton-grid {
+    @apply grid grid-cols-2 gap-1;
+
+    .skeleton-container {
+      div {
+        &:first-child {
+          @apply mb-1 max-w-3/4;
+        }
+
+        &:nth-child(2) {
+          @apply mb-1 max-w-9/10;
+        }
+
+        &:last-child {
+          @apply max-w-1/4;
+        }
+      }
+    }
+  }
+}
