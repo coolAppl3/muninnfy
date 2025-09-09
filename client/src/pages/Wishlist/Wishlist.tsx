@@ -7,7 +7,8 @@ import { getWishlistDetailsService, WishlistDetails, WishlistItem } from '../../
 import { CanceledError } from 'axios';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
-import WishlistHeader from './WishlistHeader';
+import WishlistHeaderProvider from './WishlistHeader/WishlistHeaderProvider';
+import WishlistHeader from './WishlistHeader/WishlistHeader';
 import useAuth from '../../hooks/useAuth';
 import useHistory from '../../hooks/useHistory';
 
@@ -99,13 +100,15 @@ export default function Wishlist(): JSX.Element {
       <Head title={`${wishlistDetails ? wishlistDetails.title : 'Wishlist'} - Muninnfy`} />
 
       <main className='py-4'>
-        {wishlistDetails && (
-          <WishlistHeader
-            wishlistId={wishlistId || ''}
-            wishlistDetails={wishlistDetails}
-            setWishlistDetails={setWishlistDetails}
-          />
-        )}
+        <WishlistHeaderProvider>
+          {wishlistDetails && (
+            <WishlistHeader
+              wishlistId={wishlistId || ''}
+              wishlistDetails={wishlistDetails}
+              setWishlistDetails={setWishlistDetails}
+            />
+          )}
+        </WishlistHeaderProvider>
       </main>
     </>
   );
