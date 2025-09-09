@@ -1,6 +1,5 @@
 import { JSX, useEffect, useState } from 'react';
 import { Head } from '../../components/Head/Head';
-import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';
 import { getWishlistDetailsService, WishlistDetails, WishlistItem } from '../../services/wishlistServices';
@@ -11,8 +10,10 @@ import WishlistHeaderProvider from './WishlistHeader/WishlistHeaderProvider';
 import WishlistHeader from './WishlistHeader/WishlistHeader';
 import useAuth from '../../hooks/useAuth';
 import useHistory from '../../hooks/useHistory';
+import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 
 export default function Wishlist(): JSX.Element {
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [wishlistId, setWishlistId] = useState<string | null>(null);
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetails | null>(null);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
@@ -21,18 +22,19 @@ export default function Wishlist(): JSX.Element {
   const { referrerLocation } = useHistory();
   const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();
-  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
 
   useEffect(() => {
-    displayLoadingOverlay();
+    if (isLoaded) {
+      return;
+    }
+
     const wishlistId: string | undefined = urlParams.wishlistId;
 
     if (!wishlistId || !isValidUuid(wishlistId)) {
       displayPopupMessage('Wishlist not found.', 'error');
-      removeLoadingOverlay();
-
       navigate(referrerLocation ? referrerLocation : '/account');
+
       return;
     }
 
@@ -51,6 +53,8 @@ export default function Wishlist(): JSX.Element {
 
         setWishlistDetails(wishlistDetails);
         setWishlistItems(wishlistItems);
+
+        setIsLoaded(true);
       } catch (err: unknown) {
         if (ignore || err instanceof CanceledError) {
           return;
@@ -80,8 +84,6 @@ export default function Wishlist(): JSX.Element {
         if (status === 404) {
           navigate(referrerLocation ? referrerLocation : '/account');
         }
-      } finally {
-        removeLoadingOverlay();
       }
     };
 
@@ -90,26 +92,28 @@ export default function Wishlist(): JSX.Element {
     return () => {
       ignore = true;
       abortController.abort();
-
-      removeLoadingOverlay();
     };
-  }, [displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage, setAuthStatus, referrerLocation, urlParams, navigate]);
+  }, [isLoaded, displayPopupMessage, setAuthStatus, referrerLocation, urlParams, navigate]);
 
   return (
     <>
       <Head title={`${wishlistDetails ? wishlistDetails.title : 'Wishlist'} - Muninnfy`} />
 
-      <main className='py-4'>
-        <WishlistHeaderProvider>
-          {wishlistDetails && (
-            <WishlistHeader
-              wishlistId={wishlistId || ''}
-              wishlistDetails={wishlistDetails}
-              setWishlistDetails={setWishlistDetails}
-            />
-          )}
-        </WishlistHeaderProvider>
-      </main>
+      {isLoaded ? (
+        <main className='py-4'>
+          <WishlistHeaderProvider>
+            {wishlistDetails && (
+              <WishlistHeader
+                wishlistId={wishlistId || ''}
+                wishlistDetails={wishlistDetails}
+                setWishlistDetails={setWishlistDetails}
+              />
+            )}
+          </WishlistHeaderProvider>
+        </main>
+      ) : (
+        <LoadingSkeleton />
+      )}
     </>
   );
 }
