@@ -22,7 +22,7 @@ export default function NewWishlist(): JSX.Element {
 
   const [privacyLevelValue, setPrivacyLevelValue] = useState<number>(FOLLOWERS_WISHLIST_PRIVACY_LEVEL);
   const [titleValue, setTitleValue] = useState<string>('');
-  const [titleError, setTitleError] = useState<string | null>(null);
+  const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
   const navigate: NavigateFunction = useNavigate();
   const { setAuthStatus } = useAuth();
@@ -47,18 +47,23 @@ export default function NewWishlist(): JSX.Element {
         return;
       }
 
-      const { status, errMessage } = asyncErrorData;
+      const { status, errMessage, errReason } = asyncErrorData;
       displayPopupMessage(errMessage, 'error');
 
       if (status === 401) {
         setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (errReason && [400, 409].includes(status)) {
+        errReason !== 'invalidPrivacyLevel' && setTitleErrorMessage(errMessage);
       }
     }
   }
 
   function allFieldsValid(): boolean {
     const titleErrorMessage: string | null = validateWishlistTitle(titleValue);
-    setTitleError(titleErrorMessage);
+    setTitleErrorMessage(titleErrorMessage);
 
     if (titleErrorMessage) {
       displayPopupMessage(titleErrorMessage, 'error');
@@ -105,10 +110,10 @@ export default function NewWishlist(): JSX.Element {
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   const newValue: string = e.target.value;
 
-                  setTitleError(validateWishlistTitle(newValue));
+                  setTitleErrorMessage(validateWishlistTitle(newValue));
                   setTitleValue(newValue);
                 }}
-                errorMessage={titleError}
+                errorMessage={titleErrorMessage}
               ></DefaultFormGroup>
 
               <div id='wishlist-privacy-level'>

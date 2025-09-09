@@ -10,6 +10,7 @@ import { dbPool } from '../db/db';
 import { TOTAL_WISHLISTS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { getWishlistPrivacyLevelName } from '../util/wishlistUtils';
+import { isSqlError } from '../util/sqlUtils/isSqlError';
 
 export const wishlistsRouter: Router = express.Router();
 
@@ -60,16 +61,18 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   try {
     interface AccountWishlistsDetails extends RowDataPacket {
       wishlists_created_count: number;
+      title_already_used: boolean;
     }
 
     const [accountWishlistsRows] = await dbPool.execute<AccountWishlistsDetails[]>(
       `SELECT
-        COUNT(*) AS wishlists_created_count
+        COUNT(*) AS wishlists_created_count,
+        EXISTS (SELECT 1 FROM wishlists WHERE title = :title AND account_id = :accountId ) AS title_already_used
       FROM
         wishlists
       WHERE
-        account_id = ?;`,
-      [accountId]
+        account_id = :accountId;`,
+      { accountId, title: requestData.title }
     );
 
     const accountWishlistsDetails: AccountWishlistsDetails | undefined = accountWishlistsRows[0];
@@ -81,6 +84,11 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 
     if (accountWishlistsDetails.wishlists_created_count >= TOTAL_WISHLISTS_LIMIT) {
       res.status(403).json({ message: 'Wishlists limit reached.', reason: 'wishlistLimitReached' });
+      return;
+    }
+
+    if (accountWishlistsDetails.title_already_used) {
+      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
       return;
     }
 
@@ -103,6 +111,20 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      return;
+    }
+
+    if (!isSqlError(err)) {
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
+
+      return;
+    }
+
+    const sqlError: SqlError = err;
+
+    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'account_id'`)) {
+      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
       return;
     }
 
