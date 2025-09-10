@@ -1,9 +1,10 @@
 import { JSX, useEffect } from 'react';
 import { Location, Outlet, useLocation } from 'react-router-dom';
 import './App.css';
-import Navbars from './components/Navbars/Navbars';
 import Footer from './components/Footer/Footer';
 import Providers from './Providers';
+import { TopNavbar } from './components/TopNavbar/TopNavbar';
+import { BottomNavbar } from './components/BottomNavbar/BottomNavbar';
 
 export default function App(): JSX.Element {
   const { pathname }: Location = useLocation();
@@ -13,7 +14,8 @@ export default function App(): JSX.Element {
 
   return (
     <Providers>
-      <Navbars />
+      <TopNavbar />
+      <BottomNavbar />
       <Outlet />
       <Footer />
     </Providers>

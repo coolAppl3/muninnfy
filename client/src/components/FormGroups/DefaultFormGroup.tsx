@@ -1,4 +1,4 @@
-import { ChangeEventHandler, HTMLInputAutoCompleteAttribute, JSX } from 'react';
+import { ChangeEventHandler, HTMLInputAutoCompleteAttribute, JSX, Ref } from 'react';
 import './FormGroups.css';
 
 interface DefaultFormGroupProps {
@@ -9,6 +9,7 @@ interface DefaultFormGroupProps {
   errorMessage: string | null;
   onChange: ChangeEventHandler<HTMLInputElement>;
   className?: string;
+  ref?: Ref<HTMLInputElement>;
 }
 
 export default function DefaultFormGroup({
@@ -19,6 +20,7 @@ export default function DefaultFormGroup({
   errorMessage,
   onChange,
   className,
+  ref,
 }: DefaultFormGroupProps): JSX.Element {
   return (
     <div className={`form-group ${errorMessage ? 'error' : ''} ${className ? className : ''}`}>
@@ -30,6 +32,7 @@ export default function DefaultFormGroup({
         autoComplete={autoComplete}
         value={value}
         onChange={onChange}
+        ref={ref}
       />
 
       <span className='error-span'>{errorMessage}</span>
