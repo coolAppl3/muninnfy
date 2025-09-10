@@ -1,5 +1,5 @@
-import { Dispatch, JSX, SetStateAction } from 'react';
-import { changeWishlistPrivacyLevelService, WishlistDetails } from '../../../../services/wishlistServices';
+import { JSX } from 'react';
+import { changeWishlistPrivacyLevelService } from '../../../../services/wishlistServices';
 import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -14,16 +14,10 @@ import {
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../../../utils/constants/wishlistConstants';
+import useWishlist from '../../useWishlist';
 
-export default function EditPrivacyLevelContainer({
-  wishlistId,
-  wishlistDetails,
-  setWishlistDetails,
-}: {
-  wishlistId: string;
-  wishlistDetails: WishlistDetails;
-  setWishlistDetails: Dispatch<SetStateAction<WishlistDetails | null>>;
-}): JSX.Element {
+export default function EditPrivacyLevelContainer(): JSX.Element {
+  const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen } = useWishlistHeader();
 
   const { setAuthStatus } = useAuth();

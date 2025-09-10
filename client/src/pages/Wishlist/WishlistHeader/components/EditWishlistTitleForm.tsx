@@ -1,5 +1,5 @@
-import { ChangeEvent, Dispatch, FormEvent, JSX, SetStateAction, useEffect, useRef, useState } from 'react';
-import { changeWishlistTitleService, WishlistDetails } from '../../../../services/wishlistServices';
+import { ChangeEvent, FormEvent, JSX, useEffect, useRef, useState } from 'react';
+import { changeWishlistTitleService } from '../../../../services/wishlistServices';
 import useWishlistHeader from '../useWishlistHeader';
 import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
@@ -10,14 +10,10 @@ import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils'
 import DefaultFormGroup from '../../../../components/FormGroups/DefaultFormGroup';
 import { validateWishlistTitle } from '../../../../utils/validation/wishlistValidation';
 import Button from '../../../../components/Button/Button';
+import useWishlist from '../../useWishlist';
 
-export function EditWishlistTitleForm({
-  wishlistId,
-  setWishlistDetails,
-}: {
-  wishlistId: string;
-  setWishlistDetails: Dispatch<SetStateAction<WishlistDetails | null>>;
-}): JSX.Element {
+export function EditWishlistTitleForm(): JSX.Element {
+  const { wishlistId, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
 
   const [titleValue, setTitleValue] = useState<string>('');

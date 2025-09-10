@@ -1,49 +1,23 @@
-import { Dispatch, JSX, SetStateAction } from 'react';
-import { WishlistDetails } from '../../../../services/wishlistServices';
+import { JSX } from 'react';
 import useWishlistHeader from '../useWishlistHeader';
 import { EditWishlistTitleForm } from './EditWishlistTitleForm';
 import EditPrivacyLevelContainer from './EditPrivacyLevelContainer';
 import { DeleteWishlistForm } from './DeleteWishlistForm';
 
-export default function WishlistHeaderEditingContainer({
-  wishlistId,
-  wishlistDetails,
-  setWishlistDetails,
-}: {
-  wishlistId: string;
-  wishlistDetails: WishlistDetails;
-  setWishlistDetails: Dispatch<SetStateAction<WishlistDetails | null>>;
-}): JSX.Element {
+export default function WishlistHeaderEditingContainer(): JSX.Element {
   const { editMode } = useWishlistHeader();
 
-  if (!editMode) {
-    // meant to smooth out the header's collapse animation
-    return <div className='h-[15rem] w-full'></div>;
-  }
-
   if (editMode === 'TITLE') {
-    return (
-      <EditWishlistTitleForm
-        wishlistId={wishlistId}
-        setWishlistDetails={setWishlistDetails}
-      />
-    );
+    return <EditWishlistTitleForm />;
   }
 
   if (editMode === 'PRIVACY_LEVEL') {
-    return (
-      <EditPrivacyLevelContainer
-        wishlistId={wishlistId}
-        wishlistDetails={wishlistDetails}
-        setWishlistDetails={setWishlistDetails}
-      />
-    );
+    return <EditPrivacyLevelContainer />;
   }
 
-  return (
-    <DeleteWishlistForm
-      wishlistId={wishlistId}
-      wishlistDetails={wishlistDetails}
-    />
-  );
+  if (editMode === 'DELETE_WISHLIST') {
+    return <DeleteWishlistForm />;
+  }
+
+  return <div className='h-[15rem] w-full'></div>;
 }
