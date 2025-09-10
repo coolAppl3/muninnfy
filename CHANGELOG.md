@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.0.19] (2024-09-10)
+
+### Features
+
+- Implemented a `useEffect` in `LoadingOverlayProvider` to prevent it from persisting through navigation.
+- Implemented redirect logic post sign in.
+- Added `LoadingSkeleton` component.
+  - Implemented this component in `Router` while `authStatus` is set to `loading`.
+- Added an optional `ref` prop to `DefaultFormGroup`.
+- Split `WishlistHeader` into multiple components, while also adding `WishlistHeaderContext`, `WishlistHeaderProvider`, and `useWishlistHeader` custom hook, to improve readability and scalability:
+  - `WishlistHeaderContent`.
+  - `WishlistHeaderEditingContainer`.
+  - `EditWishlistTitleForm`.
+  - `EditWishlistPrivacyLevelContainer`.
+  - `DeleteWWishlistForm`.
+- Implemented logic to focus the wishlist title input in `EditWishlistTitleForm` on mount.
+- Implemented the use of `LoadingSkeleton` in `Wishlist` while the wishlist data is being fetched.
+- Add checks to prevent duplicate wishlist titles under the same account.
+
+
+### Bug Fixes
+
+- Fixed `ContinueAccountVerificationForm` not displaying a popup message on invalid submissions.
+- Fixed `webmanifest` no having the app's name.
+  - A full implementation will be done down the line.
+- Added missing `await` before `logUnexpectedError()` in POST ` wishlists`.
+
+
+### Code Refactoring
+
+- Extracted the routes in `Router` into an array, which is mapped out, to improve readability.
+- Added explicit type definitions in a few locations.
+
+
 ## [0.0.18] (2024-09-08)
 
 ### Features
