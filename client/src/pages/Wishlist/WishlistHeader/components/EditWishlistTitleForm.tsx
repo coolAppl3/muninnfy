@@ -13,7 +13,7 @@ import Button from '../../../../components/Button/Button';
 import useWishlist from '../../useWishlist';
 
 export function EditWishlistTitleForm(): JSX.Element {
-  const { wishlistId, setWishlistDetails } = useWishlist();
+  const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
 
   const [titleValue, setTitleValue] = useState<string>('');
@@ -92,7 +92,9 @@ export function EditWishlistTitleForm(): JSX.Element {
           return;
         }
 
-        const newTitleErrorMessage: string | null = validateWishlistTitle(titleValue);
+        const newTitleErrorMessage: string | null =
+          validateWishlistTitle(titleValue) || (titleValue === wishlistDetails.title ? 'Wishlist already has this title.' : null);
+
         setTitleErrorMessage(newTitleErrorMessage);
 
         if (newTitleErrorMessage) {
