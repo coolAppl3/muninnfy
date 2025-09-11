@@ -19,6 +19,11 @@ export default function TextareaFormGroup({
   className,
   ref,
 }: TextareaFormGroupProps): JSX.Element {
+  function autoAdjustHeight(textarea: HTMLTextAreaElement): void {
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight + 2}px`; // +2 accounting for the borders
+  }
+
   return (
     <div className={`form-group ${errorMessage ? 'error' : ''} ${className ? className : ''}`}>
       <label htmlFor={id}>{label}</label>
@@ -30,10 +35,7 @@ export default function TextareaFormGroup({
         value={value}
         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
           onChange(e);
-
-          const textarea: HTMLTextAreaElement = e.target;
-          textarea.style.height = 'auto';
-          textarea.style.height = `${textarea.scrollHeight + 2}px`; // +2 accounting for the borders
+          autoAdjustHeight(e.target);
         }}
         ref={ref}
       ></textarea>
