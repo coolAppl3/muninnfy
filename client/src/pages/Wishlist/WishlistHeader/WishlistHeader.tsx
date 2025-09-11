@@ -9,7 +9,7 @@ import WishlistHeaderContent from './components/WishlistHeaderContent';
 import useWishlist from '../useWishlist';
 
 export default function WishlistHeader(): JSX.Element {
-  const { wishlistId, wishlistDetails } = useWishlist();
+  const { wishlistDetails } = useWishlist();
   const { editMode } = useWishlistHeader();
 
   return (
@@ -17,10 +17,7 @@ export default function WishlistHeader(): JSX.Element {
       <Container>
         <div className={`wishlist-header-container ${editMode ? 'expanded' : ''}`}>
           <div className='content'>
-            <WishlistHeaderContent
-              wishlistId={wishlistId}
-              wishlistDetails={wishlistDetails}
-            />
+            <WishlistHeaderContent />
 
             <p>
               Created on: <span>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
