@@ -7,8 +7,13 @@
     @apply text-sm font-medium text-title;
   }
 
-  input {
+  input,
+  textarea {
     @apply w-full h-4 p-1 rounded border-1 border-description/70 outline-0 focus:!border-cta text-description font-medium md:text-sm transition-colors;
+  }
+
+  textarea {
+    @apply max-h-[50rem] min-h-8;
   }
 
   .password-input-container {
