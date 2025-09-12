@@ -12,6 +12,7 @@ import useAuth from '../../hooks/useAuth';
 import useHistory from '../../hooks/useHistory';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import WishlistProvider from './WishlistProvider';
+import WishlistItemForm from './WishlistItemForm/WishlistItemForm';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -99,10 +100,12 @@ export default function Wishlist(): JSX.Element {
 
       {isLoaded && initialWishlistProviderData ? (
         <WishlistProvider {...initialWishlistProviderData}>
-          <main className='py-4'>
+          <main>
             <WishlistHeaderProvider>
               <WishlistHeader />
             </WishlistHeaderProvider>
+
+            <WishlistItemForm />
           </main>
         </WishlistProvider>
       ) : (

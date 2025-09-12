@@ -1,102 +1,122 @@
 @reference '../../index.css';
 
 main {
-  .wishlist-header-container {
-    @apply bg-secondary p-2 pb-0 rounded-sm shadow-simple grid grid-rows-[auto_0fr] transition-[grid] gap-2;
+  @apply py-4 grid gap-3;
 
-    &.expanded {
-      @apply grid-rows-[auto_1fr] pb-2;
-    }
+  .wishlist-header {
+    .wishlist-header-container {
+      @apply bg-secondary p-2 pb-0 rounded-sm shadow-simple grid grid-rows-[auto_0fr] transition-[grid] gap-2;
 
-    .content {
-      .content-header {
-        @apply flex justify-between items-start gap-1 mb-1 relative;
+      &.expanded {
+        @apply grid-rows-[auto_1fr] pb-2;
+      }
 
-        &.open {
-          & > button {
-            svg {
-              @apply text-cta;
-            }
-          }
-
-          .content-menu {
-            @apply block;
-          }
-        }
-
-        h3 {
-          @apply text-title font-medium mb-1 break-words leading-[1];
-        }
-
-        & > button {
-          @apply mt-[-1rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer;
+      .content {
+        .content-header {
+          @apply flex justify-between items-start gap-1 mb-1 relative;
 
           &.open {
-            svg {
-              @apply text-cta;
+            & > button {
+              svg {
+                @apply text-cta;
+              }
+            }
+
+            .content-menu {
+              @apply block;
             }
           }
 
-          svg {
-            @apply w-2 h-2 text-title transition-colors;
+          h3 {
+            @apply text-title font-medium mb-1 break-words leading-[1];
+          }
+
+          & > button {
+            @apply mt-[-1rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer;
+
+            &.open {
+              svg {
+                @apply text-cta;
+              }
+            }
+
+            svg {
+              @apply w-2 h-2 text-title transition-colors;
+            }
+          }
+        }
+
+        & > p {
+          @apply text-sm text-description;
+
+          span {
+            @apply font-medium text-title;
+          }
+        }
+
+        .content-menu {
+          @apply absolute top-[-1rem] right-5 rounded-sm overflow-hidden shadow-centered-tiny hidden;
+
+          button {
+            @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
           }
         }
       }
 
-      & > p {
-        @apply text-sm text-description;
+      .editing-container {
+        @apply overflow-hidden relative z-0;
 
-        span {
-          @apply font-medium text-title;
+        .h-line {
+          @apply mb-[14px];
         }
-      }
 
-      .content-menu {
-        @apply absolute top-[-1rem] right-5 rounded-sm overflow-hidden shadow-centered-tiny hidden;
+        .privacy-level {
+          @apply grid gap-[6px];
 
-        button {
-          @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
+          span {
+            @apply text-sm font-medium text-title;
+          }
+
+          .btn-container {
+            @apply grid grid-cols-3 rounded-sm sm:max-w-[40rem];
+
+            button {
+              @apply w-full text-sm text-title text-center font-medium py-1 bg-dark transition-[filter] hover:brightness-60 cursor-pointer z-0 focus:z-1;
+
+              &:first-child {
+                @apply rounded-tl-sm rounded-bl-sm;
+              }
+
+              &:last-child {
+                @apply rounded-tr-sm rounded-br-sm;
+              }
+
+              &.selected {
+                @apply bg-light font-bold text-dark brightness-100 hover:brightness-100;
+              }
+            }
+          }
+
+          & > button.link {
+            @apply text-sm text-end mt-1;
+          }
         }
       }
     }
+  }
 
-    .editing-container {
-      @apply overflow-hidden relative z-0;
+  .wishlist-item-form {
+    @apply relative z-0;
 
-      .h-line {
-        @apply mb-[14px];
+    .wishlist-item-form-container {
+      @apply pb-0 rounded-sm grid grid-rows-[auto_0fr] transition-[grid] gap-y-2;
+
+      & > button {
+        @apply w-fit;
       }
 
-      .privacy-level {
-        @apply grid gap-[6px];
-
-        span {
-          @apply text-sm font-medium text-title;
-        }
-
-        .btn-container {
-          @apply grid grid-cols-3 rounded-sm sm:max-w-[40rem];
-
-          button {
-            @apply w-full text-sm text-title text-center font-medium py-1 bg-dark transition-[filter] hover:brightness-60 cursor-pointer z-0 focus:z-1;
-
-            &:first-child {
-              @apply rounded-tl-sm rounded-bl-sm;
-            }
-
-            &:last-child {
-              @apply rounded-tr-sm rounded-br-sm;
-            }
-
-            &.selected {
-              @apply bg-light font-bold text-dark brightness-100 hover:brightness-100;
-            }
-          }
-        }
-
-        & > button.link {
-          @apply text-sm text-end mt-1;
-        }
+      form {
+        @apply p-2 bg-secondary grid gap-2 rounded-sm shadow-simple-tiny;
       }
     }
   }
