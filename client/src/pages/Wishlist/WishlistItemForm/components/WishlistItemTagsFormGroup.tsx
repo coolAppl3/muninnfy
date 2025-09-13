@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, JSX, KeyboardEvent, MouseEvent, Ref, SetStateAction, useRef, useState } from 'react';
+import { ChangeEvent, Dispatch, JSX, KeyboardEvent, MouseEvent, SetStateAction, useRef, useState } from 'react';
 import '../../../../components/FormGroups/FormGroups.css';
 
 export default function WishlistItemTagsFormGroup({
