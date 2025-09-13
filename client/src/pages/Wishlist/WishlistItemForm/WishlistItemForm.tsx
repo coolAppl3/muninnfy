@@ -4,6 +4,11 @@ import TextareaFormGroup from '../../../components/FormGroups/TextareaFormGroup'
 import Button from '../../../components/Button/Button';
 import WishlistItemTagsFormGroup from '../components/WishlistItemTagsFormGroup';
 import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
+import {
+  validateWishlistItemDescription,
+  validateWishlistItemLink,
+  validateWishlistItemTitle,
+} from '../../../utils/validation/wishlistItemValidation';
 
 export default function WishlistItemForm(): JSX.Element {
   const [titleValue, setTitleValue] = useState<string>('');
@@ -34,7 +39,7 @@ export default function WishlistItemForm(): JSX.Element {
                 const newValue: string = e.target.value;
 
                 setTitleValue(newValue);
-                // TODO: validate
+                setTitleErrorMessage(validateWishlistItemTitle(newValue));
               }}
             />
 
@@ -48,7 +53,7 @@ export default function WishlistItemForm(): JSX.Element {
                 const newValue: string = e.target.value;
 
                 setLinkValue(newValue);
-                // TODO: validate
+                setLinkErrorMessage(validateWishlistItemLink(newValue));
               }}
             />
 
@@ -66,7 +71,7 @@ export default function WishlistItemForm(): JSX.Element {
                 const newValue: string = e.target.value;
 
                 setDescriptionValue(newValue);
-                // TODO: validate
+                setDescriptionErrorMessage(validateWishlistItemDescription(newValue));
               }}
             />
           </form>
