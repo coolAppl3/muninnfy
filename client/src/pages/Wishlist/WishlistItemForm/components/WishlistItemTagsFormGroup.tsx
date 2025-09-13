@@ -30,7 +30,7 @@ export default function WishlistItemTagsFormGroup({
       return;
     }
 
-    setItemTags((prev) => new Set([...prev, value]));
+    setItemTags((prev) => new Set([...prev, value.toLowerCase()]));
     setValue('');
 
     setNextBackspaceRemovesTag(true);
@@ -58,7 +58,7 @@ export default function WishlistItemTagsFormGroup({
 
           setItemTags((prev) => {
             const newSet = new Set(prev);
-            newSet.delete(tag);
+            newSet.delete(tag.toLocaleLowerCase());
 
             return newSet;
           });
