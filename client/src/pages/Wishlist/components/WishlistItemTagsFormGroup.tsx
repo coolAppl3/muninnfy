@@ -18,28 +18,41 @@ export default function WishlistItemTagsFormGroup({
   function handleChange(e: ChangeEvent<HTMLInputElement>): void {
     const newValue: string = e.target.value;
 
-    if (!/\s/.test(newValue)) {
-      setValue(newValue);
-      // TODO: validate
-
-      setNextBackspaceRemovesTag(false);
+    const containsWhitespace: boolean = /\s/.test(newValue);
+    if (containsWhitespace) {
       return;
     }
 
-    if (newValue.trim() === '') {
-      return;
-    }
+    setValue(newValue);
+    setErrorMessage(validateItemTag(newValue));
 
-    setItemTags((prev) => new Set([...prev, value.toLowerCase()]));
-    setValue('');
-
-    setNextBackspaceRemovesTag(true);
+    setNextBackspaceRemovesTag(false);
   }
 
-  function handleKeyUp(e: KeyboardEvent<HTMLInputElement>): void {
-    if (e.key === 'Backspace' && e.currentTarget.value === '') {
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
+    const value: string = e.currentTarget.value;
+
+    if (e.key === 'Backspace' && value === '') {
       nextBackspaceRemovesTag ? setItemTags((prev) => new Set([...prev].slice(0, -1))) : setNextBackspaceRemovesTag(true);
+      return;
     }
+
+    if (e.key === ' ' && !validateItemTag(value)) {
+      setItemTags((prev) => new Set([...prev, value.toLowerCase()]));
+      setValue('');
+
+      setNextBackspaceRemovesTag(true);
+    }
+  }
+
+  function validateItemTag(value: string): string | null {
+    const regex: RegExp = /^[A-Za-z0-9_]{1,50}$/;
+
+    if (!regex.test(value)) {
+      return 'Only English letters, numbers, and underscores are allowed.';
+    }
+
+    return null;
   }
 
   return (
@@ -74,9 +87,12 @@ export default function WishlistItemTagsFormGroup({
           ref={inputRef}
           size={value.length || 1}
           onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
+          onBlur={() => {
+            setInputFocused(false);
+            setValue('');
+          }}
           onChange={handleChange}
-          onKeyUp={handleKeyUp}
+          onKeyDown={handleKeyDown}
         />
       </div>
 
