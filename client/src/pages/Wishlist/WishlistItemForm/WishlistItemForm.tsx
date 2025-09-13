@@ -1,9 +1,9 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
 import Container from '../../../components/Container/Container';
-import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
 import TextareaFormGroup from '../../../components/FormGroups/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
-import WishlistItemTagsFormGroup from './components/WishlistItemTagsFormGroup';
+import WishlistItemTagsFormGroup from '../components/WishlistItemTagsFormGroup';
+import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
 
 export default function WishlistItemForm(): JSX.Element {
   const [titleValue, setTitleValue] = useState<string>('');
