@@ -1,11 +1,5 @@
-import { containsInvalidWhitespace } from '../globalUtils';
-
 export function isValidWishlistItemTagName(value: any): boolean {
   if (typeof value !== 'string') {
-    return false;
-  }
-
-  if (containsInvalidWhitespace(value)) {
     return false;
   }
 
