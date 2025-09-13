@@ -54,7 +54,7 @@
 
   &.tags-form-group {
     & > div {
-      @apply w-full min-h-4 p-1 rounded border-1 border-description/70 outline-0 focus:!border-cta text-description font-medium md:text-sm transition-colors;
+      @apply w-full min-h-4 p-[8px] rounded border-1 border-description/70 outline-0 focus:!border-cta text-description font-medium md:text-sm transition-colors;
 
       &.focused {
         @apply border-cta;
@@ -65,7 +65,7 @@
       }
 
       span.tag {
-        @apply inline-block p-[4px] bg-light text-dark rounded m-[2px] leading-[1] break-words max-w-[20rem] transition-colors hover:bg-danger cursor-pointer;
+        @apply inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] transition-colors hover:bg-danger cursor-pointer;
       }
     }
   }
