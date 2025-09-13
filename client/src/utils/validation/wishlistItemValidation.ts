@@ -41,7 +41,7 @@ export function validateWishlistItemDescription(value: string): string | null {
 }
 
 export function validateWishlistItemLink(value: string): string | null {
-  const regex: RegExp = /^(?=.{1,50}$)(?!.*  )[\x00-\x7F]+(?: [\x00-\x7F]+)*$/;
+  const regex = /^(?=.{1,2000}$)(https?:\/\/[^\s/$.?#].[^\s]*)$/i;
   if (!regex.test(value)) {
     return 'Invalid item link.';
   }
