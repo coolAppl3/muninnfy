@@ -41,6 +41,14 @@ export function validateWishlistItemDescription(value: string): string | null {
 }
 
 export function validateWishlistItemLink(value: string): string | null {
+  if (!value.startsWith('http://') && !value.startsWith('https://')) {
+    return `Link must start with either "http://" or "https://".`;
+  }
+
+  if (value.length > 2000) {
+    return `Link can't exceed 2000 characters.`;
+  }
+
   const regex = /^(?=.{1,2000}$)(https?:\/\/[^\s/$.?#].[^\s]*)$/i;
   if (!regex.test(value)) {
     return 'Invalid item link.';
