@@ -9,6 +9,6 @@ export function isValidWishlistItemTagName(value: any): boolean {
     return false;
   }
 
-  const regex: RegExp = /^(?=.{1,50}$)(?!.*  )[\x00-\x7F]+(?: [\x00-\x7F]+)*$/;
+  const regex: RegExp = /^[A-Za-z0-9_]{1,50}$/;
   return regex.test(value);
 }
