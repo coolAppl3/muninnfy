@@ -126,13 +126,14 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     const wishlistItemId: number = resultSetHeader.insertId;
     const sanitizedTags: [number, string][] = sanitizedWishlistItemTags(tags, wishlistItemId);
 
-    await connection.query<ResultSetHeader>(
-      `INSERT INTO wishlist_item_tags (
+    sanitizedTags.length > 0 &&
+      (await connection.query<ResultSetHeader>(
+        `INSERT INTO wishlist_item_tags (
         item_id,
         tag_name
       ) VALUES ?;`,
-      [sanitizedTags]
-    );
+        [sanitizedTags]
+      ));
 
     interface Tag extends RowDataPacket {
       id: number;
