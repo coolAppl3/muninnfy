@@ -14,7 +14,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
-import { sanitizedWishlistItemTags } from '../util/validation/wishlistItemTagValidation';
+import { sanitizeWishlistItemTags } from '../util/validation/wishlistItemTagValidation';
 
 export const wishlistItemsRouter: Router = express.Router();
 
@@ -124,7 +124,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     );
 
     const wishlistItemId: number = resultSetHeader.insertId;
-    const sanitizedTags: [number, string][] = sanitizedWishlistItemTags(tags, wishlistItemId);
+    const sanitizedTags: [number, string][] = sanitizeWishlistItemTags(tags, wishlistItemId);
 
     sanitizedTags.length > 0 &&
       (await connection.query<ResultSetHeader>(

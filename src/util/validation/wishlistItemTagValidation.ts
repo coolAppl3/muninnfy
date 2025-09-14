@@ -9,7 +9,7 @@ export function isValidWishlistItemTagName(value: any): boolean {
   return regex.test(value);
 }
 
-export function sanitizedWishlistItemTags(tags: any[], itemId: number): [number, string][] {
+export function sanitizeWishlistItemTags(tags: any[], itemId: number): [number, string][] {
   const sanitizedTags: [number, string][] = [];
   const tagsSet = new Set<string>();
 
