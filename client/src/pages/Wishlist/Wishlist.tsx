@@ -21,6 +21,7 @@ export default function Wishlist(): JSX.Element {
     initialWishlistId: string;
     initialWishlistDetails: WishlistDetails;
     initialWishlistItems: WishlistItem[];
+    initialWishlistItemsTitleSet: Set<string>;
   } | null>(null);
 
   const { setAuthStatus } = useAuth();
@@ -54,10 +55,16 @@ export default function Wishlist(): JSX.Element {
           return;
         }
 
+        const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItem) => {
+          set.add(item.title);
+          return set;
+        }, new Set<string>());
+
         setInitialWishlistProviderData({
           initialWishlistId: wishlistId,
           initialWishlistDetails: wishlistDetails,
           initialWishlistItems: wishlistItems,
+          initialWishlistItemsTitleSet,
         });
 
         setIsLoaded(true);
