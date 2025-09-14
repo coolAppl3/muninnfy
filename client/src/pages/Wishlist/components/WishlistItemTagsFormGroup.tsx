@@ -90,6 +90,7 @@ export default function WishlistItemTagsFormGroup({
           onBlur={() => {
             setInputFocused(false);
             setValue('');
+            setNextBackspaceRemovesTag(true);
           }}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
