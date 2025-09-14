@@ -47,7 +47,7 @@ export default function WishlistItemTagsFormGroup({
         return;
       }
 
-      setItemTags((prev) => new Set([...prev, value.toLowerCase()]));
+      setItemTags((prev) => new Set(prev).add(value.toLowerCase()));
       setValue('');
 
       setNextBackspaceRemovesTag(true);
