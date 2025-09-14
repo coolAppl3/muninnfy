@@ -7,8 +7,13 @@
     @apply text-sm font-medium text-title;
   }
 
-  input {
+  input,
+  textarea {
     @apply w-full h-4 p-1 rounded border-1 border-description/70 outline-0 focus:!border-cta text-description font-medium md:text-sm transition-colors;
+  }
+
+  textarea {
+    @apply max-h-[50rem] min-h-8;
   }
 
   .password-input-container {
@@ -44,6 +49,26 @@
 
     .error-span {
       @apply block;
+    }
+  }
+
+  &.tags-form-group {
+    @apply cursor-text;
+
+    & > div {
+      @apply w-full min-h-4 p-[8px] rounded border-1 border-description/70 outline-0 focus:!border-cta text-description font-medium md:text-sm transition-colors;
+
+      &.focused {
+        @apply border-cta;
+      }
+
+      input {
+        @apply border-0 h-fit max-w-fit p-0 inline-block ml-[2px] text-sm;
+      }
+
+      span.tag {
+        @apply inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] transition-colors hover:bg-danger cursor-pointer;
+      }
     }
   }
 }

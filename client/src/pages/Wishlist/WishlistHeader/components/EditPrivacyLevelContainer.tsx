@@ -1,5 +1,5 @@
-import { Dispatch, JSX, SetStateAction } from 'react';
-import { changeWishlistPrivacyLevelService, WishlistDetails } from '../../../../services/wishlistServices';
+import { JSX } from 'react';
+import { changeWishlistPrivacyLevelService } from '../../../../services/wishlistServices';
 import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -14,16 +14,10 @@ import {
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../../../utils/constants/wishlistConstants';
+import useWishlist from '../../useWishlist';
 
-export default function EditPrivacyLevelContainer({
-  wishlistId,
-  wishlistDetails,
-  setWishlistDetails,
-}: {
-  wishlistId: string;
-  wishlistDetails: WishlistDetails;
-  setWishlistDetails: Dispatch<SetStateAction<WishlistDetails | null>>;
-}): JSX.Element {
+export default function EditPrivacyLevelContainer(): JSX.Element {
+  const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen } = useWishlistHeader();
 
   const { setAuthStatus } = useAuth();
@@ -44,7 +38,7 @@ export default function EditPrivacyLevelContainer({
           }
       );
 
-      displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}.`, 'success');
+      displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}.`, 'success');
     } catch (err: unknown) {
       console.log(err);
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
@@ -83,7 +77,7 @@ export default function EditPrivacyLevelContainer({
     }
 
     displayConfirmModal({
-      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}?`,
+      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}?`,
       confirmBtnTitle: 'Confirm',
       cancelBtnTitle: 'Cancel',
       isDangerous: true,

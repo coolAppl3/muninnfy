@@ -4,9 +4,11 @@ import Container from '../../components/Container/Container';
 import HeroGradient from '../../assets/svg/HeroGradient.svg?react';
 import HeroArc from '../../assets/svg/HeroArc.svg?react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
 export default function Hero(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
+  const { authStatus } = useAuth();
 
   return (
     <section className='hero relative overflow-hidden py-4'>
@@ -21,7 +23,7 @@ export default function Hero(): JSX.Element {
           </p>
           <Button
             className='bg-cta border-cta text-dark mt-1 w-full xs:w-fit'
-            onClick={() => navigate('/wishlist/new')}
+            onClick={() => authStatus === 'loading' || navigate(authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new')}
           >
             Create a wishlist
           </Button>

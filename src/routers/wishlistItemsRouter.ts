@@ -14,6 +14,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
+import { sanitizeWishlistItemTags } from '../util/validation/wishlistItemTagValidation';
 
 export const wishlistItemsRouter: Router = express.Router();
 
@@ -37,11 +38,12 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     title: string;
     description: string | null;
     link: string | null;
+    tags: string[];
   }
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'title', 'description', 'link'];
+  const expectedKeys: string[] = ['wishlistId', 'title', 'description', 'link', 'tags'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
@@ -73,6 +75,8 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
+  let connection;
+
   try {
     interface WishlistDetails extends RowDataPacket {
       wishlist_items_count: number;
@@ -101,10 +105,13 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const { wishlistId, title, description, link } = requestData;
+    const { wishlistId, title, description, link, tags } = requestData;
     const currentTimestamp: number = Date.now();
 
-    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO wishlist_items (
         wishlist_id,
         added_on_timestamp,
@@ -116,9 +123,60 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       [wishlistId, currentTimestamp, title, description, link, false]
     );
 
-    res.status(201).json({ wishlistItemId: resultSetHeader.insertId });
+    const wishlistItemId: number = resultSetHeader.insertId;
+    const sanitizedTags: [number, string][] = sanitizeWishlistItemTags(tags, wishlistItemId);
+
+    sanitizedTags.length > 0 &&
+      (await connection.query<ResultSetHeader>(
+        `INSERT INTO wishlist_item_tags (
+        item_id,
+        tag_name
+      ) VALUES ?;`,
+        [sanitizedTags]
+      ));
+
+    interface Tag extends RowDataPacket {
+      id: number;
+      name: string;
+    }
+
+    const [itemTags] = await connection.execute<Tag[]>(
+      `SELECT
+        tag_id AS id,
+        tag_name AS name
+      FROM
+        wishlist_item_tags
+      WHERE
+        item_id = ?;`,
+      [wishlistItemId]
+    );
+
+    interface MappedWishlistItem {
+      item_id: number;
+      added_on_timestamp: number;
+      title: string;
+      description: string | null;
+      link: string | null;
+      tags: {
+        id: number;
+        name: string;
+      }[];
+    }
+
+    const mappedWishlistItem: MappedWishlistItem = {
+      item_id: wishlistItemId,
+      added_on_timestamp: currentTimestamp,
+      title,
+      description,
+      link,
+      tags: [...itemTags],
+    };
+
+    await connection.commit();
+    res.status(201).json(mappedWishlistItem);
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       return;
@@ -140,5 +198,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });

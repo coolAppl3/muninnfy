@@ -1,22 +1,15 @@
-import { Dispatch, JSX, SetStateAction } from 'react';
+import { JSX } from 'react';
 import Container from '../../../components/Container/Container';
 import '../Wishlist.css';
 import { getFullDateString } from '../../../utils/globalUtils';
-import { WishlistDetails } from '../../../services/wishlistServices';
 import { getWishlistPrivacyLevelName } from '../../../utils/wishlistUtils';
 import useWishlistHeader from './useWishlistHeader';
 import WishlistHeaderEditingContainer from './components/WishlistHeaderEditingContainer';
 import WishlistHeaderContent from './components/WishlistHeaderContent';
+import useWishlist from '../useWishlist';
 
-export default function WishlistHeader({
-  wishlistId,
-  wishlistDetails,
-  setWishlistDetails,
-}: {
-  wishlistId: string;
-  wishlistDetails: WishlistDetails;
-  setWishlistDetails: Dispatch<SetStateAction<WishlistDetails | null>>;
-}): JSX.Element {
+export default function WishlistHeader(): JSX.Element {
+  const { wishlistDetails } = useWishlist();
   const { editMode } = useWishlistHeader();
 
   return (
@@ -24,10 +17,7 @@ export default function WishlistHeader({
       <Container>
         <div className={`wishlist-header-container ${editMode ? 'expanded' : ''}`}>
           <div className='content'>
-            <WishlistHeaderContent
-              wishlistId={wishlistId}
-              wishlistDetails={wishlistDetails}
-            />
+            <WishlistHeaderContent />
 
             <p>
               Created on: <span>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
@@ -39,12 +29,7 @@ export default function WishlistHeader({
 
           <div className='editing-container'>
             <div className='h-line'></div>
-
-            <WishlistHeaderEditingContainer
-              wishlistId={wishlistId}
-              wishlistDetails={wishlistDetails}
-              setWishlistDetails={setWishlistDetails}
-            />
+            <WishlistHeaderEditingContainer />
           </div>
         </div>
       </Container>

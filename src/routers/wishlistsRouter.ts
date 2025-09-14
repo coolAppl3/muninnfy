@@ -216,11 +216,6 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       [wishlistId]
     );
 
-    interface Tag {
-      id: number;
-      name: string;
-    }
-
     interface MappedWishlistItem {
       item_id: number;
       added_on_timestamp: number;
@@ -444,7 +439,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
 
     if (wishlistDetails.privacy_level === requestData.newPrivacyLevel) {
       res.status(409).json({
-        message: `Privacy level is already set to ${getWishlistPrivacyLevelName(wishlistDetails.privacy_level).toLocaleLowerCase()}.`,
+        message: `Privacy level is already set to ${getWishlistPrivacyLevelName(wishlistDetails.privacy_level).toLowerCase()}.`,
         reason: 'identicalPrivacyLevel',
       });
 

@@ -11,12 +11,18 @@ import WishlistHeader from './WishlistHeader/WishlistHeader';
 import useAuth from '../../hooks/useAuth';
 import useHistory from '../../hooks/useHistory';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
+import WishlistProvider from './WishlistProvider';
+import WishlistItemForm from './WishlistItemForm/WishlistItemForm';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [wishlistId, setWishlistId] = useState<string | null>(null);
-  const [wishlistDetails, setWishlistDetails] = useState<WishlistDetails | null>(null);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+
+  const [initialWishlistProviderData, setInitialWishlistProviderData] = useState<{
+    initialWishlistId: string;
+    initialWishlistDetails: WishlistDetails;
+    initialWishlistItems: WishlistItem[];
+    initialWishlistItemsTitleSet: Set<string>;
+  } | null>(null);
 
   const { setAuthStatus } = useAuth();
   const { referrerLocation } = useHistory();
@@ -38,8 +44,6 @@ export default function Wishlist(): JSX.Element {
       return;
     }
 
-    setWishlistId(wishlistId);
-
     let ignore: boolean = false;
     const abortController: AbortController = new AbortController();
 
@@ -51,8 +55,17 @@ export default function Wishlist(): JSX.Element {
           return;
         }
 
-        setWishlistDetails(wishlistDetails);
-        setWishlistItems(wishlistItems);
+        const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItem) => {
+          set.add(item.title.toLowerCase());
+          return set;
+        }, new Set<string>());
+
+        setInitialWishlistProviderData({
+          initialWishlistId: wishlistId,
+          initialWishlistDetails: wishlistDetails,
+          initialWishlistItems: wishlistItems,
+          initialWishlistItemsTitleSet,
+        });
 
         setIsLoaded(true);
       } catch (err: unknown) {
@@ -71,19 +84,12 @@ export default function Wishlist(): JSX.Element {
         const { status, errMessage } = asyncErrorData;
         displayPopupMessage(errMessage, 'error');
 
-        if (status === 400) {
-          navigate(referrerLocation ? referrerLocation : '/account');
-          return;
-        }
-
         if (status === 401) {
           setAuthStatus('unauthenticated');
           return;
         }
 
-        if (status === 404) {
-          navigate(referrerLocation ? referrerLocation : '/account');
-        }
+        navigate(referrerLocation ? referrerLocation : '/account');
       }
     };
 
@@ -97,20 +103,18 @@ export default function Wishlist(): JSX.Element {
 
   return (
     <>
-      <Head title={`${wishlistDetails ? wishlistDetails.title : 'Wishlist'} - Muninnfy`} />
+      <Head title='Wishlist - Muninnfy' />
 
-      {isLoaded ? (
-        <main className='py-4'>
-          <WishlistHeaderProvider>
-            {wishlistDetails && (
-              <WishlistHeader
-                wishlistId={wishlistId || ''}
-                wishlistDetails={wishlistDetails}
-                setWishlistDetails={setWishlistDetails}
-              />
-            )}
-          </WishlistHeaderProvider>
-        </main>
+      {isLoaded && initialWishlistProviderData ? (
+        <WishlistProvider {...initialWishlistProviderData}>
+          <main>
+            <WishlistHeaderProvider>
+              <WishlistHeader />
+            </WishlistHeaderProvider>
+
+            <WishlistItemForm />
+          </main>
+        </WishlistProvider>
       ) : (
         <LoadingSkeleton />
       )}

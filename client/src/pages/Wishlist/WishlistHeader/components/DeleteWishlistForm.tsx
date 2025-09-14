@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
-import { deleteWishlistService, WishlistDetails } from '../../../../services/wishlistServices';
+import { deleteWishlistService } from '../../../../services/wishlistServices';
 import useWishlistHeader from '../useWishlistHeader';
 import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
@@ -9,9 +9,12 @@ import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import DefaultFormGroup from '../../../../components/FormGroups/DefaultFormGroup';
 import Button from '../../../../components/Button/Button';
 import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils';
+import useWishlist from '../../useWishlist';
 
-export function DeleteWishlistForm({ wishlistId, wishlistDetails }: { wishlistId: string; wishlistDetails: WishlistDetails }): JSX.Element {
+export function DeleteWishlistForm(): JSX.Element {
+  const { wishlistId, wishlistDetails } = useWishlist();
   const { editMode, setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
+
   const [confirmationTitleValue, setConfirmationTitleValue] = useState<string>('');
 
   const { setAuthStatus } = useAuth();
