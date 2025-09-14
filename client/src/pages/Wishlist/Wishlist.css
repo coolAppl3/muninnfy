@@ -109,14 +109,26 @@ main {
     @apply relative z-0;
 
     .wishlist-item-form-container {
-      @apply pb-0 rounded-sm grid grid-rows-[auto_0fr] transition-[grid] gap-y-2;
+      @apply grid grid-rows-[auto_0fr] transition-[grid] gap-2 pb-0 rounded-sm;
 
-      & > button {
-        @apply w-fit;
+      &.expanded {
+        @apply grid-rows-[auto_1fr] pb-2;
+
+        .expand-form-btn {
+          @apply hidden;
+        }
+
+        form {
+          @apply p-2;
+        }
       }
 
       form {
-        @apply p-2 bg-secondary grid gap-2 rounded-sm shadow-simple-tiny;
+        @apply bg-secondary grid gap-2 rounded-sm shadow-simple-tiny overflow-hidden relative z-0;
+
+        .btn-container {
+          @apply flex flex-col sm:flex-row justify-start items-center gap-1;
+        }
       }
     }
   }

@@ -11,6 +11,8 @@ import {
 } from '../../../utils/validation/wishlistItemValidation';
 
 export default function WishlistItemForm(): JSX.Element {
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
@@ -25,10 +27,19 @@ export default function WishlistItemForm(): JSX.Element {
   return (
     <section className='wishlist-item-form'>
       <Container>
-        <div className='wishlist-item-form-container'>
-          <Button className='bg-cta border-cta ml-auto'>New wishlist item</Button>
+        <div className={`wishlist-item-form-container ${isExpanded ? 'expanded' : ''}`}>
+          <Button
+            className='expand-form-btn bg-cta border-cta w-full sm:w-fit h-fit'
+            onClick={() => setIsExpanded((prev) => !prev)}
+          >
+            New wishlist item
+          </Button>
 
-          <form onSubmit={(e: FormEvent) => e.preventDefault()}>
+          <form
+            onSubmit={(e: FormEvent) => {
+              e.preventDefault();
+            }}
+          >
             <DefaultFormGroup
               id='item-title'
               label='Title'
@@ -74,6 +85,22 @@ export default function WishlistItemForm(): JSX.Element {
                 setDescriptionErrorMessage(validateWishlistItemDescription(newValue));
               }}
             />
+
+            <div className='btn-container'>
+              <Button
+                className='bg-secondary border-title text-title w-full order-2 sm:w-fit sm:order-1'
+                onClick={() => setIsExpanded(false)}
+              >
+                Collapse
+              </Button>
+
+              <Button
+                isSubmitBtn={true}
+                className='bg-cta border-cta w-full order-1 sm:w-fit sm:order-2'
+              >
+                Add wishlist item
+              </Button>
+            </div>
           </form>
         </div>
       </Container>
