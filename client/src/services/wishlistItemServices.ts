@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { WishlistItem } from './wishlistServices';
 
 axios.defaults.withCredentials = true;
 const wishlistItemsApiUrl: string =
@@ -9,12 +10,9 @@ interface AddWishlistItemServicePayload {
   title: string;
   description: string | null;
   link: string | null;
+  tags: string[];
 }
 
-interface AddWishlistItemServiceData {
-  wishlistItemId: number;
-}
-
-export async function addWishlistItemService(body: AddWishlistItemServicePayload): Promise<AxiosResponse<AddWishlistItemServiceData>> {
+export async function addWishlistItemService(body: AddWishlistItemServicePayload): Promise<AxiosResponse<WishlistItem>> {
   return axios.post(wishlistItemsApiUrl, body);
 }
