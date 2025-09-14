@@ -97,8 +97,10 @@ export default function WishlistItemTagsFormGroup({
           size={value.length || 1}
           onFocus={() => setInputFocused(true)}
           onBlur={() => {
-            setInputFocused(false);
             setValue('');
+            setErrorMessage(null);
+
+            setInputFocused(false);
             setNextBackspaceRemovesTag(true);
           }}
           onChange={handleChange}
