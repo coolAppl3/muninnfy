@@ -56,7 +56,7 @@ export default function NewWishlist(): JSX.Element {
       }
 
       if (errReason && [400, 409].includes(status)) {
-        errReason !== 'invalidPrivacyLevel' && setTitleErrorMessage(errMessage);
+        errReason === 'invalidPrivacyLevel' || setTitleErrorMessage(errMessage);
       }
     }
   }
