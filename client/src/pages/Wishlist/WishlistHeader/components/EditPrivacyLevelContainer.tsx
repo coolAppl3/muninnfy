@@ -38,7 +38,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
           }
       );
 
-      displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}.`, 'success');
+      displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}.`, 'success');
     } catch (err: unknown) {
       console.log(err);
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
@@ -77,7 +77,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
     }
 
     displayConfirmModal({
-      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLocaleLowerCase()}?`,
+      description: `Are you sure you want to set the privacy level to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}?`,
       confirmBtnTitle: 'Confirm',
       cancelBtnTitle: 'Cancel',
       isDangerous: true,

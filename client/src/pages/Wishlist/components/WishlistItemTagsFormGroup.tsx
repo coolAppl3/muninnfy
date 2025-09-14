@@ -80,7 +80,7 @@ export default function WishlistItemTagsFormGroup({
 
           setItemTags((prev) => {
             const newSet = new Set(prev);
-            newSet.delete(tag.toLocaleLowerCase());
+            newSet.delete(tag.toLowerCase());
 
             return newSet;
           });
