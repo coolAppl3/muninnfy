@@ -24,6 +24,10 @@ export function validateWishlistItemTitle(value: string): string | null {
 }
 
 export function validateWishlistItemDescription(value: string): string | null {
+  if (value === '') {
+    return null;
+  }
+
   if (value !== value.trim()) {
     return 'Description must not contain leading or trailing whitespace.';
   }
@@ -41,6 +45,10 @@ export function validateWishlistItemDescription(value: string): string | null {
 }
 
 export function validateWishlistItemLink(value: string): string | null {
+  if (value === '') {
+    return null;
+  }
+
   if (value.length > 2000) {
     return `Link can't exceed 2000 characters.`;
   }
