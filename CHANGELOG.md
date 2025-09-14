@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.0.20] (2024-09-14)
+
+### Features
+
+- Added `WishlistContext`, `WishlistProvider` and `useWishlist` custom hook.
+- Added `TextareaFormGroup` component.
+- Added `WishlistsItemTagsFormGroup` component.
+- Added `wishlistItemValidation` on the client side with the following functions:
+  - `validateWishlistItemTitle()`.
+  - `validateWishlistItemDescription()`.
+  - `validateWishlistItemLink()`.
+- Added `sanitizedWishlistItemTags()` under `wishlistItemTagValidation`.
+- Added `wishlistItemConstants` on the client side with `WISHLIST_ITEM_TAGS_LIMIT`.
+- Added `WishlistItemForm`.
+
+
+### Changes
+
+- Changed `isValidWishlistItemTagName()` to only allow ASCII letters, numbers, and underscores.
+- Reworked POST `wishlistItems` to accept an array of tags.
+- Reduced the strictness of validating wishlist item links.
+  - Now just requires a somewhat valid TLD.
+
+
+### Bug Fixes
+
+- Fixed `EditWishlistTitleForm` not checking if the new title is identical to the existing one before making an API call.
+- Removed unused props being passed to `WishlistHeaderContent`.
+- Fixed the "Create a wishlist" button in `Hero` not accounting for guest users, and instead always navigating to `wishlist/new`.
+- Fixed `toLocaleLowerCase()` being accidentally used instead of `toLowerCase()` in a few locations.
+
+
 ## [0.0.19] (2024-09-10)
 
 ### Features
