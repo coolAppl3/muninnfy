@@ -56,7 +56,7 @@ export default function Wishlist(): JSX.Element {
         }
 
         const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItem) => {
-          set.add(item.title);
+          set.add(item.title.toLowerCase());
           return set;
         }, new Set<string>());
 
