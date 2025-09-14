@@ -1,5 +1,7 @@
 import { ChangeEvent, Dispatch, JSX, KeyboardEvent, MouseEvent, SetStateAction, useRef, useState } from 'react';
 import '../../../components/FormGroups/FormGroups.css';
+import { WISHLIST_ITEM_TAGS_LIMIT } from '../../../utils/constants/wishlistItemConstants';
+import usePopupMessage from '../../../hooks/usePopupMessage';
 
 export default function WishlistItemTagsFormGroup({
   itemTags,
@@ -15,6 +17,8 @@ export default function WishlistItemTagsFormGroup({
   const [inputFocused, setInputFocused] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const { displayPopupMessage } = usePopupMessage();
+
   function handleChange(e: ChangeEvent<HTMLInputElement>): void {
     const newValue: string = e.target.value;
 
@@ -24,7 +28,7 @@ export default function WishlistItemTagsFormGroup({
     }
 
     setValue(newValue);
-    setErrorMessage(validateItemTag(newValue));
+    newValue === '' || setErrorMessage(validateItemTag(newValue));
 
     setNextBackspaceRemovesTag(false);
   }
@@ -38,6 +42,11 @@ export default function WishlistItemTagsFormGroup({
     }
 
     if (e.key === ' ' && !validateItemTag(value)) {
+      if (itemTags.size >= WISHLIST_ITEM_TAGS_LIMIT) {
+        displayPopupMessage('Item tags limit reached.', 'error');
+        return;
+      }
+
       setItemTags((prev) => new Set([...prev, value.toLowerCase()]));
       setValue('');
 
