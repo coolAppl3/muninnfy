@@ -134,8 +134,14 @@ export default function WishlistItemForm(): JSX.Element {
 
   function clearForm(): void {
     setTitleValue('');
+    setTitleErrorMessage(null);
+
     setDescriptionValue('');
+    setDescriptionErrorMessage(null);
+
     setLinkValue('');
+    setLinkErrorMessage(null);
+
     setItemTags(new Set());
   }
 
@@ -216,9 +222,12 @@ export default function WishlistItemForm(): JSX.Element {
             <div className='btn-container'>
               <Button
                 className='bg-secondary border-title text-title w-full order-2 sm:w-fit sm:order-1'
-                onClick={() => setIsExpanded(false)}
+                onClick={() => {
+                  setIsExpanded(false);
+                  clearForm();
+                }}
               >
-                Collapse
+                Cancel
               </Button>
 
               <Button
