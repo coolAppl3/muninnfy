@@ -216,11 +216,6 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       [wishlistId]
     );
 
-    interface Tag {
-      id: number;
-      name: string;
-    }
-
     interface MappedWishlistItem {
       item_id: number;
       added_on_timestamp: number;
