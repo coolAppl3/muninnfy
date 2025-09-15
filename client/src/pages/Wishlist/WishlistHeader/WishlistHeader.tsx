@@ -1,6 +1,5 @@
 import { JSX } from 'react';
 import Container from '../../../components/Container/Container';
-import '../Wishlist.css';
 import { getFullDateString } from '../../../utils/globalUtils';
 import { getWishlistPrivacyLevelName } from '../../../utils/wishlistUtils';
 import useWishlistHeader from './useWishlistHeader';
