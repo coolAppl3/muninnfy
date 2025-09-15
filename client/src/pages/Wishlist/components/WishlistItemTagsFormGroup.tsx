@@ -66,7 +66,7 @@ export default function WishlistItemTagsFormGroup({
 
   return (
     <div className={`form-group tags-form-group ${errorMessage ? 'error' : ''}`}>
-      <label htmlFor='item-tags'>Tags (optional)</label>
+      <label htmlFor='item-tags'>Tags (optional) - space to add</label>
 
       <div
         className={inputFocused ? 'focused' : ''}
