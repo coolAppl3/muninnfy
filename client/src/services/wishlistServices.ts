@@ -31,6 +31,7 @@ export interface WishlistItem {
   title: string;
   description: string | null;
   link: string | null;
+  is_purchased: boolean;
   tags: {
     id: number;
     name: string;
