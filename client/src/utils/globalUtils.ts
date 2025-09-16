@@ -19,8 +19,23 @@ export function getFullDateString(timestamp: number): string {
   return `${monthName} ${date}${ordinalSuffix}, ${year}`;
 }
 
+export function getShortenedDateString(timestamp: number): string {
+  const dateObject: Date = new Date(timestamp);
+
+  const date: number = dateObject.getDate();
+  const monthName: string = getShortMonthName(dateObject);
+  const year: number = dateObject.getFullYear();
+  const ordinalSuffix: string = getDateOrdinalSuffix(date);
+
+  return `${monthName} ${date}${ordinalSuffix}, ${year}`;
+}
+
 function getMonthName(date: Date): string {
   return new Intl.DateTimeFormat('en-GB', { month: 'long' }).format(date);
+}
+
+function getShortMonthName(date: Date): string {
+  return new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(date);
 }
 
 function getDateOrdinalSuffix(date: number): string {
