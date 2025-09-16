@@ -13,7 +13,7 @@ import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import useAuth from '../../../hooks/useAuth';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useWishlist from '../useWishlist';
-import { WishlistItem } from '../../../services/wishlistServices';
+import { WishlistItemInterface } from '../../../services/wishlistServices';
 import { addWishlistItemService } from '../../../services/wishlistItemServices';
 import { AsyncErrorData, getAsyncErrorData } from '../../../utils/errorUtils';
 import useHistory from '../../../hooks/useHistory';
@@ -49,7 +49,7 @@ export default function WishlistItemForm(): JSX.Element {
     const tags: string[] = [...itemTags];
 
     try {
-      const wishlistItem: WishlistItem = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
+      const wishlistItem: WishlistItemInterface = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
 
       setWishlistItems((prev) => [...prev, wishlistItem]);
       setWishlistItemsTitleSet((prev) => new Set(prev).add(wishlistItem.title.toLowerCase()));

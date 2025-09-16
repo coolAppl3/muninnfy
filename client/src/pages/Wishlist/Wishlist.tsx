@@ -3,7 +3,7 @@ import './Wishlist.css';
 import { Head } from '../../components/Head/Head';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';
-import { getWishlistDetailsService, WishlistDetails, WishlistItem } from '../../services/wishlistServices';
+import { getWishlistDetailsService, WishlistDetailsInterface, WishlistItemInterface } from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
 import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
@@ -20,8 +20,8 @@ export default function Wishlist(): JSX.Element {
 
   const [initialWishlistProviderData, setInitialWishlistProviderData] = useState<{
     initialWishlistId: string;
-    initialWishlistDetails: WishlistDetails;
-    initialWishlistItems: WishlistItem[];
+    initialWishlistDetails: WishlistDetailsInterface;
+    initialWishlistItems: WishlistItemInterface[];
     initialWishlistItemsTitleSet: Set<string>;
   } | null>(null);
 
@@ -56,7 +56,7 @@ export default function Wishlist(): JSX.Element {
           return;
         }
 
-        const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItem) => {
+        const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItemInterface) => {
           set.add(item.title.toLowerCase());
           return set;
         }, new Set<string>());

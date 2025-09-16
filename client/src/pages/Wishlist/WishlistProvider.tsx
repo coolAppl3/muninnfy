@@ -1,6 +1,6 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
 import WishlistContext, { WishlistContextInterface } from './WishlistContext';
-import { WishlistDetails, WishlistItem } from '../../services/wishlistServices';
+import { WishlistDetailsInterface, WishlistItemInterface } from '../../services/wishlistServices';
 
 export default function WishlistProvider({
   initialWishlistId,
@@ -11,15 +11,15 @@ export default function WishlistProvider({
   children,
 }: {
   initialWishlistId: string;
-  initialWishlistDetails: WishlistDetails;
-  initialWishlistItems: WishlistItem[];
+  initialWishlistDetails: WishlistDetailsInterface;
+  initialWishlistItems: WishlistItemInterface[];
   initialWishlistItemsTitleSet: Set<string>;
 
   children: ReactNode;
 }): JSX.Element {
   const [wishlistId, setWishlistId] = useState<string>(initialWishlistId);
-  const [wishlistDetails, setWishlistDetails] = useState<WishlistDetails>(initialWishlistDetails);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>(initialWishlistItems);
+  const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsInterface>(initialWishlistDetails);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItemInterface[]>(initialWishlistItems);
   const [wishlistItemsTitleSet, setWishlistItemsTitleSet] = useState<Set<string>>(new Set(initialWishlistItemsTitleSet));
 
   const contextValue: WishlistContextInterface = useMemo(
