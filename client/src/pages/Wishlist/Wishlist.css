@@ -142,7 +142,7 @@ main {
 
         &.expanded {
           .header {
-            button {
+            span {
               svg {
                 @apply rotate-180;
               }
