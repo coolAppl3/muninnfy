@@ -16,6 +16,7 @@ import { logUnexpectedError } from '../logs/errorLogger';
 import { WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { sanitizeWishlistItemTags } from '../util/validation/wishlistItemTagValidation';
 import { deleteWishlistItemTags, insertWishlistItemTags } from '../db/helpers/wishlistItemTagsDbHelpers';
+import { getWishlistItemByTitle } from '../db/helpers/wishlistItemsDbHelpers';
 
 export const wishlistItemsRouter: Router = express.Router();
 
@@ -188,7 +189,21 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     const sqlError: SqlError = err;
 
     if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
-      res.status(409).json({ message: 'Wishlist already contains this item.', reason: 'duplicateItemTitle' });
+      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(
+        requestData.title,
+        requestData.wishlistId,
+        dbPool,
+        req
+      );
+
+      existingWishlistItem
+        ? res.status(409).json({
+            message: 'Wishlist already contains this item.',
+            reason: 'duplicateItemTitle',
+            resData: { duplicateWishlistItem: existingWishlistItem },
+          })
+        : res.status(500).json({ message: 'Internal server error.' });
+
       return;
     }
 
