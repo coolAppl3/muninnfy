@@ -16,3 +16,16 @@ interface AddWishlistItemServicePayload {
 export async function addWishlistItemService(body: AddWishlistItemServicePayload): Promise<AxiosResponse<WishlistItemInterface>> {
   return axios.post(wishlistItemsApiUrl, body);
 }
+
+interface EditWishlistItemServicePayload {
+  wishlistId: string;
+  itemId: number;
+  title: string;
+  description: string | null;
+  link: string | null;
+  tags: string[];
+}
+
+export async function editWishlistItemService(body: EditWishlistItemServicePayload): Promise<AxiosResponse<WishlistItemInterface>> {
+  return axios.patch(wishlistItemsApiUrl, body);
+}
