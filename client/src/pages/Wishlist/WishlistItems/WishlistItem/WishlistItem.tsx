@@ -1,4 +1,4 @@
-import { JSX, Key, MouseEvent, useState } from 'react';
+import { FocusEvent, JSX, useState } from 'react';
 import { WishlistItemInterface } from '../../../../services/wishlistServices';
 import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
@@ -7,6 +7,12 @@ import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 
 export default function WishlistItem({ item }: { item: WishlistItemInterface }): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  async function removeWishlistItem(): Promise<void> {
+    // TODO: implement
+  }
 
   return (
     <div className={`wishlist-item ${isExpanded ? 'expanded' : ''}`}>
@@ -57,12 +63,22 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
           )}
         </div>
 
-        <div className='body-btn-container grid gap-1'>
+        <div
+          className={`body-btn-container ${menuIsOpen ? 'open' : ''}`}
+          onBlur={(e: FocusEvent<HTMLDivElement>) => {
+            if (e.relatedTarget) {
+              return;
+            }
+
+            setMenuIsOpen(false);
+          }}
+        >
           <button
             type='button'
             className='item-menu-btn'
             title='Menu'
             aria-label='Menu'
+            onClick={() => setMenuIsOpen((prev) => !prev)}
           >
             <TripleDotMenuIcon className='text-title rotate-180' />
           </button>
@@ -76,7 +92,27 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
             <CheckIcon className='text-dark' />
           </button>
 
-          {/* TODO: implement context menu */}
+          <div className='item-menu'>
+            <button
+              type='button'
+              onClick={() => {
+                setMenuIsOpen(false);
+                setIsEditing(true);
+              }}
+            >
+              Edit
+            </button>
+            <button
+              type='button'
+              className='!text-danger'
+              onClick={async () => {
+                setMenuIsOpen(false);
+                await removeWishlistItem();
+              }}
+            >
+              Remove
+            </button>
+          </div>
         </div>
       </div>
     </div>

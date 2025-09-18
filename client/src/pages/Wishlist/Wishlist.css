@@ -192,9 +192,23 @@ main {
           }
 
           .body-btn-container {
-            @apply mr-[-1rem];
+            @apply grid gap-1 mr-[-1rem] relative;
 
-            button {
+            &.open {
+              .item-menu-btn {
+                @apply bg-dark;
+
+                svg {
+                  @apply text-cta;
+                }
+              }
+
+              .item-menu {
+                @apply block;
+              }
+            }
+
+            & > button {
               @apply p-1 rounded-[50%] transition-colors cursor-pointer;
 
               &.item-menu-btn {
@@ -207,6 +221,14 @@ main {
 
               svg {
                 @apply w-[1.6rem] h-[1.6rem];
+              }
+            }
+
+            .item-menu {
+              @apply absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden;
+
+              button {
+                @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
               }
             }
           }
