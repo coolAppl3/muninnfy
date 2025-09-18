@@ -24,3 +24,22 @@ export async function insertWishlistItemTags(
     return false;
   }
 }
+
+export async function deleteWishlistItemTags(itemId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+  try {
+    await executor.query<ResultSetHeader>(
+      `DELETE FROM
+        wishlist_item_tags
+      WHERE
+        item_id = ?;`,
+      [itemId]
+    );
+
+    return true;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, err, 'failed to delete account');
+
+    return false;
+  }
+}
