@@ -13,7 +13,7 @@ import useAuth from '../../../hooks/useAuth';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useWishlist from '../useWishlist';
 import { WishlistItemInterface } from '../../../services/wishlistServices';
-import { addWishlistItemService } from '../../../services/wishlistItemServices';
+import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
 import { AsyncErrorData, getAsyncErrorData } from '../../../utils/errorUtils';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -51,13 +51,19 @@ export default function WishlistItemForm({
   async function handleSubmit(): Promise<void> {
     if (formMode === 'NEW_ITEM' && !itemAlreadyInWishlist()) {
       await addWishlistItem();
-      onFinish();
+      return;
+    }
 
+    if (!wishlistItem) {
       return;
     }
 
     if (!changesDetected()) {
       displayPopupMessage('No changes detected.', 'error');
+      return;
+    }
+
+    if (titleValue !== wishlistItem.title && itemAlreadyInWishlist()) {
       return;
     }
 
@@ -109,16 +115,83 @@ export default function WishlistItemForm({
         return;
       }
 
-      const setErrorMessage: ((errMessage: string | null) => void) | undefined = addWishlistItemErrFieldRecord[errReason];
+      const setErrorMessage: ((errMessage: string | null) => void) | undefined = wishlistItemErrFieldRecord[errReason];
       setErrorMessage && setErrorMessage(errMessage);
     }
   }
 
   async function editWishlistItem(): Promise<void> {
-    // TODO: continue implementation
+    if (!wishlistItem) {
+      displayPopupMessage('Something went wrong.', 'error');
+      return;
+    }
+
+    const itemId: number | undefined = wishlistItem.item_id;
+
+    const title: string = titleValue;
+    const description: string | null = descriptionValue || null;
+    const link: string | null = linkValue || null;
+    const tags: string[] = [...itemTags];
+
+    try {
+      const updatedWishlistItem: WishlistItemInterface = (
+        await editWishlistItemService({ wishlistId, itemId, title, description, link, tags })
+      ).data;
+
+      setWishlistItems((prev) =>
+        prev.map((wishlistItem: WishlistItemInterface) => {
+          if (wishlistItem.item_id !== itemId) {
+            return wishlistItem;
+          }
+
+          return updatedWishlistItem;
+        })
+      );
+
+      displayPopupMessage('Item updated.', 'success');
+      onFinish();
+    } catch (err: unknown) {
+      console.log(err);
+      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+
+      if (!asyncErrorData) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      const { status, errMessage, errReason, errResData } = asyncErrorData;
+      displayPopupMessage(errMessage, 'error');
+
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (status === 404) {
+        if (errReason === 'wishlistNotFound') {
+          navigate(referrerLocation || '/account');
+          return;
+        }
+
+        setWishlistItems((prev) => prev.filter((item: WishlistItemInterface) => item.item_id !== wishlistItem.item_id));
+        return;
+      }
+
+      if (status === 409) {
+        handleDuplicateItemTitle(errResData);
+        return;
+      }
+
+      if (!errReason || status !== 400) {
+        return;
+      }
+
+      const setErrorMessage: ((errMessage: string | null) => void) | undefined = wishlistItemErrFieldRecord[errReason];
+      setErrorMessage && setErrorMessage(errMessage);
+    }
   }
 
-  const addWishlistItemErrFieldRecord: Record<string, (errorMessage: string | null) => void> = useMemo(
+  const wishlistItemErrFieldRecord: Record<string, (errorMessage: string | null) => void> = useMemo(
     () => ({
       invalidTitle: setTitleErrorMessage,
       invalidDescription: setDescriptionErrorMessage,
