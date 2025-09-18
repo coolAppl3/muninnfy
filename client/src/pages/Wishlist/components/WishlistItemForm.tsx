@@ -291,7 +291,7 @@ export default function WishlistItemForm({
 
   return (
     <form
-      className='wishlist-item-form'
+      className={`wishlist-item-form ${formMode === 'EDIT_ITEM' ? 'edit-mode' : ''}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 

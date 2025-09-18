@@ -128,6 +128,22 @@ main {
   form.wishlist-item-form {
     @apply bg-secondary grid gap-2 rounded-sm shadow-simple-tiny overflow-hidden relative z-0;
 
+    &.edit-mode {
+      .btn-container {
+        @apply sm:flex-col md:flex-row;
+
+        button {
+          &:first-child {
+            @apply sm:w-full md:w-fit sm:order-2 md:order-1;
+          }
+
+          &:last-child {
+            @apply sm:w-full md:w-fit sm:order-1 md:order-2;
+          }
+        }
+      }
+    }
+
     .btn-container {
       @apply flex flex-col sm:flex-row justify-start items-center gap-1;
     }
