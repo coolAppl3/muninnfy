@@ -31,16 +31,16 @@ export default function WishlistItemForm({
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const [titleValue, setTitleValue] = useState<string>('');
+  const [titleValue, setTitleValue] = useState<string>(wishlistItem?.title || '');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
-  const [descriptionValue, setDescriptionValue] = useState<string>('');
+  const [descriptionValue, setDescriptionValue] = useState<string>(wishlistItem?.description || '');
   const [descriptionErrorMessage, setDescriptionErrorMessage] = useState<string | null>(null);
 
-  const [linkValue, setLinkValue] = useState<string>('');
+  const [linkValue, setLinkValue] = useState<string>(wishlistItem?.link || '');
   const [linkErrorMessage, setLinkErrorMessage] = useState<string | null>(null);
 
-  const [itemTags, setItemTags] = useState<Set<string>>(new Set());
+  const [itemTags, setItemTags] = useState<Set<string>>(new Set(wishlistItem?.tags.map(({ name }) => name) || []));
 
   const { setAuthStatus } = useAuth();
   const { referrerLocation } = useHistory();
@@ -49,6 +49,22 @@ export default function WishlistItemForm({
   const { displayPopupMessage } = usePopupMessage();
 
   async function handleSubmit(): Promise<void> {
+    if (formMode === 'NEW_ITEM' && !itemAlreadyInWishlist()) {
+      await addWishlistItem();
+      onFinish();
+
+      return;
+    }
+
+    if (!changesDetected()) {
+      displayPopupMessage('No changes detected.', 'error');
+      return;
+    }
+
+    await editWishlistItem();
+  }
+
+  async function addWishlistItem(): Promise<void> {
     const title: string = titleValue;
     const description: string | null = descriptionValue || null;
     const link: string | null = linkValue || null;
@@ -95,12 +111,16 @@ export default function WishlistItemForm({
         return;
       }
 
-      const setErrorMessage: ((errMessage: string | null) => void) | undefined = errFieldRecord[errReason];
+      const setErrorMessage: ((errMessage: string | null) => void) | undefined = addWishlistItemErrFieldRecord[errReason];
       setErrorMessage && setErrorMessage(errMessage);
     }
   }
 
-  const errFieldRecord: Record<string, (errorMessage: string | null) => void> = useMemo(
+  async function editWishlistItem(): Promise<void> {
+    // TODO: continue implementation
+  }
+
+  const addWishlistItemErrFieldRecord: Record<string, (errorMessage: string | null) => void> = useMemo(
     () => ({
       invalidTitle: setTitleErrorMessage,
       invalidDescription: setDescriptionErrorMessage,
@@ -140,6 +160,36 @@ export default function WishlistItemForm({
     return itemExists;
   }
 
+  function changesDetected(): boolean {
+    if (!wishlistItem) {
+      return false;
+    }
+
+    if (titleValue !== wishlistItem.title) {
+      return true;
+    }
+
+    if (linkValue !== wishlistItem.link) {
+      return true;
+    }
+
+    if (descriptionValue !== wishlistItem.description) {
+      return true;
+    }
+
+    if (itemTags.size !== wishlistItem.tags.length) {
+      return true;
+    }
+
+    for (const { name } of wishlistItem.tags) {
+      if (!itemTags.has(name)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   function clearForm(): void {
     setTitleValue('');
     setTitleErrorMessage(null);
@@ -159,7 +209,7 @@ export default function WishlistItemForm({
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
-        if (isSubmitting || !allFieldsValid() || itemAlreadyInWishlist()) {
+        if (isSubmitting || !allFieldsValid()) {
           return;
         }
 

@@ -20,6 +20,7 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
       <div className='wishlist-item p-2'>
         <WishlistItemForm
           formMode='EDIT_ITEM'
+          wishlistItem={item}
           onFinish={() => setIsEditing(false)}
         />
       </div>
