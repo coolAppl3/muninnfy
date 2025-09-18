@@ -27,7 +27,7 @@ export default function WishlistItemForm({
   wishlistItem?: WishlistItemInterface;
   onFinish: () => void;
 }): JSX.Element {
-  const { wishlistId, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
+  const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -87,7 +87,7 @@ export default function WishlistItemForm({
         return;
       }
 
-      const { status, errMessage, errReason } = asyncErrorData;
+      const { status, errMessage, errReason, errResData } = asyncErrorData;
       displayPopupMessage(errMessage, 'error');
 
       if (status === 401) {
@@ -100,9 +100,8 @@ export default function WishlistItemForm({
         return;
       }
 
-      if (status === 409) {
-        // errReason === 'duplicateItemTitle'
-        // TODO: fix
+      if (status === 409 && errReason === 'duplicateItemTitle') {
+        handleDuplicateItemTitle(errResData);
         return;
       }
 
@@ -127,6 +126,21 @@ export default function WishlistItemForm({
     }),
     []
   );
+
+  function handleDuplicateItemTitle(errResData: unknown): void {
+    if (!errResData || typeof errResData !== 'object') {
+      return;
+    }
+
+    if (!('existingWishlistItem' in errResData)) {
+      return;
+    }
+
+    const existingWishlistItem = errResData.existingWishlistItem as WishlistItemInterface;
+    const itemExists: boolean = wishlistItems.some((item: WishlistItemInterface) => item.item_id === existingWishlistItem.item_id);
+
+    itemExists || setWishlistItems((prev) => [...prev, existingWishlistItem]);
+  }
 
   function allFieldsValid(): boolean {
     const newTitleErrorMessage: string | null = validateWishlistItemTitle(titleValue);
