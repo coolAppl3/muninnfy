@@ -14,7 +14,7 @@ import useHistory from '../../hooks/useHistory';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import WishlistProvider from './WishlistProvider';
 import WishlistItems from './WishlistItems/WishlistItems';
-import NewWishlistItemFormContainer from './NewWishlistItemFormContainer/NewWishlistItemForm';
+import NewWishlistItemFormContainer from './NewWishlistItemFormContainer/NewWishlistItemFormContainer';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
