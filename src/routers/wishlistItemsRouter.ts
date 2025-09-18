@@ -151,6 +151,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       title: string;
       description: string | null;
       link: string | null;
+      is_purchased: boolean;
       tags: {
         id: number;
         name: string;
@@ -163,6 +164,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       title,
       description,
       link,
+      is_purchased: false,
       tags: [...itemTags],
     };
 
