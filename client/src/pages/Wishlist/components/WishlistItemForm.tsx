@@ -27,7 +27,7 @@ export default function WishlistItemForm({
   wishlistItem?: WishlistItemInterface;
   onFinish: () => void;
 }): JSX.Element {
-  const { wishlistId, setWishlistItems, wishlistItemsTitleSet, setWishlistItemsTitleSet } = useWishlist();
+  const { wishlistId, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -72,9 +72,7 @@ export default function WishlistItemForm({
 
     try {
       const wishlistItem: WishlistItemInterface = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
-
       setWishlistItems((prev) => [...prev, wishlistItem]);
-      setWishlistItemsTitleSet((prev) => new Set(prev).add(wishlistItem.title.toLowerCase()));
 
       displayPopupMessage('Item added.', 'success');
       clearForm();
@@ -103,7 +101,8 @@ export default function WishlistItemForm({
       }
 
       if (status === 409) {
-        errReason === 'duplicateItemTitle' && setWishlistItemsTitleSet((prev) => new Set(prev).add(title.toLowerCase()));
+        // errReason === 'duplicateItemTitle'
+        // TODO: fix
         return;
       }
 

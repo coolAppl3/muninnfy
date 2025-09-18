@@ -12,7 +12,6 @@ export interface WishlistContextInterface {
   setWishlistItems: Dispatch<SetStateAction<WishlistItemInterface[]>>;
 
   wishlistItemsTitleSet: Set<string>;
-  setWishlistItemsTitleSet: Dispatch<SetStateAction<Set<string>>>;
 }
 
 const WishlistContext = createContext<WishlistContextInterface | null>(null);
