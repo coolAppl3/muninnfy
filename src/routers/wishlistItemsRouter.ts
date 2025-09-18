@@ -19,6 +19,19 @@ import { insertWishlistItemTags } from '../db/helpers/wishlistItemTagsDbHelpers'
 
 export const wishlistItemsRouter: Router = express.Router();
 
+interface MappedWishlistItem {
+  item_id: number;
+  added_on_timestamp: number;
+  title: string;
+  description: string | null;
+  link: string | null;
+  is_purchased: boolean;
+  tags: {
+    id: number;
+    name: string;
+  }[];
+}
+
 wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
   const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
 
@@ -127,7 +140,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     const wishlistItemId: number = resultSetHeader.insertId;
     const sanitizedTags: [number, string][] = sanitizeWishlistItemTags(tags, wishlistItemId);
 
-    sanitizedTags.length > 0 && insertWishlistItemTags(sanitizedTags, connection, req);
+    sanitizedTags.length > 0 && (await insertWishlistItemTags(sanitizedTags, connection, req));
 
     interface Tag extends RowDataPacket {
       id: number;
@@ -144,19 +157,6 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
         item_id = ?;`,
       [wishlistItemId]
     );
-
-    interface MappedWishlistItem {
-      item_id: number;
-      added_on_timestamp: number;
-      title: string;
-      description: string | null;
-      link: string | null;
-      is_purchased: boolean;
-      tags: {
-        id: number;
-        name: string;
-      }[];
-    }
 
     const mappedWishlistItem: MappedWishlistItem = {
       item_id: wishlistItemId,
