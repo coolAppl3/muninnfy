@@ -369,7 +369,7 @@ export default function WishlistItemForm({
           isSubmitBtn={true}
           className='bg-cta border-cta w-full order-1 sm:w-fit sm:order-2'
         >
-          Add wishlist item
+          {wishlistItem ? 'Update wishlist item' : 'Add wishlist item'}
         </Button>
       </div>
     </form>
