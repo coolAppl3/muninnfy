@@ -287,7 +287,6 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     interface WishlistItemDetails extends RowDataPacket {
       added_on_timestamp: number;
       is_purchased: boolean;
-      title_in_use: boolean;
       tags_count: number;
       is_wishlist_owner: boolean;
     }
@@ -296,7 +295,6 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       `SELECT
         added_on_timestamp,
         is_purchased,
-        EXISTS (SELECT 1 FROM wishlist_items WHERE wishlist_id = :wishlistId AND title = :title) AS title_in_use,
         (SELECT COUNT(*) FROM wishlist_item_tags WHERE item_id = :itemId) AS tags_count,
         EXISTS (SELECT 1 FROM wishlists WHERE wishlist_id = :wishlistId AND account_id = :accountId) AS is_wishlist_owner
       FROM
@@ -319,27 +317,6 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     if (!wishlistItemDetails.is_wishlist_owner) {
       await connection.rollback();
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
-
-      return;
-    }
-
-    if (wishlistItemDetails.title_in_use) {
-      await connection.rollback();
-
-      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(
-        requestData.title,
-        requestData.wishlistId,
-        dbPool,
-        req
-      );
-
-      existingWishlistItem
-        ? res.status(409).json({
-            message: 'Wishlist already contains this item.',
-            reason: 'duplicateItemTitle',
-            resData: { duplicateWishlistItem: existingWishlistItem },
-          })
-        : res.status(500).json({ message: 'Internal server error.' });
 
       return;
     }
