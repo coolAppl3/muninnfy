@@ -4,6 +4,7 @@ import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
+import WishlistItemForm from '../../components/WishlistItemForm';
 
 export default function WishlistItem({ item }: { item: WishlistItemInterface }): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -12,6 +13,17 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
 
   async function removeWishlistItem(): Promise<void> {
     // TODO: implement
+  }
+
+  if (isEditing) {
+    return (
+      <div className='wishlist-item p-2'>
+        <WishlistItemForm
+          formMode='EDIT_ITEM'
+          onFinish={() => setIsEditing(false)}
+        />
+      </div>
+    );
   }
 
   return (

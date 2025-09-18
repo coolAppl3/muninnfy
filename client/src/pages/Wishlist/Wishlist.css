@@ -105,10 +105,10 @@ main {
     }
   }
 
-  .wishlist-item-form {
+  .wishlist-item-form-container {
     @apply relative z-0;
 
-    .wishlist-item-form-container {
+    .inner-container {
       @apply grid grid-rows-[auto_0fr] transition-[grid] rounded-sm;
 
       &.expanded {
@@ -118,18 +118,18 @@ main {
           @apply hidden;
         }
 
-        form {
+        form.wishlist-item-form {
           @apply p-2;
         }
       }
+    }
+  }
 
-      form {
-        @apply bg-secondary grid gap-2 rounded-sm shadow-simple-tiny overflow-hidden relative z-0;
+  form.wishlist-item-form {
+    @apply bg-secondary grid gap-2 rounded-sm shadow-simple-tiny overflow-hidden relative z-0;
 
-        .btn-container {
-          @apply flex flex-col sm:flex-row justify-start items-center gap-1;
-        }
-      }
+    .btn-container {
+      @apply flex flex-col sm:flex-row justify-start items-center gap-1;
     }
   }
 
@@ -152,6 +152,10 @@ main {
           .body {
             @apply flex;
           }
+        }
+
+        form.wishlist-item-form {
+          @apply shadow-none overflow-visible;
         }
 
         .header {

@@ -1,8 +1,7 @@
 import { ChangeEvent, FormEvent, JSX, useMemo, useState } from 'react';
-import Container from '../../../components/Container/Container';
 import TextareaFormGroup from '../../../components/FormGroups/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
-import WishlistItemTagsFormGroup from '../components/WishlistItemTagsFormGroup';
+import WishlistItemTagsFormGroup from './WishlistItemTagsFormGroup';
 import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
 import {
   validateWishlistItemDescription,
@@ -19,10 +18,17 @@ import { AsyncErrorData, getAsyncErrorData } from '../../../utils/errorUtils';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
-export default function WishlistItemForm(): JSX.Element {
+export default function WishlistItemForm({
+  formMode,
+  wishlistItem,
+  onFinish,
+}: {
+  formMode: 'NEW_ITEM' | 'EDIT_ITEM';
+  wishlistItem?: WishlistItemInterface;
+  onFinish: () => void;
+}): JSX.Element {
   const { wishlistId, setWishlistItems, wishlistItemsTitleSet, setWishlistItemsTitleSet } = useWishlist();
 
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [titleValue, setTitleValue] = useState<string>('');
@@ -56,6 +62,8 @@ export default function WishlistItemForm(): JSX.Element {
 
       displayPopupMessage('Item added.', 'success');
       clearForm();
+
+      onFinish();
     } catch (err: unknown) {
       console.log(err);
       const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
@@ -146,100 +154,88 @@ export default function WishlistItemForm(): JSX.Element {
   }
 
   return (
-    <section className='wishlist-item-form'>
-      <Container>
-        <div className={`wishlist-item-form-container ${isExpanded ? 'expanded' : ''}`}>
-          <Button
-            className='expand-form-btn bg-cta border-cta w-full sm:w-fit h-fit'
-            onClick={() => setIsExpanded((prev) => !prev)}
-          >
-            New wishlist item
-          </Button>
+    <form
+      className='wishlist-item-form'
+      onSubmit={async (e: FormEvent) => {
+        e.preventDefault();
 
-          <form
-            onSubmit={async (e: FormEvent) => {
-              e.preventDefault();
+        if (isSubmitting || !allFieldsValid() || itemAlreadyInWishlist()) {
+          return;
+        }
 
-              if (isSubmitting || !allFieldsValid() || itemAlreadyInWishlist()) {
-                return;
-              }
+        setIsSubmitting(true);
+        displayLoadingOverlay();
 
-              setIsSubmitting(true);
-              displayLoadingOverlay();
+        await handleSubmit();
 
-              await handleSubmit();
+        setIsSubmitting(false);
+        removeLoadingOverlay();
+      }}
+    >
+      <DefaultFormGroup
+        id='item-title'
+        label='Title'
+        autoComplete='off'
+        value={titleValue}
+        errorMessage={titleErrorMessage}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          const newValue: string = e.target.value;
 
-              setIsSubmitting(false);
-              removeLoadingOverlay();
-            }}
-          >
-            <DefaultFormGroup
-              id='item-title'
-              label='Title'
-              autoComplete='off'
-              value={titleValue}
-              errorMessage={titleErrorMessage}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                const newValue: string = e.target.value;
+          setTitleValue(newValue);
+          setTitleErrorMessage(validateWishlistItemTitle(newValue));
+        }}
+      />
 
-                setTitleValue(newValue);
-                setTitleErrorMessage(validateWishlistItemTitle(newValue));
-              }}
-            />
+      <DefaultFormGroup
+        id='item-link'
+        label='Link (optional)'
+        autoComplete='off'
+        value={linkValue}
+        errorMessage={linkErrorMessage}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          const newValue: string = e.target.value;
 
-            <DefaultFormGroup
-              id='item-link'
-              label='Link (optional)'
-              autoComplete='off'
-              value={linkValue}
-              errorMessage={linkErrorMessage}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                const newValue: string = e.target.value;
+          setLinkValue(newValue);
+          setLinkErrorMessage(validateWishlistItemLink(newValue));
+        }}
+      />
 
-                setLinkValue(newValue);
-                setLinkErrorMessage(validateWishlistItemLink(newValue));
-              }}
-            />
+      <WishlistItemTagsFormGroup
+        itemTags={itemTags}
+        setItemTags={setItemTags}
+      />
 
-            <WishlistItemTagsFormGroup
-              itemTags={itemTags}
-              setItemTags={setItemTags}
-            />
+      <TextareaFormGroup
+        id='item-description'
+        label='Description (optional)'
+        value={descriptionValue}
+        errorMessage={descriptionErrorMessage}
+        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
+          const newValue: string = e.target.value;
 
-            <TextareaFormGroup
-              id='item-description'
-              label='Description (optional)'
-              value={descriptionValue}
-              errorMessage={descriptionErrorMessage}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
-                const newValue: string = e.target.value;
+          setDescriptionValue(newValue);
+          setDescriptionErrorMessage(validateWishlistItemDescription(newValue));
+        }}
+      />
 
-                setDescriptionValue(newValue);
-                setDescriptionErrorMessage(validateWishlistItemDescription(newValue));
-              }}
-            />
+      <div className='btn-container'>
+        <Button
+          className='bg-secondary border-title text-title w-full order-2 sm:w-fit sm:order-1'
+          onClick={() => {
+            clearForm();
+            onFinish();
+          }}
+        >
+          Cancel
+        </Button>
 
-            <div className='btn-container'>
-              <Button
-                className='bg-secondary border-title text-title w-full order-2 sm:w-fit sm:order-1'
-                onClick={() => {
-                  setIsExpanded(false);
-                  clearForm();
-                }}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                isSubmitBtn={true}
-                className='bg-cta border-cta w-full order-1 sm:w-fit sm:order-2'
-              >
-                Add wishlist item
-              </Button>
-            </div>
-          </form>
-        </div>
-      </Container>
-    </section>
+        <Button
+          isSubmitBtn={true}
+          className='bg-cta border-cta w-full order-1 sm:w-fit sm:order-2'
+        >
+          Add wishlist item
+        </Button>
+      </div>
+    </form>
   );
 }
