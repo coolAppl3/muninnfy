@@ -200,7 +200,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
         ? res.status(409).json({
             message: 'Wishlist already contains this item.',
             reason: 'duplicateItemTitle',
-            resData: { duplicateWishlistItem: existingWishlistItem },
+            resData: { existingWishlistItem },
           })
         : res.status(500).json({ message: 'Internal server error.' });
 
@@ -416,7 +416,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
         ? res.status(409).json({
             message: 'Wishlist already contains this item.',
             reason: 'duplicateItemTitle',
-            resData: { duplicateWishlistItem: existingWishlistItem },
+            resData: { existingWishlistItem },
           })
         : res.status(500).json({ message: 'Internal server error.' });
 
