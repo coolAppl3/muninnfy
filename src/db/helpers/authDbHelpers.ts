@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { RowDataPacket } from 'mysql2/promise';
 import { dbPool } from '../db';
+import { removeRequestCookie } from '../../util/cookieUtils';
 
 export async function getAccountIdByAuthSessionId(authSessionId: string, res: Response): Promise<number | null> {
   const currentTimestamp: number = Date.now();
@@ -26,11 +27,15 @@ export async function getAccountIdByAuthSessionId(authSessionId: string, res: Re
 
     if (!authSessionDetails) {
       res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
+      removeRequestCookie(res, 'authSessionId', true);
+
       return null;
     }
 
     if (currentTimestamp >= authSessionDetails.expiry_timestamp) {
       res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
+      removeRequestCookie(res, 'authSessionId', true);
+
       return null;
     }
 
