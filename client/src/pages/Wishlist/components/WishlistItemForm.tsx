@@ -111,7 +111,7 @@ export default function WishlistItemForm({
         return;
       }
 
-      if (!errReason || ![400, 409].includes(status)) {
+      if (!errReason || status !== 400) {
         return;
       }
 
