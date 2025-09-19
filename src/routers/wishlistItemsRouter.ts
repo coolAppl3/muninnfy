@@ -233,7 +233,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
   }
 
   if (!Number.isInteger(itemId)) {
-    res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidWishlistItemId' });
+    res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidItemId' });
     return;
   }
 
