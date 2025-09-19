@@ -151,3 +151,17 @@ export async function purgeAuthSessions(userId: number): Promise<void> {
     console.log(err);
   }
 }
+
+export async function deleteExpiredAuthSessionsCron(currentTimestamp: number): Promise<void> {
+  try {
+    await dbPool.execute(
+      `DELETE FROM
+        auth_sessions
+      WHERE
+        expiry_timestamp <= ?;`,
+      [currentTimestamp]
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
