@@ -127,7 +127,7 @@ authRouter.delete('/session', async (req: Request, res: Response) => {
     );
 
     if (resultSetHeader.affectedRows === 0) {
-      await logUnexpectedError(req, null, 'Failed to delete auth_sessions row on sign out.');
+      await logUnexpectedError(req, null, 'failed to delete auth_sessions');
     }
   } catch (err: unknown) {
     console.log(err);
