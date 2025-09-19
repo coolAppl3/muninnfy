@@ -137,7 +137,7 @@ export async function destroyAuthSession(sessionId: string): Promise<void> {
   }
 }
 
-export async function purgeAuthSessions(userId: number, userType: 'account' | 'guest'): Promise<void> {
+export async function purgeAuthSessions(userId: number): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
