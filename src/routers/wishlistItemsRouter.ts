@@ -403,3 +403,75 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     connection?.release();
   }
 });
+
+wishlistItemsRouter.delete('/:itemId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const itemId: number | null = req.params.itemId ? +req.params.itemId : null;
+
+  if (!itemId || !Number.isInteger(itemId)) {
+    res.status(400).json({ message: 'invalid wishlist item ID.', reason: 'invalidItemId' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    interface WishlistItemDetails extends RowDataPacket {
+      is_wishlist_owner: boolean;
+    }
+
+    const [wishlistItemRows] = await dbPool.execute<WishlistItemDetails[]>(
+      `SELECT
+        (SELECT 1 FROM wishlists WHERE wishlist_id = wishlist_items.wishlist_id AND account_id = ?) AS is_wishlist_owner
+      FROM
+        wishlist_items
+      WHERE
+        item_id = ?;`,
+      [accountId, itemId]
+    );
+
+    const wishlistItemDetails: WishlistItemDetails | undefined = wishlistItemRows[0];
+
+    if (!wishlistItemDetails) {
+      res.json({});
+      return;
+    }
+
+    if (!wishlistItemDetails.is_wishlist_owner) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `DELETE FROM
+        wishlist_items
+      WHERE
+        item_id = ?;`,
+      [itemId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
