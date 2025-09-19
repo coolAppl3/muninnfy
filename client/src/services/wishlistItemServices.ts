@@ -29,3 +29,7 @@ interface EditWishlistItemServicePayload {
 export async function editWishlistItemService(body: EditWishlistItemServicePayload): Promise<AxiosResponse<WishlistItemInterface>> {
   return axios.patch(wishlistItemsApiUrl, body);
 }
+
+export async function deleteWishlistItemService(itemId: number): Promise<AxiosResponse> {
+  return axios.delete(`${wishlistItemsApiUrl}/${itemId}`);
+}
