@@ -138,8 +138,8 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       [wishlistId, currentTimestamp, title, description, link, false]
     );
 
-    const wishlistItemId: number = resultSetHeader.insertId;
-    const sanitizedTags: [number, string][] = sanitizeWishlistItemTags(tags, wishlistItemId);
+    const itemId: number = resultSetHeader.insertId;
+    const sanitizedTags: [number, string][] = sanitizeWishlistItemTags(tags, itemId);
 
     sanitizedTags.length > 0 && (await insertWishlistItemTags(sanitizedTags, connection, req));
 
@@ -156,11 +156,11 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
         wishlist_item_tags
       WHERE
         item_id = ?;`,
-      [wishlistItemId]
+      [itemId]
     );
 
     const mappedWishlistItem: MappedWishlistItem = {
-      item_id: wishlistItemId,
+      item_id: itemId,
       added_on_timestamp: currentTimestamp,
       title,
       description,
