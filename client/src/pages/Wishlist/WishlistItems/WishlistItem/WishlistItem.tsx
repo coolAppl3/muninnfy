@@ -5,14 +5,59 @@ import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
+import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
+import { deleteWishlistItemService } from '../../../../services/wishlistItemServices';
+import useWishlist from '../../useWishlist';
+import usePopupMessage from '../../../../hooks/usePopupMessage';
+import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils';
+import useAuth from '../../../../hooks/useAuth';
+import useHistory from '../../../../hooks/useHistory';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 export default function WishlistItem({ item }: { item: WishlistItemInterface }): JSX.Element {
+  const { setWishlistItems } = useWishlist();
+
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
+  const { setAuthStatus } = useAuth();
+  const { referrerLocation } = useHistory();
+  const navigate: NavigateFunction = useNavigate();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
+  const { displayPopupMessage } = usePopupMessage();
+
   async function removeWishlistItem(): Promise<void> {
-    // TODO: implement
+    displayLoadingOverlay();
+
+    try {
+      await deleteWishlistItemService(item.item_id);
+      setWishlistItems((prev) => prev.filter((existingItem: WishlistItemInterface) => existingItem.item_id !== item.item_id));
+
+      displayPopupMessage('Item removed.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+
+      if (!asyncErrorData) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      const { status, errMessage } = asyncErrorData;
+      displayPopupMessage(errMessage, 'error');
+
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (status === 404) {
+        navigate(referrerLocation || '/account');
+      }
+    } finally {
+      removeLoadingOverlay();
+    }
   }
 
   if (isEditing) {
