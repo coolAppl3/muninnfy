@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.0.21] (2024-09-19)
+
+### Features
+
+- Added `getShortenedDateString()` to `globalUtils`.
+- Added `WishlistItems` and `WishlistItem` components (mostly implemented).
+- Added `wishlistItemTagsDbHelpers` with `insertWishlistItemTags()` and `deleteWishlistItemTags()`.
+- Added PATCH `wishlistItems`.
+- Added `editWishlistItemService()`.
+
+
+### Bug Fixes
+
+- Fixed `Wishlist` CSS file being imported to the wrong component.
+- Fixed `is_purchased` not being included in the fetched wishlist items in `Wishlist`.
+
+
+### Code Refactoring
+
+- Improved clarity for label in `WishlistItemTagsFormGroup`.
+- Renamed `WishlistDetails` and `WishlistItem` interfaces to `WishlistDetailsInterface` and `WishlistItemInterface` respectively to avoid name conflicts.
+
+
 ## [0.0.20] (2024-09-14)
 
 ### Features
