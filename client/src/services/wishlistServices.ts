@@ -19,18 +19,19 @@ export async function createWishlistAsAccountService(
   return axios.post(wishlistsApiUrl, body);
 }
 
-export interface WishlistDetails {
+export interface WishlistDetailsInterface {
   privacy_level: number;
   title: string;
   created_on_timestamp: number;
 }
 
-export interface WishlistItem {
+export interface WishlistItemInterface {
   item_id: number;
   added_on_timestamp: number;
   title: string;
   description: string | null;
   link: string | null;
+  is_purchased: boolean;
   tags: {
     id: number;
     name: string;
@@ -38,8 +39,8 @@ export interface WishlistItem {
 }
 
 interface getWishlistDetailsData {
-  wishlistDetails: WishlistDetails;
-  wishlistItems: WishlistItem[];
+  wishlistDetails: WishlistDetailsInterface;
+  wishlistItems: WishlistItemInterface[];
 }
 
 export async function getWishlistDetailsService(

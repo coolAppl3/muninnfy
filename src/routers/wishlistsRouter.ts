@@ -194,6 +194,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       title: string;
       description: string | null;
       link: string | null;
+      is_purchased: boolean;
       tag_id: number;
       tag_name: string;
     }
@@ -205,6 +206,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
         wishlist_items.title,
         wishlist_items.description,
         wishlist_items.link,
+        wishlist_items.is_purchased,
         wishlist_item_tags.tag_id,
         wishlist_item_tags.tag_name
       FROM 
@@ -222,6 +224,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       title: string;
       description: string | null;
       link: string | null;
+      is_purchased: boolean;
       tags: {
         id: number;
         name: string;
