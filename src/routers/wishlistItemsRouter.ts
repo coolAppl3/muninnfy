@@ -1,6 +1,5 @@
 import express, { Router, Request, Response } from 'express';
 import { isValidUuid } from '../util/tokenGenerator';
-import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import {
   isValidWishlistItemDescription,
@@ -17,6 +16,7 @@ import { WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { sanitizeWishlistItemTags } from '../util/validation/wishlistItemTagValidation';
 import { deleteWishlistItemTags, insertWishlistItemTags } from '../db/helpers/wishlistItemTagsDbHelpers';
 import { getWishlistItemByTitle } from '../db/helpers/wishlistItemsDbHelpers';
+import { getAuthSessionId } from '../auth/authUtils';
 
 export const wishlistItemsRouter: Router = express.Router();
 
@@ -34,17 +34,9 @@ interface MappedWishlistItem {
 }
 
 wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -215,17 +207,9 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 });
 
 wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 

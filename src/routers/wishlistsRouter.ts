@@ -1,5 +1,4 @@
 import express, { Router, Request, Response } from 'express';
-import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
@@ -11,21 +10,14 @@ import { TOTAL_WISHLISTS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { getWishlistPrivacyLevelName } from '../util/wishlistUtils';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
+import { getAuthSessionId } from '../auth/authUtils';
 
 export const wishlistsRouter: Router = express.Router();
 
 wishlistsRouter.post('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -134,17 +126,9 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 });
 
 wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -274,17 +258,9 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
 });
 
 wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -374,17 +350,9 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
 });
 
 wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -478,17 +446,9 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
 });
 
 wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 

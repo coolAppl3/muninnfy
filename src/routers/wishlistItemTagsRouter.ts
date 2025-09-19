@@ -1,6 +1,4 @@
 import express, { Router, Request, Response } from 'express';
-import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
-import { isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidWishlistItemTagName } from '../util/validation/wishlistItemTagValidation';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
@@ -10,21 +8,14 @@ import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
+import { getAuthSessionId } from '../auth/authUtils';
 
 export const wishlistItemTagsRouter: Router = express.Router();
 
 wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
