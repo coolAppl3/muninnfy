@@ -11,7 +11,7 @@ export function getAuthSessionId(req: Request, res: Response): string | null {
   }
 
   if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
+    removeRequestCookie(res, 'authSessionId');
     res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
 
     return null;

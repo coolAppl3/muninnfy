@@ -27,14 +27,14 @@ export async function getAccountIdByAuthSessionId(authSessionId: string, res: Re
 
     if (!authSessionDetails) {
       res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-      removeRequestCookie(res, 'authSessionId', true);
+      removeRequestCookie(res, 'authSessionId');
 
       return null;
     }
 
     if (currentTimestamp >= authSessionDetails.expiry_timestamp) {
       res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-      removeRequestCookie(res, 'authSessionId', true);
+      removeRequestCookie(res, 'authSessionId');
 
       return null;
     }

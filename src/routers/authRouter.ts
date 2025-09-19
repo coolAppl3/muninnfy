@@ -19,7 +19,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
   }
 
   if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
+    removeRequestCookie(res, 'authSessionId');
     res.json({ isValidAuthSession: false });
 
     return;
@@ -49,7 +49,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
     const authSessionDetails: AuthSessionDetails | undefined = authRows[0];
 
     if (!authSessionDetails) {
-      removeRequestCookie(res, 'authSessionId', true);
+      removeRequestCookie(res, 'authSessionId');
       res.json({ isValidAuthSession: false });
 
       return;
@@ -58,7 +58,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
     const currentTimestamp: number = Date.now();
 
     if (authSessionDetails.expiry_timestamp <= currentTimestamp) {
-      removeRequestCookie(res, 'authSessionId', true);
+      removeRequestCookie(res, 'authSessionId');
       await destroyAuthSession(authSessionId);
 
       res.json({ isValidAuthSession: false });
@@ -108,13 +108,13 @@ authRouter.delete('/session', async (req: Request, res: Response) => {
   }
 
   if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
+    removeRequestCookie(res, 'authSessionId');
     res.json({});
 
     return;
   }
 
-  removeRequestCookie(res, 'authSessionId', true);
+  removeRequestCookie(res, 'authSessionId');
   res.json({});
 
   try {
