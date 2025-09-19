@@ -34,17 +34,19 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, itemId, tagName } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!Number.isInteger(requestData.itemId)) {
+  if (!Number.isInteger(itemId)) {
     res.status(400).json({ message: 'Invalid item Id.', reason: 'invalidItemId' });
     return;
   }
 
-  if (!isValidWishlistItemTagName(requestData.tagName)) {
+  if (!isValidWishlistItemTagName(tagName)) {
     res.status(400).json({ message: 'Invalid tag name.', reason: 'invalidTagName' });
     return;
   }
@@ -68,7 +70,7 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
       WHERE
         wishlist_id = ? AND
         account_id = ?;`,
-      [requestData.itemId, requestData.wishlistId, accountId]
+      [itemId, wishlistId, accountId]
     );
 
     const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
@@ -88,7 +90,7 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
         item_id,
         tag_name
       ) VALUES (${generatePlaceHolders(2)});`,
-      [requestData.itemId, requestData.tagName]
+      [itemId, tagName]
     );
 
     res.status(201).json({ tagId: resultSetHeader.insertId });

@@ -56,22 +56,24 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, title, description, link, tags } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!isValidWishlistItemTitle(requestData.title)) {
+  if (!isValidWishlistItemTitle(title)) {
     res.status(400).json({ message: 'Invalid title.', reason: 'invalidTitle' });
     return;
   }
 
-  if (requestData.description && !isValidWishlistItemDescription(requestData.description)) {
+  if (description && !isValidWishlistItemDescription(description)) {
     res.status(400).json({ message: 'Invalid description.', reason: 'invalidDescription' });
     return;
   }
 
-  if (requestData.link && !isValidWishlistItemLink(requestData.link)) {
+  if (link && !isValidWishlistItemLink(link)) {
     res.status(400).json({ message: 'Invalid link.', reason: 'invalidLink' });
     return;
   }
@@ -97,7 +99,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       WHERE
         wishlist_id = :wishlistId AND
         account_id = :accountId;`,
-      { wishlistId: requestData.wishlistId, accountId }
+      { wishlistId, accountId }
     );
 
     const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
@@ -112,7 +114,6 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const { wishlistId, title, description, link, tags } = requestData;
     const currentTimestamp: number = Date.now();
 
     connection = await dbPool.getConnection();
@@ -181,13 +182,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     const sqlError: SqlError = err;
 
     if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
-      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(
-        requestData.title,
-        requestData.wishlistId,
-        dbPool,
-        req
-      );
-
+      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
       existingWishlistItem
         ? res.status(409).json({
             message: 'Wishlist already contains this item.',
@@ -230,27 +225,29 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, itemId, title, description, link, tags } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!Number.isInteger(requestData.itemId)) {
+  if (!Number.isInteger(itemId)) {
     res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidWishlistItemId' });
     return;
   }
 
-  if (!isValidWishlistItemTitle(requestData.title)) {
+  if (!isValidWishlistItemTitle(title)) {
     res.status(400).json({ message: 'Invalid title.', reason: 'invalidTitle' });
     return;
   }
 
-  if (requestData.description && !isValidWishlistItemDescription(requestData.description)) {
+  if (description && !isValidWishlistItemDescription(description)) {
     res.status(400).json({ message: 'Invalid description.', reason: 'invalidDescription' });
     return;
   }
 
-  if (requestData.link && !isValidWishlistItemLink(requestData.link)) {
+  if (link && !isValidWishlistItemLink(link)) {
     res.status(400).json({ message: 'Invalid link.', reason: 'invalidLink' });
     return;
   }
@@ -262,7 +259,6 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
   }
 
   let connection;
-  const { wishlistId, itemId, title, description, link, tags } = requestData;
 
   try {
     connection = await dbPool.getConnection();
@@ -329,7 +325,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     if (wishlistItemDetails.tags_count !== 0 && sanitizedTags.length !== 0) {
       const deletedSuccessfully: boolean =
-        wishlistItemDetails.tags_count === 0 ? true : await deleteWishlistItemTags(requestData.itemId, connection, req);
+        wishlistItemDetails.tags_count === 0 ? true : await deleteWishlistItemTags(itemId, connection, req);
 
       const insertedSuccessfully: boolean =
         sanitizedTags.length === 0 ? true : await insertWishlistItemTags(sanitizedTags, connection, req);
@@ -388,12 +384,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     const sqlError: SqlError = err;
 
     if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
-      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(
-        requestData.title,
-        requestData.wishlistId,
-        dbPool,
-        req
-      );
+      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
 
       existingWishlistItem
         ? res.status(409).json({

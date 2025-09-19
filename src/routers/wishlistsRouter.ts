@@ -34,12 +34,14 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidWishlistPrivacyLevel(requestData.privacyLevel)) {
+  const { privacyLevel, title } = requestData;
+
+  if (!isValidWishlistPrivacyLevel(privacyLevel)) {
     res.status(400).json({ message: 'Invalid privacy level.', reason: 'invalidPrivacyLevel' });
     return;
   }
 
-  if (!isValidWishlistTitle(requestData.title)) {
+  if (!isValidWishlistTitle(title)) {
     res.status(400).json({ message: 'Invalid title.', reason: 'invalidTitle' });
     return;
   }
@@ -64,7 +66,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         wishlists
       WHERE
         account_id = :accountId;`,
-      { accountId, title: requestData.title }
+      { accountId, title: title }
     );
 
     const accountWishlistsDetails: AccountWishlistsDetails | undefined = accountWishlistsRows[0];
@@ -95,7 +97,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         title,
         created_on_timestamp
       ) VALUES (${generatePlaceHolders(5)});`,
-      [wishlistId, accountId, requestData.privacyLevel, requestData.title, currentTimestamp]
+      [wishlistId, accountId, privacyLevel, title, currentTimestamp]
     );
 
     res.status(201).json({ wishlistId });
@@ -277,12 +279,14 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, newTitle } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!isValidWishlistTitle(requestData.newTitle)) {
+  if (!isValidWishlistTitle(newTitle)) {
     res.status(400).json({ message: 'Invalid wishlist title.', reason: 'invalidTitle' });
     return;
   }
@@ -306,7 +310,7 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
       WHERE
         wishlist_id = ? AND
         account_id = ?;`,
-      [requestData.wishlistId, accountId]
+      [wishlistId, accountId]
     );
 
     const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
@@ -316,7 +320,7 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
       return;
     }
 
-    if (wishlistDetails.title === requestData.newTitle) {
+    if (wishlistDetails.title === newTitle) {
       res.status(409).json({ message: 'Wishlist already has this title.', reason: 'identicalTitle' });
       return;
     }
@@ -328,7 +332,7 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
         title = ?
       WHERE
         wishlist_id = ?;`,
-      [requestData.newTitle, requestData.wishlistId]
+      [newTitle, wishlistId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
@@ -369,12 +373,14 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, newPrivacyLevel } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!isValidWishlistPrivacyLevel(requestData.newPrivacyLevel)) {
+  if (!isValidWishlistPrivacyLevel(newPrivacyLevel)) {
     res.status(400).json({ message: 'Invalid privacy level.', reason: 'invalidPrivacyLevel' });
     return;
   }
@@ -398,7 +404,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
       WHERE
         wishlist_id = ? AND
         account_id = ?;`,
-      [requestData.wishlistId, accountId]
+      [wishlistId, accountId]
     );
 
     const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
@@ -408,7 +414,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
       return;
     }
 
-    if (wishlistDetails.privacy_level === requestData.newPrivacyLevel) {
+    if (wishlistDetails.privacy_level === newPrivacyLevel) {
       res.status(409).json({
         message: `Privacy level is already set to ${getWishlistPrivacyLevelName(wishlistDetails.privacy_level).toLowerCase()}.`,
         reason: 'identicalPrivacyLevel',
@@ -424,7 +430,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
         privacy_level = ?
       WHERE
         wishlist_id = ?;`,
-      [requestData.newPrivacyLevel, requestData.wishlistId]
+      [newPrivacyLevel, wishlistId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
