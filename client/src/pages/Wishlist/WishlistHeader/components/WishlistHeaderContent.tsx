@@ -26,6 +26,8 @@ export default function WishlistHeaderContent(): JSX.Element {
 
       <button
         type='button'
+        title='Wishlist menu'
+        aria-label='Wishlist menu'
         onClick={() => setMenuIsOpen((prev) => !prev)}
       >
         <TripleDotMenuIcon />
