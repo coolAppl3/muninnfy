@@ -354,7 +354,6 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
         await connection.rollback();
         res.status(500).json({ message: 'Internal server error.' });
 
-        await logUnexpectedError(req, null, !deletedSuccessfully ? 'failed to delete tags' : 'failed to insert tags');
         return;
       }
     }
