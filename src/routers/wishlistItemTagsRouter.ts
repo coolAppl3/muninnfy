@@ -9,6 +9,7 @@ import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
 import { getAuthSessionId } from '../auth/authUtils';
+import { isValidUuid } from '../util/tokenGenerator';
 
 export const wishlistItemTagsRouter: Router = express.Router();
 
@@ -30,6 +31,11 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
   const expectedKeys: string[] = ['itemId', 'tagName'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  if (!isValidUuid(requestData.wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
