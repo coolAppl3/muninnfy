@@ -38,6 +38,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
           }
       );
 
+      setEditMode(null);
       displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}.`, 'success');
     } catch (err: unknown) {
       console.log(err);
