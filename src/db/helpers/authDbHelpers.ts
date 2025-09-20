@@ -7,12 +7,12 @@ export async function getAccountIdByAuthSessionId(authSessionId: string, res: Re
   const currentTimestamp: number = Date.now();
 
   try {
-    interface AuthSessionDetails extends RowDataPacket {
+    interface AuthSessionDetails {
       account_id: number;
       expiry_timestamp: number;
     }
 
-    const [authSessionRows] = await dbPool.execute<AuthSessionDetails[]>(
+    const [authSessionRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         account_id,
         expiry_timestamp
@@ -23,7 +23,7 @@ export async function getAccountIdByAuthSessionId(authSessionId: string, res: Re
       [authSessionId]
     );
 
-    const authSessionDetails: AuthSessionDetails | undefined = authSessionRows[0];
+    const authSessionDetails = authSessionRows[0] as AuthSessionDetails | undefined;
 
     if (!authSessionDetails) {
       res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });

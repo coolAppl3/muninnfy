@@ -31,12 +31,12 @@ export async function createAuthSession(
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface SessionDetails extends RowDataPacket {
+    interface SessionDetails {
       session_id: string;
       created_on_timestamp: number;
     }
 
-    const [sessionRows] = await connection.execute<SessionDetails[]>(
+    const [sessionRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         session_id,
         created_on_timestamp
@@ -67,7 +67,7 @@ export async function createAuthSession(
       return true;
     }
 
-    const oldestAuthSession: SessionDetails | null = sessionRows.reduce((oldest: SessionDetails | null, current: SessionDetails) => {
+    const oldestAuthSession = (sessionRows as SessionDetails[]).reduce((oldest: SessionDetails | null, current: SessionDetails) => {
       if (!oldest) {
         return current;
       }

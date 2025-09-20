@@ -87,11 +87,11 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
   let connection;
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       wishlist_items_count: number;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         (SELECT COUNT(*) FROM wishlist_items WHERE wishlist_id = :wishlistId) AS wishlist_items_count
       FROM
@@ -102,7 +102,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       { wishlistId, accountId }
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound.' });
@@ -136,12 +136,12 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
     sanitizedTags.length > 0 && (await insertWishlistItemTags(sanitizedTags, connection, req));
 
-    interface Tag extends RowDataPacket {
+    interface Tag {
       id: number;
       name: string;
     }
 
-    const [itemTags] = await connection.execute<Tag[]>(
+    const [itemTags] = await connection.execute<RowDataPacket[]>(
       `SELECT
         tag_id AS id,
         tag_name AS name
@@ -159,7 +159,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       description,
       link,
       is_purchased: false,
-      tags: [...itemTags],
+      tags: [...(itemTags as Tag[])],
     };
 
     await connection.commit();
@@ -264,14 +264,14 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     connection = await dbPool.getConnection();
     await connection.beginTransaction();
 
-    interface WishlistItemDetails extends RowDataPacket {
+    interface WishlistItemDetails {
       added_on_timestamp: number;
       is_purchased: boolean;
       tags_count: number;
       is_wishlist_owner: boolean;
     }
 
-    const [wishlistItemRows] = await connection.execute<WishlistItemDetails[]>(
+    const [wishlistItemRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         added_on_timestamp,
         is_purchased,
@@ -285,7 +285,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       { wishlistId, accountId, itemId }
     );
 
-    const wishlistItemDetails: WishlistItemDetails | undefined = wishlistItemRows[0];
+    const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
 
     if (!wishlistItemDetails) {
       res.status(404).json({ message: 'Item not found.', reason: 'itemNotFound' });
@@ -338,12 +338,12 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       }
     }
 
-    interface Tag extends RowDataPacket {
+    interface Tag {
       id: number;
       name: string;
     }
 
-    const [itemTags] = await connection.execute<Tag[]>(
+    const [itemTags] = await connection.execute<RowDataPacket[]>(
       `SELECT
         tag_id AS id,
         tag_name AS name
@@ -361,7 +361,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       description,
       link,
       is_purchased: wishlistItemDetails.is_purchased,
-      tags: itemTags,
+      tags: itemTags as Tag[],
     };
 
     await connection.commit();
@@ -431,11 +431,11 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistItemDetails extends RowDataPacket {
+    interface WishlistItemDetails {
       item_exists: boolean;
     }
 
-    const [wishlistItemRows] = await dbPool.execute<WishlistItemDetails[]>(
+    const [wishlistItemRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         EXISTS (SELECT 1 FROM wishlist_items WHERE item_id = ?;) AS item_exists
       FROM
@@ -446,7 +446,7 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
       [+itemId, wishlistId, accountId]
     );
 
-    const wishlistItemDetails: WishlistItemDetails | undefined = wishlistItemRows[0];
+    const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
 
     if (!wishlistItemDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });

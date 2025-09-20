@@ -82,19 +82,19 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface TakenStatus extends RowDataPacket {
+    interface TakenStatus {
       email_taken: boolean;
       username_taken: boolean;
     }
 
-    const [takenStatusRows] = await connection.execute<TakenStatus[]>(
+    const [takenStatusRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         EXISTS (SELECT 1 FROM accounts WHERE email = ?) AS email_taken,
         EXISTS (SELECT 1 FROM accounts WHERE username = ?) AS username_taken;`,
       [email, username]
     );
 
-    const takenStatus: TakenStatus | undefined = takenStatusRows[0];
+    const takenStatus = takenStatusRows[0] as TakenStatus | undefined;
 
     if (!takenStatus) {
       res.status(500).json({ message: 'Internal server error.' });
@@ -231,14 +231,14 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
   }
 
   try {
-    interface AccountDetails extends RowDataPacket {
+    interface AccountDetails {
       account_id: number;
       public_account_id: string;
       is_verified: boolean;
       verification_request_exists: boolean;
     }
 
-    const [accountRows] = await dbPool.execute<AccountDetails[]>(
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         accounts.account_id,
         accounts.public_account_id,
@@ -251,7 +251,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
       [email]
     );
 
-    const accountDetails: AccountDetails | undefined = accountRows[0];
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
@@ -308,7 +308,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
   }
 
   try {
-    interface AccountDetails extends RowDataPacket {
+    interface AccountDetails {
       account_id: number;
       public_account_id: string;
       email: string;
@@ -320,7 +320,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       failed_verification_attempts: number;
     }
 
-    const [accountRows] = await dbPool.execute<AccountDetails[]>(
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         accounts.account_id,
         accounts.public_account_id,
@@ -340,7 +340,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       [publicAccountId]
     );
 
-    const accountDetails: AccountDetails | undefined = accountRows[0];
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
@@ -424,7 +424,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface AccountDetails extends RowDataPacket {
+    interface AccountDetails {
       account_id: number;
       is_verified: boolean;
       verification_id: number;
@@ -432,7 +432,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       failed_verification_attempts: number;
     }
 
-    const [accountRows] = await connection.execute<AccountDetails[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         accounts.account_id,
         accounts.is_verified,
@@ -448,7 +448,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       [publicAccountId]
     );
 
-    const accountDetails: AccountDetails | undefined = accountRows[0];
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
       await connection.rollback();
@@ -559,14 +559,14 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
   }
 
   try {
-    interface AccountDetails extends RowDataPacket {
+    interface AccountDetails {
       account_id: number;
       hashed_password: string;
       is_verified: boolean;
       failed_sign_in_attempts: number;
     }
 
-    const [accountRows] = await dbPool.execute<AccountDetails[]>(
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         account_id,
         hashed_password,
@@ -579,7 +579,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       [email]
     );
 
-    const accountDetails: AccountDetails | undefined = accountRows[0];
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });

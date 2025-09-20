@@ -2,7 +2,7 @@ import { Request } from 'express';
 import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
 
-interface MappedWishlistItem extends RowDataPacket {
+interface MappedWishlistItem {
   item_id: number;
   added_on_timestamp: number;
   title: string;
@@ -21,7 +21,7 @@ export async function getWishlistItemByTitle(
   executor: Pool | PoolConnection,
   req: Request
 ): Promise<MappedWishlistItem | null> {
-  interface WishlistItemDetails extends RowDataPacket {
+  interface WishlistItemDetails {
     item_id: number;
     added_on_timestamp: number;
     title: string;
@@ -33,7 +33,7 @@ export async function getWishlistItemByTitle(
   }
 
   try {
-    const [wishlistItemRows] = await executor.execute<WishlistItemDetails[]>(
+    const [wishlistItemRows] = await executor.execute<RowDataPacket[]>(
       `SELECT
         wishlist_items.item_id,
         wishlist_items.added_on_timestamp,
@@ -53,7 +53,7 @@ export async function getWishlistItemByTitle(
       [itemTitle, wishlistId]
     );
 
-    const wishlistItemDetails: WishlistItemDetails | undefined = wishlistItemRows[0];
+    const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
 
     if (!wishlistItemDetails) {
       return null;

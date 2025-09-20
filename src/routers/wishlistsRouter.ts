@@ -53,12 +53,12 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface AccountWishlistsDetails extends RowDataPacket {
+    interface AccountWishlistsDetails {
       wishlists_created_count: number;
       title_already_used: boolean;
     }
 
-    const [accountWishlistsRows] = await dbPool.execute<AccountWishlistsDetails[]>(
+    const [accountWishlistsRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         COUNT(*) AS wishlists_created_count,
         EXISTS (SELECT 1 FROM wishlists WHERE title = :title AND account_id = :accountId ) AS title_already_used
@@ -69,7 +69,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
       { accountId, title: title }
     );
 
-    const accountWishlistsDetails: AccountWishlistsDetails | undefined = accountWishlistsRows[0];
+    const accountWishlistsDetails = accountWishlistsRows[0] as AccountWishlistsDetails | undefined;
 
     if (!accountWishlistsDetails) {
       res.status(500).json({ message: 'Internal server error.' });
@@ -148,13 +148,13 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         privacy_level,
         title,
@@ -167,14 +167,14 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       [wishlistId, accountId]
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
-    interface WishlistItem extends RowDataPacket {
+    interface WishlistItem {
       item_id: number;
       added_on_timestamp: number;
       title: string;
@@ -185,7 +185,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       tag_name: string;
     }
 
-    const [wishlistItems] = await dbPool.execute<WishlistItem[]>(
+    const [wishlistItems] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         wishlist_items.item_id,
         wishlist_items.added_on_timestamp,
@@ -220,7 +220,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
     const mappedWishlistItems: MappedWishlistItem[] = [];
     let currentItemId: number = 0;
 
-    for (const item of wishlistItems) {
+    for (const item of wishlistItems as WishlistItem[]) {
       const { tag_id, tag_name, ...rest } = item;
 
       if (item.item_id === currentItemId) {
@@ -298,11 +298,11 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       title: string;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         title
       FROM
@@ -313,7 +313,7 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
       [wishlistId, accountId]
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
@@ -392,11 +392,11 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
   }
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       privacy_level: number;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         privacy_level
       FROM
@@ -407,7 +407,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
       [wishlistId, accountId]
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });

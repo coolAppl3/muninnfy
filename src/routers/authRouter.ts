@@ -26,14 +26,14 @@ authRouter.get('/session', async (req: Request, res: Response) => {
   }
 
   try {
-    interface AuthSessionDetails extends RowDataPacket {
+    interface AuthSessionDetails {
       account_id: number;
       expiry_timestamp: number;
       keep_signed_in: boolean;
       extensions_count: number;
     }
 
-    const [authRows] = await dbPool.execute<AuthSessionDetails[]>(
+    const [authRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         account_id,
         expiry_timestamp,
@@ -46,7 +46,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
       [authSessionId]
     );
 
-    const authSessionDetails: AuthSessionDetails | undefined = authRows[0];
+    const authSessionDetails = authRows[0] as AuthSessionDetails | undefined;
 
     if (!authSessionDetails) {
       removeRequestCookie(res, 'authSessionId');

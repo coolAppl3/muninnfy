@@ -58,12 +58,12 @@ async function addToRateTracker(res: Response): Promise<void> {
 }
 
 async function rateLimitReached(rateLimitId: string, res: Response): Promise<boolean> {
-  interface RateTrackerDetails extends RowDataPacket {
+  interface RateTrackerDetails {
     requests_count: number;
   }
 
   try {
-    const [rateTrackerRows] = await dbPool.execute<RateTrackerDetails[]>(
+    const [rateTrackerRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         requests_count
       FROM
@@ -73,7 +73,7 @@ async function rateLimitReached(rateLimitId: string, res: Response): Promise<boo
       [rateLimitId]
     );
 
-    const rateTrackerDetails: RateTrackerDetails | undefined = rateTrackerRows[0];
+    const rateTrackerDetails = rateTrackerRows[0] as RateTrackerDetails | undefined;
 
     if (!rateTrackerDetails) {
       await addToRateTracker(res);
@@ -111,12 +111,12 @@ async function addToAbusiveUsers(req: Request): Promise<void> {
   const currentTimestamp: number = Date.now();
 
   try {
-    interface UserDetails extends RowDataPacket {
+    interface UserDetails {
       rate_limit_reached_count: number;
       latest_abuse_timestamp: number;
     }
 
-    const [userRows] = await dbPool.execute<UserDetails[]>(
+    const [userRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         rate_limit_reached_count
       FROM
@@ -126,7 +126,7 @@ async function addToAbusiveUsers(req: Request): Promise<void> {
       [req.ip]
     );
 
-    const userDetails: UserDetails | undefined = userRows[0];
+    const userDetails = userRows[0] as UserDetails | undefined;
 
     if (!userDetails) {
       await dbPool.execute(
