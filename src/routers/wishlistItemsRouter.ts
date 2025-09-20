@@ -482,3 +482,107 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
+
+wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  interface RequestData {
+    wishlistId: string;
+    itemId: number;
+    newPurchaseStatus: boolean;
+  }
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['wishlistId', 'itemId', 'newPurchaseStatus'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { wishlistId, itemId, newPurchaseStatus } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (!Number.isInteger(itemId)) {
+    res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidItemId' });
+    return;
+  }
+
+  if (typeof newPurchaseStatus !== 'boolean') {
+    res.status(400).json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    interface WishlistItemDetails {
+      is_purchased: boolean | null;
+    }
+
+    const [wishlistItemRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        (SELECT is_purchased FROM wishlist_items WHERE item_id = ?) AS is_purchased
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [itemId, wishlistId, accountId]
+    );
+
+    const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
+
+    if (!wishlistItemDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
+      return;
+    }
+
+    if (wishlistItemDetails.is_purchased === null) {
+      res.status(404).json({ message: 'Wishlist Item not found.', reason: 'itemNotfound' });
+      return;
+    }
+
+    if (Boolean(wishlistItemDetails.is_purchased) === newPurchaseStatus) {
+      res.json({});
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        wishlist_items
+      SET
+        is_purchased = ?
+      WHERE
+        item_id = ?;`,
+      [newPurchaseStatus, itemId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
