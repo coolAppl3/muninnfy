@@ -42,7 +42,7 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   if (!Number.isInteger(itemId)) {
-    res.status(400).json({ message: 'Invalid item Id.', reason: 'invalidItemId' });
+    res.status(400).json({ message: 'Invalid item ID.', reason: 'invalidItemId' });
     return;
   }
 
