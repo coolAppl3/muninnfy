@@ -437,7 +437,7 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
 
     const [wishlistItemRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        EXISTS (SELECT 1 FROM wishlist_items WHERE item_id = ?;) AS item_exists
+        EXISTS (SELECT 1 FROM wishlist_items WHERE item_id = ?) AS item_exists
       FROM
         wishlists
       WHERE
