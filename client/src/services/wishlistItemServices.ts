@@ -30,6 +30,6 @@ export async function editWishlistItemService(body: EditWishlistItemServicePaylo
   return axios.patch(wishlistItemsApiUrl, body);
 }
 
-export async function deleteWishlistItemService(itemId: number): Promise<AxiosResponse> {
-  return axios.delete(`${wishlistItemsApiUrl}/${itemId}`);
+export async function deleteWishlistItemService(wishlistId: string, itemId: number): Promise<AxiosResponse> {
+  return axios.delete(`${wishlistItemsApiUrl}?wishlistId=${wishlistId}&itemId=${itemId}`);
 }

@@ -404,16 +404,22 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
   }
 });
 
-wishlistItemsRouter.delete('/:itemId', async (req: Request, res: Response) => {
+wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
     return;
   }
 
-  const itemId: number | null = req.params.itemId ? +req.params.itemId : null;
+  const wishlistId = req.query.wishlistId;
+  const itemId = req.query.itemId;
 
-  if (!itemId || !Number.isInteger(itemId)) {
+  if (typeof wishlistId !== 'string' || !isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (typeof itemId !== 'string' || !Number.isInteger(+itemId)) {
     res.status(400).json({ message: 'invalid wishlist item ID.', reason: 'invalidItemId' });
     return;
   }
@@ -426,28 +432,29 @@ wishlistItemsRouter.delete('/:itemId', async (req: Request, res: Response) => {
 
   try {
     interface WishlistItemDetails extends RowDataPacket {
-      is_wishlist_owner: boolean;
+      item_exists: boolean;
     }
 
     const [wishlistItemRows] = await dbPool.execute<WishlistItemDetails[]>(
       `SELECT
-        (SELECT 1 FROM wishlists WHERE wishlist_id = wishlist_items.wishlist_id AND account_id = ?) AS is_wishlist_owner
+        EXISTS (SELECT 1 FROM wishlist_items WHERE item_id = ?;) AS item_exists
       FROM
-        wishlist_items
+        wishlists
       WHERE
-        item_id = ?;`,
-      [accountId, itemId]
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [+itemId, wishlistId, accountId]
     );
 
     const wishlistItemDetails: WishlistItemDetails | undefined = wishlistItemRows[0];
 
     if (!wishlistItemDetails) {
-      res.json({});
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
-    if (!wishlistItemDetails.is_wishlist_owner) {
-      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+    if (!wishlistItemDetails.item_exists) {
+      res.json({});
       return;
     }
 

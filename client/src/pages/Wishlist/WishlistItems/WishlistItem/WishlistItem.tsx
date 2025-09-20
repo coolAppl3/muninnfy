@@ -15,7 +15,7 @@ import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 export default function WishlistItem({ item }: { item: WishlistItemInterface }): JSX.Element {
-  const { setWishlistItems } = useWishlist();
+  const { wishlistId, setWishlistItems } = useWishlist();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
@@ -31,7 +31,7 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
     displayLoadingOverlay();
 
     try {
-      await deleteWishlistItemService(item.item_id);
+      await deleteWishlistItemService(wishlistId, item.item_id);
       setWishlistItems((prev) => prev.filter((existingItem: WishlistItemInterface) => existingItem.item_id !== item.item_id));
 
       displayPopupMessage('Item removed.', 'success');
