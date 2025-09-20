@@ -33,3 +33,13 @@ export async function editWishlistItemService(body: EditWishlistItemServicePaylo
 export async function deleteWishlistItemService(wishlistId: string, itemId: number): Promise<AxiosResponse> {
   return axios.delete(`${wishlistItemsApiUrl}?wishlistId=${wishlistId}&itemId=${itemId}`);
 }
+
+interface SetWishlistItemIsPurchasedServicePayload {
+  wishlistId: string;
+  itemId: number;
+  newPurchaseStatus: boolean;
+}
+
+export async function setWishlistItemIsPurchasedService(body: SetWishlistItemIsPurchasedServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${wishlistItemsApiUrl}/purchaseStatus`, body);
+}
