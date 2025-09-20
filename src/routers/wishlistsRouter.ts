@@ -11,6 +11,7 @@ import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { getWishlistPrivacyLevelName } from '../util/wishlistUtils';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
+import { MappedWishlistItem } from './wishlistItemsRouter';
 
 export const wishlistsRouter: Router = express.Router();
 
@@ -203,19 +204,6 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
         wishlist_items.wishlist_id = ?;`,
       [wishlistId]
     );
-
-    interface MappedWishlistItem {
-      item_id: number;
-      added_on_timestamp: number;
-      title: string;
-      description: string | null;
-      link: string | null;
-      is_purchased: boolean;
-      tags: {
-        id: number;
-        name: string;
-      }[];
-    }
 
     const mappedWishlistItems: MappedWishlistItem[] = [];
     let currentItemId: number = 0;

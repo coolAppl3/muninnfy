@@ -20,7 +20,7 @@ import { getAuthSessionId } from '../auth/authUtils';
 
 export const wishlistItemsRouter: Router = express.Router();
 
-interface MappedWishlistItem {
+export interface MappedWishlistItem {
   item_id: number;
   added_on_timestamp: number;
   title: string;

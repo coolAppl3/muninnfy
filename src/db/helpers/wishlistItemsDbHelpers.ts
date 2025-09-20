@@ -1,19 +1,7 @@
 import { Request } from 'express';
 import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
-
-interface MappedWishlistItem {
-  item_id: number;
-  added_on_timestamp: number;
-  title: string;
-  description: string | null;
-  link: string | null;
-  is_purchased: boolean;
-  tags: {
-    id: number;
-    name: string;
-  }[];
-}
+import { MappedWishlistItem } from '../../routers/wishlistItemsRouter';
 
 export async function getWishlistItemByTitle(
   itemTitle: string,
