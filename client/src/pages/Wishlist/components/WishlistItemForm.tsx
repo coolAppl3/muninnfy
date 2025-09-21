@@ -77,8 +77,8 @@ export default function WishlistItemForm({
     const tags: string[] = [...itemTags];
 
     try {
-      const wishlistItem: WishlistItemInterface = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
-      setWishlistItems((prev) => [wishlistItem, ...prev]);
+      const newWishlistItem: WishlistItemInterface = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
+      setWishlistItems((prev) => [newWishlistItem, ...prev]);
 
       displayPopupMessage('Item added.', 'success');
       clearForm();
@@ -139,9 +139,9 @@ export default function WishlistItemForm({
       ).data;
 
       setWishlistItems((prev) =>
-        prev.map((wishlistItem: WishlistItemInterface) => {
-          if (wishlistItem.item_id !== itemId) {
-            return wishlistItem;
+        prev.map((item: WishlistItemInterface) => {
+          if (item.item_id !== itemId) {
+            return item;
           }
 
           return updatedWishlistItem;

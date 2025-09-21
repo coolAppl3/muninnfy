@@ -16,7 +16,7 @@ export default function WishlistItems(): JSX.Element {
           ) : (
             wishlistItems.map((item: WishlistItemInterface) => (
               <WishlistItem
-                item={item}
+                wishlistItem={item}
                 key={item.item_id}
               />
             ))
