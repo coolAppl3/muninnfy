@@ -110,6 +110,10 @@ async function incrementRequestsCount(rateLimitId: string): Promise<void> {
 async function addToAbusiveUsers(req: Request): Promise<void> {
   const currentTimestamp: number = Date.now();
 
+  if (!req.ip) {
+    return;
+  }
+
   try {
     interface UserDetails {
       rate_limit_reached_count: number;
