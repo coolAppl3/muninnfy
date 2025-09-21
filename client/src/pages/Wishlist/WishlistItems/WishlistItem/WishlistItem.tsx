@@ -128,8 +128,8 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
         className='header'
         onClick={() => setIsExpanded((prev) => !prev)}
         tabIndex={0}
-        title={`${isExpanded ? 'Collapse' : 'Expand'} item.`}
-        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item.`}
+        title={`${isExpanded ? 'Collapse' : 'Expand'} item`}
+        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item`}
       >
         <h4>{item.title}</h4>
         <span>
@@ -197,8 +197,8 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
             <button
               type='button'
               className={`mark-as-purchased-btn ${item.is_purchased ? 'purchased' : ''}`}
-              title={`Mark as ${item.is_purchased ? 'purchased.' : 'not purchased.'}`}
-              aria-label={`Mark as ${item.is_purchased ? 'purchased.' : 'not purchased.'}`}
+              title={`Mark as ${item.is_purchased ? 'purchased' : 'not purchased'}`}
+              aria-label={`Mark as ${item.is_purchased ? 'purchased' : 'not purchased'}`}
               onClick={async () => await setWishlistItemIsPurchased()}
             >
               <CheckIcon className='text-dark' />
