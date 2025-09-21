@@ -6,12 +6,13 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
-import { TOTAL_WISHLISTS_LIMIT } from '../util/constants/wishlistConstants';
+import { TOTAL_WISHLISTS_LIMIT, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { getWishlistPrivacyLevelName } from '../util/wishlistUtils';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
 import { MappedWishlistItem } from './wishlistItemsRouter';
+import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
 
 export const wishlistsRouter: Router = express.Router();
 
@@ -201,8 +202,11 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       LEFT JOIN
         wishlist_item_tags USING(item_id)
       WHERE
-        wishlist_items.wishlist_id = ?;`,
-      [wishlistId]
+        wishlist_items.wishlist_id = ?
+      ORDER BY
+        wishlist_items.added_on_timestamp DESC
+      LIMIT ?;`,
+      [wishlistId, WISHLIST_ITEMS_LIMIT * WISHLIST_ITEM_TAGS_LIMIT]
     );
 
     const mappedWishlistItems: MappedWishlistItem[] = [];
