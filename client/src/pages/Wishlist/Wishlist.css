@@ -249,7 +249,7 @@ main {
             }
 
             .spinner {
-              @apply w-[2.6rem] h-[2.6rem];
+              @apply w-[2.6rem] h-[2.6rem] my-[5px];
             }
 
             .item-menu {
