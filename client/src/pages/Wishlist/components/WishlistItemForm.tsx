@@ -78,7 +78,7 @@ export default function WishlistItemForm({
 
     try {
       const wishlistItem: WishlistItemInterface = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
-      setWishlistItems((prev) => [...prev, wishlistItem]);
+      setWishlistItems((prev) => [wishlistItem, ...prev]);
 
       displayPopupMessage('Item added.', 'success');
       clearForm();
@@ -212,7 +212,7 @@ export default function WishlistItemForm({
     const existingWishlistItem = errResData.existingWishlistItem as WishlistItemInterface;
     const itemExists: boolean = wishlistItems.some((item: WishlistItemInterface) => item.item_id === existingWishlistItem.item_id);
 
-    itemExists || setWishlistItems((prev) => [...prev, existingWishlistItem]);
+    itemExists || setWishlistItems((prev) => [...prev, existingWishlistItem].sort((a, b) => b.added_on_timestamp - a.added_on_timestamp));
   }
 
   function allFieldsValid(): boolean {
