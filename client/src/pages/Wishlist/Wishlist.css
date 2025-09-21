@@ -153,6 +153,10 @@ main {
     .wishlist-items-container {
       @apply grid grid-cols-1 sm:grid-cols-2 gap-1 items-start;
 
+      p.no-items {
+        @apply sm:col-span-2 text-sm font-medium text-description w-fit mx-auto;
+      }
+
       .wishlist-item {
         @apply bg-secondary rounded-sm overflow-hidden shadow-simple-tiny;
 
