@@ -108,14 +108,12 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1452 && sqlError.code === 'ER_NO_REFERENCED_ROW_2') {
+    if (err.errno === 1452 && err.code === 'ER_NO_REFERENCED_ROW_2') {
       res.status(404).json({ message: 'Wishlist item not found.', reason: 'itemNotFound' });
       return;
     }
 
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'item_id'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'item_id'`)) {
       res.status(409).json({ message: 'Item already contains this tag.', reason: 'duplicateItemTag' });
       return;
     }

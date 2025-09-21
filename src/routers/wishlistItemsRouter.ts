@@ -179,9 +179,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
       const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
       existingWishlistItem
         ? res.status(409).json({
@@ -381,9 +379,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
       const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
 
       existingWishlistItem

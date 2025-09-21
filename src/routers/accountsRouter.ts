@@ -185,14 +185,12 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'email'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'email'`)) {
       res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
       return;
     }
 
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'username'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'username'`)) {
       res.status(409).json({ message: 'Username is taken.', reason: 'usernameTaken' });
       return;
     }

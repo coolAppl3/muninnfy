@@ -117,9 +117,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'account_id'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
       res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
       return;
     }
