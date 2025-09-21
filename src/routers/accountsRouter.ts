@@ -48,27 +48,29 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidEmail(requestData.email)) {
+  const { email, username, password, displayName } = requestData;
+
+  if (!isValidEmail(email)) {
     res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
     return;
   }
 
-  if (!isValidUsername(requestData.username)) {
+  if (!isValidUsername(username)) {
     res.status(400).json({ message: 'Invalid username.', reason: 'invalidUsername' });
     return;
   }
 
-  if (!isValidNewPassword(requestData.password)) {
+  if (!isValidNewPassword(password)) {
     res.status(400).json({ message: 'Invalid password.', reason: 'invalidPassword' });
     return;
   }
 
-  if (!isValidDisplayName(requestData.displayName)) {
+  if (!isValidDisplayName(displayName)) {
     res.status(400).json({ message: 'Invalid display name', reason: 'invalidDisplayName' });
     return;
   }
 
-  if (requestData.username === requestData.password) {
+  if (username === password) {
     res.status(409).json({ message: `Username and password can't match.`, reason: 'passwordMatchesUsername' });
     return;
   }
@@ -80,19 +82,19 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface TakenStatus extends RowDataPacket {
+    interface TakenStatus {
       email_taken: boolean;
       username_taken: boolean;
     }
 
-    const [takenStatusRows] = await connection.execute<TakenStatus[]>(
+    const [takenStatusRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         EXISTS (SELECT 1 FROM accounts WHERE email = ?) AS email_taken,
         EXISTS (SELECT 1 FROM accounts WHERE username = ?) AS username_taken;`,
-      [requestData.email, requestData.username]
+      [email, username]
     );
 
-    const takenStatus: TakenStatus | undefined = takenStatusRows[0];
+    const takenStatus = takenStatusRows[0] as TakenStatus | undefined;
 
     if (!takenStatus) {
       res.status(500).json({ message: 'Internal server error.' });
@@ -117,7 +119,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     const currentTimestamp: number = Date.now();
 
-    const hashedPassword: string = await bcrypt.hash(requestData.password, 10);
+    const hashedPassword: string = await bcrypt.hash(password, 10);
     const publicAccountId: string = generateCryptoUuid();
 
     const [resultSetHeader] = await connection.execute<ResultSetHeader>(
@@ -131,7 +133,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
         is_verified,
         failed_sign_in_attempts
       ) VALUES (${generatePlaceHolders(8)});`,
-      [publicAccountId, requestData.email, hashedPassword, requestData.username, requestData.displayName, currentTimestamp, false, 0]
+      [publicAccountId, email, hashedPassword, username, displayName, currentTimestamp, false, 0]
     );
 
     const accountId: number = resultSetHeader.insertId;
@@ -163,8 +165,8 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     res.status(201).json({ publicAccountId });
 
     await sendAccountVerificationEmail({
-      receiver: requestData.email,
-      displayName: requestData.displayName,
+      receiver: email,
+      displayName: displayName,
       publicAccountId,
       verificationToken,
     });
@@ -221,20 +223,22 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
     return;
   }
 
-  if (!isValidEmail(requestData.email)) {
+  const { email } = requestData;
+
+  if (!isValidEmail(email)) {
     res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
     return;
   }
 
   try {
-    interface AccountDetails extends RowDataPacket {
+    interface AccountDetails {
       account_id: number;
       public_account_id: string;
       is_verified: boolean;
       verification_request_exists: boolean;
     }
 
-    const [accountRows] = await dbPool.execute<AccountDetails[]>(
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         accounts.account_id,
         accounts.public_account_id,
@@ -244,10 +248,10 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
         accounts
       WHERE
         email = ?;`,
-      [requestData.email]
+      [email]
     );
 
-    const accountDetails: AccountDetails | undefined = accountRows[0];
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
@@ -296,13 +300,15 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     return;
   }
 
-  if (!isValidUuid(requestData.publicAccountId)) {
+  const { publicAccountId } = requestData;
+
+  if (!isValidUuid(publicAccountId)) {
     res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
     return;
   }
 
   try {
-    interface AccountDetails extends RowDataPacket {
+    interface AccountDetails {
       account_id: number;
       public_account_id: string;
       email: string;
@@ -314,7 +320,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       failed_verification_attempts: number;
     }
 
-    const [accountRows] = await dbPool.execute<AccountDetails[]>(
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         accounts.account_id,
         accounts.public_account_id,
@@ -331,10 +337,10 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
         account_verification USING(account_id)
       WHERE
         accounts.public_account_id = ?;`,
-      [requestData.publicAccountId]
+      [publicAccountId]
     );
 
-    const accountDetails: AccountDetails | undefined = accountRows[0];
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
@@ -399,12 +405,14 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     return;
   }
 
-  if (!isValidUuid(requestData.publicAccountId)) {
+  const { publicAccountId, verificationToken } = requestData;
+
+  if (!isValidUuid(publicAccountId)) {
     res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
     return;
   }
 
-  if (!isValidUuid(requestData.verificationToken)) {
+  if (!isValidUuid(verificationToken)) {
     res.status(400).json({ message: 'Invalid verification token.', reason: 'invalidVerificationToken' });
     return;
   }
@@ -416,7 +424,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface AccountDetails extends RowDataPacket {
+    interface AccountDetails {
       account_id: number;
       is_verified: boolean;
       verification_id: number;
@@ -424,7 +432,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       failed_verification_attempts: number;
     }
 
-    const [accountRows] = await connection.execute<AccountDetails[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         accounts.account_id,
         accounts.is_verified,
@@ -437,10 +445,10 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
         account_verification USING(account_id)
       WHERE
         accounts.public_account_id = ?;`,
-      [requestData.publicAccountId]
+      [publicAccountId]
     );
 
-    const accountDetails: AccountDetails | undefined = accountRows[0];
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
       await connection.rollback();
@@ -463,7 +471,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       return;
     }
 
-    if (requestData.verificationToken === accountDetails.verification_token) {
+    if (verificationToken === accountDetails.verification_token) {
       const [resultSetHeader] = await connection.execute<ResultSetHeader>(
         `UPDATE
           accounts
@@ -534,29 +542,31 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidEmail(requestData.email)) {
-    res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
-    return;
-  }
-
-  if (!isValidPassword(requestData.password)) {
-    res.status(400).json({ message: 'Invalid password.', reason: 'invalidPassword' });
-    return;
-  }
-
   if (typeof requestData.keepSignedIn !== 'boolean') {
     requestData.keepSignedIn = false;
   }
 
+  const { email, password, keepSignedIn } = requestData;
+
+  if (!isValidEmail(email)) {
+    res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
+    return;
+  }
+
+  if (!isValidPassword(password)) {
+    res.status(400).json({ message: 'Invalid password.', reason: 'invalidPassword' });
+    return;
+  }
+
   try {
-    interface AccountDetails extends RowDataPacket {
+    interface AccountDetails {
       account_id: number;
       hashed_password: string;
       is_verified: boolean;
       failed_sign_in_attempts: number;
     }
 
-    const [accountRows] = await dbPool.execute<AccountDetails[]>(
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         account_id,
         hashed_password,
@@ -566,10 +576,10 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
         accounts
       WHERE
         email = ?;`,
-      [requestData.email]
+      [email]
     );
 
-    const accountDetails: AccountDetails | undefined = accountRows[0];
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
@@ -587,7 +597,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       return;
     }
 
-    const isCorrectPassword: boolean = await bcrypt.compare(requestData.password, accountDetails.hashed_password);
+    const isCorrectPassword: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
     if (!isCorrectPassword) {
       const incremented: boolean = await incrementFailedVerificationAttempts(accountDetails.account_id, dbPool, req);
       const hasBeenLocked: boolean = accountDetails.failed_sign_in_attempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
@@ -604,7 +614,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       await resetFailedSignInAttempts(accountDetails.account_id, dbPool, req);
     }
 
-    const authSessionCreated: boolean = await createAuthSession(res, accountDetails.account_id, requestData.keepSignedIn);
+    const authSessionCreated: boolean = await createAuthSession(res, accountDetails.account_id, keepSignedIn);
     if (!authSessionCreated) {
       res.status(500).json({ message: 'Internal server error.' });
       return;

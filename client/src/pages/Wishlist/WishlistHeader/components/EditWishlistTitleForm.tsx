@@ -67,7 +67,7 @@ export function EditWishlistTitleForm(): JSX.Element {
           return;
         }
 
-        navigate(referrerLocation ? referrerLocation : '/account');
+        navigate(referrerLocation || '/account');
         return;
       }
 
@@ -77,7 +77,7 @@ export function EditWishlistTitleForm(): JSX.Element {
       }
 
       if (status === 404) {
-        navigate(referrerLocation ? referrerLocation : '/account');
+        navigate(referrerLocation || '/account');
       }
     }
   }

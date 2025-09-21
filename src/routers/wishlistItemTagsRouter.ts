@@ -1,6 +1,4 @@
 import express, { Router, Request, Response } from 'express';
-import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
-import { isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidWishlistItemTagName } from '../util/validation/wishlistItemTagValidation';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
@@ -10,21 +8,15 @@ import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
+import { getAuthSessionId } from '../auth/authUtils';
+import { isValidUuid } from '../util/tokenGenerator';
 
 export const wishlistItemTagsRouter: Router = express.Router();
 
 wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -42,12 +34,19 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!Number.isInteger(requestData.itemId)) {
-    res.status(400).json({ message: 'Invalid item Id.', reason: 'invalidItemId' });
+  const { wishlistId, itemId, tagName } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!isValidWishlistItemTagName(requestData.tagName)) {
+  if (!Number.isInteger(itemId)) {
+    res.status(400).json({ message: 'Invalid item ID.', reason: 'invalidItemId' });
+    return;
+  }
+
+  if (!isValidWishlistItemTagName(tagName)) {
     res.status(400).json({ message: 'Invalid tag name.', reason: 'invalidTagName' });
     return;
   }
@@ -59,11 +58,11 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       wishlist_item_tags_count: number;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         (SELECT COUNT(*) FROM wishlist_item_tags WHERE item_id = ?) AS wishlist_item_tags_count
       FROM
@@ -71,10 +70,10 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
       WHERE
         wishlist_id = ? AND
         account_id = ?;`,
-      [requestData.itemId, requestData.wishlistId, accountId]
+      [itemId, wishlistId, accountId]
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
@@ -91,7 +90,7 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
         item_id,
         tag_name
       ) VALUES (${generatePlaceHolders(2)});`,
-      [requestData.itemId, requestData.tagName]
+      [itemId, tagName]
     );
 
     res.status(201).json({ tagId: resultSetHeader.insertId });

@@ -42,7 +42,7 @@ export function DeleteWishlistForm(): JSX.Element {
       displayPopupMessage(errMessage, 'error');
 
       if (status === 400 && errReason === 'invalidWishlistId') {
-        navigate(referrerLocation ? referrerLocation : '/account');
+        navigate(referrerLocation || '/account');
         return;
       }
 
@@ -52,7 +52,7 @@ export function DeleteWishlistForm(): JSX.Element {
       }
 
       if (status === 404) {
-        navigate(referrerLocation ? referrerLocation : '/account');
+        navigate(referrerLocation || '/account');
       }
     }
   }

@@ -21,7 +21,7 @@ export default function NotFound(): JSX.Element {
 
             <Button
               className='bg-cta border-cta w-full'
-              onClick={() => navigate(referrerLocation ? referrerLocation : '/home')}
+              onClick={() => navigate(referrerLocation || '/home')}
             >
               {referrerLocation ? 'Go back' : 'Go to homepage'}
             </Button>

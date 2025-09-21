@@ -41,7 +41,7 @@ export default function Wishlist(): JSX.Element {
 
     if (!wishlistId || !isValidUuid(wishlistId)) {
       displayPopupMessage('Wishlist not found.', 'error');
-      navigate(referrerLocation ? referrerLocation : '/account');
+      navigate(referrerLocation || '/account');
 
       return;
     }
@@ -91,7 +91,7 @@ export default function Wishlist(): JSX.Element {
           return;
         }
 
-        navigate(referrerLocation ? referrerLocation : '/account');
+        navigate(referrerLocation || '/account');
       }
     };
 

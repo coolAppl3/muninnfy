@@ -38,6 +38,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
           }
       );
 
+      setEditMode(null);
       displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}.`, 'success');
     } catch (err: unknown) {
       console.log(err);
@@ -56,7 +57,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
       }
 
       if (status === 400 && errReason === 'invalidWishlistId') {
-        navigate(referrerLocation ? referrerLocation : '/account');
+        navigate(referrerLocation || '/account');
         return;
       }
 
@@ -66,7 +67,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
       }
 
       if (status === 404) {
-        navigate(referrerLocation ? referrerLocation : '/account');
+        navigate(referrerLocation || '/account');
       }
     }
   }

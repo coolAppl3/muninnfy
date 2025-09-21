@@ -1,6 +1,5 @@
 import express, { Router, Request, Response } from 'express';
 import { isValidUuid } from '../util/tokenGenerator';
-import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import {
   isValidWishlistItemDescription,
@@ -17,10 +16,11 @@ import { WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { sanitizeWishlistItemTags } from '../util/validation/wishlistItemTagValidation';
 import { deleteWishlistItemTags, insertWishlistItemTags } from '../db/helpers/wishlistItemTagsDbHelpers';
 import { getWishlistItemByTitle } from '../db/helpers/wishlistItemsDbHelpers';
+import { getAuthSessionId } from '../auth/authUtils';
 
 export const wishlistItemsRouter: Router = express.Router();
 
-interface MappedWishlistItem {
+export interface MappedWishlistItem {
   item_id: number;
   added_on_timestamp: number;
   title: string;
@@ -34,17 +34,9 @@ interface MappedWishlistItem {
 }
 
 wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -64,22 +56,24 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, title, description, link, tags } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!isValidWishlistItemTitle(requestData.title)) {
+  if (!isValidWishlistItemTitle(title)) {
     res.status(400).json({ message: 'Invalid title.', reason: 'invalidTitle' });
     return;
   }
 
-  if (requestData.description && !isValidWishlistItemDescription(requestData.description)) {
+  if (description && !isValidWishlistItemDescription(description)) {
     res.status(400).json({ message: 'Invalid description.', reason: 'invalidDescription' });
     return;
   }
 
-  if (requestData.link && !isValidWishlistItemLink(requestData.link)) {
+  if (link && !isValidWishlistItemLink(link)) {
     res.status(400).json({ message: 'Invalid link.', reason: 'invalidLink' });
     return;
   }
@@ -93,11 +87,11 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
   let connection;
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       wishlist_items_count: number;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         (SELECT COUNT(*) FROM wishlist_items WHERE wishlist_id = :wishlistId) AS wishlist_items_count
       FROM
@@ -105,10 +99,10 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       WHERE
         wishlist_id = :wishlistId AND
         account_id = :accountId;`,
-      { wishlistId: requestData.wishlistId, accountId }
+      { wishlistId, accountId }
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound.' });
@@ -120,7 +114,6 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const { wishlistId, title, description, link, tags } = requestData;
     const currentTimestamp: number = Date.now();
 
     connection = await dbPool.getConnection();
@@ -143,12 +136,12 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
     sanitizedTags.length > 0 && (await insertWishlistItemTags(sanitizedTags, connection, req));
 
-    interface Tag extends RowDataPacket {
+    interface Tag {
       id: number;
       name: string;
     }
 
-    const [itemTags] = await connection.execute<Tag[]>(
+    const [itemTags] = await connection.execute<RowDataPacket[]>(
       `SELECT
         tag_id AS id,
         tag_name AS name
@@ -166,7 +159,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       description,
       link,
       is_purchased: false,
-      tags: [...itemTags],
+      tags: [...(itemTags as Tag[])],
     };
 
     await connection.commit();
@@ -189,13 +182,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     const sqlError: SqlError = err;
 
     if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
-      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(
-        requestData.title,
-        requestData.wishlistId,
-        dbPool,
-        req
-      );
-
+      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
       existingWishlistItem
         ? res.status(409).json({
             message: 'Wishlist already contains this item.',
@@ -215,17 +202,9 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 });
 
 wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -246,27 +225,29 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, itemId, title, description, link, tags } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!Number.isInteger(requestData.itemId)) {
-    res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidWishlistItemId' });
+  if (!Number.isInteger(itemId)) {
+    res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidItemId' });
     return;
   }
 
-  if (!isValidWishlistItemTitle(requestData.title)) {
+  if (!isValidWishlistItemTitle(title)) {
     res.status(400).json({ message: 'Invalid title.', reason: 'invalidTitle' });
     return;
   }
 
-  if (requestData.description && !isValidWishlistItemDescription(requestData.description)) {
+  if (description && !isValidWishlistItemDescription(description)) {
     res.status(400).json({ message: 'Invalid description.', reason: 'invalidDescription' });
     return;
   }
 
-  if (requestData.link && !isValidWishlistItemLink(requestData.link)) {
+  if (link && !isValidWishlistItemLink(link)) {
     res.status(400).json({ message: 'Invalid link.', reason: 'invalidLink' });
     return;
   }
@@ -278,20 +259,19 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
   }
 
   let connection;
-  const { wishlistId, itemId, title, description, link, tags } = requestData;
 
   try {
     connection = await dbPool.getConnection();
     await connection.beginTransaction();
 
-    interface WishlistItemDetails extends RowDataPacket {
+    interface WishlistItemDetails {
       added_on_timestamp: number;
       is_purchased: boolean;
       tags_count: number;
       is_wishlist_owner: boolean;
     }
 
-    const [wishlistItemRows] = await connection.execute<WishlistItemDetails[]>(
+    const [wishlistItemRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         added_on_timestamp,
         is_purchased,
@@ -305,7 +285,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       { wishlistId, accountId, itemId }
     );
 
-    const wishlistItemDetails: WishlistItemDetails | undefined = wishlistItemRows[0];
+    const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
 
     if (!wishlistItemDetails) {
       res.status(404).json({ message: 'Item not found.', reason: 'itemNotFound' });
@@ -345,7 +325,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     if (wishlistItemDetails.tags_count !== 0 && sanitizedTags.length !== 0) {
       const deletedSuccessfully: boolean =
-        wishlistItemDetails.tags_count === 0 ? true : await deleteWishlistItemTags(requestData.itemId, connection, req);
+        wishlistItemDetails.tags_count === 0 ? true : await deleteWishlistItemTags(itemId, connection, req);
 
       const insertedSuccessfully: boolean =
         sanitizedTags.length === 0 ? true : await insertWishlistItemTags(sanitizedTags, connection, req);
@@ -354,17 +334,16 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
         await connection.rollback();
         res.status(500).json({ message: 'Internal server error.' });
 
-        await logUnexpectedError(req, null, !deletedSuccessfully ? 'failed to delete tags' : 'failed to insert tags');
         return;
       }
     }
 
-    interface Tag extends RowDataPacket {
+    interface Tag {
       id: number;
       name: string;
     }
 
-    const [itemTags] = await connection.execute<Tag[]>(
+    const [itemTags] = await connection.execute<RowDataPacket[]>(
       `SELECT
         tag_id AS id,
         tag_name AS name
@@ -382,7 +361,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       description,
       link,
       is_purchased: wishlistItemDetails.is_purchased,
-      tags: itemTags,
+      tags: itemTags as Tag[],
     };
 
     await connection.commit();
@@ -405,12 +384,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     const sqlError: SqlError = err;
 
     if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
-      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(
-        requestData.title,
-        requestData.wishlistId,
-        dbPool,
-        req
-      );
+      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
 
       existingWishlistItem
         ? res.status(409).json({
@@ -427,5 +401,188 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     await logUnexpectedError(req, err);
   } finally {
     connection?.release();
+  }
+});
+
+wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const wishlistId = req.query.wishlistId;
+  const itemId = req.query.itemId;
+
+  if (typeof wishlistId !== 'string' || !isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (typeof itemId !== 'string' || !Number.isInteger(+itemId)) {
+    res.status(400).json({ message: 'invalid wishlist item ID.', reason: 'invalidItemId' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    interface WishlistItemDetails {
+      item_exists: boolean;
+    }
+
+    const [wishlistItemRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        EXISTS (SELECT 1 FROM wishlist_items WHERE item_id = ?) AS item_exists
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [+itemId, wishlistId, accountId]
+    );
+
+    const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
+
+    if (!wishlistItemDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    if (!wishlistItemDetails.item_exists) {
+      res.json({});
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `DELETE FROM
+        wishlist_items
+      WHERE
+        item_id = ?;`,
+      [itemId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  interface RequestData {
+    wishlistId: string;
+    itemId: number;
+    newPurchaseStatus: boolean;
+  }
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['wishlistId', 'itemId', 'newPurchaseStatus'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { wishlistId, itemId, newPurchaseStatus } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (!Number.isInteger(itemId)) {
+    res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidItemId' });
+    return;
+  }
+
+  if (typeof newPurchaseStatus !== 'boolean') {
+    res.status(400).json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    interface WishlistItemDetails {
+      is_purchased: boolean | null;
+    }
+
+    const [wishlistItemRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        (SELECT is_purchased FROM wishlist_items WHERE item_id = ?) AS is_purchased
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [itemId, wishlistId, accountId]
+    );
+
+    const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
+
+    if (!wishlistItemDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
+      return;
+    }
+
+    if (wishlistItemDetails.is_purchased === null) {
+      res.status(404).json({ message: 'Wishlist Item not found.', reason: 'itemNotfound' });
+      return;
+    }
+
+    if (Boolean(wishlistItemDetails.is_purchased) === newPurchaseStatus) {
+      res.json({});
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        wishlist_items
+      SET
+        is_purchased = ?
+      WHERE
+        item_id = ?;`,
+      [newPurchaseStatus, itemId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
   }
 });

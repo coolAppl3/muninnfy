@@ -35,8 +35,8 @@ export default function PasswordFormGroup({ id, label, value, errorMessage, onCh
         <button
           type='button'
           onClick={handleClick}
-          title={`${isPasswordType ? 'Reveal' : 'Hide'} password.`}
-          aria-label={`${isPasswordType ? 'Reveal' : 'Hide'} password.`}
+          title={`${isPasswordType ? 'Reveal' : 'Hide'} password`}
+          aria-label={`${isPasswordType ? 'Reveal' : 'Hide'} password`}
         >
           {isPasswordType ? <EyeIcon /> : <EyeShutIcon />}
         </button>

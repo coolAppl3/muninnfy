@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.0.22] (2024-09-21)
+
+### Features
+
+- Added `deleteExpiredAuthSessionsCron()` and scheduled it to run every minute.
+- Added `authUtils` with `getAuthSessionId()`.
+  - Refactored a number of endpoints to use this function to improve readability and reduce repetition.
+- Added the following endpoints:
+  - DELETE `wishlistItems`.
+  - PATCH `wishlistItems/purchaseStatus`.
+- Added the following services:
+  - `deleteWishlistItemService()`.
+  - `setWishlistItemIsPurchasedService()`.
+- Completed implementation of `WishlistItem`.
+  - Logic for deleting items, and marking them as purchased, implemented with tiny UI improvements.
+
+
+### Changes
+
+- Updated GET `wishlists/:wishlistId`, and corresponding client-side logic, to sort wishlist items by `added_on_timestamp` with the newest items being first.
+- Increased the lifespan of `unexpected_errors` table rows from 2 to 7 days.
+
+
+### Bug Fixes
+
+- Fixed `validateItemTag()` in `WishlistItemTagsFormGroup` not relaying to the user the maximum tag length.
+- Fixed POST `wishlistItemTags` not validating the wishlist ID.
+  - This endpoint will likely end up being removed, as a different approach for managing tags has since been implemented, but it will stay for now.
+- Fixed `getAccountIdByAuthSessionId()` not removing the authSessionId cookie when the auth session is invalid.
+- Added missing `title` and `aria-label` attributes to the wishlist header context menu button.
+- Fixed wishlist header editing container not being collapsed after the privacy level is successfully updated.
+- Fixed `addToAbusiveUsers()` not accounting for undefined ip addresses.
+  - This is not relevant for production environments.
+
+
+### Code Refactoring
+
+- Refactored endpoints to always destructure the request body to improve readability.
+- Refactored how mysql2 queries are typed to now use casting carefully, instead of extending `RowDataPacket`.
+  - Previous approach failed to flag attempts to access a property that's not defined in the query's interface due to `RowDataPacket`'s interface.
+- Rename both `globals.d.ts` files to `global.d.ts`, and moved them into the type directory.
+- Removed fullstops from some `title` and `aria-label` attributes to ensure consistency.
+
+
 ## [0.0.21] (2024-09-19)
 
 ### Features

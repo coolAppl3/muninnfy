@@ -31,12 +31,12 @@ export async function createAuthSession(
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface SessionDetails extends RowDataPacket {
+    interface SessionDetails {
       session_id: string;
       created_on_timestamp: number;
     }
 
-    const [sessionRows] = await connection.execute<SessionDetails[]>(
+    const [sessionRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         session_id,
         created_on_timestamp
@@ -67,7 +67,7 @@ export async function createAuthSession(
       return true;
     }
 
-    const oldestAuthSession: SessionDetails | null = sessionRows.reduce((oldest: SessionDetails | null, current: SessionDetails) => {
+    const oldestAuthSession = (sessionRows as SessionDetails[]).reduce((oldest: SessionDetails | null, current: SessionDetails) => {
       if (!oldest) {
         return current;
       }
@@ -137,7 +137,7 @@ export async function destroyAuthSession(sessionId: string): Promise<void> {
   }
 }
 
-export async function purgeAuthSessions(userId: number, userType: 'account' | 'guest'): Promise<void> {
+export async function purgeAuthSessions(userId: number): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
@@ -146,6 +146,20 @@ export async function purgeAuthSessions(userId: number, userType: 'account' | 'g
         account_id = ?
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
       [userId]
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
+
+export async function deleteExpiredAuthSessionsCron(currentTimestamp: number): Promise<void> {
+  try {
+    await dbPool.execute(
+      `DELETE FROM
+        auth_sessions
+      WHERE
+        expiry_timestamp <= ?;`,
+      [currentTimestamp]
     );
   } catch (err: unknown) {
     console.log(err);

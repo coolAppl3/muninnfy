@@ -8,7 +8,7 @@ export async function clearErrorLogsCron(currentTimestamp: number): Promise<void
         unexpected_errors
       WHERE
         ? - error_timestamp >= ?;`,
-      [currentTimestamp, 2 * dayMilliseconds]
+      [currentTimestamp, 7 * dayMilliseconds]
     );
   } catch (err: unknown) {
     console.log(err);

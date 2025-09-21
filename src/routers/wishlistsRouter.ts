@@ -1,5 +1,4 @@
 import express, { Router, Request, Response } from 'express';
-import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
@@ -7,25 +6,20 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
-import { TOTAL_WISHLISTS_LIMIT } from '../util/constants/wishlistConstants';
+import { TOTAL_WISHLISTS_LIMIT, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { getWishlistPrivacyLevelName } from '../util/wishlistUtils';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
+import { getAuthSessionId } from '../auth/authUtils';
+import { MappedWishlistItem } from './wishlistItemsRouter';
+import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
 
 export const wishlistsRouter: Router = express.Router();
 
 wishlistsRouter.post('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -42,12 +36,14 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidWishlistPrivacyLevel(requestData.privacyLevel)) {
+  const { privacyLevel, title } = requestData;
+
+  if (!isValidWishlistPrivacyLevel(privacyLevel)) {
     res.status(400).json({ message: 'Invalid privacy level.', reason: 'invalidPrivacyLevel' });
     return;
   }
 
-  if (!isValidWishlistTitle(requestData.title)) {
+  if (!isValidWishlistTitle(title)) {
     res.status(400).json({ message: 'Invalid title.', reason: 'invalidTitle' });
     return;
   }
@@ -59,12 +55,12 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface AccountWishlistsDetails extends RowDataPacket {
+    interface AccountWishlistsDetails {
       wishlists_created_count: number;
       title_already_used: boolean;
     }
 
-    const [accountWishlistsRows] = await dbPool.execute<AccountWishlistsDetails[]>(
+    const [accountWishlistsRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         COUNT(*) AS wishlists_created_count,
         EXISTS (SELECT 1 FROM wishlists WHERE title = :title AND account_id = :accountId ) AS title_already_used
@@ -72,10 +68,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         wishlists
       WHERE
         account_id = :accountId;`,
-      { accountId, title: requestData.title }
+      { accountId, title: title }
     );
 
-    const accountWishlistsDetails: AccountWishlistsDetails | undefined = accountWishlistsRows[0];
+    const accountWishlistsDetails = accountWishlistsRows[0] as AccountWishlistsDetails | undefined;
 
     if (!accountWishlistsDetails) {
       res.status(500).json({ message: 'Internal server error.' });
@@ -103,7 +99,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         title,
         created_on_timestamp
       ) VALUES (${generatePlaceHolders(5)});`,
-      [wishlistId, accountId, requestData.privacyLevel, requestData.title, currentTimestamp]
+      [wishlistId, accountId, privacyLevel, title, currentTimestamp]
     );
 
     res.status(201).json({ wishlistId });
@@ -134,17 +130,9 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 });
 
 wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -162,13 +150,13 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         privacy_level,
         title,
@@ -181,14 +169,14 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       [wishlistId, accountId]
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
-    interface WishlistItem extends RowDataPacket {
+    interface WishlistItem {
       item_id: number;
       added_on_timestamp: number;
       title: string;
@@ -199,7 +187,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       tag_name: string;
     }
 
-    const [wishlistItems] = await dbPool.execute<WishlistItem[]>(
+    const [wishlistItems] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         wishlist_items.item_id,
         wishlist_items.added_on_timestamp,
@@ -214,27 +202,17 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       LEFT JOIN
         wishlist_item_tags USING(item_id)
       WHERE
-        wishlist_items.wishlist_id = ?;`,
-      [wishlistId]
+        wishlist_items.wishlist_id = ?
+      ORDER BY
+        wishlist_items.added_on_timestamp DESC
+      LIMIT ?;`,
+      [wishlistId, WISHLIST_ITEMS_LIMIT * WISHLIST_ITEM_TAGS_LIMIT]
     );
-
-    interface MappedWishlistItem {
-      item_id: number;
-      added_on_timestamp: number;
-      title: string;
-      description: string | null;
-      link: string | null;
-      is_purchased: boolean;
-      tags: {
-        id: number;
-        name: string;
-      }[];
-    }
 
     const mappedWishlistItems: MappedWishlistItem[] = [];
     let currentItemId: number = 0;
 
-    for (const item of wishlistItems) {
+    for (const item of wishlistItems as WishlistItem[]) {
       const { tag_id, tag_name, ...rest } = item;
 
       if (item.item_id === currentItemId) {
@@ -274,17 +252,9 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
 });
 
 wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -301,12 +271,14 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, newTitle } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!isValidWishlistTitle(requestData.newTitle)) {
+  if (!isValidWishlistTitle(newTitle)) {
     res.status(400).json({ message: 'Invalid wishlist title.', reason: 'invalidTitle' });
     return;
   }
@@ -318,11 +290,11 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       title: string;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         title
       FROM
@@ -330,17 +302,17 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
       WHERE
         wishlist_id = ? AND
         account_id = ?;`,
-      [requestData.wishlistId, accountId]
+      [wishlistId, accountId]
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
       return;
     }
 
-    if (wishlistDetails.title === requestData.newTitle) {
+    if (wishlistDetails.title === newTitle) {
       res.status(409).json({ message: 'Wishlist already has this title.', reason: 'identicalTitle' });
       return;
     }
@@ -352,7 +324,7 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
         title = ?
       WHERE
         wishlist_id = ?;`,
-      [requestData.newTitle, requestData.wishlistId]
+      [newTitle, wishlistId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
@@ -374,17 +346,9 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
 });
 
 wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 
@@ -401,12 +365,14 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     return;
   }
 
-  if (!isValidUuid(requestData.wishlistId)) {
+  const { wishlistId, newPrivacyLevel } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (!isValidWishlistPrivacyLevel(requestData.newPrivacyLevel)) {
+  if (!isValidWishlistPrivacyLevel(newPrivacyLevel)) {
     res.status(400).json({ message: 'Invalid privacy level.', reason: 'invalidPrivacyLevel' });
     return;
   }
@@ -418,11 +384,11 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
   }
 
   try {
-    interface WishlistDetails extends RowDataPacket {
+    interface WishlistDetails {
       privacy_level: number;
     }
 
-    const [wishlistRows] = await dbPool.execute<WishlistDetails[]>(
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         privacy_level
       FROM
@@ -430,17 +396,17 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
       WHERE
         wishlist_id = ? AND
         account_id = ?;`,
-      [requestData.wishlistId, accountId]
+      [wishlistId, accountId]
     );
 
-    const wishlistDetails: WishlistDetails | undefined = wishlistRows[0];
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
-    if (wishlistDetails.privacy_level === requestData.newPrivacyLevel) {
+    if (wishlistDetails.privacy_level === newPrivacyLevel) {
       res.status(409).json({
         message: `Privacy level is already set to ${getWishlistPrivacyLevelName(wishlistDetails.privacy_level).toLowerCase()}.`,
         reason: 'identicalPrivacyLevel',
@@ -456,7 +422,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
         privacy_level = ?
       WHERE
         wishlist_id = ?;`,
-      [requestData.newPrivacyLevel, requestData.wishlistId]
+      [newPrivacyLevel, wishlistId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
@@ -478,17 +444,9 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
 });
 
 wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-    return;
-  }
-
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId', true);
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
     return;
   }
 

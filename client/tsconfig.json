@@ -15,6 +15,6 @@
     // "noUnusedParameters": true,
     "types": []
   },
-  "include": ["src", "globals.d.ts", "vite-env.d.ts"],
+  "include": ["src", "vite-env.d.ts"],
   "exclude": ["node_modules", "temp"]
 }

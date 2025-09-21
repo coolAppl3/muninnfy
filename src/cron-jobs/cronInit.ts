@@ -4,6 +4,7 @@ import { removeLightRateAbusersCron, removeStaleRateTrackerRowsCron, replenishRa
 import { clearErrorLogsCron } from '../logs/errorLoggerCronJobs';
 import { deleteStaleAccountVerificationRequestsCron, deleteUnverifiedAccountsCron } from './accountCronJobs';
 import { minuteMilliseconds } from '../util/constants/globalConstants';
+import { deleteExpiredAuthSessionsCron } from '../auth/authSessions';
 
 export function initCronJobs(): void {
   // every 30 seconds
@@ -17,6 +18,7 @@ export function initCronJobs(): void {
   cron.schedule('* * * * *', async () => {
     const currentTimestamp: number = Date.now();
 
+    await deleteExpiredAuthSessionsCron(currentTimestamp);
     await removeStaleRateTrackerRowsCron(currentTimestamp);
     await deleteUnverifiedAccountsCron(currentTimestamp);
     await deleteStaleAccountVerificationRequestsCron(currentTimestamp);
