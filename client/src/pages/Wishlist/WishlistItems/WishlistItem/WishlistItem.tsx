@@ -6,7 +6,7 @@ import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?reac
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
-import { deleteWishlistItemService } from '../../../../services/wishlistItemServices';
+import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '../../../../services/wishlistItemServices';
 import useWishlist from '../../useWishlist';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils';
@@ -20,12 +20,62 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [updatingPurchaseStatus, setUpdatingPurchaseState] = useState<boolean>(false);
 
   const { setAuthStatus } = useAuth();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
+
+  async function setWishlistItemIsPurchased(): Promise<void> {
+    setUpdatingPurchaseState(true);
+
+    try {
+      await setWishlistItemIsPurchasedService({ wishlistId, itemId: item.item_id, newPurchaseStatus: !item.is_purchased });
+      setWishlistItems((prev) =>
+        prev.map((existingItem: WishlistItemInterface) => {
+          if (existingItem.item_id !== item.item_id) {
+            return existingItem;
+          }
+
+          return {
+            ...existingItem,
+            is_purchased: !item.is_purchased,
+          };
+        })
+      );
+    } catch (err: unknown) {
+      console.log(err);
+      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+
+      if (!asyncErrorData) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      const { status, errMessage, errReason } = asyncErrorData;
+      displayPopupMessage(errMessage, 'error');
+
+      if (status === 401) {
+        setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (status !== 404) {
+        return;
+      }
+
+      if (errReason === 'wishlistNotFound') {
+        navigate(referrerLocation || '/account');
+        return;
+      }
+
+      setWishlistItems((prev) => prev.filter((existingItem: WishlistItemInterface) => existingItem.item_id !== item.item_id));
+    } finally {
+      setUpdatingPurchaseState(false);
+    }
+  }
 
   async function removeWishlistItem(): Promise<void> {
     displayLoadingOverlay();
@@ -141,14 +191,19 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
             <TripleDotMenuIcon className='text-title rotate-180' />
           </button>
 
-          <button
-            type='button'
-            className='mark-as-purchased-btn'
-            title={`Mark as ${item.is_purchased ? 'purchased.' : 'not purchased.'}`}
-            aria-label={`Mark as ${item.is_purchased ? 'purchased.' : 'not purchased.'}`}
-          >
-            <CheckIcon className='text-dark' />
-          </button>
+          {updatingPurchaseStatus ? (
+            <div className='spinner'></div>
+          ) : (
+            <button
+              type='button'
+              className={`mark-as-purchased-btn ${item.is_purchased ? 'purchased' : ''}`}
+              title={`Mark as ${item.is_purchased ? 'purchased.' : 'not purchased.'}`}
+              aria-label={`Mark as ${item.is_purchased ? 'purchased.' : 'not purchased.'}`}
+              onClick={async () => await setWishlistItemIsPurchased()}
+            >
+              <CheckIcon className='text-dark' />
+            </button>
+          )}
 
           <div className='item-menu'>
             <button

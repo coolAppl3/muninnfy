@@ -212,7 +212,7 @@ main {
           }
 
           .body-btn-container {
-            @apply grid gap-1 mr-[-1rem] relative;
+            @apply grid gap-1 mr-[-1rem] relative place-items-center;
 
             &.open {
               .item-menu-btn {
@@ -237,11 +237,19 @@ main {
 
               &.mark-as-purchased-btn {
                 @apply bg-light/50 hover:bg-light;
+
+                &.purchased {
+                  @apply bg-cta hover:bg-cta/75;
+                }
               }
 
               svg {
                 @apply w-[1.6rem] h-[1.6rem];
               }
+            }
+
+            .spinner {
+              @apply w-[2.6rem] h-[2.6rem];
             }
 
             .item-menu {
