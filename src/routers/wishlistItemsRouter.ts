@@ -321,7 +321,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     const sanitizedTags: [number, string][] = sanitizeWishlistItemTags(tags, itemId);
 
-    if (wishlistItemDetails.tags_count !== 0 && sanitizedTags.length !== 0) {
+    if (wishlistItemDetails.tags_count !== sanitizedTags.length) {
       const deletedSuccessfully: boolean =
         wishlistItemDetails.tags_count === 0 ? true : await deleteWishlistItemTags(itemId, connection, req);
 
