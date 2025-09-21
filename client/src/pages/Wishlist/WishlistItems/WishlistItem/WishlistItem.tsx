@@ -123,7 +123,7 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
   }
 
   return (
-    <div className={`wishlist-item ${isExpanded ? 'expanded' : ''}`}>
+    <div className={`wishlist-item ${isExpanded ? 'expanded' : ''} ${item.is_purchased ? 'purchased' : ''}`}>
       <div
         className='header'
         onClick={() => setIsExpanded((prev) => !prev)}

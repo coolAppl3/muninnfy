@@ -156,6 +156,12 @@ main {
       .wishlist-item {
         @apply bg-secondary rounded-sm overflow-hidden shadow-simple-tiny;
 
+        &.purchased {
+          .header {
+            @apply after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1;
+          }
+        }
+
         &.expanded {
           .header {
             span {
