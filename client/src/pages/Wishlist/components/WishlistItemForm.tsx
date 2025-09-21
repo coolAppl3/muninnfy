@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, JSX, useEffect, useMemo, useRef, useState } from 'react';
 import TextareaFormGroup from '../../../components/FormGroups/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
 import WishlistItemTagsFormGroup from './WishlistItemTagsFormGroup';
@@ -47,6 +47,12 @@ export default function WishlistItemForm({
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
+
+  const titleInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    titleInputRef.current?.focus();
+  }, []);
 
   async function handleSubmit(): Promise<void> {
     if (formMode === 'NEW_ITEM' && !itemAlreadyInWishlist()) {
@@ -291,7 +297,7 @@ export default function WishlistItemForm({
 
   return (
     <form
-      className={`wishlist-item-form ${formMode === 'EDIT_ITEM' ? 'edit-mode' : ''}`}
+      className={`wishlist-item-form ${formMode === 'EDIT_ITEM' && 'edit-mode'}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -312,6 +318,7 @@ export default function WishlistItemForm({
         id='item-title'
         label='Title'
         autoComplete='off'
+        ref={formMode === 'NEW_ITEM' ? titleInputRef : null}
         value={titleValue}
         errorMessage={titleErrorMessage}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {

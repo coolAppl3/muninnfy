@@ -17,10 +17,12 @@ export default function NewWishlistItemFormContainer(): JSX.Element {
             New wishlist item
           </Button>
 
-          <WishlistItemForm
-            formMode='NEW_ITEM'
-            onFinish={() => setIsExpanded(false)}
-          />
+          {isExpanded && (
+            <WishlistItemForm
+              formMode='NEW_ITEM'
+              onFinish={() => setIsExpanded(false)}
+            />
+          )}
         </div>
       </Container>
     </section>
