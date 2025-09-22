@@ -124,7 +124,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
 
   return (
     <div className={`wishlist-item ${isExpanded ? 'expanded' : ''} ${wishlistItem.is_purchased ? 'purchased' : ''}`}>
-      <div
+      <button
         className='header'
         onClick={() => setIsExpanded((prev) => !prev)}
         tabIndex={0}
@@ -135,7 +135,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
         <span>
           <ChevronIcon />
         </span>
-      </div>
+      </button>
 
       <div className='body'>
         <div className='body-content'>

@@ -176,7 +176,7 @@ main {
       }
 
       .wishlist-item {
-        @apply bg-secondary rounded-sm overflow-hidden shadow-simple-tiny;
+        @apply bg-secondary rounded-sm shadow-simple-tiny;
 
         &.purchased {
           .header {
@@ -186,6 +186,8 @@ main {
 
         &.expanded {
           .header {
+            @apply rounded-bl-none rounded-br-none;
+
             span {
               svg {
                 @apply rotate-180;
@@ -199,11 +201,15 @@ main {
         }
 
         form.wishlist-item-form {
-          @apply shadow-none overflow-visible;
+          @apply shadow-none rounded-none;
+
+          input {
+            @apply sm:text-sm;
+          }
         }
 
         .header {
-          @apply relative bg-secondary flex justify-between items-start gap-1 px-2 py-1 transition-[filter] hover:brightness-110 cursor-pointer;
+          @apply relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter] hover:brightness-110 cursor-pointer rounded-sm;
 
           h4 {
             @apply text-title py-[8.4px];
