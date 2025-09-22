@@ -1,7 +1,7 @@
 import { JSX, useState } from 'react';
 import Container from '../../../components/Container/Container';
-import Button from '../../../components/Button/Button';
 import WishlistItemForm from '../components/WishlistItemForm';
+import ChevronIcon from '../../../assets/svg/ChevronIcon.svg?react';
 
 export default function NewWishlistItemFormContainer(): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -10,12 +10,13 @@ export default function NewWishlistItemFormContainer(): JSX.Element {
     <section className='wishlist-item-form-container'>
       <Container>
         <div className={`inner-container ${isExpanded ? 'expanded' : ''}`}>
-          <Button
-            className='expand-form-btn bg-cta border-cta w-full sm:w-fit h-fit'
-            onClick={() => setIsExpanded(true)}
+          <button
+            className='header'
+            onClick={() => setIsExpanded((prev) => !prev)}
           >
-            New wishlist item
-          </Button>
+            <p>New wishlist item</p>
+            <ChevronIcon />
+          </button>
 
           {isExpanded && (
             <WishlistItemForm

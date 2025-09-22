@@ -1,11 +1,11 @@
 @reference '../../index.css';
 
 main {
-  @apply py-4 grid gap-3;
+  @apply py-4 grid gap-2;
 
   .wishlist-header {
     .wishlist-header-container {
-      @apply bg-secondary p-2 pb-0 rounded-sm shadow-simple grid grid-rows-[auto_0fr] transition-[grid] gap-2;
+      @apply bg-secondary p-2 pb-0 rounded-sm shadow-simple-tiny grid grid-rows-[auto_0fr] transition-[grid] gap-2;
 
       &.expanded {
         @apply grid-rows-[auto_1fr] pb-2;
@@ -32,7 +32,7 @@ main {
           }
 
           & > button {
-            @apply mt-[-1rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer;
+            @apply mt-[-1rem] mr-[-1rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer;
 
             &.open {
               svg {
@@ -55,7 +55,7 @@ main {
         }
 
         .content-menu {
-          @apply absolute top-[-1rem] right-5 rounded-sm overflow-hidden shadow-centered-tiny hidden;
+          @apply absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden;
 
           button {
             @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
@@ -109,18 +109,36 @@ main {
     @apply relative z-0;
 
     .inner-container {
-      @apply grid grid-rows-[auto_0fr] transition-[grid] rounded-sm;
+      @apply rounded-sm bg-secondary shadow-simple-tiny;
 
       &.expanded {
-        @apply grid-rows-[auto_1fr];
+        .header {
+          @apply border-b-light-gray rounded-bl-none rounded-br-none;
+        }
 
-        .expand-form-btn {
-          @apply hidden;
+        svg {
+          @apply rotate-180;
         }
 
         form.wishlist-item-form {
-          @apply p-2;
+          @apply py-2;
         }
+      }
+
+      .header {
+        @apply w-full flex justify-between items-center p-2 bg-secondary text-title transition-[filter_colors] hover:brightness-110 hover:text-cta cursor-pointer border-b-1 border-b-transparent rounded-sm;
+
+        p {
+          @apply font-medium;
+        }
+
+        svg {
+          @apply w-2 h-2;
+        }
+      }
+
+      form.wishlist-item-form {
+        @apply px-2 shadow-none rounded-none;
       }
     }
   }
