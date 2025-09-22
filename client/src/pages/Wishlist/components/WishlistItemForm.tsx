@@ -52,6 +52,10 @@ export default function WishlistItemForm({
 
   useEffect(() => {
     titleInputRef.current?.focus();
+
+    return () => {
+      titleInputRef.current = null;
+    };
   }, []);
 
   async function handleSubmit(): Promise<void> {
