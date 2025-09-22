@@ -166,7 +166,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
           {wishlistItem.description && (
             <>
               <div className='h-line'></div>
-              <p>{wishlistItem.description}</p>
+              <p className='description'>{wishlistItem.description}</p>
             </>
           )}
         </div>

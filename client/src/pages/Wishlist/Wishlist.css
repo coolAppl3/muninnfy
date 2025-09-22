@@ -219,6 +219,10 @@ main {
                 @apply inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] font-medium;
               }
             }
+
+            .description {
+              @apply whitespace-break-spaces;
+            }
           }
 
           .body-btn-container {
