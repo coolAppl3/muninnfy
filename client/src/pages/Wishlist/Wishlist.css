@@ -186,7 +186,7 @@ main {
 
         &.expanded {
           .header {
-            @apply rounded-bl-none rounded-br-none;
+            @apply rounded-bl-none rounded-br-none border-b-light-gray;
 
             span {
               svg {
@@ -209,7 +209,7 @@ main {
         }
 
         .header {
-          @apply relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter] hover:brightness-110 cursor-pointer rounded-sm;
+          @apply relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter_colors] hover:brightness-110 cursor-pointer rounded-sm border-b-1 border-b-secondary;
 
           h4 {
             @apply text-title py-[8.4px];
