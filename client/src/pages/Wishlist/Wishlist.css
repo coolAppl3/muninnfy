@@ -126,7 +126,7 @@ main {
       }
 
       .header {
-        @apply w-full flex justify-between items-center p-2 bg-secondary text-title transition-[filter_colors] hover:brightness-110 hover:text-cta cursor-pointer border-b-1 border-b-transparent rounded-sm;
+        @apply w-full flex justify-between items-center p-2 bg-secondary text-title transition-[filter_colors] hover:brightness-110 hover:text-cta cursor-pointer border-b-1 border-b-secondary rounded-sm;
 
         p {
           @apply font-medium;
