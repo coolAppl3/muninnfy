@@ -1,16 +1,15 @@
 import { ChangeEvent, FormEvent, JSX, useEffect, useRef, useState } from 'react';
 import { changeWishlistTitleService } from '../../../../services/wishlistServices';
 import useWishlistHeader from '../useWishlistHeader';
-import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
-import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils';
 import DefaultFormGroup from '../../../../components/FormGroups/DefaultFormGroup';
 import { validateWishlistTitle } from '../../../../utils/validation/wishlistValidation';
 import Button from '../../../../components/Button/Button';
 import useWishlist from '../../useWishlist';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export function EditWishlistTitleForm(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
@@ -19,7 +18,7 @@ export function EditWishlistTitleForm(): JSX.Element {
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
-  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
@@ -47,36 +46,23 @@ export function EditWishlistTitleForm(): JSX.Element {
       displayPopupMessage('Title updated.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (!errReason) {
+      if (status === 404) {
+        navigate(referrerLocation || '/account');
         return;
       }
 
-      if (status === 400) {
+      if (errReason && status === 400) {
         if (errReason === 'invalidTitle') {
           setTitleErrorMessage(errMessage);
           return;
         }
 
-        navigate(referrerLocation || '/account');
-        return;
-      }
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
-        return;
-      }
-
-      if (status === 404) {
         navigate(referrerLocation || '/account');
       }
     }

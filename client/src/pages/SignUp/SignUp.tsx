@@ -6,20 +6,21 @@ import signUpFormValidationReducer, { initialSignUpFormValidationState } from '.
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { signUpService } from '../../services/accountServices';
-import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import useAuth from '../../hooks/useAuth';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const [{ formData, formErrors }, dispatch] = useReducer(signUpFormValidationReducer, initialSignUpFormValidationState);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
-  const { setAuthStatus } = useAuth();
 
   async function handleSubmit(): Promise<void> {
     const { displayName, username, email, password } = formData;
@@ -31,15 +32,11 @@ export default function SignUp(): JSX.Element {
       displayPopupMessage('Account created.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
-
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
 
       if (status === 403) {
         setAuthStatus('authenticated');

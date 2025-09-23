@@ -9,12 +9,12 @@ import {
   verifyAccountService,
 } from '../../services/accountServices';
 import usePopupMessage from '../../hooks/usePopupMessage';
-import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
 import { validateEmail } from '../../utils/validation/userValidation';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { CanceledError } from 'axios';
 import useAuth from '../../hooks/useAuth';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
 
 export default function AccountVerification(): JSX.Element {
   const [urlSearchParams] = useSearchParams();
@@ -42,10 +42,11 @@ function ContinueAccountVerificationForm(): JSX.Element {
   const [emailValue, setEmailValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
-  const { setAuthStatus } = useAuth();
 
   async function continueAccountVerification(): Promise<void> {
     const email: string = emailValue;
@@ -65,15 +66,11 @@ function ContinueAccountVerificationForm(): JSX.Element {
       displayPopupMessage('Verification request found.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
-
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
 
       if (status === 403) {
         setAuthStatus('authenticated');
@@ -143,6 +140,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
   const [btnNavigateLocation, setBtnNavigateLocation] = useState<string | null>(null);
 
   const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
@@ -156,15 +154,11 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
       displayPopupMessage('Email resent.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
-
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
 
       if (status === 403 && errReason === 'signedIn') {
         setAuthStatus('authenticated');
@@ -173,7 +167,7 @@ function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: 
 
       setTitle(errMessage);
 
-      if (status === 400 || status === 403) {
+      if (status === 400 || (status === 403 && errReason === 'emailLimitReached')) {
         setBtnTitle('Go to homepage');
         setBtnNavigateLocation('/home');
 
@@ -241,9 +235,10 @@ function ConfirmAccountVerification({
   const [btnTitle, setBtnTitle] = useState<string>('Resend email');
   const [btnNavigateLocation, setBtnNavigateLocation] = useState<string | null>(null);
 
+  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
-  const { setAuthStatus } = useAuth();
 
   const verifyAccount = useCallback(
     async (abortSignal: AbortSignal = new AbortController().signal): Promise<void> => {
@@ -258,9 +253,13 @@ function ConfirmAccountVerification({
         }
 
         console.log(err);
-        const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+        const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
-        if (!asyncErrorData || !asyncErrorData.errReason || ![400, 403, 404, 409].includes(asyncErrorData.status)) {
+        if (isHandled) {
+          return;
+        }
+
+        if (status === 500) {
           setVerificationFailed(true);
           displayPopupMessage('Something went wrong.', 'error');
 
@@ -271,9 +270,6 @@ function ConfirmAccountVerification({
           return;
         }
 
-        const { status, errMessage, errReason } = asyncErrorData;
-        displayPopupMessage(errMessage, 'error');
-
         if (status === 403) {
           setAuthStatus('authenticated');
           return;
@@ -283,7 +279,7 @@ function ConfirmAccountVerification({
         setTitle(errMessage);
 
         if (status === 401) {
-          const accountDeleted: boolean = errReason.includes('_deleted');
+          const accountDeleted: boolean = errReason?.includes('_deleted') === true;
           const description: string = accountDeleted
             ? 'Account deleted due to too many failed verification attempts.'
             : `Your verification link is invalid or malformed. Make sure you've copied the correct link.`;
@@ -318,7 +314,7 @@ function ConfirmAccountVerification({
         }
       }
     },
-    [displayPopupMessage, navigate, publicAccountId, verificationToken, setAuthStatus]
+    [publicAccountId, verificationToken, displayPopupMessage, navigate, setAuthStatus, handleAsyncError]
   );
 
   useEffect(() => {

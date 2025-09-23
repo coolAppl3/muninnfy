@@ -1,12 +1,10 @@
 import { JSX } from 'react';
 import { changeWishlistPrivacyLevelService } from '../../../../services/wishlistServices';
-import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useConfirmModal from '../../../../hooks/useConfirmModal';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
-import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils';
 import { getWishlistPrivacyLevelName } from '../../../../utils/wishlistUtils';
 import useWishlistHeader from '../useWishlistHeader';
 import {
@@ -15,12 +13,13 @@ import {
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../../../utils/constants/wishlistConstants';
 import useWishlist from '../../useWishlist';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export default function EditPrivacyLevelContainer(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen } = useWishlistHeader();
 
-  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
@@ -42,31 +41,13 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
       displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}.`, 'success');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (!errReason) {
-        return;
-      }
-
-      if (status === 400 && errReason === 'invalidWishlistId') {
-        navigate(referrerLocation || '/account');
-        return;
-      }
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
-        return;
-      }
-
-      if (status === 404) {
+      if (status === 404 || (status === 400 && errReason === 'invalidWishlistId')) {
         navigate(referrerLocation || '/account');
       }
     }

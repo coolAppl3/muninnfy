@@ -9,14 +9,13 @@ import {
   validateWishlistItemTitle,
 } from '../../../utils/validation/wishlistItemValidation';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
-import useAuth from '../../../hooks/useAuth';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useWishlist from '../useWishlist';
 import { WishlistItemInterface } from '../../../services/wishlistServices';
 import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
-import { AsyncErrorData, getAsyncErrorData } from '../../../utils/errorUtils';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
 
 export default function WishlistItemForm({
   formMode,
@@ -42,7 +41,7 @@ export default function WishlistItemForm({
 
   const [itemTags, setItemTags] = useState<Set<string>>(new Set(wishlistItem?.tags.map(({ name }) => name) || []));
 
-  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
@@ -96,22 +95,13 @@ export default function WishlistItemForm({
       onFinish();
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason, errResData } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason, errResData } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
-        return;
-      }
-
-      if (status === 404) {
+      if (status === 404 || (status === 400 && errReason === 'invalidWishlistId')) {
         navigate(referrerLocation || '/account');
         return;
       }
@@ -162,18 +152,14 @@ export default function WishlistItemForm({
       onFinish();
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason, errResData } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason, errResData } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
+      if (status === 409) {
+        handleDuplicateItemTitle(errResData);
         return;
       }
 
@@ -184,11 +170,6 @@ export default function WishlistItemForm({
         }
 
         setWishlistItems((prev) => prev.filter((item: WishlistItemInterface) => item.item_id !== wishlistItem.item_id));
-        return;
-      }
-
-      if (status === 409) {
-        handleDuplicateItemTitle(errResData);
         return;
       }
 

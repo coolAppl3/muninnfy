@@ -9,10 +9,9 @@ import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '../../../../services/wishlistItemServices';
 import useWishlist from '../../useWishlist';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
-import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils';
-import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistItemInterface }): JSX.Element {
   const { wishlistId, setWishlistItems } = useWishlist();
@@ -22,7 +21,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [updatingPurchaseStatus, setUpdatingPurchaseState] = useState<boolean>(false);
 
-  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
@@ -47,18 +46,14 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
       );
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
         return;
       }
 
@@ -87,18 +82,14 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
       displayPopupMessage('Item removed.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
         return;
       }
 
