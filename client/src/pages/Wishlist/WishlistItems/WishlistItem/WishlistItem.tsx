@@ -1,5 +1,4 @@
 import { FocusEvent, JSX, useState } from 'react';
-import { WishlistItemType } from '../../../../services/wishlistServices';
 import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
@@ -12,6 +11,7 @@ import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
+import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 
 export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistItemType }): JSX.Element {
   const { wishlistId, setWishlistItems } = useWishlist();

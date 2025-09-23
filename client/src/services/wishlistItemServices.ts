@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { WishlistItemType } from './wishlistServices';
+import { WishlistItemType } from '../types/wishlistItemTypes';
 
 axios.defaults.withCredentials = true;
 const wishlistItemsApiUrl: string =

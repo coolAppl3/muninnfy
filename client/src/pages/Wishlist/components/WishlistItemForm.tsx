@@ -11,11 +11,11 @@ import {
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useWishlist from '../useWishlist';
-import { WishlistItemType } from '../../../services/wishlistServices';
 import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
+import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 export default function WishlistItemForm({
   formMode,

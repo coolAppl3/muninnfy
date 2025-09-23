@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { WishlistDetailsType } from '../types/wishlistTypes';
+import { WishlistItemType } from '../types/wishlistItemTypes';
 
 axios.defaults.withCredentials = true;
 const wishlistsApiUrl: string =
@@ -19,19 +20,6 @@ export async function createWishlistAsAccountService(
 ): Promise<AxiosResponse<CreateWishListAsAccountServiceData>> {
   return axios.post(wishlistsApiUrl, body);
 }
-
-export type WishlistItemType = {
-  item_id: number;
-  added_on_timestamp: number;
-  title: string;
-  description: string | null;
-  link: string | null;
-  is_purchased: boolean;
-  tags: {
-    id: number;
-    name: string;
-  }[];
-};
 
 type getWishlistDetailsData = {
   wishlistDetails: WishlistDetailsType;

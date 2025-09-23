@@ -1,8 +1,8 @@
 import { JSX } from 'react';
 import useWishlist from '../useWishlist';
 import Container from '../../../components/Container/Container';
-import { WishlistItemType } from '../../../services/wishlistServices';
 import WishlistItem from './WishlistItem/WishlistItem';
+import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 export default function WishlistItems(): JSX.Element {
   const { wishlistItems } = useWishlist();
