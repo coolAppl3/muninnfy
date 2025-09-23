@@ -209,7 +209,7 @@ main {
         }
 
         .header {
-          @apply relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter_colors] hover:brightness-110 cursor-pointer rounded-sm border-b-1 border-b-secondary;
+          @apply relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter_colors] hover:brightness-110 cursor-pointer rounded-sm border-b-1 border-b-secondary overflow-hidden;
 
           h4 {
             @apply text-title py-[8.4px];
