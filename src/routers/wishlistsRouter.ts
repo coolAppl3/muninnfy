@@ -8,7 +8,6 @@ import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
 import { TOTAL_WISHLISTS_LIMIT, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { getWishlistPrivacyLevelName } from '../util/wishlistUtils';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
 import { MappedWishlistItem } from './wishlistItemsRouter';
@@ -405,11 +404,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     }
 
     if (wishlistDetails.privacy_level === newPrivacyLevel) {
-      res.status(409).json({
-        message: `Privacy level is already set to ${getWishlistPrivacyLevelName(wishlistDetails.privacy_level).toLowerCase()}.`,
-        reason: 'identicalPrivacyLevel',
-      });
-
+      res.json({});
       return;
     }
 
