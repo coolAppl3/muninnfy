@@ -1,5 +1,6 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
-import { WishlistDetailsType, WishlistItemType } from '../../services/wishlistServices';
+import { WishlistItemType } from '../../services/wishlistServices';
+import { WishlistDetailsType } from '../../types/wishlistTypes';
 
 export type WishlistContextType = {
   wishlistId: string;

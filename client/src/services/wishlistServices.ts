@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { WishlistDetailsType } from '../types/wishlistTypes';
 
 axios.defaults.withCredentials = true;
 const wishlistsApiUrl: string =
@@ -18,12 +19,6 @@ export async function createWishlistAsAccountService(
 ): Promise<AxiosResponse<CreateWishListAsAccountServiceData>> {
   return axios.post(wishlistsApiUrl, body);
 }
-
-export type WishlistDetailsType = {
-  privacy_level: number;
-  title: string;
-  created_on_timestamp: number;
-};
 
 export type WishlistItemType = {
   item_id: number;

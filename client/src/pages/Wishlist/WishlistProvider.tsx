@@ -1,6 +1,7 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
 import WishlistContext, { WishlistContextType } from './WishlistContext';
-import { WishlistDetailsType, WishlistItemType } from '../../services/wishlistServices';
+import { WishlistItemType } from '../../services/wishlistServices';
+import { WishlistDetailsType } from '../../types/wishlistTypes';
 
 export default function WishlistProvider({
   initialWishlistId,

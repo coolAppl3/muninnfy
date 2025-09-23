@@ -3,7 +3,7 @@ import './Wishlist.css';
 import { Head } from '../../components/Head/Head';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';
-import { getWishlistDetailsService, WishlistDetailsType, WishlistItemType } from '../../services/wishlistServices';
+import { getWishlistDetailsService, WishlistItemType } from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import WishlistHeaderProvider from './WishlistHeader/WishlistHeaderProvider';
@@ -14,6 +14,7 @@ import WishlistProvider from './WishlistProvider';
 import WishlistItems from './WishlistItems/WishlistItems';
 import NewWishlistItemFormContainer from './NewWishlistItemFormContainer/NewWishlistItemFormContainer';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
+import { WishlistDetailsType } from '../../types/wishlistTypes';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
