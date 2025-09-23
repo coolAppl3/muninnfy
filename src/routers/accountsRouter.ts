@@ -264,6 +264,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
     if (!accountDetails.verification_request_exists) {
       await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
+
       return;
     }
 
