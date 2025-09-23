@@ -2,13 +2,13 @@ import { JSX, MouseEventHandler } from 'react';
 import './FormGroups.css';
 import CheckIcon from '../../assets/svg/CheckIcon.svg?react';
 
-interface CheckboxFormGroupProps {
+type CheckboxFormGroupProps = {
   label: string;
   id: string;
   isChecked: boolean;
   onClick: MouseEventHandler<HTMLButtonElement>;
   className?: string;
-}
+};
 
 export default function CheckboxFormGroup({ label, id, isChecked, onClick, className }: CheckboxFormGroupProps): JSX.Element {
   return (

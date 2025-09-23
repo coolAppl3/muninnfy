@@ -1,10 +1,10 @@
-interface SqlError {
+type SqlError = {
   code?: string;
   errno?: number;
   sql?: string;
   sqlState?: string;
   sqlMessage?: string;
-}
+};
 
 export function isSqlError(err: unknown): err is SqlError {
   if (typeof err !== 'object' || err === null) {

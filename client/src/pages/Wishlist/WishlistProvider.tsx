@@ -1,6 +1,6 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
-import WishlistContext, { WishlistContextInterface } from './WishlistContext';
-import { WishlistDetailsInterface, WishlistItemInterface } from '../../services/wishlistServices';
+import WishlistContext, { WishlistContextType } from './WishlistContext';
+import { WishlistDetailsType, WishlistItemType } from '../../services/wishlistServices';
 
 export default function WishlistProvider({
   initialWishlistId,
@@ -10,19 +10,19 @@ export default function WishlistProvider({
   children,
 }: {
   initialWishlistId: string;
-  initialWishlistDetails: WishlistDetailsInterface;
-  initialWishlistItems: WishlistItemInterface[];
+  initialWishlistDetails: WishlistDetailsType;
+  initialWishlistItems: WishlistItemType[];
 
   children: ReactNode;
 }): JSX.Element {
   const [wishlistId, setWishlistId] = useState<string>(initialWishlistId);
-  const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsInterface>(initialWishlistDetails);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItemInterface[]>(initialWishlistItems);
+  const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () =>
       new Set(
-        wishlistItems.reduce((set: Set<string>, item: WishlistItemInterface) => {
+        wishlistItems.reduce((set: Set<string>, item: WishlistItemType) => {
           set.add(item.title.toLowerCase());
           return set;
         }, new Set<string>())
@@ -30,7 +30,7 @@ export default function WishlistProvider({
     [wishlistItems]
   );
 
-  const contextValue: WishlistContextInterface = useMemo(
+  const contextValue: WishlistContextType = useMemo(
     () => ({
       wishlistId,
       setWishlistId,

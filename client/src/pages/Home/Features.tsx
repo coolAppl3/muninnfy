@@ -55,11 +55,11 @@ export default function Features(): JSX.Element {
   );
 }
 
-interface FeatureCardProps {
+type FeatureCardProps = {
   title: string;
   description: string;
   Icon: FunctionComponent<SVGProps<SVGSVGElement>>;
-}
+};
 
 function FeatureCard({ title, description, Icon }: FeatureCardProps): JSX.Element {
   return (

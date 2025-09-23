@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import useWishlist from '../useWishlist';
 import Container from '../../../components/Container/Container';
-import { WishlistItemInterface } from '../../../services/wishlistServices';
+import { WishlistItemType } from '../../../services/wishlistServices';
 import WishlistItem from './WishlistItem/WishlistItem';
 
 export default function WishlistItems(): JSX.Element {
@@ -14,7 +14,7 @@ export default function WishlistItems(): JSX.Element {
           {wishlistItems.length === 0 ? (
             <p className='no-items'>No items found</p>
           ) : (
-            wishlistItems.map((item: WishlistItemInterface) => (
+            wishlistItems.map((item: WishlistItemType) => (
               <WishlistItem
                 wishlistItem={item}
                 key={item.item_id}

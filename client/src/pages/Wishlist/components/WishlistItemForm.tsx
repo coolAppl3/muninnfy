@@ -11,7 +11,7 @@ import {
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useWishlist from '../useWishlist';
-import { WishlistItemInterface } from '../../../services/wishlistServices';
+import { WishlistItemType } from '../../../services/wishlistServices';
 import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -23,7 +23,7 @@ export default function WishlistItemForm({
   onFinish,
 }: {
   formMode: 'NEW_ITEM' | 'EDIT_ITEM';
-  wishlistItem?: WishlistItemInterface;
+  wishlistItem?: WishlistItemType;
   onFinish: () => void;
 }): JSX.Element {
   const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
@@ -86,7 +86,7 @@ export default function WishlistItemForm({
     const tags: string[] = [...itemTags];
 
     try {
-      const newWishlistItem: WishlistItemInterface = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
+      const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
       setWishlistItems((prev) => [newWishlistItem, ...prev]);
 
       displayPopupMessage('Item added.', 'success');
@@ -134,12 +134,11 @@ export default function WishlistItemForm({
     const tags: string[] = [...itemTags];
 
     try {
-      const updatedWishlistItem: WishlistItemInterface = (
-        await editWishlistItemService({ wishlistId, itemId, title, description, link, tags })
-      ).data;
+      const updatedWishlistItem: WishlistItemType = (await editWishlistItemService({ wishlistId, itemId, title, description, link, tags }))
+        .data;
 
       setWishlistItems((prev) =>
-        prev.map((item: WishlistItemInterface) => {
+        prev.map((item: WishlistItemType) => {
           if (item.item_id !== itemId) {
             return item;
           }
@@ -169,7 +168,7 @@ export default function WishlistItemForm({
           return;
         }
 
-        setWishlistItems((prev) => prev.filter((item: WishlistItemInterface) => item.item_id !== wishlistItem.item_id));
+        setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
         return;
       }
 
@@ -200,8 +199,8 @@ export default function WishlistItemForm({
       return;
     }
 
-    const existingWishlistItem = errResData.existingWishlistItem as WishlistItemInterface;
-    const itemExists: boolean = wishlistItems.some((item: WishlistItemInterface) => item.item_id === existingWishlistItem.item_id);
+    const existingWishlistItem = errResData.existingWishlistItem as WishlistItemType;
+    const itemExists: boolean = wishlistItems.some((item: WishlistItemType) => item.item_id === existingWishlistItem.item_id);
 
     itemExists || setWishlistItems((prev) => [...prev, existingWishlistItem].sort((a, b) => b.added_on_timestamp - a.added_on_timestamp));
   }

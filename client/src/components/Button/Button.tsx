@@ -1,13 +1,13 @@
 import { JSX, MouseEventHandler, ReactNode } from 'react';
 import './Button.css';
 
-interface ButtonProps {
+type ButtonProps = {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
   isSubmitBtn?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-}
+};
 
 export default function Button({ children, className = '', disabled = false, isSubmitBtn = false, onClick }: ButtonProps): JSX.Element {
   return (

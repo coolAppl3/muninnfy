@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useEffect, useMemo, useState } from 'react';
-import AuthContext, { AuthContextInterface, AuthStatus } from '../contexts/AuthContext';
+import AuthContext, { AuthContextType, AuthStatus } from '../contexts/AuthContext';
 import { checkForAuthSessionService } from '../services/authServices';
 
 export default function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
@@ -24,6 +24,6 @@ export default function AuthProvider({ children }: { children: ReactNode }): JSX
     };
   }, []);
 
-  const contextValue: AuthContextInterface = useMemo(() => ({ authStatus, setAuthStatus }), [authStatus]);
+  const contextValue: AuthContextType = useMemo(() => ({ authStatus, setAuthStatus }), [authStatus]);
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }

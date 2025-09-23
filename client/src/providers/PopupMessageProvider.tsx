@@ -1,6 +1,6 @@
 import { JSX, useCallback, useEffect, useMemo, useState } from 'react';
 import PopupMessage from '../components/PopupMessage/PopupMessage';
-import PopupMessageContext, { PopupMessageContextInterface } from '../contexts/PopupMessageContext';
+import PopupMessageContext, { PopupMessageContextType } from '../contexts/PopupMessageContext';
 
 export default function PopupMessageProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -29,7 +29,7 @@ export default function PopupMessageProvider({ children }: { children: React.Rea
     return () => clearTimeout(timeoutId);
   });
 
-  const contextValue: PopupMessageContextInterface = useMemo(() => ({ displayPopupMessage }), [displayPopupMessage]);
+  const contextValue: PopupMessageContextType = useMemo(() => ({ displayPopupMessage }), [displayPopupMessage]);
 
   return (
     <PopupMessageContext.Provider value={contextValue}>

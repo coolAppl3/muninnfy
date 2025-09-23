@@ -59,13 +59,13 @@ export default function Footer(): JSX.Element {
   );
 }
 
-interface LinksContainerProps {
+type LinksContainerProps = {
   title: string;
   links: {
     title: string;
     path: string;
   }[];
-}
+};
 
 function LinksContainer({ title, links }: LinksContainerProps): JSX.Element {
   return (

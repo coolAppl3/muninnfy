@@ -20,11 +20,11 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     itemId: number;
     tagName: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -58,9 +58,9 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       wishlist_item_tags_count: number;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT

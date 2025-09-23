@@ -48,9 +48,9 @@ async function addToRateTracker(res: Response): Promise<void> {
 }
 
 async function rateLimitReached(rateLimitId: string, req: Request, res: Response): Promise<boolean> {
-  interface RateTrackerDetails {
+  type RateTrackerDetails = {
     requests_count: number;
-  }
+  };
 
   try {
     const [rateTrackerRows] = await dbPool.execute<RowDataPacket[]>(
@@ -106,10 +106,10 @@ async function addToAbusiveUsers(req: Request): Promise<void> {
   }
 
   try {
-    interface UserDetails {
+    type UserDetails = {
       rate_limit_reached_count: number;
       latest_abuse_timestamp: number;
-    }
+    };
 
     const [userRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT

@@ -1,8 +1,8 @@
 import { useContext } from 'react';
-import WishlistHeaderContext, { WishlistHeaderContextInterface } from './WishlistHeaderContext';
+import WishlistHeaderContext, { WishlistHeaderContextType } from './WishlistHeaderContext';
 
-export default function useWishlistHeader(): WishlistHeaderContextInterface {
-  const context = useContext<WishlistHeaderContextInterface | null>(WishlistHeaderContext);
+export default function useWishlistHeader(): WishlistHeaderContextType {
+  const context = useContext<WishlistHeaderContextType | null>(WishlistHeaderContext);
 
   if (!context) {
     throw new Error('useWishlistHeader must be used withing WishlistHeaderProvider.');

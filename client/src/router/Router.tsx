@@ -16,10 +16,10 @@ import useAuth from '../hooks/useAuth';
 import useHistory from '../hooks/useHistory';
 import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
 
-interface RouteDetails {
+type RouteDetails = {
   path: string;
   element: JSX.Element;
-}
+};
 
 export function Router(): JSX.Element {
   const { authStatus } = useAuth();

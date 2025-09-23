@@ -1,18 +1,18 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
-import { WishlistDetailsInterface, WishlistItemInterface } from '../../services/wishlistServices';
+import { WishlistDetailsType, WishlistItemType } from '../../services/wishlistServices';
 
-export interface WishlistContextInterface {
+export type WishlistContextType = {
   wishlistId: string;
   setWishlistId: Dispatch<SetStateAction<string>>;
 
-  wishlistDetails: WishlistDetailsInterface;
-  setWishlistDetails: Dispatch<SetStateAction<WishlistDetailsInterface>>;
+  wishlistDetails: WishlistDetailsType;
+  setWishlistDetails: Dispatch<SetStateAction<WishlistDetailsType>>;
 
-  wishlistItems: WishlistItemInterface[];
-  setWishlistItems: Dispatch<SetStateAction<WishlistItemInterface[]>>;
+  wishlistItems: WishlistItemType[];
+  setWishlistItems: Dispatch<SetStateAction<WishlistItemType[]>>;
 
   wishlistItemsTitleSet: Set<string>;
-}
+};
 
-const WishlistContext = createContext<WishlistContextInterface | null>(null);
+const WishlistContext = createContext<WishlistContextType | null>(null);
 export default WishlistContext;

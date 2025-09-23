@@ -2,12 +2,12 @@ import { JSX, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import './InfoModal.css';
 import Button from '../Button/Button';
 
-export interface InfoModalProps {
+export type InfoModalProps = {
   title?: string;
   description?: string;
   btnTitle: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
-}
+};
 
 export default function InfoModal({ title, description, btnTitle, onClick }: InfoModalProps): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);

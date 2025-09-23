@@ -7,10 +7,10 @@ export async function getAccountIdByAuthSessionId(authSessionId: string, res: Re
   const currentTimestamp: number = Date.now();
 
   try {
-    interface AuthSessionDetails {
+    type AuthSessionDetails = {
       account_id: number;
       expiry_timestamp: number;
-    }
+    };
 
     const [authSessionRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT

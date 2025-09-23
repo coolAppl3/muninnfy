@@ -1,7 +1,7 @@
 import { ChangeEventHandler, HTMLInputAutoCompleteAttribute, JSX, Ref } from 'react';
 import './FormGroups.css';
 
-interface DefaultFormGroupProps {
+type DefaultFormGroupProps = {
   id: string;
   label: string;
   autoComplete: HTMLInputAutoCompleteAttribute;
@@ -10,7 +10,7 @@ interface DefaultFormGroupProps {
   onChange: ChangeEventHandler<HTMLInputElement>;
   className?: string;
   ref?: Ref<HTMLInputElement>;
-}
+};
 
 export default function DefaultFormGroup({
   id,

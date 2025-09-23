@@ -22,10 +22,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     privacyLevel: number;
     title: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -54,10 +54,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface AccountWishlistsDetails {
+    type AccountWishlistsDetails = {
       wishlists_created_count: number;
       title_already_used: boolean;
-    }
+    };
 
     const [accountWishlistsRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -147,11 +147,11 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -173,7 +173,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       return;
     }
 
-    interface WishlistItem {
+    type WishlistItem = {
       item_id: number;
       added_on_timestamp: number;
       title: string;
@@ -182,7 +182,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       is_purchased: boolean;
       tag_id: number;
       tag_name: string;
-    }
+    };
 
     const [wishlistItems] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -255,10 +255,10 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     newTitle: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -287,9 +287,9 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       title: string;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -349,10 +349,10 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     newPrivacyLevel: number;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -381,9 +381,9 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
   }
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       privacy_level: number;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT

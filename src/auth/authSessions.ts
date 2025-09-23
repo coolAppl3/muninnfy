@@ -31,10 +31,10 @@ export async function createAuthSession(
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface SessionDetails {
+    type SessionDetails = {
       session_id: string;
       created_on_timestamp: number;
-    }
+    };
 
     const [sessionRows] = await connection.execute<RowDataPacket[]>(
       `SELECT

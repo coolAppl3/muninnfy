@@ -1,6 +1,6 @@
-interface RequestData {
+type RequestData = {
   [key: string]: any;
-}
+};
 
 export function undefinedValuesDetected(requestData: RequestData, expectedKeys: string[]): boolean {
   if (Object.keys(requestData).length !== expectedKeys.length) {

@@ -33,12 +33,12 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     email: string;
     username: string;
     password: string;
     displayName: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -82,10 +82,10 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface TakenStatus {
+    type TakenStatus = {
       email_taken: boolean;
       username_taken: boolean;
-    }
+    };
 
     const [takenStatusRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -209,9 +209,9 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     email: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -229,12 +229,12 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
   }
 
   try {
-    interface AccountDetails {
+    type AccountDetails = {
       account_id: number;
       public_account_id: string;
       is_verified: boolean;
       verification_request_exists: boolean;
-    }
+    };
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -286,9 +286,9 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     publicAccountId: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -306,7 +306,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
   }
 
   try {
-    interface AccountDetails {
+    type AccountDetails = {
       account_id: number;
       public_account_id: string;
       email: string;
@@ -316,7 +316,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       verification_token: string;
       verification_emails_sent: number;
       failed_verification_attempts: number;
-    }
+    };
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -390,10 +390,10 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     publicAccountId: string;
     verificationToken: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -422,13 +422,13 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
-    interface AccountDetails {
+    type AccountDetails = {
       account_id: number;
       is_verified: boolean;
       verification_id: number;
       verification_token: string;
       failed_verification_attempts: number;
-    }
+    };
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -526,11 +526,11 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     email: string;
     password: string;
     keepSignedIn: boolean;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -557,12 +557,12 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
   }
 
   try {
-    interface AccountDetails {
+    type AccountDetails = {
       account_id: number;
       hashed_password: string;
       is_verified: boolean;
       failed_sign_in_attempts: number;
-    }
+    };
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT

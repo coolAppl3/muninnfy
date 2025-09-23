@@ -26,12 +26,12 @@ authRouter.get('/session', async (req: Request, res: Response) => {
   }
 
   try {
-    interface AuthSessionDetails {
+    type AuthSessionDetails = {
       account_id: number;
       expiry_timestamp: number;
       keep_signed_in: boolean;
       extensions_count: number;
-    }
+    };
 
     const [authRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT

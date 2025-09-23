@@ -2,7 +2,7 @@ import { JSX, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import './ConfirmModal.css';
 import Button from '../Button/Button';
 
-export interface ConfirmModalProps {
+export type ConfirmModalProps = {
   title?: string;
   description?: string;
 
@@ -15,7 +15,7 @@ export interface ConfirmModalProps {
   onConfirm: MouseEventHandler<HTMLButtonElement>;
   onCancel: MouseEventHandler<HTMLButtonElement>;
   onExtraAction?: MouseEventHandler<HTMLButtonElement>;
-}
+};
 
 export default function ConfirmModal({
   title,

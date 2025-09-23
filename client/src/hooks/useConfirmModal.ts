@@ -1,8 +1,8 @@
 import { useContext } from 'react';
-import ConfirmModalContext, { ConfirmModalContextInterface } from '../contexts/ConfirmModalContext';
+import ConfirmModalContext, { ConfirmModalContextType } from '../contexts/ConfirmModalContext';
 
-export default function useConfirmModal(): ConfirmModalContextInterface {
-  const context = useContext<ConfirmModalContextInterface | null>(ConfirmModalContext);
+export default function useConfirmModal(): ConfirmModalContextType {
+  const context = useContext<ConfirmModalContextType | null>(ConfirmModalContext);
 
   if (!context) {
     throw new Error('useConfirmModal must be used within a ConfirmModalProvider.');

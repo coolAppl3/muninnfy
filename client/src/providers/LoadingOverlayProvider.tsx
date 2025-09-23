@@ -1,5 +1,5 @@
 import { JSX, useCallback, useEffect, useMemo, useState } from 'react';
-import LoadingOverlayContext, { LoadingOverlayContextInterface } from '../contexts/LoadingOverlayContext';
+import LoadingOverlayContext, { LoadingOverlayContextType } from '../contexts/LoadingOverlayContext';
 import { Location, useLocation } from 'react-router-dom';
 
 export default function LoadingOverlayProvider({ children }: { children: React.ReactNode }): JSX.Element {
@@ -9,7 +9,7 @@ export default function LoadingOverlayProvider({ children }: { children: React.R
   const displayLoadingOverlay = useCallback(() => setIsVisible(true), []);
   const removeLoadingOverlay = useCallback(() => setIsVisible(false), []);
 
-  const contextValue: LoadingOverlayContextInterface = useMemo(
+  const contextValue: LoadingOverlayContextType = useMemo(
     () => ({ displayLoadingOverlay, removeLoadingOverlay }),
     [displayLoadingOverlay, removeLoadingOverlay]
   );

@@ -1,5 +1,5 @@
 import { FocusEvent, JSX, useState } from 'react';
-import { WishlistItemInterface } from '../../../../services/wishlistServices';
+import { WishlistItemType } from '../../../../services/wishlistServices';
 import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
@@ -13,7 +13,7 @@ import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
-export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistItemInterface }): JSX.Element {
+export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistItemType }): JSX.Element {
   const { wishlistId, setWishlistItems } = useWishlist();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -33,7 +33,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
     try {
       await setWishlistItemIsPurchasedService({ wishlistId, itemId: wishlistItem.item_id, newPurchaseStatus: !wishlistItem.is_purchased });
       setWishlistItems((prev) =>
-        prev.map((item: WishlistItemInterface) => {
+        prev.map((item: WishlistItemType) => {
           if (item.item_id !== wishlistItem.item_id) {
             return item;
           }
@@ -66,7 +66,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
         return;
       }
 
-      setWishlistItems((prev) => prev.filter((item: WishlistItemInterface) => item.item_id !== wishlistItem.item_id));
+      setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
     } finally {
       setUpdatingPurchaseState(false);
     }
@@ -77,7 +77,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
 
     try {
       await deleteWishlistItemService(wishlistId, wishlistItem.item_id);
-      setWishlistItems((prev) => prev.filter((item: WishlistItemInterface) => item.item_id !== wishlistItem.item_id));
+      setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
 
       displayPopupMessage('Item removed.', 'success');
     } catch (err: unknown) {
