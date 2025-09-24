@@ -1,9 +1,9 @@
 import { createContext } from 'react';
 
-export interface LoadingOverlayContextInterface {
+export type LoadingOverlayContextType = {
   displayLoadingOverlay: () => void;
   removeLoadingOverlay: () => void;
-}
+};
 
-const LoadingOverlayContext = createContext<LoadingOverlayContextInterface | null>(null);
+const LoadingOverlayContext = createContext<LoadingOverlayContextType | null>(null);
 export default LoadingOverlayContext;

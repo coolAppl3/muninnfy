@@ -1,5 +1,52 @@
 # Changelog
 
+## [0.0.23] (2024-09-24)
+
+### Features
+
+- Implemented logic to rendering when there are no wishlist items in `WishlistItems`.
+- Implemented logic to focus the title input in `WishlistItemForm` on mount, but only when adding a new item.
+  - This is meant to streamline the user's experience, as a title is always required, whereas they might want to change something else when editing an item.
+- Added `ABUSE_INCREMENT_THRESHOLD` constant.
+- Added `useAsyncErrorHandler` custom hook.
+  - This hook is meant to improve how async error data is extracted, leveraging `getAsyncErrorData()`, while also handling common, component-agnostic errors.
+  - Refactored relevant components to use this hook.
+- Added `wishlistTypes` under the `types` directory, and moved `WishlistDetailsType` to it.
+- Added `wishlistItemTypes` under the `types` directory, and moved `WishlistItemType` to it.
+
+
+### Improvements
+
+- Improved the header in `NewWishlistItemFormContainer`.
+- A number of small improvements to the UI in `Wishlist`.
+- Improved variable naming in `WishlistItem`, `WishlistItems`, and `WishlistItemForm`.
+- Improved rate-limiting logic to allow for a grace window of 10 requests beyond the rate limit in place before adding an IP address to the `abusive_users` table.
+
+
+### Changes
+
+- Changed all interfaces to types throughout the app.
+  - Interfaces with names ending with `Interface` were updated to end with `Type`.
+  - This change has no effect on any of the app's logic. It's purely meant for consistency and to prevent the potential for unwanted declaration merging.
+
+
+### Bug Fixes
+
+- Fixed logical flaw in one of the if-statement under PATCH `wishlistItemsRouter`, causing tags to not be updated if the number of, either existing or new tags, is 0.
+- Added missing cleanup function for the `useEffect` in `WishlistItemForm`.
+
+
+### Code Refactoring
+
+- Moved `SqlError` interface from `global.d.ts` to `isSqlError`, and simplified relevant code to no longer need the interface explicitly, which is no longer exported.
+- Changed PATCH `wishlists/change/privacyLevel` to return a 200 response if the privacy level requests is already set to the wishlist, simplifying client-side handling.
+- Improved handling of 400 errors throughout.
+- Refactored `AccountVerification` by moving its local components into their own dedicated files:
+  - `ContinueAccountVerification`.
+  - `ResendAccountVerificationEmail`.
+  - `ConfirmAccountVerification`.
+
+
 ## [0.0.22] (2024-09-21)
 
 ### Features

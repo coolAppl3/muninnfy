@@ -20,11 +20,11 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     itemId: number;
     tagName: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -58,9 +58,9 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       wishlist_item_tags_count: number;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -108,14 +108,12 @@ wishlistItemTagsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1452 && sqlError.code === 'ER_NO_REFERENCED_ROW_2') {
+    if (err.errno === 1452 && err.code === 'ER_NO_REFERENCED_ROW_2') {
       res.status(404).json({ message: 'Wishlist item not found.', reason: 'itemNotFound' });
       return;
     }
 
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'item_id'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'item_id'`)) {
       res.status(409).json({ message: 'Item already contains this tag.', reason: 'duplicateItemTag' });
       return;
     }

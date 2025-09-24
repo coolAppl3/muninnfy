@@ -10,9 +10,9 @@ import { validateEmail, validatePassword } from '../../utils/validation/userVali
 import CheckboxFormGroup from '../../components/FormGroups/CheckboxFormGroup';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { signInService } from '../../services/accountServices';
-import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import useConfirmModal from '../../hooks/useConfirmModal';
 import useAuth from '../../hooks/useAuth';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
 
 export default function SignIn(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -24,11 +24,12 @@ export default function SignIn(): JSX.Element {
   const [emailErrorMessage, setEmailErrorMessage] = useState<string | null>(null);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | null>(null);
 
+  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayConfirmModal } = useConfirmModal();
-  const { setAuthStatus } = useAuth();
 
   async function handleSubmit(): Promise<void> {
     const email: string = emailValue;
@@ -42,21 +43,13 @@ export default function SignIn(): JSX.Element {
       displayPopupMessage('Signed in.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (!errReason) {
-        return;
-      }
-
-      if ([400, 401, 404].includes(status)) {
+      if (errReason && [400, 401, 404].includes(status)) {
         const setErrorMessage: ((errorMessage: string | null) => void) | undefined = errFieldRecord[errReason];
         setErrorMessage && setErrorMessage(errMessage);
 

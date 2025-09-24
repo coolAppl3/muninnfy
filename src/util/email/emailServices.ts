@@ -1,12 +1,12 @@
 import { emailTransporter } from './initTransporter';
 import accountVerificationEmailTemplate from './emailTemplates/accountVerificationEmailTemplate';
 
-interface SendAccountVerificationEmailConfig {
+type SendAccountVerificationEmailConfig = {
   receiver: string;
   displayName: string;
   publicAccountId: string;
   verificationToken: string;
-}
+};
 
 export async function sendAccountVerificationEmail(config: SendAccountVerificationEmailConfig): Promise<void> {
   try {

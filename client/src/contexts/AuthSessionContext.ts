@@ -1,8 +1,8 @@
 import { createContext } from 'react';
 
-export interface AuthSessionContextInterface {
+export type AuthSessionContextType = {
   signOut: () => Promise<void>;
-}
+};
 
-const AuthSessionContext = createContext<AuthSessionContextInterface | null>(null);
+const AuthSessionContext = createContext<AuthSessionContextType | null>(null);
 export default AuthSessionContext;

@@ -1,15 +1,14 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
 import { deleteWishlistService } from '../../../../services/wishlistServices';
 import useWishlistHeader from '../useWishlistHeader';
-import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import DefaultFormGroup from '../../../../components/FormGroups/DefaultFormGroup';
 import Button from '../../../../components/Button/Button';
-import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils';
 import useWishlist from '../../useWishlist';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export function DeleteWishlistForm(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();
@@ -17,7 +16,7 @@ export function DeleteWishlistForm(): JSX.Element {
 
   const [confirmationTitleValue, setConfirmationTitleValue] = useState<string>('');
 
-  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
@@ -31,27 +30,13 @@ export function DeleteWishlistForm(): JSX.Element {
       navigate('/wishlists');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 400 && errReason === 'invalidWishlistId') {
-        navigate(referrerLocation || '/account');
-        return;
-      }
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
-        return;
-      }
-
-      if (status === 404) {
+      if (status === 404 || (status === 400 && errReason === 'invalidWishlistId')) {
         navigate(referrerLocation || '/account');
       }
     }

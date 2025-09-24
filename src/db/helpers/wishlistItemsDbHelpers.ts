@@ -9,7 +9,7 @@ export async function getWishlistItemByTitle(
   executor: Pool | PoolConnection,
   req: Request
 ): Promise<MappedWishlistItem | null> {
-  interface WishlistItemDetails {
+  type WishlistItemDetails = {
     item_id: number;
     added_on_timestamp: number;
     title: string;
@@ -18,7 +18,7 @@ export async function getWishlistItemByTitle(
     is_purchased: boolean;
     tag_id: number;
     tag_name: string;
-  }
+  };
 
   try {
     const [wishlistItemRows] = await executor.execute<RowDataPacket[]>(

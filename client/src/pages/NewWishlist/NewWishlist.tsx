@@ -3,7 +3,6 @@ import { Head } from '../../components/Head/Head';
 import './NewWishlist.css';
 import Container from '../../components/Container/Container';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
-import useAuth from '../../hooks/useAuth';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import {
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
@@ -15,7 +14,7 @@ import { validateWishlistTitle } from '../../utils/validation/wishlistValidation
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { createWishlistAsAccountService } from '../../services/wishlistServices';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
 
 export default function NewWishlist(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -24,8 +23,8 @@ export default function NewWishlist(): JSX.Element {
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const navigate: NavigateFunction = useNavigate();
-  const { setAuthStatus } = useAuth();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
 
@@ -40,18 +39,9 @@ export default function NewWishlist(): JSX.Element {
       navigate(`/wishlist/${wishlistId}`);
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
-        return;
-      }
-
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
+      if (isHandled) {
         return;
       }
 

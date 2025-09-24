@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useCallback, useMemo } from 'react';
-import AuthSessionContext, { AuthSessionContextInterface } from '../contexts/AuthSessionContext';
+import AuthSessionContext, { AuthSessionContextType } from '../contexts/AuthSessionContext';
 import useAuth from '../hooks/useAuth';
 import useLoadingOverlay from '../hooks/useLoadingOverlay';
 import usePopupMessage from '../hooks/usePopupMessage';
@@ -26,6 +26,6 @@ export default function AuthSessionProvider({ children }: { children: ReactNode 
     }
   }, [setAuthStatus, displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage]);
 
-  const contextValue: AuthSessionContextInterface = useMemo(() => ({ signOut }), [signOut]);
+  const contextValue: AuthSessionContextType = useMemo(() => ({ signOut }), [signOut]);
   return <AuthSessionContext.Provider value={contextValue}>{children}</AuthSessionContext.Provider>;
 }

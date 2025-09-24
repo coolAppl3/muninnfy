@@ -1,6 +1,6 @@
 import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import ConfirmModal, { ConfirmModalProps } from '../components/ConfirmModal/ConfirmModal';
-import ConfirmModalContext, { ConfirmModalContextInterface } from '../contexts/ConfirmModalContext';
+import ConfirmModalContext, { ConfirmModalContextType } from '../contexts/ConfirmModalContext';
 import { Location, useLocation } from 'react-router-dom';
 
 export default function ConfirmModalProvider({ children }: { children: ReactNode }): JSX.Element {
@@ -49,7 +49,7 @@ export default function ConfirmModalProvider({ children }: { children: ReactNode
     return removeConfirmModal;
   }, [routerLocation, removeConfirmModal]);
 
-  const contextValue: ConfirmModalContextInterface = useMemo(
+  const contextValue: ConfirmModalContextType = useMemo(
     () => ({
       displayConfirmModal,
       removeConfirmModal,

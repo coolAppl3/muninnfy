@@ -4,36 +4,26 @@ import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { RowDataPacket } from 'mysql2/promise';
 import { hourMilliseconds } from '../util/constants/globalConstants';
-import { REQUESTS_RATE_LIMIT } from '../util/constants/rateLimitingConstants';
+import { ABUSE_INCREMENT_THRESHOLD, REQUESTS_RATE_LIMIT } from '../util/constants/rateLimitingConstants';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 
 export async function rateLimiter(req: Request, res: Response, next: NextFunction): Promise<void> {
   const rateLimitId: string | null = getRequestCookie(req, 'rateLimitId');
 
-  if (!rateLimitId) {
+  if (!rateLimitId || !isValidUuid(rateLimitId)) {
     await addToRateTracker(res);
     next();
-
-    return;
-  }
-
-  if (!isValidUuid(rateLimitId)) {
-    await addToRateTracker(res);
-    next();
-
-    return;
-  }
-
-  if (await rateLimitReached(rateLimitId, res)) {
-    res.status(429).json({ message: 'Too many requests.' });
-
-    await incrementRequestsCount(rateLimitId);
-    await addToAbusiveUsers(req);
 
     return;
   }
 
   await incrementRequestsCount(rateLimitId);
+
+  if (await rateLimitReached(rateLimitId, req, res)) {
+    res.status(429).json({ message: 'Too many requests.' });
+    return;
+  }
+
   next();
 }
 
@@ -57,10 +47,10 @@ async function addToRateTracker(res: Response): Promise<void> {
   }
 }
 
-async function rateLimitReached(rateLimitId: string, res: Response): Promise<boolean> {
-  interface RateTrackerDetails {
+async function rateLimitReached(rateLimitId: string, req: Request, res: Response): Promise<boolean> {
+  type RateTrackerDetails = {
     requests_count: number;
-  }
+  };
 
   try {
     const [rateTrackerRows] = await dbPool.execute<RowDataPacket[]>(
@@ -80,7 +70,8 @@ async function rateLimitReached(rateLimitId: string, res: Response): Promise<boo
       return false;
     }
 
-    if (rateTrackerDetails.requests_count > REQUESTS_RATE_LIMIT) {
+    if (rateTrackerDetails.requests_count > ABUSE_INCREMENT_THRESHOLD) {
+      await addToAbusiveUsers(req);
       return true;
     }
 
@@ -115,10 +106,10 @@ async function addToAbusiveUsers(req: Request): Promise<void> {
   }
 
   try {
-    interface UserDetails {
+    type UserDetails = {
       rate_limit_reached_count: number;
       latest_abuse_timestamp: number;
-    }
+    };
 
     const [userRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT

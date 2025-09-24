@@ -1,17 +1,19 @@
 import axios, { AxiosResponse } from 'axios';
+import { WishlistDetailsType } from '../types/wishlistTypes';
+import { WishlistItemType } from '../types/wishlistItemTypes';
 
 axios.defaults.withCredentials = true;
 const wishlistsApiUrl: string =
   location.hostname === 'localhost' ? `http://localhost:5000/api/wishlists` : `https://muninnfy/api/wishlists`;
 
-interface CreateWishListAsAccountServicePayload {
+type CreateWishListAsAccountServicePayload = {
   privacyLevel: number;
   title: string;
-}
+};
 
-interface CreateWishListAsAccountServiceData {
+type CreateWishListAsAccountServiceData = {
   wishlistId: string;
-}
+};
 
 export async function createWishlistAsAccountService(
   body: CreateWishListAsAccountServicePayload
@@ -19,29 +21,10 @@ export async function createWishlistAsAccountService(
   return axios.post(wishlistsApiUrl, body);
 }
 
-export interface WishlistDetailsInterface {
-  privacy_level: number;
-  title: string;
-  created_on_timestamp: number;
-}
-
-export interface WishlistItemInterface {
-  item_id: number;
-  added_on_timestamp: number;
-  title: string;
-  description: string | null;
-  link: string | null;
-  is_purchased: boolean;
-  tags: {
-    id: number;
-    name: string;
-  }[];
-}
-
-interface getWishlistDetailsData {
-  wishlistDetails: WishlistDetailsInterface;
-  wishlistItems: WishlistItemInterface[];
-}
+type getWishlistDetailsData = {
+  wishlistDetails: WishlistDetailsType;
+  wishlistItems: WishlistItemType[];
+};
 
 export async function getWishlistDetailsService(
   wishlistId: string,
@@ -50,19 +33,19 @@ export async function getWishlistDetailsService(
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
 }
 
-interface ChangeWishlistTitleServicePayload {
+type ChangeWishlistTitleServicePayload = {
   wishlistId: string;
   newTitle: string;
-}
+};
 
 export async function changeWishlistTitleService(body: ChangeWishlistTitleServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${wishlistsApiUrl}/change/title`, body);
 }
 
-interface ChangeWishlistPrivacyLevelServicePayload {
+type ChangeWishlistPrivacyLevelServicePayload = {
   wishlistId: string;
   newPrivacyLevel: number;
-}
+};
 
 export async function changeWishlistPrivacyLevelService(body: ChangeWishlistPrivacyLevelServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);

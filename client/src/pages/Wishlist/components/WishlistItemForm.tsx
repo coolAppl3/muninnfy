@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, JSX, useEffect, useMemo, useRef, useState } from 'react';
 import TextareaFormGroup from '../../../components/FormGroups/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
 import WishlistItemTagsFormGroup from './WishlistItemTagsFormGroup';
@@ -9,14 +9,13 @@ import {
   validateWishlistItemTitle,
 } from '../../../utils/validation/wishlistItemValidation';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
-import useAuth from '../../../hooks/useAuth';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useWishlist from '../useWishlist';
-import { WishlistItemInterface } from '../../../services/wishlistServices';
 import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
-import { AsyncErrorData, getAsyncErrorData } from '../../../utils/errorUtils';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
+import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 export default function WishlistItemForm({
   formMode,
@@ -24,7 +23,7 @@ export default function WishlistItemForm({
   onFinish,
 }: {
   formMode: 'NEW_ITEM' | 'EDIT_ITEM';
-  wishlistItem?: WishlistItemInterface;
+  wishlistItem?: WishlistItemType;
   onFinish: () => void;
 }): JSX.Element {
   const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
@@ -42,11 +41,21 @@ export default function WishlistItemForm({
 
   const [itemTags, setItemTags] = useState<Set<string>>(new Set(wishlistItem?.tags.map(({ name }) => name) || []));
 
-  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
+
+  const titleInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    titleInputRef.current?.focus();
+
+    return () => {
+      titleInputRef.current = null;
+    };
+  }, []);
 
   async function handleSubmit(): Promise<void> {
     if (formMode === 'NEW_ITEM' && !itemAlreadyInWishlist()) {
@@ -77,8 +86,8 @@ export default function WishlistItemForm({
     const tags: string[] = [...itemTags];
 
     try {
-      const wishlistItem: WishlistItemInterface = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
-      setWishlistItems((prev) => [wishlistItem, ...prev]);
+      const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
+      setWishlistItems((prev) => [newWishlistItem, ...prev]);
 
       displayPopupMessage('Item added.', 'success');
       clearForm();
@@ -86,22 +95,13 @@ export default function WishlistItemForm({
       onFinish();
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason, errResData } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason, errResData } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
-        return;
-      }
-
-      if (status === 404) {
+      if (status === 404 || (status === 400 && errReason === 'invalidWishlistId')) {
         navigate(referrerLocation || '/account');
         return;
       }
@@ -134,14 +134,13 @@ export default function WishlistItemForm({
     const tags: string[] = [...itemTags];
 
     try {
-      const updatedWishlistItem: WishlistItemInterface = (
-        await editWishlistItemService({ wishlistId, itemId, title, description, link, tags })
-      ).data;
+      const updatedWishlistItem: WishlistItemType = (await editWishlistItemService({ wishlistId, itemId, title, description, link, tags }))
+        .data;
 
       setWishlistItems((prev) =>
-        prev.map((wishlistItem: WishlistItemInterface) => {
-          if (wishlistItem.item_id !== itemId) {
-            return wishlistItem;
+        prev.map((item: WishlistItemType) => {
+          if (item.item_id !== itemId) {
+            return item;
           }
 
           return updatedWishlistItem;
@@ -152,18 +151,14 @@ export default function WishlistItemForm({
       onFinish();
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errMessage, errReason, errResData } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason, errResData } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
+      if (status === 409) {
+        handleDuplicateItemTitle(errResData);
         return;
       }
 
@@ -173,12 +168,7 @@ export default function WishlistItemForm({
           return;
         }
 
-        setWishlistItems((prev) => prev.filter((item: WishlistItemInterface) => item.item_id !== wishlistItem.item_id));
-        return;
-      }
-
-      if (status === 409) {
-        handleDuplicateItemTitle(errResData);
+        setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
         return;
       }
 
@@ -209,8 +199,8 @@ export default function WishlistItemForm({
       return;
     }
 
-    const existingWishlistItem = errResData.existingWishlistItem as WishlistItemInterface;
-    const itemExists: boolean = wishlistItems.some((item: WishlistItemInterface) => item.item_id === existingWishlistItem.item_id);
+    const existingWishlistItem = errResData.existingWishlistItem as WishlistItemType;
+    const itemExists: boolean = wishlistItems.some((item: WishlistItemType) => item.item_id === existingWishlistItem.item_id);
 
     itemExists || setWishlistItems((prev) => [...prev, existingWishlistItem].sort((a, b) => b.added_on_timestamp - a.added_on_timestamp));
   }
@@ -291,7 +281,7 @@ export default function WishlistItemForm({
 
   return (
     <form
-      className={`wishlist-item-form ${formMode === 'EDIT_ITEM' ? 'edit-mode' : ''}`}
+      className={`wishlist-item-form ${formMode === 'EDIT_ITEM' && 'edit-mode'}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -312,6 +302,7 @@ export default function WishlistItemForm({
         id='item-title'
         label='Title'
         autoComplete='off'
+        ref={formMode === 'NEW_ITEM' ? titleInputRef : null}
         value={titleValue}
         errorMessage={titleErrorMessage}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {

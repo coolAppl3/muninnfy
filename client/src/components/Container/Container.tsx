@@ -1,10 +1,10 @@
 import { JSX, ReactNode } from 'react';
 import './Container.css';
 
-interface ContainerProps {
+type ContainerProps = {
   children: ReactNode;
   className?: string;
-}
+};
 
 export default function Container({ children, className = '' }: ContainerProps): JSX.Element {
   return <div className={`container ${className}`}>{children}</div>;

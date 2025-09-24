@@ -20,7 +20,7 @@ import { getAuthSessionId } from '../auth/authUtils';
 
 export const wishlistItemsRouter: Router = express.Router();
 
-export interface MappedWishlistItem {
+export type MappedWishlistItem = {
   item_id: number;
   added_on_timestamp: number;
   title: string;
@@ -31,7 +31,7 @@ export interface MappedWishlistItem {
     id: number;
     name: string;
   }[];
-}
+};
 
 wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
@@ -40,13 +40,13 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     title: string;
     description: string | null;
     link: string | null;
     tags: string[];
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -87,9 +87,9 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
   let connection;
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       wishlist_items_count: number;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -136,10 +136,10 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
     sanitizedTags.length > 0 && (await insertWishlistItemTags(sanitizedTags, connection, req));
 
-    interface Tag {
+    type Tag = {
       id: number;
       name: string;
-    }
+    };
 
     const [itemTags] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -179,9 +179,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
       const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
       existingWishlistItem
         ? res.status(409).json({
@@ -208,14 +206,14 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     itemId: number;
     title: string;
     description: string | null;
     link: string | null;
     tags: string[];
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -264,12 +262,12 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     connection = await dbPool.getConnection();
     await connection.beginTransaction();
 
-    interface WishlistItemDetails {
+    type WishlistItemDetails = {
       added_on_timestamp: number;
       is_purchased: boolean;
       tags_count: number;
       is_wishlist_owner: boolean;
-    }
+    };
 
     const [wishlistItemRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -323,7 +321,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     const sanitizedTags: [number, string][] = sanitizeWishlistItemTags(tags, itemId);
 
-    if (wishlistItemDetails.tags_count !== 0 && sanitizedTags.length !== 0) {
+    if (wishlistItemDetails.tags_count !== sanitizedTags.length) {
       const deletedSuccessfully: boolean =
         wishlistItemDetails.tags_count === 0 ? true : await deleteWishlistItemTags(itemId, connection, req);
 
@@ -338,10 +336,10 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       }
     }
 
-    interface Tag {
+    type Tag = {
       id: number;
       name: string;
-    }
+    };
 
     const [itemTags] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -381,9 +379,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'title'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
       const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
 
       existingWishlistItem
@@ -431,9 +427,9 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistItemDetails {
+    type WishlistItemDetails = {
       item_exists: boolean;
-    }
+    };
 
     const [wishlistItemRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -490,11 +486,11 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     itemId: number;
     newPurchaseStatus: boolean;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -528,9 +524,9 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
   }
 
   try {
-    interface WishlistItemDetails {
+    type WishlistItemDetails = {
       is_purchased: boolean | null;
-    }
+    };
 
     const [wishlistItemRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT

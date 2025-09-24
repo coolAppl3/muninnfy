@@ -1,26 +1,26 @@
 import { ChangeEvent } from 'react';
 import { validateDisplayName, validateEmail, validateNewPassword, validateUsername } from '../../utils/validation/userValidation';
 
-interface FormData {
+type FormData = {
   displayName: string;
   username: string;
   email: string;
   password: string;
   confirmPassword: string;
-}
+};
 
-interface FormErrors {
+type FormErrors = {
   displayName: string | null;
   username: string | null;
   email: string | null;
   password: string | null;
   confirmPassword: string | null;
-}
+};
 
-interface SignUpFormValidationState {
+type SignUpFormValidationState = {
   formData: FormData;
   formErrors: FormErrors;
-}
+};
 
 export const initialSignUpFormValidationState: SignUpFormValidationState = {
   formData: {
@@ -40,20 +40,20 @@ export const initialSignUpFormValidationState: SignUpFormValidationState = {
   },
 };
 
-interface ValidateField {
+type ValidateField = {
   type: 'VALIDATE_FIELD';
   payload: ChangeEvent<HTMLInputElement>;
-}
+};
 
-interface ValidateAllFields {
+type ValidateAllFields = {
   type: 'VALIDATE_ALL_FIELDS';
   payload: null;
-}
+};
 
-interface AddFieldError {
+type AddFieldError = {
   type: 'ADD_FIELD_ERROR';
   payload: { errMessage: string; errReason: string };
-}
+};
 
 export default function signUpFormValidationReducer(
   state: SignUpFormValidationState,

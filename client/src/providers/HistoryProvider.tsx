@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
-import HistoryContext, { HistoryContextInterface } from '../contexts/HistoryContext';
+import HistoryContext, { HistoryContextType } from '../contexts/HistoryContext';
 import { useLocation } from 'react-router-dom';
 
 export default function HistoryProvider({ children }: { children: ReactNode }): JSX.Element {
@@ -20,7 +20,7 @@ export default function HistoryProvider({ children }: { children: ReactNode }): 
     locationRef.current = location;
   }, [pathname, search]);
 
-  const contextValue: HistoryContextInterface = useMemo(
+  const contextValue: HistoryContextType = useMemo(
     () => ({
       referrerLocation,
       setReferrerLocation,

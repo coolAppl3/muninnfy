@@ -3,30 +3,31 @@ import './Wishlist.css';
 import { Head } from '../../components/Head/Head';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';
-import { getWishlistDetailsService, WishlistDetailsInterface, WishlistItemInterface } from '../../services/wishlistServices';
+import { getWishlistDetailsService } from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
-import { AsyncErrorData, getAsyncErrorData } from '../../utils/errorUtils';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import WishlistHeaderProvider from './WishlistHeader/WishlistHeaderProvider';
 import WishlistHeader from './WishlistHeader/WishlistHeader';
-import useAuth from '../../hooks/useAuth';
 import useHistory from '../../hooks/useHistory';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import WishlistProvider from './WishlistProvider';
 import WishlistItems from './WishlistItems/WishlistItems';
 import NewWishlistItemFormContainer from './NewWishlistItemFormContainer/NewWishlistItemFormContainer';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
+import { WishlistDetailsType } from '../../types/wishlistTypes';
+import { WishlistItemType } from '../../types/wishlistItemTypes';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const [initialWishlistProviderData, setInitialWishlistProviderData] = useState<{
     initialWishlistId: string;
-    initialWishlistDetails: WishlistDetailsInterface;
-    initialWishlistItems: WishlistItemInterface[];
+    initialWishlistDetails: WishlistDetailsType;
+    initialWishlistItems: WishlistItemType[];
     initialWishlistItemsTitleSet: Set<string>;
   } | null>(null);
 
-  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
   const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();
@@ -57,7 +58,7 @@ export default function Wishlist(): JSX.Element {
           return;
         }
 
-        const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItemInterface) => {
+        const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItemType) => {
           set.add(item.title.toLowerCase());
           return set;
         }, new Set<string>());
@@ -76,20 +77,7 @@ export default function Wishlist(): JSX.Element {
         }
 
         console.log(err);
-        const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
-
-        if (!asyncErrorData) {
-          displayPopupMessage('Something went wrong.', 'error');
-          return;
-        }
-
-        const { status, errMessage } = asyncErrorData;
-        displayPopupMessage(errMessage, 'error');
-
-        if (status === 401) {
-          setAuthStatus('unauthenticated');
-          return;
-        }
+        handleAsyncError(err);
 
         navigate(referrerLocation || '/account');
       }
@@ -101,7 +89,7 @@ export default function Wishlist(): JSX.Element {
       ignore = true;
       abortController.abort();
     };
-  }, [isLoaded, displayPopupMessage, setAuthStatus, referrerLocation, urlParams, navigate]);
+  }, [isLoaded, referrerLocation, urlParams, displayPopupMessage, navigate, handleAsyncError]);
 
   return (
     <>

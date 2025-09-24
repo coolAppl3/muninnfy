@@ -3,14 +3,14 @@ import EyeIcon from '../../assets/svg/EyeIcon.svg?react';
 import EyeShutIcon from '../../assets/svg/EyeShutIcon.svg?react';
 import './FormGroups.css';
 
-interface PasswordFormGroupProps {
+type PasswordFormGroupProps = {
   id: string;
   label: string;
   value: string;
   errorMessage: string | null;
   onChange: ChangeEventHandler<HTMLInputElement>;
   className?: string;
-}
+};
 
 export default function PasswordFormGroup({ id, label, value, errorMessage, onChange, className }: PasswordFormGroupProps): JSX.Element {
   const [isPasswordType, setIsPasswordType] = useState<boolean>(true);

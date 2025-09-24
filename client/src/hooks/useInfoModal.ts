@@ -1,8 +1,8 @@
 import { useContext } from 'react';
-import InfoModalContext, { InfoModalContextInterface } from '../contexts/InfoModalContext';
+import InfoModalContext, { InfoModalContextType } from '../contexts/InfoModalContext';
 
-export default function useInfoModal(): InfoModalContextInterface {
-  const context = useContext<InfoModalContextInterface | null>(InfoModalContext);
+export default function useInfoModal(): InfoModalContextType {
+  const context = useContext<InfoModalContextType | null>(InfoModalContext);
 
   if (!context) {
     throw new Error('useInfoModal must be used within InfoModalContext.');

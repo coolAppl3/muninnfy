@@ -1,6 +1,6 @@
 import { ChangeEvent, ChangeEventHandler, JSX, Ref } from 'react';
 
-interface TextareaFormGroupProps {
+type TextareaFormGroupProps = {
   id: string;
   label: string;
   value: string;
@@ -8,7 +8,7 @@ interface TextareaFormGroupProps {
   onChange: ChangeEventHandler<HTMLTextAreaElement>;
   className?: string;
   ref?: Ref<HTMLTextAreaElement>;
-}
+};
 
 export default function TextareaFormGroup({
   id,

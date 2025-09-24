@@ -1,5 +1,4 @@
 import { FocusEvent, JSX, useState } from 'react';
-import { WishlistItemInterface } from '../../../../services/wishlistServices';
 import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
@@ -9,12 +8,12 @@ import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '../../../../services/wishlistItemServices';
 import useWishlist from '../../useWishlist';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
-import { AsyncErrorData, getAsyncErrorData } from '../../../../utils/errorUtils';
-import useAuth from '../../../../hooks/useAuth';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
+import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 
-export default function WishlistItem({ item }: { item: WishlistItemInterface }): JSX.Element {
+export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistItemType }): JSX.Element {
   const { wishlistId, setWishlistItems } = useWishlist();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -22,7 +21,7 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [updatingPurchaseStatus, setUpdatingPurchaseState] = useState<boolean>(false);
 
-  const { setAuthStatus } = useAuth();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
@@ -32,33 +31,29 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
     setUpdatingPurchaseState(true);
 
     try {
-      await setWishlistItemIsPurchasedService({ wishlistId, itemId: item.item_id, newPurchaseStatus: !item.is_purchased });
+      await setWishlistItemIsPurchasedService({ wishlistId, itemId: wishlistItem.item_id, newPurchaseStatus: !wishlistItem.is_purchased });
       setWishlistItems((prev) =>
-        prev.map((existingItem: WishlistItemInterface) => {
-          if (existingItem.item_id !== item.item_id) {
-            return existingItem;
+        prev.map((item: WishlistItemType) => {
+          if (item.item_id !== wishlistItem.item_id) {
+            return item;
           }
 
           return {
-            ...existingItem,
-            is_purchased: !item.is_purchased,
+            ...item,
+            is_purchased: !wishlistItem.is_purchased,
           };
         })
       );
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status, errReason } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage, errReason } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
         return;
       }
 
@@ -71,7 +66,7 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
         return;
       }
 
-      setWishlistItems((prev) => prev.filter((existingItem: WishlistItemInterface) => existingItem.item_id !== item.item_id));
+      setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
     } finally {
       setUpdatingPurchaseState(false);
     }
@@ -81,24 +76,20 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
     displayLoadingOverlay();
 
     try {
-      await deleteWishlistItemService(wishlistId, item.item_id);
-      setWishlistItems((prev) => prev.filter((existingItem: WishlistItemInterface) => existingItem.item_id !== item.item_id));
+      await deleteWishlistItemService(wishlistId, wishlistItem.item_id);
+      setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
 
       displayPopupMessage('Item removed.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const asyncErrorData: AsyncErrorData | null = getAsyncErrorData(err);
+      const { isHandled, status } = handleAsyncError(err);
 
-      if (!asyncErrorData) {
-        displayPopupMessage('Something went wrong.', 'error');
+      if (isHandled) {
         return;
       }
 
-      const { status, errMessage } = asyncErrorData;
-      displayPopupMessage(errMessage, 'error');
-
-      if (status === 401) {
-        setAuthStatus('unauthenticated');
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
         return;
       }
 
@@ -115,7 +106,7 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
       <div className='wishlist-item p-2'>
         <WishlistItemForm
           formMode='EDIT_ITEM'
-          wishlistItem={item}
+          wishlistItem={wishlistItem}
           onFinish={() => setIsEditing(false)}
         />
       </div>
@@ -123,33 +114,33 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
   }
 
   return (
-    <div className={`wishlist-item ${isExpanded ? 'expanded' : ''} ${item.is_purchased ? 'purchased' : ''}`}>
-      <div
+    <div className={`wishlist-item ${isExpanded ? 'expanded' : ''} ${wishlistItem.is_purchased ? 'purchased' : ''}`}>
+      <button
         className='header'
         onClick={() => setIsExpanded((prev) => !prev)}
         tabIndex={0}
         title={`${isExpanded ? 'Collapse' : 'Expand'} item`}
         aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item`}
       >
-        <h4>{item.title}</h4>
+        <h4>{wishlistItem.title}</h4>
         <span>
           <ChevronIcon />
         </span>
-      </div>
+      </button>
 
       <div className='body'>
         <div className='body-content'>
           <div className='info'>
-            <p>Added: {getShortenedDateString(item.added_on_timestamp)}</p>
+            <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
             <p>
               Link:{' '}
-              {item.link ? (
+              {wishlistItem.link ? (
                 <a
-                  href={/^https?:\/\//.test(item.link) ? item.link : `https://${item.link}`}
+                  href={/^https?:\/\//.test(wishlistItem.link) ? wishlistItem.link : `https://${wishlistItem.link}`}
                   target='_blank'
                   className='link'
                 >
-                  {item.link}
+                  {wishlistItem.link}
                 </a>
               ) : (
                 <span>None</span>
@@ -158,15 +149,15 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
           </div>
 
           <div className='tags'>
-            {item.tags.map((tag: { id: number; name: string }) => (
+            {wishlistItem.tags.map((tag: { id: number; name: string }) => (
               <span key={tag.id}>{tag.name}</span>
             ))}
           </div>
 
-          {item.description && (
+          {wishlistItem.description && (
             <>
               <div className='h-line'></div>
-              <p>{item.description}</p>
+              <p className='description'>{wishlistItem.description}</p>
             </>
           )}
         </div>
@@ -196,9 +187,9 @@ export default function WishlistItem({ item }: { item: WishlistItemInterface }):
           ) : (
             <button
               type='button'
-              className={`mark-as-purchased-btn ${item.is_purchased ? 'purchased' : ''}`}
-              title={`Mark as ${item.is_purchased ? 'purchased' : 'not purchased'}`}
-              aria-label={`Mark as ${item.is_purchased ? 'purchased' : 'not purchased'}`}
+              className={`mark-as-purchased-btn ${wishlistItem.is_purchased ? 'purchased' : ''}`}
+              title={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'not purchased'}`}
+              aria-label={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'not purchased'}`}
               onClick={async () => await setWishlistItemIsPurchased()}
             >
               <CheckIcon className='text-dark' />

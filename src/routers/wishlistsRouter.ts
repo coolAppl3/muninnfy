@@ -8,7 +8,6 @@ import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
 import { TOTAL_WISHLISTS_LIMIT, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { getWishlistPrivacyLevelName } from '../util/wishlistUtils';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
 import { MappedWishlistItem } from './wishlistItemsRouter';
@@ -23,10 +22,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     privacyLevel: number;
     title: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -55,10 +54,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    interface AccountWishlistsDetails {
+    type AccountWishlistsDetails = {
       wishlists_created_count: number;
       title_already_used: boolean;
-    }
+    };
 
     const [accountWishlistsRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -117,9 +116,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const sqlError: SqlError = err;
-
-    if (sqlError.errno === 1062 && sqlError.sqlMessage?.endsWith(`for key 'account_id'`)) {
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
       res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
       return;
     }
@@ -150,11 +147,11 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -176,7 +173,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       return;
     }
 
-    interface WishlistItem {
+    type WishlistItem = {
       item_id: number;
       added_on_timestamp: number;
       title: string;
@@ -185,7 +182,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       is_purchased: boolean;
       tag_id: number;
       tag_name: string;
-    }
+    };
 
     const [wishlistItems] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -258,10 +255,10 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     newTitle: string;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -290,9 +287,9 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
   }
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       title: string;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -352,10 +349,10 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     return;
   }
 
-  interface RequestData {
+  type RequestData = {
     wishlistId: string;
     newPrivacyLevel: number;
-  }
+  };
 
   const requestData: RequestData = req.body;
 
@@ -384,9 +381,9 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
   }
 
   try {
-    interface WishlistDetails {
+    type WishlistDetails = {
       privacy_level: number;
-    }
+    };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -407,11 +404,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     }
 
     if (wishlistDetails.privacy_level === newPrivacyLevel) {
-      res.status(409).json({
-        message: `Privacy level is already set to ${getWishlistPrivacyLevelName(wishlistDetails.privacy_level).toLowerCase()}.`,
-        reason: 'identicalPrivacyLevel',
-      });
-
+      res.json({});
       return;
     }
 

@@ -1,11 +1,11 @@
 import { minuteMilliseconds } from '../../constants/globalConstants';
 import { ACCOUNT_VERIFICATION_WINDOW } from '../../constants/accountConstants';
 
-interface AccountVerificationEmailTemplate {
+type AccountVerificationEmailTemplate = {
   displayName: string;
   publicAccountId: string;
   verificationToken: string;
-}
+};
 
 export default function accountVerificationEmailTemplate({
   displayName,

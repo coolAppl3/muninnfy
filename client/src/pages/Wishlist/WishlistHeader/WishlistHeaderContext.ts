@@ -2,7 +2,7 @@ import { createContext, Dispatch, SetStateAction } from 'react';
 
 export type WishlistHeaderEditMode = 'TITLE' | 'PRIVACY_LEVEL' | 'DELETE_WISHLIST';
 
-export interface WishlistHeaderContextInterface {
+export type WishlistHeaderContextType = {
   editMode: WishlistHeaderEditMode | null;
   setEditMode: Dispatch<SetStateAction<WishlistHeaderEditMode | null>>;
 
@@ -11,7 +11,7 @@ export interface WishlistHeaderContextInterface {
 
   isSubmitting: boolean;
   setIsSubmitting: Dispatch<SetStateAction<boolean>>;
-}
+};
 
-const WishlistHeaderContext = createContext<WishlistHeaderContextInterface | null>(null);
+const WishlistHeaderContext = createContext<WishlistHeaderContextType | null>(null);
 export default WishlistHeaderContext;

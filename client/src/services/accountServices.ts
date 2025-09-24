@@ -3,28 +3,28 @@ import axios, { AxiosResponse } from 'axios';
 axios.defaults.withCredentials = true;
 const accountsApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/accounts` : `https://muninnfy/api/accounts`;
 
-interface SignUpServicePayload {
+type SignUpServicePayload = {
   email: string;
   username: string;
   password: string;
   displayName: string;
-}
+};
 
-interface SignUpServiceData {
+type SignUpServiceData = {
   publicAccountId: string;
-}
+};
 
 export function signUpService(body: SignUpServicePayload): Promise<AxiosResponse<SignUpServiceData>> {
   return axios.post(`${accountsApiUrl}/signUp`, body);
 }
 
-interface ContinueAccountVerificationServicePayload {
+type ContinueAccountVerificationServicePayload = {
   email: string;
-}
+};
 
-interface ContinueAccountVerificationServiceData {
+type ContinueAccountVerificationServiceData = {
   publicAccountId: string;
-}
+};
 
 export function continueAccountVerificationService(
   body: ContinueAccountVerificationServicePayload
@@ -32,28 +32,28 @@ export function continueAccountVerificationService(
   return axios.post(`${accountsApiUrl}/verification/continue`, body);
 }
 
-interface ResendVerificationEmailPayload {
+type ResendVerificationEmailPayload = {
   publicAccountId: string;
-}
+};
 
 export function resendAccountVerificationEmailService(body: ResendVerificationEmailPayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/verification/resendEmail`, body);
 }
 
-interface VerifyAccountPayload {
+type VerifyAccountPayload = {
   publicAccountId: string;
   verificationToken: string;
-}
+};
 
 export function verifyAccountService(body: VerifyAccountPayload, abortSignal: AbortSignal): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/verification/verify`, body, { signal: abortSignal });
 }
 
-interface SignInPayload {
+type SignInPayload = {
   email: string;
   password: string;
   keepSignedIn: boolean;
-}
+};
 
 export function signInService(body: SignInPayload): Promise<AxiosResponse> {
   return axios.post(`${accountsApiUrl}/signIn`, body);

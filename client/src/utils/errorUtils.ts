@@ -1,17 +1,17 @@
 import axios, { AxiosError } from 'axios';
 
-interface AxiosErrorResponseData {
+type AxiosErrorResponseData = {
   message: string;
   reason?: string;
   resData?: unknown;
-}
+};
 
-export interface AsyncErrorData {
+export type AsyncErrorData = {
   status: number;
   errMessage: string;
   errReason?: string;
   errResData?: unknown;
-}
+};
 
 export function getAsyncErrorData(err: unknown): AsyncErrorData | null {
   if (!axios.isAxiosError(err)) {
