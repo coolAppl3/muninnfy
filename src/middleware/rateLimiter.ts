@@ -70,8 +70,8 @@ async function rateLimitReached(rateLimitId: string, req: Request, res: Response
       return false;
     }
 
-    if (rateTrackerDetails.requests_count > ABUSE_INCREMENT_THRESHOLD) {
-      await addToAbusiveUsers(req);
+    if (rateTrackerDetails.requests_count > REQUESTS_RATE_LIMIT) {
+      rateTrackerDetails.requests_count > ABUSE_INCREMENT_THRESHOLD && (await addToAbusiveUsers(req));
       return true;
     }
 
