@@ -6,13 +6,13 @@ import useConfirmModal from '../../../../hooks/useConfirmModal';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import { getWishlistPrivacyLevelName } from '../../../../utils/wishlistUtils';
-import useWishlistHeader from '../useWishlistHeader';
+import useWishlistHeader from '../context/useWishlistHeader';
 import {
   FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../../../utils/constants/wishlistConstants';
-import useWishlist from '../../useWishlist';
+import useWishlist from '../../context/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export default function EditPrivacyLevelContainer(): JSX.Element {

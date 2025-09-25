@@ -1,5 +1,5 @@
 import { JSX } from 'react';
-import useWishlist from '../useWishlist';
+import useWishlist from '../context/useWishlist';
 import Container from '../../../components/Container/Container';
 import WishlistItem from './WishlistItem/WishlistItem';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';

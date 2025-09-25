@@ -6,7 +6,7 @@ import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '../../../../services/wishlistItemServices';
-import useWishlist from '../../useWishlist';
+import useWishlist from '../../context/useWishlist';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';

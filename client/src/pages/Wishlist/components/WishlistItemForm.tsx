@@ -10,7 +10,7 @@ import {
 } from '../../../utils/validation/wishlistItemValidation';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
-import useWishlist from '../useWishlist';
+import useWishlist from '../context/useWishlist';
 import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';

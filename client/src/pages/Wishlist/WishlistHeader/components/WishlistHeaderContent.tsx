@@ -1,9 +1,9 @@
 import { FocusEvent, JSX } from 'react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
-import useWishlistHeader from '../useWishlistHeader';
+import useWishlistHeader from '../context/useWishlistHeader';
 import { copyToClipboard } from '../../../../utils/globalUtils';
-import useWishlist from '../../useWishlist';
+import useWishlist from '../../context/useWishlist';
 
 export default function WishlistHeaderContent(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();

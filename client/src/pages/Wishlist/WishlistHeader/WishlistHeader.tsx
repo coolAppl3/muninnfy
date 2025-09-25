@@ -2,10 +2,10 @@ import { JSX } from 'react';
 import Container from '../../../components/Container/Container';
 import { getFullDateString } from '../../../utils/globalUtils';
 import { getWishlistPrivacyLevelName } from '../../../utils/wishlistUtils';
-import useWishlistHeader from './useWishlistHeader';
+import useWishlistHeader from './context/useWishlistHeader';
 import WishlistHeaderEditingContainer from './components/WishlistHeaderEditingContainer';
 import WishlistHeaderContent from './components/WishlistHeaderContent';
-import useWishlist from '../useWishlist';
+import useWishlist from '../context/useWishlist';
 
 export default function WishlistHeader(): JSX.Element {
   const { wishlistDetails } = useWishlist();
