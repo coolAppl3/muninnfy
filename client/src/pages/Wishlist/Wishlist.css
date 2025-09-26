@@ -303,3 +303,53 @@ main {
     }
   }
 }
+
+.wishlist-items-toolbar {
+  .toolbar-btn {
+    @apply bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter_colors] hover:brightness-75;
+
+    svg {
+      @apply w-2 h-2;
+    }
+  }
+
+  .view-container {
+    button {
+      @apply rounded-pill px-2;
+
+      &.selected {
+        @apply bg-secondary;
+      }
+
+      &:first-child {
+        @apply rounded-tr-none rounded-br-none;
+      }
+
+      &:last-child {
+        @apply rounded-tl-none rounded-bl-none;
+      }
+    }
+  }
+
+  .options {
+    @apply relative z-3;
+
+    &.open {
+      button {
+        @apply text-cta;
+      }
+
+      .options-menu {
+        @apply block;
+      }
+    }
+
+    .options-menu {
+      @apply absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny hidden;
+
+      button {
+        @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 w-full cursor-pointer;
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+import { FocusEvent, JSX, useState } from 'react';
+import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
+
+export default function WishlistItemsToolbarOptions(): JSX.Element {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  return (
+    <div
+      className={`options ${isOpen && 'open'}`}
+      onBlur={(e: FocusEvent) => {
+        if (e.relatedTarget) {
+          return;
+        }
+
+        setIsOpen(false);
+      }}
+    >
+      <button
+        type='button'
+        className='toolbar-btn'
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <TripleDotMenuIcon />
+      </button>
+
+      <div className='options-menu'>
+        <button
+          type='button'
+          onClick={() => {
+            // TODO: toggle select mode
+            setIsOpen(false);
+          }}
+        >
+          Select items
+        </button>
+
+        <button
+          type='button'
+          onClick={() => {
+            // TODO: toggle items' default look
+            setIsOpen(false);
+          }}
+        >
+          Keep items collapsed
+        </button>
+      </div>
+    </div>
+  );
+}

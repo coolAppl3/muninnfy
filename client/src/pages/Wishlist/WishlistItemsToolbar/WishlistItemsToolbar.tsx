@@ -1,11 +1,11 @@
 import { JSX, useState } from 'react';
 import Container from '../../../components/Container/Container';
 import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
-import TripleDotMenuIcon from '../../../assets/svg/TripleDotMenuIcon.svg?react';
 import SingleColumnGridIcon from '../../../assets/svg/SingleColumnGridIcon.svg?react';
 import DoubleColumnGridIcon from '../../../assets/svg/DoubleColumnGridIcon.svg?react';
 import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
 import SortIcon from '../../../assets/svg/SortIcon.svg?react';
+import WishlistItemsToolbarOptions from './components/WishlistItemsToolbarOptions';
 
 export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
@@ -18,25 +18,33 @@ export default function WishlistItemsToolbar(): JSX.Element {
             <div className='view-container flex justify-center items-center mr-auto'>
               <button
                 type='button'
-                className='selected'
+                className='selected toolbar-btn'
               >
                 <DoubleColumnGridIcon />
               </button>
-              <button type='button'>
+              <button
+                type='button'
+                className='toolbar-btn'
+              >
                 <SingleColumnGridIcon />
               </button>
             </div>
 
-            <button type='button'>
+            <button
+              type='button'
+              className='toolbar-btn'
+            >
               <SortIcon />
             </button>
 
-            <button type='button'>
+            <button
+              type='button'
+              className='toolbar-btn'
+            >
               <SlidersIcon />
             </button>
-            <button type='button'>
-              <TripleDotMenuIcon />
-            </button>
+
+            <WishlistItemsToolbarOptions />
           </div>
         </div>
 
