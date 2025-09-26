@@ -43,7 +43,8 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
             setIsOpen(false);
           }}
         >
-          Keep items collapsed
+          Expand items by default
+          {/* TODO: conditionally change between Expand/Collapse */}
         </button>
       </div>
     </div>
