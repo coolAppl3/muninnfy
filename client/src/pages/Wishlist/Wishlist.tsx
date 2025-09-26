@@ -16,6 +16,7 @@ import NewWishlistItemFormContainer from './NewWishlistItemFormContainer/NewWish
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
 import { WishlistDetailsType } from '../../types/wishlistTypes';
 import { WishlistItemType } from '../../types/wishlistItemTypes';
+import WishlistItemsToolbar from './WishlistItemsToolbar/WishlistItemsToolbar';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -103,6 +104,7 @@ export default function Wishlist(): JSX.Element {
             </WishlistHeaderProvider>
 
             <NewWishlistItemFormContainer />
+            <WishlistItemsToolbar />
             <WishlistItems />
           </main>
         </WishlistProvider>
