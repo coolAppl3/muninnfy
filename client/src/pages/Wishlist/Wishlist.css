@@ -331,7 +331,8 @@ main {
     }
   }
 
-  .options {
+  .options,
+  .sort {
     @apply relative z-3;
 
     &.open {
@@ -339,12 +340,14 @@ main {
         @apply text-cta;
       }
 
-      .options-menu {
+      .options-menu,
+      .sort-menu {
         @apply block;
       }
     }
 
-    .options-menu {
+    .options-menu,
+    .sort-menu {
       @apply absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny hidden;
 
       button {

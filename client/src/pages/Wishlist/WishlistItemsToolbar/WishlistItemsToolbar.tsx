@@ -4,8 +4,8 @@ import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
 import SingleColumnGridIcon from '../../../assets/svg/SingleColumnGridIcon.svg?react';
 import DoubleColumnGridIcon from '../../../assets/svg/DoubleColumnGridIcon.svg?react';
 import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
-import SortIcon from '../../../assets/svg/SortIcon.svg?react';
 import WishlistItemsToolbarOptions from './components/WishlistItemsToolbarOptions';
+import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';
 
 export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
@@ -34,16 +34,10 @@ export default function WishlistItemsToolbar(): JSX.Element {
               type='button'
               className='toolbar-btn'
             >
-              <SortIcon />
-            </button>
-
-            <button
-              type='button'
-              className='toolbar-btn'
-            >
               <SlidersIcon />
             </button>
 
+            <WishlistItemsToolbarSort />
             <WishlistItemsToolbarOptions />
           </div>
         </div>
