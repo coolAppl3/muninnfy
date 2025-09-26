@@ -8,7 +8,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
     <div
       className={`options ${isOpen && 'open'}`}
       onBlur={(e: FocusEvent) => {
-        if (e.relatedTarget) {
+        if (e.relatedTarget?.classList.contains('menu-btn')) {
           return;
         }
 
@@ -26,6 +26,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
       <div className='options-menu'>
         <button
           type='button'
+          className='menu-btn'
           onClick={() => {
             // TODO: toggle select mode
             setIsOpen(false);
@@ -36,6 +37,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
 
         <button
           type='button'
+          className='menu-btn'
           onClick={() => {
             // TODO: toggle items' default look
             setIsOpen(false);
