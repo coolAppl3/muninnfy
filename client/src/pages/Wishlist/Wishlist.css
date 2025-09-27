@@ -1,8 +1,6 @@
 @reference '../../index.css';
 
 main {
-  @apply py-4 grid gap-2;
-
   .wishlist-header {
     .wishlist-header-container {
       @apply bg-secondary p-2 pb-0 rounded-sm shadow-simple-tiny grid grid-rows-[auto_0fr] transition-[grid] gap-2;
@@ -13,8 +11,6 @@ main {
 
       .content {
         .content-header {
-          @apply flex justify-between items-start gap-1 mb-1 relative;
-
           &.open {
             & > button {
               svg {
@@ -27,13 +23,7 @@ main {
             }
           }
 
-          h3 {
-            @apply text-title font-medium mb-1 break-words leading-[1];
-          }
-
           & > button {
-            @apply mt-[-1rem] mr-[-1.2rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer flex justify-center items-center;
-
             &.open {
               svg {
                 @apply text-cta;
@@ -55,8 +45,6 @@ main {
         }
 
         .content-menu {
-          @apply absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden;
-
           button {
             @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
           }
@@ -64,22 +52,10 @@ main {
       }
 
       .editing-container {
-        @apply overflow-hidden relative z-0;
-
-        .h-line {
-          @apply mb-[14px];
-        }
-
         .privacy-level {
           @apply grid gap-[6px];
 
-          span {
-            @apply text-sm font-medium text-title;
-          }
-
           .btn-container {
-            @apply grid grid-cols-3 rounded-sm sm:max-w-[40rem];
-
             button {
               @apply w-full text-sm text-title text-center font-medium py-1 bg-dark transition-[filter] hover:brightness-60 cursor-pointer z-0 focus:z-1;
 
@@ -96,21 +72,13 @@ main {
               }
             }
           }
-
-          & > button.link {
-            @apply text-sm text-end mt-1;
-          }
         }
       }
     }
   }
 
-  .wishlist-item-form-container {
-    @apply relative z-0;
-
+  .new-wishlist-item-form-container {
     .inner-container {
-      @apply rounded-sm bg-secondary shadow-simple-tiny;
-
       &.expanded {
         .header {
           @apply border-b-light-gray rounded-bl-none rounded-br-none;
@@ -124,28 +92,10 @@ main {
           @apply py-2;
         }
       }
-
-      .header {
-        @apply w-full flex justify-between items-center p-2 bg-secondary text-title transition-[filter_colors] hover:brightness-110 hover:text-cta cursor-pointer border-b-1 border-b-secondary rounded-sm;
-
-        p {
-          @apply font-medium;
-        }
-
-        svg {
-          @apply w-[1.6rem] h-[1.6rem];
-        }
-      }
-
-      form.wishlist-item-form {
-        @apply px-2 shadow-none rounded-none;
-      }
     }
   }
 
   form.wishlist-item-form {
-    @apply bg-secondary grid gap-2 rounded-sm shadow-simple-tiny overflow-hidden relative z-0;
-
     &.edit-mode {
       .btn-container {
         @apply sm:flex-col md:flex-row;
@@ -161,17 +111,11 @@ main {
         }
       }
     }
-
-    .btn-container {
-      @apply flex flex-col sm:flex-row justify-start items-center gap-1;
-    }
   }
 
   .wishlist-items-toolbar {
     .inner-container {
       & > header {
-        @apply flex justify-start items-center gap-1 mb-1 text-title;
-
         .toolbar-btn {
           @apply bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter_colors] hover:brightness-75;
 
@@ -180,7 +124,7 @@ main {
           }
         }
 
-        .view {
+        .view-btn {
           @apply flex justify-between gap-2 mr-auto px-2 bg-dark shadow-simple-tiny overflow-hidden rounded-pill relative after:absolute after:top-0 after:left-0 after:h-full after:w-1/2 after:bg-secondary after:transition-transform;
 
           &.single-column-grid {
@@ -190,8 +134,6 @@ main {
 
         .options,
         .sort {
-          @apply relative z-3;
-
           &.open {
             button {
               @apply text-cta;
@@ -205,8 +147,6 @@ main {
 
           .options-menu,
           .sort-menu {
-            @apply absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny hidden;
-
             button {
               @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 w-full cursor-pointer;
             }
@@ -222,8 +162,6 @@ main {
         }
 
         .filter-item {
-          @apply not-last:mb-1;
-
           &.open {
             @apply not-last:mb-2;
 
@@ -232,13 +170,7 @@ main {
             }
           }
 
-          & > header {
-            @apply flex justify-start items-center mb-1;
-          }
-
           .checkbox-container {
-            @apply hidden gap-[1.4rem] pl-1;
-
             .checkbox-btn {
               @apply flex justify-center items-center gap-[4px] w-fit cursor-pointer transition-[filter] hover:brightness-75;
 
@@ -266,29 +198,13 @@ main {
             }
           }
         }
-
-        .btn-container {
-          @apply flex flex-col sm:flex-row justify-start items-start gap-1 mt-2;
-
-          button {
-            @apply w-full sm:w-fit first:order-1 nth-[2]:order-2 last:order-3 sm:first:order-3 sm:last:order-1 last:mt-1 sm:last:mt-0;
-          }
-        }
       }
     }
   }
 
   .wishlist-items {
     .wishlist-items-container {
-      @apply grid grid-cols-1 sm:grid-cols-2 gap-1 items-start;
-
-      p.no-items {
-        @apply sm:col-span-2 text-sm font-medium text-description w-fit mx-auto;
-      }
-
       .wishlist-item {
-        @apply bg-secondary rounded-sm shadow-simple-tiny;
-
         &.purchased {
           .header {
             @apply after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1;
@@ -312,57 +228,21 @@ main {
         }
 
         form.wishlist-item-form {
-          @apply shadow-none rounded-none;
-
           input {
             @apply sm:text-sm;
           }
         }
 
-        .header {
-          @apply relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter_colors] hover:brightness-110 cursor-pointer rounded-sm border-b-1 border-b-secondary overflow-hidden;
-
-          h4 {
-            @apply text-title py-[8.4px];
-          }
-
-          span {
-            @apply p-1 rounded-[50%] mr-[-1rem];
-
-            svg {
-              @apply text-title w-[1.6rem] h-[1.6rem];
-            }
-          }
-        }
-
         .body {
-          @apply hidden justify-between items-start gap-1 p-2 pt-1;
-
           .body-content {
-            @apply w-full text-sm text-description grid gap-1;
-
-            .info {
-              @apply pr-1 whitespace-nowrap overflow-hidden text-ellipsis;
-
-              span {
-                @apply brightness-75;
-              }
-            }
-
             .tags {
               span {
                 @apply inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] font-medium;
               }
             }
-
-            .description {
-              @apply whitespace-break-spaces;
-            }
           }
 
           .body-btn-container {
-            @apply grid gap-1 mr-[-1rem] relative place-items-center;
-
             &.open {
               .item-menu-btn {
                 @apply bg-dark;
@@ -380,10 +260,6 @@ main {
             & > button {
               @apply p-1 rounded-[50%] transition-colors cursor-pointer;
 
-              &.item-menu-btn {
-                @apply hover:bg-dark mt-[-8px];
-              }
-
               &.mark-as-purchased-btn {
                 @apply bg-light/50 hover:bg-light;
 
@@ -391,19 +267,9 @@ main {
                   @apply bg-cta hover:bg-cta/75;
                 }
               }
-
-              svg {
-                @apply w-[1.6rem] h-[1.6rem];
-              }
-            }
-
-            .spinner {
-              @apply w-[2.6rem] h-[2.6rem] my-[5px];
             }
 
             .item-menu {
-              @apply absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden;
-
               button {
                 @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 last:border-t-1 last:border-t-description/50 w-full cursor-pointer;
               }

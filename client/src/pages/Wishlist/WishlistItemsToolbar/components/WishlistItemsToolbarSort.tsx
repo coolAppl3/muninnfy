@@ -6,7 +6,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
 
   return (
     <div
-      className={`sort ${isOpen && 'open'}`}
+      className={`sort relative z-3 ${isOpen && 'open'}`}
       onBlur={(e: FocusEvent) => {
         if (e.relatedTarget?.classList.contains('menu-btn')) {
           return;
@@ -23,7 +23,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
         <SortIcon />
       </button>
 
-      <div className='sort-menu'>
+      <div className='sort-menu absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny hidden'>
         <button
           type='button'
           className='menu-btn'

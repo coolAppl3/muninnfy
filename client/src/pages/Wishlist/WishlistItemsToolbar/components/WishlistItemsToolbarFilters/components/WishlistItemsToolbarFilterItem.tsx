@@ -16,8 +16,8 @@ export default function WishlistItemsToolbarFilterItem({
   negativeFilterTitle: string;
 }): JSX.Element {
   return (
-    <div className={`filter-item ${filterBy === null ? '' : 'open'}`}>
-      <header className='flex justify-start items-center gap-1'>
+    <div className={`filter-item not-last:mb-1 ${filterBy === null ? '' : 'open'}`}>
+      <header className='flex justify-start items-center gap-1 mb-1'>
         <p className='text-title text-sm leading-[1]'>{title}</p>
         <ToggleSwitch
           isToggled={filterBy !== null}
@@ -25,7 +25,7 @@ export default function WishlistItemsToolbarFilterItem({
         />
       </header>
 
-      <div className='checkbox-container'>
+      <div className='checkbox-container hidden gap-[1.4rem] pl-1'>
         <button
           type='button'
           className={`checkbox-btn ${filterBy ? 'checked' : ''}`}
@@ -36,6 +36,7 @@ export default function WishlistItemsToolbarFilterItem({
           </div>
           <span>{positiveFilterTitle}</span>
         </button>
+
         <button
           type='button'
           className={`checkbox-btn ${filterBy === false ? 'checked' : ''}`}

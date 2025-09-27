@@ -26,8 +26,8 @@ export default function WishlistHeader(): JSX.Element {
             </p>
           </div>
 
-          <div className='editing-container'>
-            <div className='h-line'></div>
+          <div className='editing-container overflow-hidden relative z-0'>
+            <div className='h-line mb-[1.4rem]'></div>
             <WishlistHeaderEditingContainer />
           </div>
         </div>

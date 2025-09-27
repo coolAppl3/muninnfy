@@ -6,7 +6,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
 
   return (
     <div
-      className={`options ${isOpen && 'open'}`}
+      className={`options relative z-3 ${isOpen && 'open'}`}
       onBlur={(e: FocusEvent) => {
         if (e.relatedTarget?.classList.contains('menu-btn')) {
           return;
@@ -23,7 +23,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
         <TripleDotMenuIcon />
       </button>
 
-      <div className='options-menu'>
+      <div className='options-menu absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny hidden'>
         <button
           type='button'
           className='menu-btn'

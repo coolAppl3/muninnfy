@@ -32,10 +32,10 @@ export default function WishlistItemsToolbarFilters({
         negativeFilterTitle={`Doesn't contain a link`}
       />
 
-      <div className='btn-container'>
-        <Button className='bg-cta border-cta'>Apply filters</Button>
-        <Button className='bg-secondary border-title text-title'>Cancel</Button>
-        <Button className='bg-description border-description'>Reset</Button>
+      <div className='btn-container flex flex-col sm:flex-row justify-start items-start gap-1 mt-2'>
+        <Button className='bg-cta border-cta w-full sm:w-fit order-1 sm:order-3'>Apply filters</Button>
+        <Button className='bg-secondary border-title text-title w-full sm:w-fit order-2'>Cancel</Button>
+        <Button className='bg-description border-description w-full sm:w-fit order-3 sm:order-1 mt-1 sm:mt-0'>Reset</Button>
       </div>
     </div>
   );

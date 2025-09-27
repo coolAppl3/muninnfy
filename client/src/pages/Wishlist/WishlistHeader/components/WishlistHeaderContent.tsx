@@ -13,7 +13,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
   return (
     <div
-      className={`content-header ${menuIsOpen ? 'open' : ''}`}
+      className={`content-header flex justify-between items-start gap-1 mb-1 relative ${menuIsOpen ? 'open' : ''}`}
       onBlur={(e: FocusEvent<HTMLDivElement>) => {
         if (e.relatedTarget) {
           return;
@@ -22,18 +22,19 @@ export default function WishlistHeaderContent(): JSX.Element {
         setMenuIsOpen(false);
       }}
     >
-      <h3>{wishlistDetails.title}</h3>
+      <h3 className='text-title font-medium mb-1 break-words leading-[1]'>{wishlistDetails.title}</h3>
 
       <button
         type='button'
         title='Wishlist menu'
         aria-label='Wishlist menu'
+        className='mt-[-1rem] mr-[-1.2rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer flex justify-center items-center'
         onClick={() => setMenuIsOpen((prev) => !prev)}
       >
         <TripleDotMenuIcon />
       </button>
 
-      <div className='content-menu'>
+      <div className='content-menu absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden'>
         <button
           type='button'
           onClick={() => {
@@ -43,6 +44,7 @@ export default function WishlistHeaderContent(): JSX.Element {
         >
           Change title
         </button>
+
         <button
           type='button'
           onClick={() => {
@@ -52,6 +54,7 @@ export default function WishlistHeaderContent(): JSX.Element {
         >
           Change privacy level
         </button>
+
         <button
           type='button'
           id='share-wishlist-btn'
@@ -64,6 +67,7 @@ export default function WishlistHeaderContent(): JSX.Element {
         >
           Share wishlist
         </button>
+
         <button
           type='button'
           className='!text-danger'

@@ -76,8 +76,8 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
 
   return (
     <div className='privacy-level'>
-      <span>Privacy level</span>
-      <div className='btn-container'>
+      <span className='text-sm font-medium text-title'>Privacy level</span>
+      <div className='btn-container grid grid-cols-3 rounded-sm sm:max-w-[40rem]'>
         <button
           type='button'
           className={wishlistDetails?.privacy_level === PRIVATE_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
@@ -102,7 +102,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
       </div>
 
       <button
-        className='link'
+        className='link text-sm text-start mt-1'
         onClick={() => {
           setEditMode(null);
           setMenuIsOpen(false);
