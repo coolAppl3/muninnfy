@@ -5,27 +5,36 @@ import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
 import WishlistItemsToolbarOptions from './components/WishlistItemsToolbarOptions';
 import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';
 import WishlistItemsToolbarView from './components/WishlistItemsToolbarView';
+import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilters/WishlistItemsToolbarFilters';
 
 export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
+  const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
   return (
     <div className='wishlist-items-toolbar pt-2'>
       <Container>
-        <div className='text-title'>
-          <div className='flex justify-start items-center gap-1 mb-1'>
+        <div className='inner-container'>
+          <header>
             <WishlistItemsToolbarView />
 
             <button
               type='button'
               className='toolbar-btn'
+              onClick={() => setFiltersMenuOpen((prev) => !prev)}
             >
               <SlidersIcon />
+              {/* TODO: add color indicator when filters are applied */}
             </button>
 
             <WishlistItemsToolbarSort />
             <WishlistItemsToolbarOptions />
-          </div>
+          </header>
+
+          <WishlistItemsToolbarFilters
+            isOpen={filtersMenuOpen}
+            setIsOpen={setFiltersMenuOpen}
+          />
         </div>
 
         <DefaultFormGroup

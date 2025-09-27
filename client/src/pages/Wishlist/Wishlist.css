@@ -168,43 +168,111 @@ main {
   }
 
   .wishlist-items-toolbar {
-    .toolbar-btn {
-      @apply bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter_colors] hover:brightness-75;
+    .inner-container {
+      & > header {
+        @apply flex justify-start items-center gap-1 mb-1 text-title;
 
-      svg {
-        @apply w-2 h-2;
-      }
-    }
+        .toolbar-btn {
+          @apply bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter_colors] hover:brightness-75;
 
-    .view {
-      @apply flex justify-between gap-2 mr-auto px-2 bg-dark shadow-simple-tiny overflow-hidden rounded-pill relative after:absolute after:top-0 after:left-0 after:h-full after:w-1/2 after:bg-secondary after:transition-transform;
-
-      &.single-column-grid {
-        @apply after:translate-x-full;
-      }
-    }
-
-    .options,
-    .sort {
-      @apply relative z-3;
-
-      &.open {
-        button {
-          @apply text-cta;
+          svg {
+            @apply w-2 h-2;
+          }
         }
 
-        .options-menu,
-        .sort-menu {
+        .view {
+          @apply flex justify-between gap-2 mr-auto px-2 bg-dark shadow-simple-tiny overflow-hidden rounded-pill relative after:absolute after:top-0 after:left-0 after:h-full after:w-1/2 after:bg-secondary after:transition-transform;
+
+          &.single-column-grid {
+            @apply after:translate-x-full;
+          }
+        }
+
+        .options,
+        .sort {
+          @apply relative z-3;
+
+          &.open {
+            button {
+              @apply text-cta;
+            }
+
+            .options-menu,
+            .sort-menu {
+              @apply block;
+            }
+          }
+
+          .options-menu,
+          .sort-menu {
+            @apply absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny hidden;
+
+            button {
+              @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 w-full cursor-pointer;
+            }
+          }
+        }
+      }
+
+      .filters {
+        @apply hidden bg-secondary p-2 rounded-sm shadow-simple-tiny mb-2;
+
+        &.open {
           @apply block;
         }
-      }
 
-      .options-menu,
-      .sort-menu {
-        @apply absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny hidden;
+        .filter-item {
+          @apply not-last:mb-1;
 
-        button {
-          @apply block bg-dark p-1 pr-2 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 w-full cursor-pointer;
+          &.open {
+            @apply not-last:mb-2;
+
+            .checkbox-container {
+              @apply grid;
+            }
+          }
+
+          & > header {
+            @apply flex justify-start items-center mb-1;
+          }
+
+          .checkbox-container {
+            @apply hidden gap-[1.4rem] pl-1;
+
+            .checkbox-btn {
+              @apply flex justify-center items-center gap-[4px] w-fit cursor-pointer transition-[filter] hover:brightness-75;
+
+              &.checked {
+                .checkbox {
+                  @apply bg-cta;
+
+                  svg {
+                    @apply scale-100 rotate-0;
+                  }
+                }
+              }
+
+              .checkbox {
+                @apply grid place-items-center w-[1.4rem] h-[1.4rem] bg-light rounded-[1px];
+
+                svg {
+                  @apply w-[1rem] h-[1rem] transition-transform rotate-180 scale-0;
+                }
+              }
+
+              span {
+                @apply text-sm text-description leading-[1];
+              }
+            }
+          }
+        }
+
+        .btn-container {
+          @apply flex flex-col sm:flex-row justify-start items-start gap-1 mt-2;
+
+          button {
+            @apply w-full sm:w-fit first:order-1 nth-[2]:order-2 last:order-3 sm:first:order-3 sm:last:order-1 last:mt-1 sm:last:mt-0;
+          }
         }
       }
     }
