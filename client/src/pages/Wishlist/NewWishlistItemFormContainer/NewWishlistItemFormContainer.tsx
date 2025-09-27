@@ -14,7 +14,7 @@ export default function NewWishlistItemFormContainer(): JSX.Element {
             className='header w-full flex justify-between items-center p-2 bg-secondary text-title transition-[filter_colors] hover:brightness-110 hover:text-cta cursor-pointer border-b-1 border-b-secondary rounded-sm'
             onClick={() => setIsExpanded((prev) => !prev)}
           >
-            <p className='font-medium'>New wishlist item</p>
+            <h4 className='font-medium'>New wishlist item</h4>
             <ChevronIcon className='w-[1.6rem] h-[1.6rem]' />
           </button>
 
