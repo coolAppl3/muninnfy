@@ -176,21 +176,11 @@ main {
       }
     }
 
-    .view-container {
-      button {
-        @apply rounded-pill px-2;
+    .view {
+      @apply flex justify-between gap-2 mr-auto px-2 bg-dark shadow-simple-tiny overflow-hidden rounded-pill relative after:absolute after:top-0 after:left-0 after:h-full after:w-1/2 after:bg-secondary after:transition-transform;
 
-        &.selected {
-          @apply bg-secondary;
-        }
-
-        &:first-child {
-          @apply rounded-tr-none rounded-br-none;
-        }
-
-        &:last-child {
-          @apply rounded-tl-none rounded-bl-none;
-        }
+      &.single-column-grid {
+        @apply after:translate-x-full;
       }
     }
 
