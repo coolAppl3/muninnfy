@@ -49,3 +49,29 @@ function getDateOrdinalSuffix(date: number): string {
 
   return 'th';
 }
+
+export const shortMonths: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+export function getMonthNumberOfDays(month: number, year: number): number {
+  if (month === 1) {
+    return isLeapYear(year) ? 29 : 28;
+  }
+
+  if ([3, 5, 8, 10].includes(month)) {
+    return 30;
+  }
+
+  return 31;
+}
+
+function isLeapYear(year: number): boolean {
+  if (year % 400 === 0) {
+    return true;
+  }
+
+  if (year % 100 === 0) {
+    return false;
+  }
+
+  return year % 4 === 0;
+}
