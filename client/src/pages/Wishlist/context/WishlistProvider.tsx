@@ -21,13 +21,7 @@ export default function WishlistProvider({
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
-    () =>
-      new Set(
-        wishlistItems.reduce((set: Set<string>, item: WishlistItemType) => {
-          set.add(item.title.toLowerCase());
-          return set;
-        }, new Set<string>())
-      ),
+    () => new Set(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
     [wishlistItems]
   );
 
