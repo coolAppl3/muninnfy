@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, JSX, useEffect, useRef, useState } from 'react';
 import { changeWishlistTitleService } from '../../../../services/wishlistServices';
-import useWishlistHeader from '../useWishlistHeader';
+import useWishlistHeader from '../context/useWishlistHeader';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
@@ -8,7 +8,7 @@ import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import DefaultFormGroup from '../../../../components/FormGroups/DefaultFormGroup';
 import { validateWishlistTitle } from '../../../../utils/validation/wishlistValidation';
 import Button from '../../../../components/Button/Button';
-import useWishlist from '../../useWishlist';
+import useWishlist from '../../context/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export function EditWishlistTitleForm(): JSX.Element {

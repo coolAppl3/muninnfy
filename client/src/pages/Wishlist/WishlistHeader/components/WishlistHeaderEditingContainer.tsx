@@ -1,5 +1,5 @@
 import { JSX } from 'react';
-import useWishlistHeader from '../useWishlistHeader';
+import useWishlistHeader from '../context/useWishlistHeader';
 import { EditWishlistTitleForm } from './EditWishlistTitleForm';
 import EditPrivacyLevelContainer from './EditPrivacyLevelContainer';
 import { DeleteWishlistForm } from './DeleteWishlistForm';

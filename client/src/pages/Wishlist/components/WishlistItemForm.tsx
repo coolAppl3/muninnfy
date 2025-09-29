@@ -10,7 +10,7 @@ import {
 } from '../../../utils/validation/wishlistItemValidation';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
-import useWishlist from '../useWishlist';
+import useWishlist from '../context/useWishlist';
 import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -281,7 +281,7 @@ export default function WishlistItemForm({
 
   return (
     <form
-      className={`wishlist-item-form ${formMode === 'EDIT_ITEM' && 'edit-mode'}`}
+      className={`wishlist-item-form px-2 grid gap-2 overflow-hidden relative z-0 ${formMode === 'EDIT_ITEM' && 'edit-mode'}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -345,7 +345,7 @@ export default function WishlistItemForm({
         }}
       />
 
-      <div className='btn-container'>
+      <div className='btn-container flex flex-col sm:flex-row justify-start items-center gap-1'>
         <Button
           className='bg-secondary border-title text-title w-full order-2 sm:w-fit sm:order-1'
           onClick={() => {

@@ -1,13 +1,13 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
 import { deleteWishlistService } from '../../../../services/wishlistServices';
-import useWishlistHeader from '../useWishlistHeader';
+import useWishlistHeader from '../context/useWishlistHeader';
 import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import DefaultFormGroup from '../../../../components/FormGroups/DefaultFormGroup';
 import Button from '../../../../components/Button/Button';
-import useWishlist from '../../useWishlist';
+import useWishlist from '../../context/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export function DeleteWishlistForm(): JSX.Element {

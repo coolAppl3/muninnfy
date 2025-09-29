@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.24] (2024-09-29)
+
+### Features
+
+- Added `SingleColumnGridIcon`, `DoubleColumnGridIcon`, `SortIcon` SVGs.
+- Added the following component stubs:
+  - `WishlistItemsToolbar`.
+  - `WishlistItemsToolbarOptions`.
+  - `WishlistItemsToolbarSort`.
+  - `WishlistItemsToolbarView`.
+  - `WishlistItemsToolbarFilters`.
+  - `WishlistItemsToolbarFilterItem`.
+- Added `CalendarContext`, `CalendarProvider`, and `useCalendar` custom hook.
+- Added `Calendar` component, leveraging `CalendarContext`.
+- Added `ToggleSwitch` component.
+
+
+### Bug Fixes
+
+- Fixed `rateLimitReached()` not correctly handling the difference between users going beyond the rate limit and abuse threshold.
+
+
+### Code Refactoring
+
+- Improved overall structure under the `Wishlist` page directory.
+- Improved component styling for components under the `Wishlist` page directory. 
+
+
 ## [0.0.23] (2024-09-24)
 
 ### Features

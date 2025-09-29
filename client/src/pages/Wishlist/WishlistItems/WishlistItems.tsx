@@ -1,5 +1,5 @@
 import { JSX } from 'react';
-import useWishlist from '../useWishlist';
+import useWishlist from '../context/useWishlist';
 import Container from '../../../components/Container/Container';
 import WishlistItem from './WishlistItem/WishlistItem';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
@@ -10,9 +10,9 @@ export default function WishlistItems(): JSX.Element {
   return (
     <section className='wishlist-items'>
       <Container>
-        <div className='wishlist-items-container'>
+        <div className='wishlist-items-container grid grid-cols-1 sm:grid-cols-2 gap-1 items-start'>
           {wishlistItems.length === 0 ? (
-            <p className='no-items'>No items found</p>
+            <p className='sm:!col-span-2 text-sm font-medium text-description w-fit mx-auto'>No items found</p>
           ) : (
             wishlistItems.map((item: WishlistItemType) => (
               <WishlistItem

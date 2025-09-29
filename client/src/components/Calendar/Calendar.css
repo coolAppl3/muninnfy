@@ -1,0 +1,38 @@
+@reference '../../index.css';
+
+.calendar-modal {
+  @apply fixed top-0 left-0 w-full h-[100vh] bg-overlay z-10 flex justify-center items-center outline-none;
+
+  .calendar-modal-container {
+    header {
+      button.nav-btn {
+        @apply bg-description p-1 rounded transition-[filter] hover:brightness-75 cursor-pointer;
+
+        svg {
+          @apply w-[1.4rem] h-[1.4rem];
+        }
+      }
+    }
+
+    .years-container,
+    .months-container {
+      button {
+        @apply bg-dark p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded;
+
+        &.current {
+          @apply bg-cta/10;
+        }
+      }
+    }
+
+    .dates-container {
+      button {
+        @apply bg-dark px-1 py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75;
+
+        &.current {
+          @apply bg-cta/10;
+        }
+      }
+    }
+  }
+}
