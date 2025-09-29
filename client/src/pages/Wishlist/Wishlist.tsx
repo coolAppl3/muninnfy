@@ -17,6 +17,7 @@ import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useA
 import { WishlistDetailsType } from '../../types/wishlistTypes';
 import { WishlistItemType } from '../../types/wishlistItemTypes';
 import WishlistItemsToolbar from './WishlistItemsToolbar/WishlistItemsToolbar';
+import CalendarProvider from '../../providers/CalendarProvider';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -97,17 +98,19 @@ export default function Wishlist(): JSX.Element {
       <Head title='Wishlist - Muninnfy' />
 
       {isLoaded && initialWishlistProviderData ? (
-        <WishlistProvider {...initialWishlistProviderData}>
-          <main className='py-4 grid gap-2'>
-            <WishlistHeaderProvider>
-              <WishlistHeader />
-            </WishlistHeaderProvider>
+        <CalendarProvider>
+          <WishlistProvider {...initialWishlistProviderData}>
+            <main className='py-4 grid gap-2'>
+              <WishlistHeaderProvider>
+                <WishlistHeader />
+              </WishlistHeaderProvider>
 
-            <NewWishlistItemFormContainer />
-            <WishlistItemsToolbar />
-            <WishlistItems />
-          </main>
-        </WishlistProvider>
+              <NewWishlistItemFormContainer />
+              <WishlistItemsToolbar />
+              <WishlistItems />
+            </main>
+          </WishlistProvider>
+        </CalendarProvider>
       ) : (
         <LoadingSkeleton />
       )}
