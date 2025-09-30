@@ -11,7 +11,7 @@ import Button from '../../../../components/Button/Button';
 import useWishlist from '../../context/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
-export function EditWishlistTitleForm(): JSX.Element {
+export default function EditWishlistTitleForm(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
 

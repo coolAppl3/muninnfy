@@ -1,5 +1,5 @@
 import { JSX } from 'react';
-import { Head } from '../../components/Head/Head';
+import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
 import { NavigateFunction, useNavigate } from 'react-router-dom';

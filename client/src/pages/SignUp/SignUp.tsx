@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, JSX, useReducer, useState } from 'react';
-import { Head } from '../../components/Head/Head';
+import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
 import signUpFormValidationReducer, { initialSignUpFormValidationState } from './signUpFormValidationReducer';

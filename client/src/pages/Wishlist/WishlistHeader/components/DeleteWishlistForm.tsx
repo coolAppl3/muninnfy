@@ -10,7 +10,7 @@ import Button from '../../../../components/Button/Button';
 import useWishlist from '../../context/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
-export function DeleteWishlistForm(): JSX.Element {
+export default function DeleteWishlistForm(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();
   const { editMode, setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
 

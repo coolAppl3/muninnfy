@@ -9,7 +9,7 @@ import useAuth from '../../hooks/useAuth';
 import useConfirmModal from '../../hooks/useConfirmModal';
 import useAuthSession from '../../hooks/useAuthSession';
 
-export function BottomNavbar(): JSX.Element {
+export default function BottomNavbar(): JSX.Element {
   const { authStatus } = useAuth();
   const { pathname }: Location = useLocation();
 

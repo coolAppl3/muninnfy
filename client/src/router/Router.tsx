@@ -21,7 +21,7 @@ type RouteDetails = {
   element: JSX.Element;
 };
 
-export function Router(): JSX.Element {
+export default function Router(): JSX.Element {
   const { authStatus } = useAuth();
 
   const authOnlyRoutes: RouteDetails[] = [

@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
-import { Head } from '../../components/Head/Head';
+import Head from '../../components/Head/Head';
 import './NewWishlist.css';
 import Container from '../../components/Container/Container';
 import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
