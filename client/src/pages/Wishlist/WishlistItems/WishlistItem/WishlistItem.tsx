@@ -170,7 +170,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
         <div
           className={`body-btn-container grid gap-1 mr-[-1rem] relative place-items-center ${menuIsOpen ? 'open' : ''}`}
           onBlur={(e: FocusEvent<HTMLDivElement>) => {
-            if (e.relatedTarget) {
+            if (e.relatedTarget?.classList.contains('item-menu-btn')) {
               return;
             }
 
@@ -204,6 +204,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
           <div className='item-menu absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden'>
             <button
               type='button'
+              className='item-menu-btn'
               onClick={() => {
                 setMenuIsOpen(false);
                 setIsEditing(true);
@@ -214,7 +215,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
 
             <button
               type='button'
-              className='!text-danger'
+              className='item-menu-btn !text-danger'
               onClick={async () => {
                 setMenuIsOpen(false);
                 await removeWishlistItem();

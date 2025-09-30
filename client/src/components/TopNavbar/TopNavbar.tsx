@@ -105,7 +105,7 @@ function AccountMenu(): JSX.Element {
     <div
       className={`account-menu ${isVisible ? 'visible' : ''} ${isOpen ? 'open' : ''}`}
       onBlur={(e: FocusEvent<HTMLDivElement>) => {
-        if (e.relatedTarget) {
+        if (e.relatedTarget?.classList.contains('menu-container-btn')) {
           return;
         }
 
@@ -125,6 +125,7 @@ function AccountMenu(): JSX.Element {
       <div className='account-menu-container'>
         <Link
           to='/account'
+          className='menu-container-btn'
           onClick={() => {
             setIsVisible(false);
             setIsOpen(false);
@@ -134,6 +135,7 @@ function AccountMenu(): JSX.Element {
         </Link>
         <Link
           to='/account/wishlists'
+          className='menu-container-btn'
           onClick={() => {
             setIsVisible(false);
             setIsOpen(false);
@@ -161,7 +163,7 @@ function AccountMenu(): JSX.Element {
               onCancel: removeConfirmModal,
             });
           }}
-          className='!text-danger'
+          className='menu-container-btn !text-danger'
         >
           Sign out
         </button>

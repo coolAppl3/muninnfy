@@ -15,7 +15,7 @@ export default function WishlistHeaderContent(): JSX.Element {
     <div
       className={`content-header flex justify-between items-start gap-1 mb-1 relative ${menuIsOpen ? 'open' : ''}`}
       onBlur={(e: FocusEvent<HTMLDivElement>) => {
-        if (e.relatedTarget) {
+        if (e.relatedTarget?.classList.contains('content-menu-btn')) {
           return;
         }
 
@@ -37,6 +37,7 @@ export default function WishlistHeaderContent(): JSX.Element {
       <div className='content-menu absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden'>
         <button
           type='button'
+          className='content-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('TITLE');
@@ -47,6 +48,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
+          className='content-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('PRIVACY_LEVEL');
@@ -57,6 +59,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
+          className='content-menu-btn'
           id='share-wishlist-btn'
           onClick={async () => {
             const successfullyCopied: boolean = await copyToClipboard(`${window.location.origin}/wishlist/view/${wishlistId}`);
@@ -70,7 +73,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
-          className='!text-danger'
+          className='content-menu-btn !text-danger'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('DELETE_WISHLIST');
