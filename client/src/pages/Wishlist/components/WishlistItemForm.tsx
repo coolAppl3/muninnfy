@@ -281,7 +281,7 @@ export default function WishlistItemForm({
 
   return (
     <form
-      className={`wishlist-item-form px-2 grid gap-2 overflow-hidden relative z-0 ${formMode === 'EDIT_ITEM' && 'edit-mode'}`}
+      className={`wishlist-item-form px-2 grid gap-2 overflow-hidden relative z-0 ${formMode === 'EDIT_ITEM' ? 'edit-mode' : ''}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 

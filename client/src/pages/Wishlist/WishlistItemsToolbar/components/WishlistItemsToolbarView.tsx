@@ -9,7 +9,7 @@ export default function WishlistItemsToolbarView(): JSX.Element {
   return (
     <button
       type='button'
-      className={`view-btn toolbar-btn ${isSingleColumnGrid && 'single-column-grid'}`}
+      className={`view-btn toolbar-btn ${isSingleColumnGrid ? 'single-column-grid' : ''}`}
       onClick={() => setIsSingleColumnGrid((prev) => !prev)}
     >
       <DoubleColumnGridIcon />
