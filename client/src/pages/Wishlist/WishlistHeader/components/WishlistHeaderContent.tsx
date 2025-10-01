@@ -64,8 +64,9 @@ export default function WishlistHeaderContent(): JSX.Element {
         <button
           type='button'
           className='content-menu-btn'
-          id='share-wishlist-btn'
           onClick={async () => {
+            setMenuIsOpen(false);
+
             const successfullyCopied: boolean = await copyToClipboard(`${window.location.origin}/wishlist/view/${wishlistId}`);
             successfullyCopied
               ? displayPopupMessage('Share link copied to clipboard.', 'success')
