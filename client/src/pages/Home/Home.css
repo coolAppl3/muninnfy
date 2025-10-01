@@ -14,21 +14,3 @@
     max-height: fit-content;
   }
 }
-
-.features {
-  .card {
-    @apply bg-secondary p-2 rounded-sm break-words shadow-simple;
-
-    .card-header {
-      @apply flex justify-start items-center gap-1 mb-2 shrink-0;
-
-      h3 {
-        @apply text-title text-md font-bold;
-      }
-    }
-
-    p {
-      @apply text-description font-medium;
-    }
-  }
-}

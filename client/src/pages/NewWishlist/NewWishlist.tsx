@@ -74,8 +74,7 @@ export default function NewWishlist(): JSX.Element {
             <div className='h-line my-2'></div>
 
             <form
-              id='wishlist-form'
-              className='grid grid-cols-1 gap-2'
+              className='wishlist-form grid grid-cols-1 gap-2'
               onSubmit={async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
 
@@ -106,10 +105,10 @@ export default function NewWishlist(): JSX.Element {
                 errorMessage={titleErrorMessage}
               ></DefaultFormGroup>
 
-              <div id='wishlist-privacy-level'>
-                <span>Privacy level</span>
+              <div className='wishlist-privacy-level grid gap-[6px]'>
+                <span className='text-sm font-medium text-title'>Privacy level</span>
 
-                <div className='btn-container'>
+                <div className='btn-container grid grid-cols-3 rounded-sm'>
                   <button
                     type='button'
                     className={privacyLevelValue === PRIVATE_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
@@ -117,6 +116,7 @@ export default function NewWishlist(): JSX.Element {
                   >
                     Private
                   </button>
+
                   <button
                     type='button'
                     className={privacyLevelValue === FOLLOWERS_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
@@ -124,6 +124,7 @@ export default function NewWishlist(): JSX.Element {
                   >
                     Followers
                   </button>
+
                   <button
                     type='button'
                     className={privacyLevelValue === PUBLIC_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
@@ -133,7 +134,7 @@ export default function NewWishlist(): JSX.Element {
                   </button>
                 </div>
 
-                <p className='text-description text-sm m'>Privacy settings can be changed later if needed.</p>
+                <p className='text-description text-sm'>Privacy settings can be changed later if needed.</p>
               </div>
 
               <Button

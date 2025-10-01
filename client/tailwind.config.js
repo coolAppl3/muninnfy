@@ -30,9 +30,31 @@ module.exports = {
         'centered-tiny': '0px 0px 6px rgba(0, 0, 0, 0.25)',
       },
 
+      keyframes: {
+        'slide-up': {
+          '0%': {
+            opacity: '0',
+            transform: 'translate3d(0, 3rem, 0)',
+          },
+          '6.5%': {
+            opacity: '1',
+            transform: 'translate3d(0, 0, 0)',
+          },
+          '93.5%': {
+            opacity: '1',
+            transform: 'translate3d(0, 0, 0)',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'translate3d(0, 3rem, 0)',
+          },
+        },
+      },
+
       animation: {
         pulse: 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         spin: 'spin 350ms infinite linear forwards',
+        'slide-up': 'slide-up 2000ms forwards',
       },
     },
 

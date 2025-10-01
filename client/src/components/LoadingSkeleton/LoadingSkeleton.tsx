@@ -4,7 +4,7 @@ import './LoadingSkeleton.css';
 
 export default function LoadingSkeleton(): JSX.Element {
   return (
-    <div id='loading-skeleton'>
+    <div className='loading-skeleton'>
       <Container>
         <div className='grid gap-2'>
           <div className='skeleton-container'>

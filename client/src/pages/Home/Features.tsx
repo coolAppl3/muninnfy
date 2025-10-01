@@ -63,14 +63,15 @@ type FeatureCardProps = {
 
 function FeatureCard({ title, description, Icon }: FeatureCardProps): JSX.Element {
   return (
-    <div className='card'>
-      <div className='card-header'>
+    <div className='bg-secondary p-2 rounded-sm break-words shadow-simple'>
+      <div className='flex justify-start items-center gap-1 mb-2 shrink-0'>
         <div>
           <Icon className='w-3 h-3 text-cta' />
         </div>
-        <h3>{title}</h3>
+        <h3 className='text-title text-md font-medium'>{title}</h3>
       </div>
-      <p>{description}</p>
+
+      <p className='text-description'>{description}</p>
     </div>
   );
 }

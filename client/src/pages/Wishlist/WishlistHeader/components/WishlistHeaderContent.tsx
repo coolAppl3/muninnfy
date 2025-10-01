@@ -31,10 +31,14 @@ export default function WishlistHeaderContent(): JSX.Element {
         className='mt-[-1rem] mr-[-1.2rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer flex justify-center items-center'
         onClick={() => setMenuIsOpen((prev) => !prev)}
       >
-        <TripleDotMenuIcon />
+        <TripleDotMenuIcon className={`w-2 h-2 transition-colors ${menuIsOpen ? 'text-cta' : 'text-title'}`} />
       </button>
 
-      <div className='content-menu absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden'>
+      <div
+        className={`content-menu absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${
+          menuIsOpen ? 'block' : 'hidden'
+        }`}
+      >
         <button
           type='button'
           className='content-menu-btn'

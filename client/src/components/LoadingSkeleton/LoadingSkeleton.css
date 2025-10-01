@@ -1,6 +1,6 @@
 @reference '../../index.css';
 
-#loading-skeleton {
+.loading-skeleton {
   @apply py-4;
 
   .text {

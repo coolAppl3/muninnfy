@@ -75,7 +75,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
   }
 
   return (
-    <div className='privacy-level'>
+    <div className='privacy-level grid gap-[6px]'>
       <span className='text-sm font-medium text-title'>Privacy level</span>
       <div className='btn-container grid grid-cols-3 rounded-sm sm:max-w-[40rem]'>
         <button

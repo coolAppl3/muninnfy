@@ -3,39 +3,7 @@
 main {
   .wishlist-header {
     .wishlist-header-container {
-      @apply bg-secondary p-2 pb-0 rounded-sm shadow-simple-tiny grid grid-rows-[auto_0fr] transition-[grid] gap-2;
-
-      &.expanded {
-        @apply grid-rows-[auto_1fr] pb-2;
-      }
-
       .content {
-        .content-header {
-          &.open {
-            & > button {
-              svg {
-                @apply text-cta;
-              }
-            }
-
-            .content-menu {
-              @apply block;
-            }
-          }
-
-          & > button {
-            &.open {
-              svg {
-                @apply text-cta;
-              }
-            }
-
-            svg {
-              @apply w-2 h-2 text-title transition-colors;
-            }
-          }
-        }
-
         & > p {
           @apply text-sm text-description;
 
@@ -53,8 +21,6 @@ main {
 
       .editing-container {
         .privacy-level {
-          @apply grid gap-[6px];
-
           .btn-container {
             button {
               @apply w-full text-sm text-title text-center font-medium py-1 bg-dark transition-[filter] hover:brightness-60 cursor-pointer z-0 focus:z-1;
@@ -176,8 +142,6 @@ main {
 
               &.checked {
                 .checkbox {
-                  @apply bg-cta;
-
                   svg {
                     @apply scale-100 rotate-0;
                   }
@@ -185,10 +149,10 @@ main {
               }
 
               .checkbox {
-                @apply grid place-items-center w-[1.4rem] h-[1.4rem] bg-light rounded-[1px];
+                @apply grid place-items-center w-[1.4rem] h-[1.4rem] bg-[#555] rounded-[1px];
 
                 svg {
-                  @apply w-[1rem] h-[1rem] transition-transform rotate-180 scale-0;
+                  @apply w-[1rem] h-[1rem] transition-transform rotate-180 scale-0 text-cta;
                 }
               }
 

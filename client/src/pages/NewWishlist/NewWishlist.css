@@ -1,16 +1,8 @@
 @reference '../../index.css';
 
-#wishlist-form {
-  #wishlist-privacy-level {
-    @apply grid gap-[6px];
-
-    span {
-      @apply text-sm font-medium text-title;
-    }
-
+.wishlist-form {
+  .wishlist-privacy-level {
     .btn-container {
-      @apply grid grid-cols-3 rounded-sm;
-
       button {
         @apply w-full text-sm text-title text-center font-medium py-1 bg-dark transition-[filter] hover:brightness-60 cursor-pointer z-0 focus:z-1;
 
