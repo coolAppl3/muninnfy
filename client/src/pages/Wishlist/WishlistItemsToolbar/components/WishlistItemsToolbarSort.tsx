@@ -6,9 +6,9 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
 
   return (
     <div
-      className={`sort relative z-3 ${isOpen ? 'open' : ''}`}
+      className='relative'
       onBlur={(e: FocusEvent) => {
-        if (e.relatedTarget?.classList.contains('menu-btn')) {
+        if (e.relatedTarget?.classList.contains('context-menu-btn')) {
           return;
         }
 
@@ -17,16 +17,16 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
     >
       <button
         type='button'
-        className='toolbar-btn'
+        className='bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <SortIcon />
+        <SortIcon className={`w-2 h-2 transition-colors ${isOpen ? 'text-cta' : ''}`} />
       </button>
 
-      <div className='sort-menu absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny hidden'>
+      <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className='menu-btn'
+          className='context-menu-btn'
           onClick={() => {
             // TODO: set sorting mode
             setIsOpen(false);
@@ -37,7 +37,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
 
         <button
           type='button'
-          className='menu-btn'
+          className='context-menu-btn'
           onClick={() => {
             // TODO: set sorting mode
             setIsOpen(false);
@@ -48,7 +48,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
 
         <button
           type='button'
-          className='menu-btn'
+          className='context-menu-btn'
           onClick={() => {
             // TODO: set sorting mode
             setIsOpen(false);

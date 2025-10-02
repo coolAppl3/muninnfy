@@ -114,17 +114,19 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
   }
 
   return (
-    <div
-      className={`wishlist-item bg-secondary rounded-sm shadow-simple-tiny ${isExpanded ? 'expanded' : ''} ${
-        wishlistItem.is_purchased ? 'purchased' : ''
-      }`}
-    >
+    <div className={`bg-secondary rounded-sm shadow-simple-tiny ${isExpanded ? 'expanded' : ''}`}>
       <button
-        className='header relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter_colors] hover:brightness-110 cursor-pointer rounded-sm border-b-1 border-b-secondary overflow-hidden'
         onClick={() => setIsExpanded((prev) => !prev)}
         tabIndex={0}
         title={`${isExpanded ? 'Collapse' : 'Expand'} item`}
         aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item`}
+        className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter_colors] hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden ${
+          isExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
+        } ${
+          wishlistItem.is_purchased
+            ? 'after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1'
+            : ''
+        }`}
       >
         <h4 className='text-title py-[8.4px]'>{wishlistItem.title}</h4>
         <span className='p-1 rounded-[50%] mr-[-1rem]'>
@@ -132,8 +134,8 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
         </span>
       </button>
 
-      <div className='body hidden justify-between items-start gap-1 p-2 pt-1'>
-        <div className='body-content  w-full text-sm text-description grid gap-1'>
+      <div className={isExpanded ? 'flex justify-between items-start gap-1 p-2 pt-1' : 'hidden'}>
+        <div className='w-full text-sm text-description grid gap-1'>
           <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
             <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
 
@@ -155,7 +157,12 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
 
           <div className='tags'>
             {wishlistItem.tags.map((tag: { id: number; name: string }) => (
-              <span key={tag.id}>{tag.name}</span>
+              <span
+                key={tag.id}
+                className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] font-medium'
+              >
+                {tag.name}
+              </span>
             ))}
           </div>
 
@@ -168,9 +175,9 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
         </div>
 
         <div
-          className={`body-btn-container grid gap-1 mr-[-1rem] relative place-items-center ${menuIsOpen ? 'open' : ''}`}
+          className={`grid gap-1 mr-[-1rem] relative place-items-center ${menuIsOpen ? 'open' : ''}`}
           onBlur={(e: FocusEvent<HTMLDivElement>) => {
-            if (e.relatedTarget?.classList.contains('item-menu-btn')) {
+            if (e.relatedTarget?.classList.contains('context-menu-btn')) {
               return;
             }
 
@@ -179,12 +186,14 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
         >
           <button
             type='button'
-            className='item-menu-btn hover:bg-dark mt-[-8px]'
+            className={`p-1 rounded-[50%] transition-colors cursor-pointer hover:bg-dark mt-[-8px] ${
+              menuIsOpen ? 'bg-dark text-cta' : 'text-title'
+            }`}
             title='Menu'
             aria-label='Menu'
             onClick={() => setMenuIsOpen((prev) => !prev)}
           >
-            <TripleDotMenuIcon className='w-[1.6rem] h-[1.6rem] text-title rotate-180' />
+            <TripleDotMenuIcon className='w-[1.6rem] h-[1.6rem] rotate-180' />
           </button>
 
           {updatingPurchaseStatus ? (
@@ -192,7 +201,9 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
           ) : (
             <button
               type='button'
-              className={`mark-as-purchased-btn ${wishlistItem.is_purchased ? 'purchased' : ''}`}
+              className={`p-1 rounded-[50%] transition-colors cursor-pointer  ${
+                wishlistItem.is_purchased ? 'bg-cta hover:bg-cta/75' : 'bg-light/50 hover:bg-light'
+              }`}
               title={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'not purchased'}`}
               aria-label={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'not purchased'}`}
               onClick={async () => await setWishlistItemIsPurchased()}
@@ -201,10 +212,12 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
             </button>
           )}
 
-          <div className='item-menu absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden'>
+          <div
+            className={`absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}
+          >
             <button
               type='button'
-              className='item-menu-btn'
+              className='context-menu-btn'
               onClick={() => {
                 setMenuIsOpen(false);
                 setIsEditing(true);
@@ -215,7 +228,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
 
             <button
               type='button'
-              className='item-menu-btn !text-danger'
+              className='context-menu-btn !text-danger'
               onClick={async () => {
                 setMenuIsOpen(false);
                 await removeWishlistItem();

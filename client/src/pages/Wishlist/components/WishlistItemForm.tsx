@@ -21,10 +21,12 @@ export default function WishlistItemForm({
   formMode,
   wishlistItem,
   onFinish,
+  className,
 }: {
   formMode: 'NEW_ITEM' | 'EDIT_ITEM';
   wishlistItem?: WishlistItemType;
   onFinish: () => void;
+  className?: string;
 }): JSX.Element {
   const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
 
@@ -281,7 +283,7 @@ export default function WishlistItemForm({
 
   return (
     <form
-      className={`wishlist-item-form px-2 grid gap-2 overflow-hidden relative z-0 ${formMode === 'EDIT_ITEM' ? 'edit-mode' : ''}`}
+      className={`px-2 grid gap-2 overflow-hidden relative z-0 ${className ? className : ''}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -345,9 +347,15 @@ export default function WishlistItemForm({
         }}
       />
 
-      <div className='btn-container flex flex-col sm:flex-row justify-start items-center gap-1'>
+      <div
+        className={`btn-container flex flex-col justify-start items-center gap-1 ${
+          formMode === 'EDIT_ITEM' ? 'sm:flex-col md:flex-row' : 'sm:flex-row'
+        }`}
+      >
         <Button
-          className='bg-secondary border-title text-title w-full order-2 sm:w-fit sm:order-1'
+          className={`bg-secondary border-title text-title w-full order-2 ${
+            formMode === 'EDIT_ITEM' ? 'sm:w-full md:w-fit sm:order-2 md:order-1' : 'sm:w-fit sm:order-1'
+          }`}
           onClick={() => {
             clearForm();
             onFinish();
@@ -358,7 +366,9 @@ export default function WishlistItemForm({
 
         <Button
           isSubmitBtn={true}
-          className='bg-cta border-cta w-full order-1 sm:w-fit sm:order-2'
+          className={`bg-cta border-cta w-full order-1 ${
+            formMode === 'EDIT_ITEM' ? 'sm:w-full md:w-fit sm:order-1 md:order-2' : 'sm:w-fit sm:order-2'
+          }`}
         >
           {wishlistItem ? 'Update wishlist item' : 'Add wishlist item'}
         </Button>

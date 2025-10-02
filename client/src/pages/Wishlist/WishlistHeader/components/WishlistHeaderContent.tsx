@@ -13,9 +13,9 @@ export default function WishlistHeaderContent(): JSX.Element {
 
   return (
     <div
-      className={`content-header flex justify-between items-start gap-1 mb-1 relative ${menuIsOpen ? 'open' : ''}`}
+      className='flex justify-between items-start gap-1 mb-1 relative'
       onBlur={(e: FocusEvent<HTMLDivElement>) => {
-        if (e.relatedTarget?.classList.contains('content-menu-btn')) {
+        if (e.relatedTarget?.classList.contains('context-menu-btn')) {
           return;
         }
 
@@ -34,14 +34,10 @@ export default function WishlistHeaderContent(): JSX.Element {
         <TripleDotMenuIcon className={`w-2 h-2 transition-colors ${menuIsOpen ? 'text-cta' : 'text-title'}`} />
       </button>
 
-      <div
-        className={`content-menu absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${
-          menuIsOpen ? 'block' : 'hidden'
-        }`}
-      >
+      <div className={`absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className='content-menu-btn'
+          className='context-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('TITLE');
@@ -52,7 +48,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
-          className='content-menu-btn'
+          className='context-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('PRIVACY_LEVEL');
@@ -63,7 +59,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
-          className='content-menu-btn'
+          className='context-menu-btn'
           onClick={async () => {
             setMenuIsOpen(false);
 
@@ -78,7 +74,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
-          className='content-menu-btn !text-danger'
+          className='context-menu-btn danger'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('DELETE_WISHLIST');

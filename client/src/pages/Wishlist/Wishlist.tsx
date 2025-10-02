@@ -1,5 +1,4 @@
 import { JSX, useEffect, useState } from 'react';
-import './Wishlist.css';
 import Head from '../../components/Head/Head';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import { isValidUuid } from '../../utils/validation/generalValidation';

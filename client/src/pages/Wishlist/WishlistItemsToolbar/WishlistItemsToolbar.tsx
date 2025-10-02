@@ -12,19 +12,18 @@ export default function WishlistItemsToolbar(): JSX.Element {
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
   return (
-    <div className='wishlist-items-toolbar pt-2'>
+    <div className='pt-2'>
       <Container>
-        <div className='inner-container'>
-          <header className='flex justify-start items-center gap-1 mb-1 text-title'>
+        <div>
+          <header className='flex justify-start items-center gap-1 mb-1 text-title relative z-3'>
             <WishlistItemsToolbarView />
 
             <button
               type='button'
-              className='toolbar-btn'
+              className='bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
               onClick={() => setFiltersMenuOpen((prev) => !prev)}
             >
-              <SlidersIcon />
-              {/* TODO: add color indicator when filters are applied */}
+              <SlidersIcon className={`w-2 h-2 transition-colors ${filtersMenuOpen ? 'text-cta' : ''}`} />
             </button>
 
             <WishlistItemsToolbarSort />

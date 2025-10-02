@@ -75,27 +75,40 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
   }
 
   return (
-    <div className='privacy-level grid gap-[6px]'>
+    <div className='grid gap-[6px]'>
       <span className='text-sm font-medium text-title'>Privacy level</span>
-      <div className='btn-container grid grid-cols-3 rounded-sm sm:max-w-[40rem]'>
+
+      <div className='grid grid-cols-3 sm:max-w-[40rem] rounded-sm overflow-hidden'>
         <button
           type='button'
-          className={wishlistDetails?.privacy_level === PRIVATE_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
           onClick={() => handlePrivacyLevelBtnClick(PRIVATE_WISHLIST_PRIVACY_LEVEL)}
+          className={`w-full text-sm text-center py-1 transition-[filter] cursor-pointer z-0 focus:z-1 ${
+            wishlistDetails?.privacy_level === PRIVATE_WISHLIST_PRIVACY_LEVEL
+              ? 'bg-light text-dark font-bold'
+              : 'bg-dark text-title font-medium hover:brightness-60'
+          }`}
         >
           Private
         </button>
         <button
           type='button'
-          className={wishlistDetails?.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
           onClick={() => handlePrivacyLevelBtnClick(FOLLOWERS_WISHLIST_PRIVACY_LEVEL)}
+          className={`w-full text-sm text-center py-1 transition-[filter] cursor-pointer z-0 focus:z-1 ${
+            wishlistDetails?.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL
+              ? 'bg-light text-dark font-bold'
+              : 'bg-dark text-title font-medium hover:brightness-60'
+          }`}
         >
           Followers
         </button>
         <button
           type='button'
-          className={wishlistDetails?.privacy_level === PUBLIC_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
           onClick={() => handlePrivacyLevelBtnClick(PUBLIC_WISHLIST_PRIVACY_LEVEL)}
+          className={`w-full text-sm text-center py-1 transition-[filter] cursor-pointer z-0 focus:z-1 ${
+            wishlistDetails?.privacy_level === PUBLIC_WISHLIST_PRIVACY_LEVEL
+              ? 'bg-light text-dark font-bold'
+              : 'bg-dark text-title font-medium hover:brightness-60'
+          }`}
         >
           Public
         </button>

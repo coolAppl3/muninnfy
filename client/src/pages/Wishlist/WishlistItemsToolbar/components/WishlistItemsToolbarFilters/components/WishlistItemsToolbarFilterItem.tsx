@@ -1,4 +1,4 @@
-import { Dispatch, JSX, SetStateAction } from 'react';
+import { Dispatch, JSX, MouseEventHandler, SetStateAction } from 'react';
 import ToggleSwitch from '../../../../../../components/ToggleSwitch/ToggleSwitch';
 import CheckIcon from '../../../../../../assets/svg/CheckIcon.svg?react';
 
@@ -16,7 +16,7 @@ export default function WishlistItemsToolbarFilterItem({
   negativeFilterTitle: string;
 }): JSX.Element {
   return (
-    <div className={`filter-item not-last:mb-1 ${filterBy === null ? '' : 'open'}`}>
+    <div className={filterBy !== null ? 'mb-2' : 'mb-0'}>
       <header className='flex justify-start items-center gap-1 mb-1'>
         <p className='text-title text-sm leading-[1]'>{title}</p>
         <ToggleSwitch
@@ -25,29 +25,36 @@ export default function WishlistItemsToolbarFilterItem({
         />
       </header>
 
-      <div className='checkbox-container hidden gap-[1.4rem] pl-1'>
-        <button
-          type='button'
-          className={`checkbox-btn ${filterBy ? 'checked' : ''}`}
+      <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>
+        <FilterItemButton
           onClick={() => setFilterBy(true)}
-        >
-          <div className='checkbox'>
-            <CheckIcon />
-          </div>
-          <span>{positiveFilterTitle}</span>
-        </button>
+          title={positiveFilterTitle}
+          isChecked={filterBy === true}
+        />
 
-        <button
-          type='button'
-          className={`checkbox-btn ${filterBy === false ? 'checked' : ''}`}
+        <FilterItemButton
           onClick={() => setFilterBy(false)}
-        >
-          <div className='checkbox'>
-            <CheckIcon />
-          </div>
-          <span>{negativeFilterTitle}</span>
-        </button>
+          title={negativeFilterTitle}
+          isChecked={filterBy === false}
+        />
       </div>
     </div>
+  );
+}
+
+function FilterItemButton({ onClick, title, isChecked }: { onClick: MouseEventHandler; title: string; isChecked: boolean }): JSX.Element {
+  return (
+    <button
+      type='button'
+      onClick={onClick}
+      className='flex justify-center items-center gap-[4px] w-fit cursor-pointer transition-[filter] hover:brightness-75'
+    >
+      <div className='grid place-items-center w-[1.4rem] h-[1.4rem] bg-[#555] rounded-[1px]'>
+        <CheckIcon
+          className={`w-[1rem] h-[1rem] transition-transform text-cta ${isChecked ? 'scale-100 rotate-0' : 'rotate-180 scale-0'}`}
+        />
+      </div>
+      <span className='text-sm text-description leading-[1]'>{title}</span>
+    </button>
   );
 }

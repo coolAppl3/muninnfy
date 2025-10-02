@@ -7,21 +7,25 @@ export default function NewWishlistItemFormContainer(): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   return (
-    <section className='new-wishlist-item-form-container relative z-0'>
+    <section className='relative z-0'>
       <Container>
-        <div className={`inner-container rounded-sm bg-secondary shadow-simple-tiny ${isExpanded ? 'expanded' : ''}`}>
+        <div className='rounded-sm bg-secondary shadow-simple-tiny'>
           <button
-            className='header w-full flex justify-between items-center p-2 bg-secondary text-title transition-[filter_colors] hover:brightness-110 hover:text-cta cursor-pointer border-b-1 border-b-secondary rounded-sm'
+            type='button'
             onClick={() => setIsExpanded((prev) => !prev)}
+            className={`w-full flex justify-between items-center p-2 bg-secondary text-title transition-[filter_colors] hover:brightness-110 hover:text-cta cursor-pointer border-b-1 ${
+              isExpanded ? 'border-b-light-gray rounded-bl-none rounded-br-none' : 'border-b-secondary rounded-sm'
+            }`}
           >
             <h4 className='font-medium'>New wishlist item</h4>
-            <ChevronIcon className='w-[1.6rem] h-[1.6rem]' />
+            <ChevronIcon className={`w-[1.6rem] h-[1.6rem] ${isExpanded ? 'rotate-180' : ''}`} />
           </button>
 
           {isExpanded && (
             <WishlistItemForm
               formMode='NEW_ITEM'
               onFinish={() => setIsExpanded(false)}
+              className={isExpanded ? 'py-2' : ''}
             />
           )}
         </div>

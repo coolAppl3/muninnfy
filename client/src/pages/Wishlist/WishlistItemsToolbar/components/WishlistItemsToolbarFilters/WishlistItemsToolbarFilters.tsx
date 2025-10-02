@@ -13,7 +13,7 @@ export default function WishlistItemsToolbarFilters({
   const [filterByLink, setFilterByLink] = useState<boolean | null>(null);
 
   return (
-    <div className={`filters ${isOpen ? 'open' : ''}`}>
+    <div className={`bg-secondary p-2 rounded-sm shadow-simple-tiny mb-2 ${isOpen ? 'block' : 'hidden'}`}>
       <h4 className='text-title mb-2'>Filters</h4>
 
       <WishlistItemsToolbarFilterItem

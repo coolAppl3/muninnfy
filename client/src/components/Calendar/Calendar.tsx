@@ -101,7 +101,7 @@ export default function Calendar({ calendarMode }: { calendarMode: CalendarMode 
 
   return (
     <div className='calendar-modal fixed top-0 left-0 w-full h-[100vh] bg-overlay z-10 flex justify-center items-center outline-none'>
-      <div className='calendar-modal-container w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words;'>
+      <div className='calendar-modal-container w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words'>
         <header className='flex justify-between items-center mb-2'>
           <button
             type='button'
