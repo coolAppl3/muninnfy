@@ -228,7 +228,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
 
             <button
               type='button'
-              className='context-menu-btn !text-danger'
+              className='context-menu-btn danger'
               onClick={async () => {
                 setMenuIsOpen(false);
                 await removeWishlistItem();
