@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
 import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
-import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
+import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import {
   PRIVATE_WISHLIST_PRIVACY_LEVEL,

@@ -6,7 +6,7 @@ import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import { validateEmail } from '../../../utils/validation/userValidation';
 import { continueAccountVerificationService } from '../../../services/accountServices';
-import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
+import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import Button from '../../../components/Button/Button';
 
 export default function ContinueAccountVerificationForm(): JSX.Element {

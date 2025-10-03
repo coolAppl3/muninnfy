@@ -7,8 +7,8 @@ import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { signUpService } from '../../services/accountServices';
 import usePopupMessage from '../../hooks/usePopupMessage';
-import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
-import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
+import PasswordFormGroup from '../../components/PasswordFormGroup/PasswordFormGroup';
+import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup';
 import useAuth from '../../hooks/useAuth';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
 

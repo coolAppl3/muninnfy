@@ -1,8 +1,8 @@
 import { ChangeEvent, FormEvent, JSX, useEffect, useMemo, useRef, useState } from 'react';
-import TextareaFormGroup from '../../../components/FormGroups/TextareaFormGroup';
+import TextareaFormGroup from '../../../components/TextareaFormGroup/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
 import WishlistItemTagsFormGroup from './WishlistItemTagsFormGroup';
-import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
+import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import {
   validateWishlistItemDescription,
   validateWishlistItemLink,
@@ -332,6 +332,7 @@ export default function WishlistItemForm({
       <WishlistItemTagsFormGroup
         itemTags={itemTags}
         setItemTags={setItemTags}
+        label='Tags (optional) - space to add'
       />
 
       <TextareaFormGroup

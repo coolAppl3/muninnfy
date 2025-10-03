@@ -1,6 +1,6 @@
 import { JSX, useState } from 'react';
 import Container from '../../../components/Container/Container';
-import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
+import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
 import WishlistItemsToolbarOptions from './components/WishlistItemsToolbarOptions';
 import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';

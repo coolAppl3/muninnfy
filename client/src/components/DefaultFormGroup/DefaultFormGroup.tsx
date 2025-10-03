@@ -1,5 +1,4 @@
 import { ChangeEventHandler, HTMLInputAutoCompleteAttribute, JSX, Ref } from 'react';
-import './FormGroups.css';
 
 type DefaultFormGroupProps = {
   id: string;
@@ -23,8 +22,14 @@ export default function DefaultFormGroup({
   ref,
 }: DefaultFormGroupProps): JSX.Element {
   return (
-    <div className={`form-group ${errorMessage ? 'error' : ''} ${className ? className : ''}`}>
-      <label htmlFor={id}>{label}</label>
+    <div className={`flex flex-col justify-center items-start gap-[6px] ${errorMessage ? 'error' : ''} ${className ? className : ''}`}>
+      <label
+        htmlFor={id}
+        className='text-sm font-medium text-title'
+      >
+        {label}
+      </label>
+
       <input
         type='text'
         name={id}
@@ -33,9 +38,14 @@ export default function DefaultFormGroup({
         value={value}
         onChange={onChange}
         ref={ref}
+        className={`w-full h-4 p-1 rounded border-1 focus:!border-cta outline-0 text-description font-medium md:text-sm transition-colors ${
+          errorMessage ? 'border-danger' : 'border-description/70'
+        }`}
       />
 
-      <span className='error-span'>{errorMessage}</span>
+      <span className={`text-[12px] font-medium text-danger leading-[1.2] break-words ${errorMessage ? 'block' : 'hidden'}`}>
+        {errorMessage}
+      </span>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
-import DefaultFormGroup from '../../../../components/FormGroups/DefaultFormGroup';
+import DefaultFormGroup from '../../../../components/DefaultFormGroup/DefaultFormGroup';
 import { validateWishlistTitle } from '../../../../utils/validation/wishlistValidation';
 import Button from '../../../../components/Button/Button';
 import useWishlist from '../../context/useWishlist';
