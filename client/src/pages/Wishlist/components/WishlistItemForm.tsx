@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, JSX, useEffect, useMemo, useRef, useState } from 'react';
 import TextareaFormGroup from '../../../components/TextareaFormGroup/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
-import WishlistItemTagsFormGroup from './WishlistItemTagsFormGroup';
+import WishlistItemTagsFormGroup from '../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
 import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import {
   validateWishlistItemDescription,

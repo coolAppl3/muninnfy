@@ -1,6 +1,6 @@
 import { ChangeEvent, Dispatch, JSX, KeyboardEvent, MouseEvent, SetStateAction, useRef, useState } from 'react';
-import { WISHLIST_ITEM_TAGS_LIMIT } from '../../../utils/constants/wishlistItemConstants';
-import usePopupMessage from '../../../hooks/usePopupMessage';
+import { WISHLIST_ITEM_TAGS_LIMIT } from '../../utils/constants/wishlistItemConstants';
+import usePopupMessage from '../../hooks/usePopupMessage';
 
 export default function WishlistItemTagsFormGroup({
   itemTags,
