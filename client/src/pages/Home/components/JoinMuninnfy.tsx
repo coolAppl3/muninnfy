@@ -1,8 +1,8 @@
 import { JSX } from 'react';
-import Container from '../../components/Container/Container';
-import Button from '../../components/Button/Button';
-import SignUp_Illustration from '../../assets/svg/SignUp_Illustration.svg?react';
+import SignUp_Illustration from '../../../assets/svg/SignUp_Illustration.svg?react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import Container from '../../../components/Container/Container';
+import Button from '../../../components/Button/Button';
 
 export default function JoinMuninnfy(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();

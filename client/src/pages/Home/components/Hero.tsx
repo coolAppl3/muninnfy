@@ -1,10 +1,10 @@
 import { JSX } from 'react';
-import Button from '../../components/Button/Button';
-import Container from '../../components/Container/Container';
-import HeroGradient from '../../assets/svg/HeroGradient.svg?react';
-import HeroArc from '../../assets/svg/HeroArc.svg?react';
+import Container from '../../../components/Container/Container';
+import HeroGradient from '../../../assets/svg/HeroGradient.svg?react';
+import HeroArc from '../../../assets/svg/HeroArc.svg?react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import useAuth from '../../hooks/useAuth';
+import useAuth from '../../../hooks/useAuth';
+import Button from '../../../components/Button/Button';
 
 export default function Hero(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();

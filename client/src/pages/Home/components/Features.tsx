@@ -1,11 +1,11 @@
 import { FunctionComponent, JSX, SVGProps } from 'react';
-import Container from '../../components/Container/Container';
-import EyeIcon from '../../assets/svg/EyeIcon.svg?react';
-import MagnifyingGlassIcon from '../../assets/svg/MagnifyingGlassIcon.svg?react';
-import SlidersIcon from '../../assets/svg/SlidersIcon.svg?react';
-import CheckBoxIcon from '../../assets/svg/CheckBoxIcon.svg?react';
-import HashtagIcon from '../../assets/svg/HashtagIcon.svg?react';
-import MultipleWishlistsIcon from '../../assets/svg/MultipleWishlistsIcon.svg?react';
+import Container from '../../../components/Container/Container';
+import EyeIcon from '../../../assets/svg/EyeIcon.svg?react';
+import MagnifyingGlassIcon from '../../../assets/svg/MagnifyingGlassIcon.svg?react';
+import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
+import CheckBoxIcon from '../../../assets/svg/CheckBoxIcon.svg?react';
+import HashtagIcon from '../../../assets/svg/HashtagIcon.svg?react';
+import MultipleWishlistsIcon from '../../../assets/svg/MultipleWishlistsIcon.svg?react';
 
 export default function Features(): JSX.Element {
   return (
