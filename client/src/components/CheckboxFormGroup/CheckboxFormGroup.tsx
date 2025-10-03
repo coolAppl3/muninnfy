@@ -13,8 +13,8 @@ export default function CheckboxFormGroup({ label, id, isChecked, onClick, class
   return (
     <div
       className={`flex justify-start items-center gap-1 relative transition-[filter] hover:brightness-75 max-w-fit ${
-        isChecked ? 'checked' : ''
-      } ${className ? className : ''}`}
+        className ? className : ''
+      }`}
     >
       <button
         type='button'
@@ -24,7 +24,7 @@ export default function CheckboxFormGroup({ label, id, isChecked, onClick, class
         className='bg-[#555] w-2 h-2 rounded cursor-pointer grid place-items-center'
       >
         <CheckIcon
-          className={`text-cta w-[14px] h-[14px] transition-transform ${isChecked ? 'rotate-[720deg] scale-0' : 'rotate-0 scale-100'}`}
+          className={`text-cta w-[14px] h-[14px] transition-transform ${isChecked ? 'rotate-0 scale-100' : 'rotate-[720deg] scale-0'}`}
         />
       </button>
 
