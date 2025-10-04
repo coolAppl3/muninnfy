@@ -12,7 +12,7 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
   useEffect(() => {
     const abortController: AbortController = new AbortController();
 
-    const checkForAuthSession = async (): Promise<void> => {
+    const checkForAuthSession = async () => {
       try {
         const isValidAuthSession: boolean = (await checkForAuthSessionService(abortController.signal)).data.isValidAuthSession;
         setAuthStatus(isValidAuthSession ? 'authenticated' : 'unauthenticated');
