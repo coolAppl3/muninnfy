@@ -12,6 +12,7 @@ import useHistory from '../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
+import useConfirmModal from '../../../../hooks/useConfirmModal';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
@@ -30,6 +31,7 @@ export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.E
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
+  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   async function setWishlistItemIsPurchased(): Promise<void> {
     setUpdatingPurchaseState(true);
@@ -233,10 +235,22 @@ export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.E
             <button
               type='button'
               className='context-menu-btn danger'
-              onClick={async () => {
-                setMenuIsOpen(false);
-                await removeWishlistItem();
-              }}
+              onClick={() =>
+                displayConfirmModal({
+                  title: 'Are you sure you want to remove this item:',
+                  description: wishlistItem.title,
+                  confirmBtnTitle: 'Remove item',
+                  cancelBtnTitle: 'Cancel',
+                  isDangerous: true,
+                  onConfirm: async () => {
+                    removeConfirmModal();
+                    setMenuIsOpen(false);
+
+                    await removeWishlistItem();
+                  },
+                  onCancel: removeConfirmModal,
+                })
+              }
             >
               Remove
             </button>
