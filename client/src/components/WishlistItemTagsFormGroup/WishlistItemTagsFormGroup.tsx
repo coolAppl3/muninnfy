@@ -68,7 +68,7 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
   }
 
   return (
-    <div className={`flex flex-col justify-center items-start gap-[6px] cursor-text ${errorMessage ? 'error' : ''}`}>
+    <div className='flex flex-col justify-center items-start gap-[6px] cursor-text'>
       <label
         htmlFor='item-tags'
         className='text-sm font-medium text-title'

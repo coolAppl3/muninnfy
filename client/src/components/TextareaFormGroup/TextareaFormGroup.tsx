@@ -25,7 +25,7 @@ export default function TextareaFormGroup({
   }
 
   return (
-    <div className={`flex flex-col justify-center items-start gap-[6px] ${errorMessage ? 'error' : ''} ${className ? className : ''}`}>
+    <div className={`flex flex-col justify-center items-start gap-[6px] ${className ? className : ''}`}>
       <label
         htmlFor={id}
         className='text-sm font-medium text-title'
