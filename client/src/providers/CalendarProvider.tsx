@@ -15,10 +15,10 @@ export default function CalendarProvider({ children }: CalendarProviderProps): J
 
   const routerLocation: Location = useLocation();
 
-  const displayCalendar: (mode: CalendarMode) => void = useCallback((mode: CalendarMode) => setCalendarMode(mode), []);
-  const removeCalendar: () => void = useCallback(() => setCalendarMode(null), []);
+  const displayCalendar = useCallback((mode: CalendarMode) => setCalendarMode(mode), []);
+  const removeCalendar = useCallback(() => setCalendarMode(null), []);
 
-  const clearCalendar: () => void = useCallback(() => {
+  const clearCalendar = useCallback(() => {
     setCalendarMode(null);
 
     setStartTimestamp(null);

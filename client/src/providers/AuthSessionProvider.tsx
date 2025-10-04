@@ -14,7 +14,7 @@ export default function AuthSessionProvider({ children }: AuthSessionProviderPro
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
 
-  const signOut = useCallback(async (): Promise<void> => {
+  const signOut = useCallback(async () => {
     displayLoadingOverlay();
 
     try {

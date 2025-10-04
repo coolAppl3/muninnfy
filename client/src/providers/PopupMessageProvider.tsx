@@ -12,7 +12,7 @@ export default function PopupMessageProvider({ children }: PopupMessageProviderP
   const [type, setType] = useState<'success' | 'error'>('success');
   const [popupKey, setPopupKey] = useState<number>(0);
 
-  const displayPopupMessage = useCallback((message: string, type: 'success' | 'error'): void => {
+  const displayPopupMessage = useCallback((message: string, type: 'success' | 'error') => {
     setMessage(message);
     setType(type);
     setIsVisible(true);

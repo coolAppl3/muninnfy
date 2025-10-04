@@ -26,12 +26,12 @@ export default function ConfirmModalProvider({ children }: ConfirmModalProviderP
     onExtraAction: () => {},
   });
 
-  const displayConfirmModal = useCallback((props: ConfirmModalProps): void => {
+  const displayConfirmModal = useCallback((props: ConfirmModalProps) => {
     setConfirmModalState({ ...props });
     setIsVisible(true);
   }, []);
 
-  const removeConfirmModal = useCallback((): void => {
+  const removeConfirmModal = useCallback(() => {
     setIsVisible(false);
     setConfirmModalState({
       title: undefined,

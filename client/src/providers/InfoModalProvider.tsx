@@ -18,12 +18,12 @@ export default function InfoModalProvider({ children }: InfoModalProviderProps):
     onClick: () => {},
   });
 
-  const displayInfoModal = useCallback((props: InfoModalProps): void => {
+  const displayInfoModal = useCallback((props: InfoModalProps) => {
     setInfoModalState({ ...props });
     setIsVisible(true);
   }, []);
 
-  const removeInfoModal = useCallback((): void => {
+  const removeInfoModal = useCallback(() => {
     setIsVisible(false);
     setInfoModalState({
       title: undefined,

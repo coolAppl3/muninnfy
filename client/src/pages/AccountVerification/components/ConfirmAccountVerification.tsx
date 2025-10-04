@@ -25,7 +25,7 @@ export default function ConfirmAccountVerification({ publicAccountId, verificati
   const { displayPopupMessage } = usePopupMessage();
 
   const verifyAccount = useCallback(
-    async (abortSignal: AbortSignal = new AbortController().signal): Promise<void> => {
+    async (abortSignal: AbortSignal = new AbortController().signal) => {
       try {
         await verifyAccountService({ publicAccountId, verificationToken }, abortSignal);
 
