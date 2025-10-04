@@ -45,18 +45,6 @@
 - Added `eqeqeq` to `eslint.config.js`.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ## [0.0.24] (2024-09-29)
 
 ### Features
