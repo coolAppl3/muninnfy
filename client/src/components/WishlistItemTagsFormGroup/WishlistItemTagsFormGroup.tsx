@@ -36,7 +36,7 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
     const value: string = e.currentTarget.value;
 
     if (e.key === 'Backspace' && value === '') {
-      nextBackspaceRemovesTag ? setItemTags((prev) => new Set([...prev].slice(0, -1))) : setNextBackspaceRemovesTag(true);
+      nextBackspaceRemovesTag ? setItemTags((prev) => new Set<string>([...prev].slice(0, -1))) : setNextBackspaceRemovesTag(true);
       return;
     }
 
@@ -89,7 +89,7 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
           const tag: string = e.target.textContent;
 
           setItemTags((prev) => {
-            const newSet = new Set(prev);
+            const newSet = new Set<string>(prev);
             newSet.delete(tag.toLowerCase());
 
             return newSet;

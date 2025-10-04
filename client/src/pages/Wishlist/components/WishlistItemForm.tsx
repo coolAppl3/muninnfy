@@ -38,7 +38,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   const [linkValue, setLinkValue] = useState<string>(wishlistItem?.link || '');
   const [linkErrorMessage, setLinkErrorMessage] = useState<string | null>(null);
 
-  const [itemTags, setItemTags] = useState<Set<string>>(new Set(wishlistItem?.tags.map(({ name }) => name) || []));
+  const [itemTags, setItemTags] = useState<Set<string>>(new Set<string>(wishlistItem?.tags.map(({ name }) => name) || []));
 
   const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
@@ -275,7 +275,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     setLinkValue('');
     setLinkErrorMessage(null);
 
-    setItemTags(new Set());
+    setItemTags(new Set<string>());
   }
 
   return (

@@ -11,7 +11,7 @@ const defaultItemsFilterConfig: ItemsFilterConfig = {
   hasLink: null,
 
   titleQuery: '',
-  tagsSet: new Set(),
+  tagsSet: new Set<string>(),
 };
 
 type WishlistProviderProps = {
@@ -35,7 +35,7 @@ export default function WishlistProvider({
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
-    () => new Set(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
+    () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
     [wishlistItems]
   );
 
