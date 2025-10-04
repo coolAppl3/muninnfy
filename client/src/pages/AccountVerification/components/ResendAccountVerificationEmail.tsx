@@ -7,7 +7,11 @@ import usePopupMessage from '../../../hooks/usePopupMessage';
 import Button from '../../../components/Button/Button';
 import { resendAccountVerificationEmailService } from '../../../services/accountServices';
 
-export default function ResendAccountVerificationEmail({ publicAccountId }: { publicAccountId: string }): JSX.Element {
+type ResendAccountVerificationEmailProps = {
+  publicAccountId: string;
+};
+
+export default function ResendAccountVerificationEmail({ publicAccountId }: ResendAccountVerificationEmailProps): JSX.Element {
   const [title, setTitle] = useState<string>('Ongoing account verification detected.');
   const [description, setDescription] = useState<string>('Find the verification email in your inbox, and click the link to continue.');
 

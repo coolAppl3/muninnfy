@@ -2,13 +2,17 @@ import { JSX, ReactNode, useEffect, useMemo, useState } from 'react';
 import AuthContext, { AuthContextType, AuthStatus } from '../contexts/AuthContext';
 import { checkForAuthSessionService } from '../services/authServices';
 
-export default function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
+type AuthProviderProps = {
+  children: ReactNode;
+};
+
+export default function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const [authStatus, setAuthStatus] = useState<AuthStatus>('loading');
 
   useEffect(() => {
     const abortController: AbortController = new AbortController();
 
-    const checkForAuthSession = async (): Promise<void> => {
+    const checkForAuthSession = async () => {
       try {
         const isValidAuthSession: boolean = (await checkForAuthSessionService(abortController.signal)).data.isValidAuthSession;
         setAuthStatus(isValidAuthSession ? 'authenticated' : 'unauthenticated');

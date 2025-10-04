@@ -1,24 +1,24 @@
-import './BottomNavbar.css';
-import { FocusEvent, JSX, useState } from 'react';
-import { Link, NavLink, Location, useLocation } from 'react-router-dom';
+import { JSX } from 'react';
+import { NavLink, Location, useLocation } from 'react-router-dom';
 import HomeIcon from '../../assets/svg/HomeIcon.svg?react';
 import SignInIcon from '../../assets/svg/SignInIcon.svg?react';
 import AddIcon from '../../assets/svg/AddIcon.svg?react';
-import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
 import useAuth from '../../hooks/useAuth';
-import useConfirmModal from '../../hooks/useConfirmModal';
-import useAuthSession from '../../hooks/useAuthSession';
+import NavbarAccountMenu from '../NavbarAccountMenu/NavbarAccountMenu';
 
-export function BottomNavbar(): JSX.Element {
+const navLinkClassname: string =
+  'border-r-1 border-r-light-gray last:border-r-transparent flex flex-col justify-center items-center shrink-0 gap-[4px]';
+
+export default function BottomNavbar(): JSX.Element {
   const { authStatus } = useAuth();
   const { pathname }: Location = useLocation();
 
   return (
-    <nav className='bottom-navbar md:hidden'>
-      <div>
+    <nav className='fixed bottom-0 left-0 w-full h-6 bg-dark border-t-1 border-t-cta/49 text-title font-medium text-sm z-15 md:hidden'>
+      <div className='h-full w-full grid grid-cols-3'>
         <NavLink
           to='/home'
-          className={({ isActive }) => (isActive || pathname === '/' ? 'isActive' : '')}
+          className={({ isActive }) => (isActive || pathname === '/' ? `text-cta ${navLinkClassname}` : navLinkClassname)}
         >
           <HomeIcon className='w-[2.4rem] h-[2.4rem]' />
           <span>Home</span>
@@ -26,7 +26,7 @@ export function BottomNavbar(): JSX.Element {
 
         <NavLink
           to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
-          className={({ isActive }) => (isActive ? 'isActive' : '')}
+          className={({ isActive }) => (isActive ? `text-cta ${navLinkClassname}` : navLinkClassname)}
         >
           <AddIcon className='w-[2.4rem] h-[2.4rem]' />
           <span>New wishlist</span>
@@ -46,103 +46,16 @@ function AdditionalLinks(): JSX.Element {
   }
 
   if (authStatus === 'authenticated') {
-    return <AccountMenu />;
+    return <NavbarAccountMenu navbarType='bottom' />;
   }
 
   return (
     <NavLink
       to='/sign-in'
-      className={({ isActive }) => (isActive ? 'isActive' : '')}
+      className={({ isActive }) => (isActive ? `text-cta ${navLinkClassname}` : navLinkClassname)}
     >
       <SignInIcon className='w-[2.4rem] h-[2.4rem]' />
       <span>Sign in</span>
     </NavLink>
-  );
-}
-
-function AccountMenu(): JSX.Element {
-  const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const { signOut } = useAuthSession();
-  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
-
-  function handleClick(): void {
-    setIsVisible((prev) => !prev);
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setIsOpen((prev) => !prev);
-      });
-    });
-  }
-
-  return (
-    <div
-      className={`account-menu ${isVisible ? 'visible' : ''} ${isOpen ? 'open' : ''}`}
-      tabIndex={0}
-      onBlur={(e: FocusEvent<HTMLDivElement>) => {
-        if (e.relatedTarget) {
-          return;
-        }
-
-        setIsVisible(false);
-        setIsOpen(false);
-      }}
-    >
-      <button
-        type='button'
-        className='account-menu-btn'
-        onClick={handleClick}
-      >
-        <span>Menu</span>
-        <ChevronIcon />
-      </button>
-
-      <div className='account-menu-container'>
-        <Link
-          to='/account'
-          onClick={() => {
-            setIsVisible(false);
-            setIsOpen(false);
-          }}
-        >
-          My account
-        </Link>
-        <Link
-          to='/account/wishlists'
-          onClick={() => {
-            setIsVisible(false);
-            setIsOpen(false);
-          }}
-        >
-          Wishlists
-        </Link>
-
-        <button
-          type='button'
-          onClick={async () => {
-            displayConfirmModal({
-              title: 'Are you sure you want to sign out?',
-              confirmBtnTitle: 'Confirm',
-              cancelBtnTitle: 'Cancel',
-              isDangerous: true,
-              onConfirm: async () => {
-                removeConfirmModal();
-
-                setIsVisible(false);
-                setIsOpen(false);
-
-                await signOut();
-              },
-              onCancel: removeConfirmModal,
-            });
-          }}
-          className='!text-danger'
-        >
-          Sign out
-        </button>
-      </div>
-    </div>
   );
 }

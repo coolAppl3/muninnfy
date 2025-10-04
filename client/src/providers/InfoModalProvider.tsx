@@ -3,7 +3,11 @@ import InfoModalContext, { InfoModalContextType } from '../contexts/InfoModalCon
 import InfoModal, { InfoModalProps } from '../components/InfoModal/InfoModal';
 import { Location, useLocation } from 'react-router-dom';
 
-export default function InfoModalProvider({ children }: { children: ReactNode }): JSX.Element {
+type InfoModalProviderProps = {
+  children: ReactNode;
+};
+
+export default function InfoModalProvider({ children }: InfoModalProviderProps): JSX.Element {
   const routerLocation: Location = useLocation();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -14,12 +18,12 @@ export default function InfoModalProvider({ children }: { children: ReactNode })
     onClick: () => {},
   });
 
-  const displayInfoModal = useCallback((props: InfoModalProps): void => {
+  const displayInfoModal = useCallback((props: InfoModalProps) => {
     setInfoModalState({ ...props });
     setIsVisible(true);
   }, []);
 
-  const removeInfoModal = useCallback((): void => {
+  const removeInfoModal = useCallback(() => {
     setIsVisible(false);
     setInfoModalState({
       title: undefined,

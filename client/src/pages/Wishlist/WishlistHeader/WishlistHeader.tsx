@@ -12,21 +12,25 @@ export default function WishlistHeader(): JSX.Element {
   const { editMode } = useWishlistHeader();
 
   return (
-    <header className='wishlist-header'>
+    <header>
       <Container>
-        <div className={`wishlist-header-container ${editMode ? 'expanded' : ''}`}>
-          <div className='content'>
+        <div
+          className={`bg-secondary p-2 pb-0 rounded-sm shadow-simple-tiny grid transition-[grid] gap-2 ${
+            editMode ? 'grid-rows-[auto_1fr] !pb-2' : 'grid-rows-[auto_0fr]'
+          }`}
+        >
+          <div>
             <WishlistHeaderContent />
 
-            <p>
-              Created on: <span>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
+            <p className='text-sm text-description'>
+              Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
             </p>
-            <p>
-              Privacy level: <span>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
+            <p className='text-sm text-description'>
+              Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
             </p>
           </div>
 
-          <div className='editing-container overflow-hidden relative z-0'>
+          <div className='overflow-hidden relative z-0'>
             <div className='h-line mb-[1.4rem]'></div>
             <WishlistHeaderEditingContainer />
           </div>

@@ -1,13 +1,13 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
-import { Head } from '../../components/Head/Head';
+import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
-import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
+import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup';
 import Button from '../../components/Button/Button';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
-import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
+import PasswordFormGroup from '../../components/PasswordFormGroup/PasswordFormGroup';
 import { validateEmail, validatePassword } from '../../utils/validation/userValidation';
-import CheckboxFormGroup from '../../components/FormGroups/CheckboxFormGroup';
+import CheckboxFormGroup from '../../components/CheckboxFormGroup/CheckboxFormGroup';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { signInService } from '../../services/accountServices';
 import useConfirmModal from '../../hooks/useConfirmModal';

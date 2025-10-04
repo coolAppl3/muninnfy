@@ -1,7 +1,11 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
 import WishlistHeaderContext, { WishlistHeaderContextType, WishlistHeaderEditMode } from './WishlistHeaderContext';
 
-export default function WishlistHeaderProvider({ children }: { children: ReactNode }): JSX.Element {
+type WishlistHeaderProviderProps = {
+  children: ReactNode;
+};
+
+export default function WishlistHeaderProvider({ children }: WishlistHeaderProviderProps): JSX.Element {
   const [editMode, setEditMode] = useState<WishlistHeaderEditMode | null>(null);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);

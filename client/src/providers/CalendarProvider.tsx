@@ -3,7 +3,11 @@ import CalendarContext, { CalendarContextType, CalendarMode } from '../contexts/
 import Calendar from '../components/Calendar/Calendar';
 import { Location, useLocation } from 'react-router-dom';
 
-export default function CalendarProvider({ children }: { children: ReactNode }): JSX.Element {
+type CalendarProviderProps = {
+  children: ReactNode;
+};
+
+export default function CalendarProvider({ children }: CalendarProviderProps): JSX.Element {
   const [calendarMode, setCalendarMode] = useState<CalendarMode | null>(null);
 
   const [startTimestamp, setStartTimestamp] = useState<number | null>(null);
@@ -11,10 +15,10 @@ export default function CalendarProvider({ children }: { children: ReactNode }):
 
   const routerLocation: Location = useLocation();
 
-  const displayCalendar: (mode: CalendarMode) => void = useCallback((mode: CalendarMode) => setCalendarMode(mode), []);
-  const removeCalendar: () => void = useCallback(() => setCalendarMode(null), []);
+  const displayCalendar = useCallback((mode: CalendarMode) => setCalendarMode(mode), []);
+  const removeCalendar = useCallback(() => setCalendarMode(null), []);
 
-  const clearCalendar: () => void = useCallback(() => {
+  const clearCalendar = useCallback(() => {
     setCalendarMode(null);
 
     setStartTimestamp(null);

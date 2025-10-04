@@ -1,15 +1,14 @@
 import { ChangeEvent, Dispatch, JSX, KeyboardEvent, MouseEvent, SetStateAction, useRef, useState } from 'react';
-import '../../../components/FormGroups/FormGroups.css';
-import { WISHLIST_ITEM_TAGS_LIMIT } from '../../../utils/constants/wishlistItemConstants';
-import usePopupMessage from '../../../hooks/usePopupMessage';
+import { WISHLIST_ITEM_TAGS_LIMIT } from '../../utils/constants/wishlistItemConstants';
+import usePopupMessage from '../../hooks/usePopupMessage';
 
-export default function WishlistItemTagsFormGroup({
-  itemTags,
-  setItemTags,
-}: {
+type WishlistItemTagsFormGroupProps = {
   itemTags: Set<string>;
   setItemTags: Dispatch<SetStateAction<Set<string>>>;
-}): JSX.Element {
+  label: string;
+};
+
+export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label }: WishlistItemTagsFormGroupProps): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -37,7 +36,7 @@ export default function WishlistItemTagsFormGroup({
     const value: string = e.currentTarget.value;
 
     if (e.key === 'Backspace' && value === '') {
-      nextBackspaceRemovesTag ? setItemTags((prev) => new Set([...prev].slice(0, -1))) : setNextBackspaceRemovesTag(true);
+      nextBackspaceRemovesTag ? setItemTags((prev) => new Set<string>([...prev].slice(0, -1))) : setNextBackspaceRemovesTag(true);
       return;
     }
 
@@ -69,11 +68,18 @@ export default function WishlistItemTagsFormGroup({
   }
 
   return (
-    <div className={`form-group tags-form-group ${errorMessage ? 'error' : ''}`}>
-      <label htmlFor='item-tags'>Tags (optional) - space to add</label>
+    <div className='flex flex-col justify-center items-start gap-[6px] cursor-text'>
+      <label
+        htmlFor='item-tags'
+        className='text-sm font-medium text-title'
+      >
+        {label}
+      </label>
 
       <div
-        className={inputFocused ? 'focused' : ''}
+        className={`w-full min-h-4 p-[8px] rounded border-1 focus:!border-cta outline-0 text-description font-medium md:text-sm transition-colors ${
+          inputFocused ? 'border-cta' : 'border-description/70'
+        }`}
         onClick={(e: MouseEvent<HTMLDivElement>) => {
           if (!(e.target instanceof HTMLSpanElement)) {
             inputRef.current?.focus();
@@ -83,14 +89,23 @@ export default function WishlistItemTagsFormGroup({
           const tag: string = e.target.textContent;
 
           setItemTags((prev) => {
-            const newSet = new Set(prev);
+            const newSet = new Set<string>(prev);
             newSet.delete(tag.toLowerCase());
 
             return newSet;
           });
         }}
       >
-        <Tags itemTags={itemTags} />
+        {[...itemTags].map((tag: string) => (
+          <span
+            key={tag}
+            title='Remove tag'
+            aria-label='Remove tag'
+            className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] transition-colors hover:bg-danger cursor-pointer'
+          >
+            {tag}
+          </span>
+        ))}
 
         <input
           name='item-tags'
@@ -109,10 +124,13 @@ export default function WishlistItemTagsFormGroup({
           }}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
+          className='outline-none h-fit max-w-fit inline-block ml-[2px] text-sm'
         />
       </div>
 
-      <span className='error-span'>{errorMessage}</span>
+      <span className={`text-[12px] font-medium text-danger leading-[1.2] break-words ${errorMessage ? 'block' : 'hidden'}`}>
+        {errorMessage}
+      </span>
     </div>
   );
 }

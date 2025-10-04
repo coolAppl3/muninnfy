@@ -1,12 +1,15 @@
 import { JSX, MouseEvent, useState } from 'react';
-import './Calendar.css';
 import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
 import usePopupMessage from '../../hooks/usePopupMessage';
 import useCalendar from '../../hooks/useCalendar';
 import { CalendarMode } from '../../contexts/CalendarContext';
 import Button from '../Button/Button';
 
-export default function Calendar({ calendarMode }: { calendarMode: CalendarMode }): JSX.Element {
+type CalendarProps = {
+  calendarMode: CalendarMode;
+};
+
+export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
   const { setStartTimestamp, setEndTimestamp, removeCalendar } = useCalendar();
   const [renderMode, setRenderMode] = useState<'years' | 'months' | 'dates'>('years');
 
@@ -100,8 +103,8 @@ export default function Calendar({ calendarMode }: { calendarMode: CalendarMode 
   }
 
   return (
-    <div className='calendar-modal fixed top-0 left-0 w-full h-[100vh] bg-overlay z-10 flex justify-center items-center outline-none'>
-      <div className='calendar-modal-container w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words;'>
+    <div className='fixed top-0 left-0 w-full h-[100vh] bg-overlay z-10 flex justify-center items-center outline-none'>
+      <div className='w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words'>
         <header className='flex justify-between items-center mb-2'>
           <button
             type='button'
@@ -114,24 +117,24 @@ export default function Calendar({ calendarMode }: { calendarMode: CalendarMode 
 
           <button
             type='button'
-            className='nav-btn ml-auto mr-1'
+            className='bg-description p-1 rounded transition-[filter] hover:brightness-75 cursor-pointer ml-auto mr-1'
             onClick={() => navigateCalendar(-1)}
           >
-            <ChevronIcon className='rotate-90' />
+            <ChevronIcon className='w-[1.4rem] h-[1.4rem] rotate-90' />
           </button>
 
           <button
             type='button'
-            className='nav-btn'
+            className='bg-description p-1 rounded transition-[filter] hover:brightness-75 cursor-pointer'
             onClick={() => navigateCalendar(1)}
           >
-            <ChevronIcon className='-rotate-90' />
+            <ChevronIcon className='w-[1.4rem] h-[1.4rem] -rotate-90' />
           </button>
         </header>
 
         {renderMode === 'years' && (
           <div
-            className='years-container grid grid-cols-3 gap-1'
+            className='grid grid-cols-3 gap-1'
             onClick={(e: MouseEvent) => {
               if (!(e.target instanceof HTMLButtonElement)) {
                 return;
@@ -151,7 +154,9 @@ export default function Calendar({ calendarMode }: { calendarMode: CalendarMode 
               <button
                 type='button'
                 key={year}
-                className={year === dateObject.getFullYear() ? 'current' : ''}
+                className={`bg-dark p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
+                  year === dateObject.getFullYear() ? 'bg-cta/10' : ''
+                }`}
               >
                 {year}
               </button>
@@ -161,7 +166,7 @@ export default function Calendar({ calendarMode }: { calendarMode: CalendarMode 
 
         {renderMode === 'months' && (
           <div
-            className='months-container grid grid-cols-3 gap-1'
+            className='grid grid-cols-3 gap-1'
             onClick={(e: MouseEvent) => {
               if (!(e.target instanceof HTMLButtonElement)) {
                 return;
@@ -181,7 +186,9 @@ export default function Calendar({ calendarMode }: { calendarMode: CalendarMode 
             {Array.from({ length: 12 }, (_, index: number) => (
               <button
                 type='button'
-                className={isCurrentMonth(index) ? 'current' : ''}
+                className={`bg-dark p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
+                  isCurrentMonth(index) ? 'bg-cta/10' : ''
+                }`}
                 key={index}
               >
                 {monthsArr[index]?.slice(0, 3)}
@@ -192,7 +199,7 @@ export default function Calendar({ calendarMode }: { calendarMode: CalendarMode 
 
         {renderMode === 'dates' && (
           <div
-            className='dates-container grid grid-cols-7'
+            className='grid grid-cols-7'
             onClick={(e: MouseEvent<HTMLDivElement>) => {
               if (!(e.target instanceof HTMLButtonElement)) {
                 return;
@@ -221,7 +228,9 @@ export default function Calendar({ calendarMode }: { calendarMode: CalendarMode 
               return (
                 <button
                   type='button'
-                  className={isCurrentMonth(selectedMonth) && date === dateObject.getDate() ? 'current' : ''}
+                  className={`bg-dark px-1 py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
+                    isCurrentMonth(selectedMonth) && date === dateObject.getDate() ? 'bg-cta/10' : ''
+                  }`}
                   key={index}
                 >
                   {date}

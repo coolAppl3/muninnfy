@@ -1,8 +1,8 @@
 import { JSX } from 'react';
 import useWishlistHeader from '../context/useWishlistHeader';
-import { EditWishlistTitleForm } from './EditWishlistTitleForm';
+import EditWishlistTitleForm from './EditWishlistTitleForm';
 import EditPrivacyLevelContainer from './EditPrivacyLevelContainer';
-import { DeleteWishlistForm } from './DeleteWishlistForm';
+import DeleteWishlistForm from './DeleteWishlistForm';
 
 export default function WishlistHeaderEditingContainer(): JSX.Element {
   const { editMode } = useWishlistHeader();

@@ -1,9 +1,0 @@
-@reference '../../index.css';
-
-.btn-secondary {
-  @apply block min-w-fit p-0 underline transition-colors ease-out font-bold text-description hover:text-cta cursor-pointer;
-
-  &.disabled {
-    @apply opacity-25 cursor-default hover:text-description;
-  }
-}

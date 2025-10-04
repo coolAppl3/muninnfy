@@ -1,9 +1,8 @@
 import { JSX } from 'react';
-import './Home.css';
-import { Head } from '../../components/Head/Head';
-import Hero from './Hero';
-import Features from './Features';
-import JoinMuninnfy from './JoinMuninnfy';
+import Head from '../../components/Head/Head';
+import Hero from './components/Hero';
+import Features from './components/Features';
+import JoinMuninnfy from './components/JoinMuninnfy';
 
 export default function Home(): JSX.Element {
   return (

@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, JSX, useReducer, useState } from 'react';
-import { Head } from '../../components/Head/Head';
+import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
 import signUpFormValidationReducer, { initialSignUpFormValidationState } from './signUpFormValidationReducer';
@@ -7,8 +7,8 @@ import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { signUpService } from '../../services/accountServices';
 import usePopupMessage from '../../hooks/usePopupMessage';
-import PasswordFormGroup from '../../components/FormGroups/PasswordFormGroup';
-import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
+import PasswordFormGroup from '../../components/PasswordFormGroup/PasswordFormGroup';
+import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup';
 import useAuth from '../../hooks/useAuth';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
 

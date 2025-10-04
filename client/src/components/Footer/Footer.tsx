@@ -1,5 +1,4 @@
 import { JSX } from 'react';
-import './Footer.css';
 import Container from '../Container/Container';
 import { NavLink } from 'react-router-dom';
 import Logo from '../../assets/svg/Logo.svg';
@@ -10,9 +9,9 @@ export default function Footer(): JSX.Element {
   const { authStatus } = useAuth();
 
   return (
-    <footer className='footer'>
+    <footer className='bg-dark py-4'>
       <Container>
-        <div className='footer-container grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3'>
+        <div className='grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3'>
           <div>
             <Link to='/home'>
               <div className='w-fit flex justify-center items-center gap-1 mb-1 xs:mb-2'>
@@ -69,13 +68,18 @@ type LinksContainerProps = {
 
 function LinksContainer({ title, links }: LinksContainerProps): JSX.Element {
   return (
-    <div className='links-container'>
-      <h3>{title}</h3>
+    <div>
+      <h3 className='text-title text-lg font-medium mb-2'>{title}</h3>
 
-      <ul className='links'>
+      <ul className='text-description font-medium flex flex-col justify-center items-start gap-[4px]'>
         {links.map((link: { title: string; path: string }) => (
           <li key={`${link.title}-${link.path}`}>
-            <NavLink to={link.path}>{link.title}</NavLink>
+            <NavLink
+              to={link.path}
+              className='transition-colors hover:text-cta'
+            >
+              {link.title}
+            </NavLink>
           </li>
         ))}
       </ul>

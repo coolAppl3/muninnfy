@@ -1,8 +1,7 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
-import { Head } from '../../components/Head/Head';
-import './NewWishlist.css';
+import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
-import DefaultFormGroup from '../../components/FormGroups/DefaultFormGroup';
+import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import {
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
@@ -74,7 +73,6 @@ export default function NewWishlist(): JSX.Element {
             <div className='h-line my-2'></div>
 
             <form
-              id='wishlist-form'
               className='grid grid-cols-1 gap-2'
               onSubmit={async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
@@ -106,34 +104,48 @@ export default function NewWishlist(): JSX.Element {
                 errorMessage={titleErrorMessage}
               ></DefaultFormGroup>
 
-              <div id='wishlist-privacy-level'>
-                <span>Privacy level</span>
+              <div className='grid gap-[6px]'>
+                <span className='text-sm font-medium text-title'>Privacy level</span>
 
-                <div className='btn-container'>
+                <div className='grid grid-cols-3 rounded-sm overflow-hidden'>
                   <button
                     type='button'
-                    className={privacyLevelValue === PRIVATE_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
                     onClick={() => setPrivacyLevelValue(PRIVATE_WISHLIST_PRIVACY_LEVEL)}
+                    className={`w-full text-sm text-center py-1 transition-[filter] cursor-pointer z-0 focus:z-1 ${
+                      privacyLevelValue === PRIVATE_WISHLIST_PRIVACY_LEVEL
+                        ? 'bg-light text-dark font-bold'
+                        : 'bg-dark text-title font-medium hover:brightness-60'
+                    }`}
                   >
                     Private
                   </button>
+
                   <button
                     type='button'
-                    className={privacyLevelValue === FOLLOWERS_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
                     onClick={() => setPrivacyLevelValue(FOLLOWERS_WISHLIST_PRIVACY_LEVEL)}
+                    className={`w-full text-sm text-center py-1 transition-[filter] cursor-pointer z-0 focus:z-1 ${
+                      privacyLevelValue === FOLLOWERS_WISHLIST_PRIVACY_LEVEL
+                        ? 'bg-light text-dark font-bold'
+                        : 'bg-dark text-title font-medium hover:brightness-60'
+                    }`}
                   >
                     Followers
                   </button>
+
                   <button
                     type='button'
-                    className={privacyLevelValue === PUBLIC_WISHLIST_PRIVACY_LEVEL ? 'selected' : ''}
                     onClick={() => setPrivacyLevelValue(PUBLIC_WISHLIST_PRIVACY_LEVEL)}
+                    className={`w-full text-sm text-center py-1 transition-[filter] cursor-pointer z-0 focus:z-1 ${
+                      privacyLevelValue === PUBLIC_WISHLIST_PRIVACY_LEVEL
+                        ? 'bg-light text-dark font-bold'
+                        : 'bg-dark text-title font-medium hover:brightness-60'
+                    }`}
                   >
                     Public
                   </button>
                 </div>
 
-                <p className='text-description text-sm m'>Privacy settings can be changed later if needed.</p>
+                <p className='text-description text-sm'>Privacy settings can be changed later if needed.</p>
               </div>
 
               <Button

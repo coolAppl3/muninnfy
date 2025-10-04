@@ -1,5 +1,5 @@
 import { JSX } from 'react';
-import { Head } from '../../components/Head/Head';
+import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import { useSearchParams } from 'react-router-dom';
 import ConfirmAccountVerification from './components/ConfirmAccountVerification';

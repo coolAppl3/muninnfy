@@ -5,7 +5,11 @@ import ConfirmModalProvider from './providers/ConfirmModalProvider';
 import InfoModalProvider from './providers/InfoModalProvider';
 import AuthSessionProvider from './providers/AuthSessionProvider';
 
-export default function Providers({ children }: { children: ReactNode }): JSX.Element {
+type ProvidersProps = {
+  children: ReactNode;
+};
+
+export default function Providers({ children }: ProvidersProps): JSX.Element {
   return (
     <LoadingOverlayProvider>
       <PopupMessageProvider>

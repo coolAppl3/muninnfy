@@ -25,8 +25,13 @@ export default function TextareaFormGroup({
   }
 
   return (
-    <div className={`form-group ${errorMessage ? 'error' : ''} ${className ? className : ''}`}>
-      <label htmlFor={id}>{label}</label>
+    <div className={`flex flex-col justify-center items-start gap-[6px] ${className ? className : ''}`}>
+      <label
+        htmlFor={id}
+        className='text-sm font-medium text-title'
+      >
+        {label}
+      </label>
 
       <textarea
         name={id}
@@ -38,9 +43,14 @@ export default function TextareaFormGroup({
           autoAdjustHeight(e.target);
         }}
         ref={ref}
+        className={`w-full h-4 p-1 rounded border-1 focus:!border-cta outline-0 text-description font-medium md:text-sm transition-colors max-h-[50rem] min-h-8 ${
+          errorMessage ? 'border-danger' : 'border-description/70'
+        }`}
       ></textarea>
 
-      <span className='error-span'>{errorMessage}</span>
+      <span className={`text-[12px] font-medium text-danger leading-[1.2] break-words ${errorMessage ? 'block' : 'hidden'}`}>
+        {errorMessage}
+      </span>
     </div>
   );
 }

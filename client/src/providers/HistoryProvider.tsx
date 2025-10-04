@@ -2,7 +2,11 @@ import { JSX, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import HistoryContext, { HistoryContextType } from '../contexts/HistoryContext';
 import { useLocation } from 'react-router-dom';
 
-export default function HistoryProvider({ children }: { children: ReactNode }): JSX.Element {
+type HistoryProviderProps = {
+  children: ReactNode;
+};
+
+export default function HistoryProvider({ children }: HistoryProviderProps): JSX.Element {
   const [referrerLocation, setReferrerLocation] = useState<string | null>(null);
   const [postAuthNavigate, setPostAuthNavigate] = useState<string | null>(null);
 

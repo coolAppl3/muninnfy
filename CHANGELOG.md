@@ -1,5 +1,62 @@
 # Changelog
 
+## [0.0.25] (2024-10-04)
+
+### Features
+
+- Implement custom typecasting function in `db` to convert all `TINYINT(1)` fetched by `mysql2` to JS booleans.
+- Added filtering state and function to `WishlistContext`.
+- Added `NavbarAccountMenu` component to factor out the duplication in `TopNavbar` and `BottomNavbar`.
+- Added `WishlistItemButtonContainer` component, extracting the button container from `WishlistItem`, to improve readability and maintainability.
+
+
+### Improvements
+
+- Reworked all styling to be tailwind-first, effectively eliminating all CSS files except for `index`.
+  - This change was done over multiple commits and included plenty of refactors.
+- Improved `onBlur` handler logic. 
+
+
+### Changes
+
+- Added a confirmation step before deleting a single wishlist item.
+
+
+### Bug Fixes
+
+- Removed unnecessary inefficiency and complexity in creating `wishlistItemsTitleSet` in `WishlistProvider`.
+- Fixed some components not having a default export.
+- Fixed short-circuiting being incorrectly used in some locations to determine an element's className.
+- Fixed UI issues with `WishlistItem` created in the last patch. 
+- Fixed clicking the `Share wishlist` button not closing the context menu.
+- Fixed a few instances where tailwind's `transition-` property wasn't correctly used.
+- Fixed `ConfirmModal` and `InfoModal` not correctly handling how long words should overflow.
+
+
+### Code Refactoring
+
+- Split all different form group components into their own dedicated directory in the app's `components` directory.
+- Refactored all components to have a dedicated prop object type definition for better readability.
+- Removed overly-verbose function return type definitions.
+
+
+### Build Changes
+
+- Added `eqeqeq` to `eslint.config.js`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## [0.0.24] (2024-09-29)
 
 ### Features

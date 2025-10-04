@@ -13,9 +13,9 @@ export default function WishlistHeaderContent(): JSX.Element {
 
   return (
     <div
-      className={`content-header flex justify-between items-start gap-1 mb-1 relative ${menuIsOpen ? 'open' : ''}`}
+      className='flex justify-between items-start gap-1 mb-1 relative'
       onBlur={(e: FocusEvent<HTMLDivElement>) => {
-        if (e.relatedTarget) {
+        if (e.relatedTarget?.classList.contains('context-menu-btn')) {
           return;
         }
 
@@ -31,12 +31,13 @@ export default function WishlistHeaderContent(): JSX.Element {
         className='mt-[-1rem] mr-[-1.2rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer flex justify-center items-center'
         onClick={() => setMenuIsOpen((prev) => !prev)}
       >
-        <TripleDotMenuIcon />
+        <TripleDotMenuIcon className={`w-2 h-2 transition-colors ${menuIsOpen ? 'text-cta' : 'text-title'}`} />
       </button>
 
-      <div className='content-menu absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny hidden'>
+      <div className={`absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
+          className='context-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('TITLE');
@@ -47,6 +48,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
+          className='context-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('PRIVACY_LEVEL');
@@ -57,8 +59,10 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
-          id='share-wishlist-btn'
+          className='context-menu-btn'
           onClick={async () => {
+            setMenuIsOpen(false);
+
             const successfullyCopied: boolean = await copyToClipboard(`${window.location.origin}/wishlist/view/${wishlistId}`);
             successfullyCopied
               ? displayPopupMessage('Share link copied to clipboard.', 'success')
@@ -70,7 +74,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
         <button
           type='button'
-          className='!text-danger'
+          className='context-menu-btn danger'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('DELETE_WISHLIST');

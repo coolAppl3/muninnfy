@@ -1,8 +1,8 @@
 import { ChangeEvent, FormEvent, JSX, useEffect, useMemo, useRef, useState } from 'react';
-import TextareaFormGroup from '../../../components/FormGroups/TextareaFormGroup';
+import TextareaFormGroup from '../../../components/TextareaFormGroup/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
-import WishlistItemTagsFormGroup from './WishlistItemTagsFormGroup';
-import DefaultFormGroup from '../../../components/FormGroups/DefaultFormGroup';
+import WishlistItemTagsFormGroup from '../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
+import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import {
   validateWishlistItemDescription,
   validateWishlistItemLink,
@@ -17,15 +17,14 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
-export default function WishlistItemForm({
-  formMode,
-  wishlistItem,
-  onFinish,
-}: {
+type WishlistItemFromProps = {
   formMode: 'NEW_ITEM' | 'EDIT_ITEM';
   wishlistItem?: WishlistItemType;
   onFinish: () => void;
-}): JSX.Element {
+  className?: string;
+};
+
+export default function WishlistItemForm({ formMode, wishlistItem, onFinish, className }: WishlistItemFromProps): JSX.Element {
   const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -39,7 +38,7 @@ export default function WishlistItemForm({
   const [linkValue, setLinkValue] = useState<string>(wishlistItem?.link || '');
   const [linkErrorMessage, setLinkErrorMessage] = useState<string | null>(null);
 
-  const [itemTags, setItemTags] = useState<Set<string>>(new Set(wishlistItem?.tags.map(({ name }) => name) || []));
+  const [itemTags, setItemTags] = useState<Set<string>>(new Set<string>(wishlistItem?.tags.map(({ name }) => name) || []));
 
   const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
@@ -276,12 +275,12 @@ export default function WishlistItemForm({
     setLinkValue('');
     setLinkErrorMessage(null);
 
-    setItemTags(new Set());
+    setItemTags(new Set<string>());
   }
 
   return (
     <form
-      className={`wishlist-item-form px-2 grid gap-2 overflow-hidden relative z-0 ${formMode === 'EDIT_ITEM' && 'edit-mode'}`}
+      className={`px-2 grid gap-2 overflow-hidden relative z-0 ${className ? className : ''}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -330,6 +329,7 @@ export default function WishlistItemForm({
       <WishlistItemTagsFormGroup
         itemTags={itemTags}
         setItemTags={setItemTags}
+        label='Tags (optional) - space to add'
       />
 
       <TextareaFormGroup
@@ -345,9 +345,15 @@ export default function WishlistItemForm({
         }}
       />
 
-      <div className='btn-container flex flex-col sm:flex-row justify-start items-center gap-1'>
+      <div
+        className={`btn-container flex flex-col justify-start items-center gap-1 ${
+          formMode === 'EDIT_ITEM' ? 'sm:flex-col md:flex-row' : 'sm:flex-row'
+        }`}
+      >
         <Button
-          className='bg-secondary border-title text-title w-full order-2 sm:w-fit sm:order-1'
+          className={`bg-secondary border-title text-title w-full order-2 ${
+            formMode === 'EDIT_ITEM' ? 'sm:w-full md:w-fit sm:order-2 md:order-1' : 'sm:w-fit sm:order-1'
+          }`}
           onClick={() => {
             clearForm();
             onFinish();
@@ -358,7 +364,9 @@ export default function WishlistItemForm({
 
         <Button
           isSubmitBtn={true}
-          className='bg-cta border-cta w-full order-1 sm:w-fit sm:order-2'
+          className={`bg-cta border-cta w-full order-1 ${
+            formMode === 'EDIT_ITEM' ? 'sm:w-full md:w-fit sm:order-1 md:order-2' : 'sm:w-fit sm:order-2'
+          }`}
         >
           {wishlistItem ? 'Update wishlist item' : 'Add wishlist item'}
         </Button>

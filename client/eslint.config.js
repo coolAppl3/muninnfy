@@ -14,12 +14,13 @@ export default defineConfig([
 
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
+
     plugins: {
-      react,
+      ...react.configs.flat.recommended,
     },
+
     languageOptions: {
       parser: tseslint.parser,
-      ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
         ecmaVersion: 'latest',
@@ -27,17 +28,19 @@ export default defineConfig([
         ecmaFeatures: { jsx: true },
       },
     },
+
     settings: {
       react: {
         version: 'detect',
       },
     },
+
     rules: {
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      'react/jsx-key': 'error',
+      "eqeqeq": 'error',
     },
   },
 ]);
