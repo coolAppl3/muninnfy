@@ -114,7 +114,7 @@
     @apply w-full h-[2px] bg-light-gray rounded-[5rem];
   }
 
-  button.context-menu-btn {
+  .context-menu-btn {
     @apply block w-full bg-dark p-1 text-title text-sm font-medium text-start text-nowrap transition-[filter] hover:brightness-75 cursor-pointer;
 
     &.danger {

@@ -1,13 +1,11 @@
 import './BottomNavbar.css';
-import { FocusEvent, JSX, useState } from 'react';
-import { Link, NavLink, Location, useLocation } from 'react-router-dom';
+import { JSX } from 'react';
+import { NavLink, Location, useLocation } from 'react-router-dom';
 import HomeIcon from '../../assets/svg/HomeIcon.svg?react';
 import SignInIcon from '../../assets/svg/SignInIcon.svg?react';
 import AddIcon from '../../assets/svg/AddIcon.svg?react';
-import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
 import useAuth from '../../hooks/useAuth';
-import useConfirmModal from '../../hooks/useConfirmModal';
-import useAuthSession from '../../hooks/useAuthSession';
+import NavbarAccountMenu from '../NavbarAccountMenu/NavbarAccountMenu';
 
 export default function BottomNavbar(): JSX.Element {
   const { authStatus } = useAuth();
@@ -46,7 +44,7 @@ function AdditionalLinks(): JSX.Element {
   }
 
   if (authStatus === 'authenticated') {
-    return <AccountMenu />;
+    return <NavbarAccountMenu navbarType='bottom' />;
   }
 
   return (
@@ -57,93 +55,5 @@ function AdditionalLinks(): JSX.Element {
       <SignInIcon className='w-[2.4rem] h-[2.4rem]' />
       <span>Sign in</span>
     </NavLink>
-  );
-}
-
-function AccountMenu(): JSX.Element {
-  const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const { signOut } = useAuthSession();
-  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
-
-  function handleClick(): void {
-    setIsVisible((prev) => !prev);
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setIsOpen((prev) => !prev);
-      });
-    });
-  }
-
-  return (
-    <div
-      className={`account-menu ${isVisible ? 'visible' : ''} ${isOpen ? 'open' : ''}`}
-      onBlur={(e: FocusEvent<HTMLDivElement>) => {
-        if (e.relatedTarget?.classList.contains('menu-container-btn')) {
-          return;
-        }
-
-        setIsVisible(false);
-        setIsOpen(false);
-      }}
-    >
-      <button
-        type='button'
-        className='account-menu-btn'
-        onClick={handleClick}
-      >
-        <span>Menu</span>
-        <ChevronIcon />
-      </button>
-
-      <div className='account-menu-container'>
-        <Link
-          to='/account'
-          className='menu-container-btn'
-          onClick={() => {
-            setIsVisible(false);
-            setIsOpen(false);
-          }}
-        >
-          My account
-        </Link>
-        <Link
-          to='/account/wishlists'
-          className='menu-container-btn'
-          onClick={() => {
-            setIsVisible(false);
-            setIsOpen(false);
-          }}
-        >
-          Wishlists
-        </Link>
-
-        <button
-          type='button'
-          onClick={async () => {
-            displayConfirmModal({
-              title: 'Are you sure you want to sign out?',
-              confirmBtnTitle: 'Confirm',
-              cancelBtnTitle: 'Cancel',
-              isDangerous: true,
-              onConfirm: async () => {
-                removeConfirmModal();
-
-                setIsVisible(false);
-                setIsOpen(false);
-
-                await signOut();
-              },
-              onCancel: removeConfirmModal,
-            });
-          }}
-          className='menu-container-btn !text-danger'
-        >
-          Sign out
-        </button>
-      </div>
-    </div>
   );
 }
