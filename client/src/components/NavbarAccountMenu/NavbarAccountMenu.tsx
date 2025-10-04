@@ -49,7 +49,7 @@ export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps
       </button>
 
       <div
-        className={`absolute rounded-sm overflow-hidden shadow-centered-tiny transform-gpu transition-[transform_opacity] ${
+        className={`absolute rounded-sm overflow-hidden shadow-centered-tiny transform-gpu transition-all ${
           navbarType === 'top' ? 'top-4 right-0' : 'bottom-[6.4rem] right-[1px] w-full border-1 border-cta'
         } ${isOpen ? 'block' : 'hidden'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}
       >

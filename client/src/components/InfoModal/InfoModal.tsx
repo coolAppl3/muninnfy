@@ -24,7 +24,7 @@ export default function InfoModal({ title, description, btnTitle, onClick }: Inf
       ref={modalRef}
     >
       <div
-        className={`grid gap-1 w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words transition-[translate_opacity] ${
+        className={`grid gap-1 w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words transition-all ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
         }`}
       >

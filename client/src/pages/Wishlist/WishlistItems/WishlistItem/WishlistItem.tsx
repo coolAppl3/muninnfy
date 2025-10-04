@@ -124,7 +124,7 @@ export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.E
         tabIndex={0}
         title={`${isExpanded ? 'Collapse' : 'Expand'} item`}
         aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item`}
-        className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-[filter_colors] hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden ${
+        className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-all hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden ${
           isExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
         } ${
           wishlistItem.is_purchased
