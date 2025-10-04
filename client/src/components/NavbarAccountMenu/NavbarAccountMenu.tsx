@@ -35,10 +35,10 @@ export default function NavbarAccountMenu({ navbarType }: { navbarType: 'top' | 
     >
       <button
         type='button'
+        onClick={handleClick}
         className={`flex justify-between items-center gap-1 px-[1.2rem] py-[4px] border-2 rounded-pill cursor-pointer transition-colors ${
           isVisible ? 'text-cta border-cta' : 'text-title border-title hover:text-cta hover:border-cta'
         }`}
-        onClick={handleClick}
       >
         <span className='text-sm font-medium'>Menu</span>
         <ChevronIcon className={`w-[1.6rem] h-[1.6rem] transition-transform ${isVisible ? '-rotate-180' : ''}`} />
@@ -46,7 +46,7 @@ export default function NavbarAccountMenu({ navbarType }: { navbarType: 'top' | 
 
       <div
         className={`absolute rounded-sm overflow-hidden shadow-centered-tiny transform-gpu transition-[transform_opacity] ${
-          navbarType === 'top' ? 'top-4 right-0' : 'bottom-[6.4rem] right-[1px] w-full border-2 border-cta/40'
+          navbarType === 'top' ? 'top-4 right-0' : 'bottom-[6.4rem] right-[1px] w-full border-1 border-cta'
         } ${isOpen ? 'block' : 'hidden'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}
       >
         <Link
