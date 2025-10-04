@@ -208,8 +208,8 @@ export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.E
               className={`p-1 rounded-[50%] transition-colors cursor-pointer  ${
                 wishlistItem.is_purchased ? 'bg-cta hover:bg-cta/75' : 'bg-light/50 hover:bg-light'
               }`}
-              title={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'not purchased'}`}
-              aria-label={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'not purchased'}`}
+              title={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'unpurchased'}`}
+              aria-label={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'unpurchased'}`}
               onClick={async () => await setWishlistItemIsPurchased()}
             >
               <CheckIcon className='w-[1.6rem] h-[1.6rem] text-dark' />
