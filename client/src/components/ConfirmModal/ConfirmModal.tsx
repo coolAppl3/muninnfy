@@ -45,17 +45,17 @@ export default function ConfirmModal({
       ref={modalRef}
     >
       <div
-        className={`grid gap-1 w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words transition-all ${
+        className={`grid gap-1 w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words overflow-hidden transition-all ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
         }`}
       >
-        {title && <h4 className='text-title font-medium'>{title}</h4>}
+        {title && <h4 className='text-title font-medium overflow-hidden'>{title}</h4>}
 
         {description &&
           description.split('\n').map((descriptionLine: string, index: number) => (
             <p
               key={index}
-              className={`${title ? 'text-description' : 'text-title'} text-sm`}
+              className={`${title ? 'text-description overflow-hidden' : 'text-title'} text-sm overflow-hidden`}
             >
               {descriptionLine}
             </p>
