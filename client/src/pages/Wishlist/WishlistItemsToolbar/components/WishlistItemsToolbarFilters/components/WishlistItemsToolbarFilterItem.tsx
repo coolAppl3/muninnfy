@@ -2,19 +2,21 @@ import { Dispatch, JSX, MouseEventHandler, SetStateAction } from 'react';
 import ToggleSwitch from '../../../../../../components/ToggleSwitch/ToggleSwitch';
 import CheckIcon from '../../../../../../assets/svg/CheckIcon.svg?react';
 
+type WishlistItemsToolbarFilterItemProps = {
+  filterBy: boolean | null;
+  setFilterBy: Dispatch<SetStateAction<boolean | null>>;
+  title: string;
+  positiveFilterTitle: string;
+  negativeFilterTitle: string;
+};
+
 export default function WishlistItemsToolbarFilterItem({
   filterBy,
   setFilterBy,
   title,
   positiveFilterTitle,
   negativeFilterTitle,
-}: {
-  filterBy: boolean | null;
-  setFilterBy: Dispatch<SetStateAction<boolean | null>>;
-  title: string;
-  positiveFilterTitle: string;
-  negativeFilterTitle: string;
-}): JSX.Element {
+}: WishlistItemsToolbarFilterItemProps): JSX.Element {
   return (
     <div className={filterBy !== null ? 'mb-2' : 'mb-0'}>
       <header className='flex justify-start items-center gap-1 mb-1'>

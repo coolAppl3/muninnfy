@@ -4,7 +4,11 @@ import useConfirmModal from '../../hooks/useConfirmModal';
 import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
 import { Link } from 'react-router-dom';
 
-export default function NavbarAccountMenu({ navbarType }: { navbarType: 'top' | 'bottom' }): JSX.Element {
+type NavbarAccountMenuProps = {
+  navbarType: 'top' | 'bottom';
+};
+
+export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 

@@ -5,7 +5,11 @@ import useLoadingOverlay from '../hooks/useLoadingOverlay';
 import usePopupMessage from '../hooks/usePopupMessage';
 import { signOutService } from '../services/authServices';
 
-export default function AuthSessionProvider({ children }: { children: ReactNode }): JSX.Element {
+type AuthSessionProviderProps = {
+  children: ReactNode;
+};
+
+export default function AuthSessionProvider({ children }: AuthSessionProviderProps): JSX.Element {
   const { setAuthStatus } = useAuth();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();

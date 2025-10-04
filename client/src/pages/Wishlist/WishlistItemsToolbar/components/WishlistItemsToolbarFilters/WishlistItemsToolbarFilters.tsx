@@ -2,13 +2,12 @@ import { Dispatch, JSX, SetStateAction, useState } from 'react';
 import WishlistItemsToolbarFilterItem from './components/WishlistItemsToolbarFilterItem';
 import Button from '../../../../../components/Button/Button';
 
-export default function WishlistItemsToolbarFilters({
-  isOpen,
-  setIsOpen,
-}: {
+type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-}): JSX.Element {
+};
+
+export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
   const [filterByPurchaseStatus, setFilterByPurchaseStatus] = useState<boolean | null>(null);
   const [filterByLink, setFilterByLink] = useState<boolean | null>(null);
 

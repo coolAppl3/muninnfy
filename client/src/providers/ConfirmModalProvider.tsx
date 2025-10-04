@@ -3,7 +3,11 @@ import ConfirmModal, { ConfirmModalProps } from '../components/ConfirmModal/Conf
 import ConfirmModalContext, { ConfirmModalContextType } from '../contexts/ConfirmModalContext';
 import { Location, useLocation } from 'react-router-dom';
 
-export default function ConfirmModalProvider({ children }: { children: ReactNode }): JSX.Element {
+type ConfirmModalProviderProps = {
+  children: ReactNode;
+};
+
+export default function ConfirmModalProvider({ children }: ConfirmModalProviderProps): JSX.Element {
   const routerLocation: Location = useLocation();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);

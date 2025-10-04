@@ -1,14 +1,12 @@
 import { Dispatch, JSX, SetStateAction } from 'react';
 
-export default function ToggleSwitch({
-  isToggled,
-  setIsToggled,
-  className,
-}: {
+type ToggleSwitchProps = {
   isToggled: boolean;
   setIsToggled: Dispatch<SetStateAction<boolean>>;
   className?: string;
-}): JSX.Element {
+};
+
+export default function ToggleSwitch({ isToggled, setIsToggled, className }: ToggleSwitchProps): JSX.Element {
   return (
     <button
       type='button'

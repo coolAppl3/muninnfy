@@ -17,17 +17,14 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
-export default function WishlistItemForm({
-  formMode,
-  wishlistItem,
-  onFinish,
-  className,
-}: {
+type WishlistItemFromProps = {
   formMode: 'NEW_ITEM' | 'EDIT_ITEM';
   wishlistItem?: WishlistItemType;
   onFinish: () => void;
   className?: string;
-}): JSX.Element {
+};
+
+export default function WishlistItemForm({ formMode, wishlistItem, onFinish, className }: WishlistItemFromProps): JSX.Element {
   const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);

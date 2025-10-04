@@ -2,7 +2,11 @@ import { JSX, ReactNode, useEffect, useMemo, useState } from 'react';
 import AuthContext, { AuthContextType, AuthStatus } from '../contexts/AuthContext';
 import { checkForAuthSessionService } from '../services/authServices';
 
-export default function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
+type AuthProviderProps = {
+  children: ReactNode;
+};
+
+export default function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const [authStatus, setAuthStatus] = useState<AuthStatus>('loading');
 
   useEffect(() => {

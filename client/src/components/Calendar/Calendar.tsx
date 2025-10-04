@@ -5,7 +5,11 @@ import useCalendar from '../../hooks/useCalendar';
 import { CalendarMode } from '../../contexts/CalendarContext';
 import Button from '../Button/Button';
 
-export default function Calendar({ calendarMode }: { calendarMode: CalendarMode }): JSX.Element {
+type CalendarProps = {
+  calendarMode: CalendarMode;
+};
+
+export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
   const { setStartTimestamp, setEndTimestamp, removeCalendar } = useCalendar();
   const [renderMode, setRenderMode] = useState<'years' | 'months' | 'dates'>('years');
 

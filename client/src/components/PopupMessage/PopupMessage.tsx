@@ -1,6 +1,11 @@
 import { JSX, ReactNode } from 'react';
 
-export default function PopupMessage({ children, type }: { children: ReactNode; type: 'success' | 'error' }): JSX.Element {
+type PopupMessageProps = {
+  children: ReactNode;
+  type: 'success' | 'error';
+};
+
+export default function PopupMessage({ children, type }: PopupMessageProps): JSX.Element {
   return (
     <div className='fixed top-8 left-0 right-0 mx-auto z-35 flex justify-center items-center w-fit'>
       <span

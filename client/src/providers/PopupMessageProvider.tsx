@@ -1,8 +1,12 @@
-import { JSX, useCallback, useEffect, useMemo, useState } from 'react';
+import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import PopupMessage from '../components/PopupMessage/PopupMessage';
 import PopupMessageContext, { PopupMessageContextType } from '../contexts/PopupMessageContext';
 
-export default function PopupMessageProvider({ children }: { children: React.ReactNode }): JSX.Element {
+type PopupMessageProviderProps = {
+  children: ReactNode;
+};
+
+export default function PopupMessageProvider({ children }: PopupMessageProviderProps): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [type, setType] = useState<'success' | 'error'>('success');

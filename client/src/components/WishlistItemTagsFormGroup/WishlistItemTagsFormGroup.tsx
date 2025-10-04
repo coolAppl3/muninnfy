@@ -2,15 +2,13 @@ import { ChangeEvent, Dispatch, JSX, KeyboardEvent, MouseEvent, SetStateAction, 
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../../utils/constants/wishlistItemConstants';
 import usePopupMessage from '../../hooks/usePopupMessage';
 
-export default function WishlistItemTagsFormGroup({
-  itemTags,
-  setItemTags,
-  label,
-}: {
+type WishlistItemTagsFormGroupProps = {
   itemTags: Set<string>;
   setItemTags: Dispatch<SetStateAction<Set<string>>>;
   label: string;
-}): JSX.Element {
+};
+
+export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label }: WishlistItemTagsFormGroupProps): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 

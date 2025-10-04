@@ -7,13 +7,12 @@ import Button from '../../../components/Button/Button';
 import { verifyAccountService } from '../../../services/accountServices';
 import { CanceledError } from 'axios';
 
-export default function ConfirmAccountVerification({
-  publicAccountId,
-  verificationToken,
-}: {
+type ConfirmAccountVerificationProps = {
   publicAccountId: string;
   verificationToken: string;
-}): JSX.Element {
+};
+
+export default function ConfirmAccountVerification({ publicAccountId, verificationToken }: ConfirmAccountVerificationProps): JSX.Element {
   const [verificationFailed, setVerificationFailed] = useState<boolean>(false);
   const [title, setTitle] = useState<string>('Ongoing account verification detected.');
   const [description, setDescription] = useState<string>('Find the verification email in your inbox, and click the link to continue.');

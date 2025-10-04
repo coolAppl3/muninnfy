@@ -13,7 +13,11 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 
-export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistItemType }): JSX.Element {
+type WishlistItemProps = {
+  wishlistItem: WishlistItemType;
+};
+
+export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const { wishlistId, setWishlistItems } = useWishlist();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);

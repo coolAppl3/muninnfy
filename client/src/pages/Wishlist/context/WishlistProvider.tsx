@@ -14,19 +14,21 @@ const defaultItemsFilterConfig: ItemsFilterConfig = {
   tagsSet: new Set(),
 };
 
+type WishlistProviderProps = {
+  initialWishlistId: string;
+  initialWishlistDetails: WishlistDetailsType;
+  initialWishlistItems: WishlistItemType[];
+
+  children: ReactNode;
+};
+
 export default function WishlistProvider({
   initialWishlistId,
   initialWishlistDetails,
   initialWishlistItems,
 
   children,
-}: {
-  initialWishlistId: string;
-  initialWishlistDetails: WishlistDetailsType;
-  initialWishlistItems: WishlistItemType[];
-
-  children: ReactNode;
-}): JSX.Element {
+}: WishlistProviderProps): JSX.Element {
   const [wishlistId, setWishlistId] = useState<string>(initialWishlistId);
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);

@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 
-export default function Head({ title }: { title: string }) {
+type HeadProps = {
+  title: string;
+};
+
+export default function Head({ title }: HeadProps) {
   useEffect(() => {
     document.title = title;
   }, [title]);
