@@ -68,10 +68,10 @@ type LinksContainerProps = {
 
 function LinksContainer({ title, links }: LinksContainerProps): JSX.Element {
   return (
-    <div className='links-container'>
+    <div>
       <h3 className='text-title text-lg font-medium mb-2'>{title}</h3>
 
-      <ul className='links text-description font-medium flex flex-col justify-center items-start gap-[4px]'>
+      <ul className='text-description font-medium flex flex-col justify-center items-start gap-[4px]'>
         {links.map((link: { title: string; path: string }) => (
           <li key={`${link.title}-${link.path}`}>
             <NavLink

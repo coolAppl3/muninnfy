@@ -9,9 +9,9 @@ export default function WishlistItems(): JSX.Element {
   const filteredItems: WishlistItemType[] = wishlistItems.filter((item: WishlistItemType) => itemMatchesFilterConfig(item));
 
   return (
-    <section className='wishlist-items'>
+    <section>
       <Container>
-        <div className='wishlist-items-container grid grid-cols-1 sm:grid-cols-2 gap-1 items-start'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-1 items-start'>
           {filteredItems.length === 0 ? (
             <p className='sm:!col-span-2 text-sm font-medium text-description w-fit mx-auto'>No items found</p>
           ) : (

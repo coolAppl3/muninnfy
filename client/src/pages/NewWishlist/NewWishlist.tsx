@@ -73,7 +73,7 @@ export default function NewWishlist(): JSX.Element {
             <div className='h-line my-2'></div>
 
             <form
-              className='wishlist-form grid grid-cols-1 gap-2'
+              className='grid grid-cols-1 gap-2'
               onSubmit={async (e: FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
 

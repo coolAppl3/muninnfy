@@ -8,9 +8,9 @@ export default function JoinMuninnfy(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
   return (
-    <section className='join-muninnfy py-4 bg-secondary/50'>
+    <section className='py-4 bg-secondary/50'>
       <Container>
-        <div className='join-muninnfy-container md:flex md:justify-between md:items-center md:gap-2'>
+        <div className='md:flex md:justify-between md:items-center md:gap-2'>
           <div className='content md:!max-w-1/2'>
             <h2 className='text-title text-4xl font-bold mb-2'>Join Muninnfy.</h2>
             <p className='text-description font-medium mb-1'>

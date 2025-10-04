@@ -14,7 +14,7 @@ export default function Hero(): JSX.Element {
     <section className='hero relative overflow-hidden py-4'>
       <HeroGradient className='absolute top-0 left-0 w-[140%] sm:w-full h-full z-0' />
       <Container>
-        <div className='hero-container max-w-full md:max-w-1/2 h-full flex flex-col justify-center items-start gap-1'>
+        <div className='max-w-full md:max-w-1/2 h-full flex flex-col justify-center items-start gap-1'>
           <h1 className='text-title font-bold text-[4.6rem] leading-[1]'>
             Your Wishlists, <span className='text-cta italic'>Reimagined.</span>
           </h1>

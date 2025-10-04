@@ -9,7 +9,7 @@ import MultipleWishlistsIcon from '../../../assets/svg/MultipleWishlistsIcon.svg
 
 export default function Features(): JSX.Element {
   return (
-    <section className='features py-4'>
+    <section className='py-4'>
       <Container>
         <h2 className='text-title text-4xl font-bold mb-2'>Wish Big. Do More.</h2>
 

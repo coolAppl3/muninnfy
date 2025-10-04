@@ -103,7 +103,7 @@ export default function WishlistItem({ wishlistItem }: { wishlistItem: WishlistI
 
   if (isEditing) {
     return (
-      <div className='wishlist-item py-2 bg-secondary rounded-sm shadow-simple-tiny'>
+      <div className='py-2 bg-secondary rounded-sm shadow-simple-tiny'>
         <WishlistItemForm
           formMode='EDIT_ITEM'
           wishlistItem={wishlistItem}
