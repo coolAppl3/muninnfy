@@ -43,20 +43,20 @@ export default function WishlistProvider({
     (item: WishlistItemType): boolean => {
       const { addedAfterTimestamp, addedBeforeTimestamp, isPurchased, hasLink, titleQuery, tagsSet } = itemsFilterConfig;
 
-      if (addedAfterTimestamp) {
-        return item.added_on_timestamp < addedAfterTimestamp;
+      if (addedAfterTimestamp && item.added_on_timestamp < addedAfterTimestamp) {
+        return false;
       }
 
-      if (addedBeforeTimestamp) {
-        return item.added_on_timestamp > addedBeforeTimestamp;
+      if (addedBeforeTimestamp && item.added_on_timestamp > addedBeforeTimestamp) {
+        return false;
       }
 
-      if (isPurchased !== null) {
-        return item.is_purchased === isPurchased;
+      if (isPurchased !== null && item.is_purchased !== isPurchased) {
+        return false;
       }
 
-      if (hasLink !== null) {
-        return Boolean(item.link) === hasLink;
+      if (hasLink !== null && Boolean(item.link) !== hasLink) {
+        return false;
       }
 
       if (!item.title.includes(titleQuery)) {
