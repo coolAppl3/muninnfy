@@ -85,10 +85,11 @@ export default function WishlistProvider({
 
       wishlistItemsTitleSet,
 
+      itemsFilterConfig,
       setItemsFilterConfig,
       itemMatchesFilterConfig,
     }),
-    [wishlistId, wishlistDetails, wishlistItems, wishlistItemsTitleSet, itemMatchesFilterConfig]
+    [wishlistId, wishlistDetails, wishlistItems, wishlistItemsTitleSet, itemsFilterConfig, itemMatchesFilterConfig]
   );
 
   return <WishlistContext.Provider value={contextValue}>{children}</WishlistContext.Provider>;
