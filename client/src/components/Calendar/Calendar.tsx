@@ -246,7 +246,7 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
               return (
                 <button
                   type='button'
-                  className={`px-1 py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
+                  className={`py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
                     isCurrentMonth(selectedMonth) && date === dateObject.getDate() ? 'bg-cta/10' : 'bg-dark'
                   }`}
                   key={index}
