@@ -140,13 +140,13 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
                 return;
               }
 
-              const newSelectedYear: string = e.target.textContent;
+              const newSelectedYear: number = +e.target.textContent;
 
-              if (!Number.isInteger(+newSelectedYear)) {
+              if (!Number.isInteger(newSelectedYear)) {
                 return;
               }
 
-              setSelectedYear(+newSelectedYear);
+              setSelectedYear(newSelectedYear);
               setRenderMode('months');
             }}
           >
