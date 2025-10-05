@@ -15,7 +15,7 @@ export default function TimeWindowContainer({ startLabel, endLabel, className }:
 
   return (
     <div className={`grid gap-1 sm:gap-2 sm:grid-cols-2 ${className || ''}`}>
-      {Array.from({ length: 2 }).map((_, index: number) => (
+      {Array.from({ length: 2 }, (_, index: number) => (
         <div
           key={index}
           className='relative flex flex-col justify-center items-start gap-[6px]'
