@@ -154,8 +154,8 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
               <button
                 type='button'
                 key={year}
-                className={`bg-dark p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
-                  year === dateObject.getFullYear() ? 'bg-cta/10' : ''
+                className={`p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
+                  year === dateObject.getFullYear() ? 'bg-cta/10' : 'bg-dark'
                 }`}
               >
                 {year}
@@ -186,8 +186,8 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
             {Array.from({ length: 12 }, (_, index: number) => (
               <button
                 type='button'
-                className={`bg-dark p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
-                  isCurrentMonth(index) ? 'bg-cta/10' : ''
+                className={`p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
+                  isCurrentMonth(index) ? 'bg-cta/10' : 'bg-dark'
                 }`}
                 key={index}
               >
@@ -228,8 +228,8 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
               return (
                 <button
                   type='button'
-                  className={`bg-dark px-1 py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
-                    isCurrentMonth(selectedMonth) && date === dateObject.getDate() ? 'bg-cta/10' : ''
+                  className={`px-1 py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
+                    isCurrentMonth(selectedMonth) && date === dateObject.getDate() ? 'bg-cta/10' : 'bg-dark'
                   }`}
                   key={index}
                 >
