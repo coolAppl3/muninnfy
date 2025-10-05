@@ -1,7 +1,6 @@
 import { Dispatch, JSX, SetStateAction, useState } from 'react';
 import WishlistItemsToolbarFilterItem from './components/WishlistItemsToolbarFilterItem';
 import Button from '../../../../../components/Button/Button';
-import useCalendar from '../../../../../hooks/useCalendar';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 
 type WishlistItemsToolbarFiltersProps = {
@@ -12,7 +11,6 @@ type WishlistItemsToolbarFiltersProps = {
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
   const [filterByPurchaseStatus, setFilterByPurchaseStatus] = useState<boolean | null>(null);
   const [filterByLink, setFilterByLink] = useState<boolean | null>(null);
-  const { startTimestamp, endTimestamp } = useCalendar();
 
   return (
     <div className={`bg-secondary p-2 rounded-sm shadow-simple-tiny mb-2 ${isOpen ? 'block' : 'hidden'}`}>
