@@ -36,7 +36,7 @@ export default function PasswordFormGroup({ id, label, value, errorMessage, onCh
           value={value}
           onChange={onChange}
           className={`w-full h-4 p-1 rounded border-1 focus:border-cta outline-0 text-description font-medium md:text-sm transition-colors ${
-            errorMessage ? 'border-danger' : 'border-description/70'
+            errorMessage ? 'border-danger' : 'border-description/75'
           }`}
         />
 

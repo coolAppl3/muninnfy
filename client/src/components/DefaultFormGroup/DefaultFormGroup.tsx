@@ -39,7 +39,7 @@ export default function DefaultFormGroup({
         onChange={onChange}
         ref={ref}
         className={`w-full h-4 p-1 rounded border-1 focus:border-cta outline-0 text-description font-medium md:text-sm transition-colors ${
-          errorMessage ? 'border-danger' : 'border-description/70'
+          errorMessage ? 'border-danger' : 'border-description/75'
         }`}
       />
 
