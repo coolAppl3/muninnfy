@@ -10,7 +10,7 @@ type CalendarProps = {
 };
 
 export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
-  const { setStartTimestamp, setEndTimestamp, removeCalendar } = useCalendar();
+  const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp, removeCalendar } = useCalendar();
   const [renderMode, setRenderMode] = useState<'years' | 'months' | 'dates'>('years');
 
   const dateObject: Date = new Date();
@@ -100,6 +100,17 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
 
   function isCurrentMonth(index: number): boolean {
     return selectedYear === dateObject.getFullYear() && index === dateObject.getMonth();
+  }
+
+  function removeConflictingTimestamp(timestamp: number): void {
+    if (calendarMode === 'start' && endTimestamp && timestamp > endTimestamp) {
+      setEndTimestamp(null);
+      return;
+    }
+
+    if (calendarMode === 'end' && startTimestamp && timestamp < startTimestamp) {
+      setStartTimestamp(null);
+    }
   }
 
   return (
@@ -215,6 +226,7 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
               const timestamp: number = new Date(selectedYear, selectedMonth, newSelectedDate).getTime();
               calendarMode === 'start' ? setStartTimestamp(timestamp) : setEndTimestamp(timestamp);
 
+              removeConflictingTimestamp(timestamp);
               removeCalendar();
             }}
           >
