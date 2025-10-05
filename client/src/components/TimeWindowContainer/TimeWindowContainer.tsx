@@ -31,7 +31,7 @@ export default function TimeWindowContainer({ startLabel, endLabel, className }:
             type='button'
             id='time-window-start'
             onClick={() => (index === 0 ? displayCalendar('start') : displayCalendar('end'))}
-            className='w-full h-4 p-1 rounded border-1 focus:!border-cta outline-0 text-description text-start font-medium md:text-sm transition-colors cursor-pointer'
+            className='w-full h-4 p-1 rounded border-1 hover:border-cta outline-0 text-description text-start text-sm transition-colors cursor-pointer'
           >
             {index === 0 ? startTimestamp && getFullDateString(startTimestamp) : endTimestamp && getFullDateString(endTimestamp)}
           </button>
