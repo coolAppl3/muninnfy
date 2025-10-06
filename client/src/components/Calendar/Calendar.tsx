@@ -10,7 +10,7 @@ type CalendarProps = {
 };
 
 export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
-  const { setStartTimestamp, setEndTimestamp, removeCalendar } = useCalendar();
+  const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp, removeCalendar } = useCalendar();
   const [renderMode, setRenderMode] = useState<'years' | 'months' | 'dates'>('years');
 
   const dateObject: Date = new Date();
@@ -21,6 +21,67 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
 
   const yearsArr: number[] = Array.from({ length: 12 }, (_, index: number) => selectedYear - (selectedYear % 10) + index);
   const daysArr: number[] = Array.from({ length: getMonthNumberOfDays(selectedMonth, selectedYear) }, (_, index: number) => index + 1);
+
+  function handleYearsClick(e: MouseEvent<HTMLDivElement>): void {
+    if (!(e.target instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const newSelectedYear: number = +e.target.textContent;
+
+    if (!Number.isInteger(newSelectedYear)) {
+      return;
+    }
+
+    setSelectedYear(newSelectedYear);
+    setRenderMode('months');
+  }
+
+  function handleMonthsClick(e: MouseEvent<HTMLDivElement>): void {
+    if (!(e.target instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const newSelectedMonth: string = e.target.textContent;
+    const monthIndex: number = monthsArr.findIndex((month) => month.slice(0, 3) === newSelectedMonth);
+
+    if (monthIndex < 0 || monthIndex > 11) {
+      return;
+    }
+
+    setSelecteDMonth(monthIndex);
+    setRenderMode('dates');
+  }
+
+  function handleDatesClick(e: MouseEvent<HTMLDivElement>): void {
+    if (!(e.target instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const newSelectedDate: number = +e.target.textContent;
+
+    if (!isValidDate(newSelectedDate)) {
+      displayPopupMessage('Invalid date selected.', 'error');
+      return;
+    }
+
+    const timestamp: number = new Date(selectedYear, selectedMonth, newSelectedDate).getTime();
+    calendarMode === 'start' ? setStartTimestamp(timestamp) : setEndTimestamp(timestamp);
+
+    removeConflictingTimestamp(timestamp);
+    removeCalendar();
+  }
+
+  function removeConflictingTimestamp(timestamp: number): void {
+    if (calendarMode === 'start' && endTimestamp && timestamp > endTimestamp) {
+      setEndTimestamp(null);
+      return;
+    }
+
+    if (calendarMode === 'end' && startTimestamp && timestamp < startTimestamp) {
+      setStartTimestamp(null);
+    }
+  }
 
   function navigateCalendar(direction: 1 | -1): void {
     if (renderMode === 'years') {
@@ -135,27 +196,14 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
         {renderMode === 'years' && (
           <div
             className='grid grid-cols-3 gap-1'
-            onClick={(e: MouseEvent) => {
-              if (!(e.target instanceof HTMLButtonElement)) {
-                return;
-              }
-
-              const newSelectedYear: string = e.target.textContent;
-
-              if (!Number.isInteger(+newSelectedYear)) {
-                return;
-              }
-
-              setSelectedYear(+newSelectedYear);
-              setRenderMode('months');
-            }}
+            onClick={handleYearsClick}
           >
             {yearsArr.map((year: number) => (
               <button
                 type='button'
                 key={year}
-                className={`bg-dark p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
-                  year === dateObject.getFullYear() ? 'bg-cta/10' : ''
+                className={`p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
+                  year === dateObject.getFullYear() ? 'bg-cta/10' : 'bg-dark'
                 }`}
               >
                 {year}
@@ -167,27 +215,13 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
         {renderMode === 'months' && (
           <div
             className='grid grid-cols-3 gap-1'
-            onClick={(e: MouseEvent) => {
-              if (!(e.target instanceof HTMLButtonElement)) {
-                return;
-              }
-
-              const newSelectedMonth: string = e.target.textContent;
-              const monthIndex: number = monthsArr.findIndex((month) => month.slice(0, 3) === newSelectedMonth);
-
-              if (monthIndex < 0 || monthIndex > 11) {
-                return;
-              }
-
-              setSelecteDMonth(monthIndex);
-              setRenderMode('dates');
-            }}
+            onClick={handleMonthsClick}
           >
             {Array.from({ length: 12 }, (_, index: number) => (
               <button
                 type='button'
-                className={`bg-dark p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
-                  isCurrentMonth(index) ? 'bg-cta/10' : ''
+                className={`p-1 text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 rounded ${
+                  isCurrentMonth(index) ? 'bg-cta/10' : 'bg-dark'
                 }`}
                 key={index}
               >
@@ -200,23 +234,7 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
         {renderMode === 'dates' && (
           <div
             className='grid grid-cols-7'
-            onClick={(e: MouseEvent<HTMLDivElement>) => {
-              if (!(e.target instanceof HTMLButtonElement)) {
-                return;
-              }
-
-              const newSelectedDate: number = +e.target.textContent;
-
-              if (!isValidDate(newSelectedDate)) {
-                displayPopupMessage('Invalid date selected.', 'error');
-                return;
-              }
-
-              const timestamp: number = new Date(selectedYear, selectedMonth, newSelectedDate).getTime();
-              calendarMode === 'start' ? setStartTimestamp(timestamp) : setEndTimestamp(timestamp);
-
-              removeCalendar();
-            }}
+            onClick={handleDatesClick}
           >
             {Array.from({ length: daysArr.length + getEmptyDaysCount() }, (_, index) => {
               if (index < getEmptyDaysCount()) {
@@ -228,8 +246,8 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
               return (
                 <button
                   type='button'
-                  className={`bg-dark px-1 py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
-                    isCurrentMonth(selectedMonth) && date === dateObject.getDate() ? 'bg-cta/10' : ''
+                  className={`py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
+                    isCurrentMonth(selectedMonth) && date === dateObject.getDate() ? 'bg-cta/10' : 'bg-dark'
                   }`}
                   key={index}
                 >

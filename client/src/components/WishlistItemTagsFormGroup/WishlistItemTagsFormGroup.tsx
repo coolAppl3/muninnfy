@@ -77,8 +77,8 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
       </label>
 
       <div
-        className={`w-full min-h-4 p-[8px] rounded border-1 focus:!border-cta outline-0 text-description font-medium md:text-sm transition-colors ${
-          inputFocused ? 'border-cta' : 'border-description/70'
+        className={`w-full min-h-4 p-[8px] rounded border-1 focus:border-cta outline-0 text-description font-medium md:text-sm transition-colors ${
+          inputFocused ? 'border-cta' : 'border-description/75'
         }`}
         onClick={(e: MouseEvent<HTMLDivElement>) => {
           if (!(e.target instanceof HTMLSpanElement)) {

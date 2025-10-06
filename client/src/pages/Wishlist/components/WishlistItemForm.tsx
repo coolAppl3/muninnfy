@@ -91,7 +91,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       displayPopupMessage('Item added.', 'success');
       clearForm();
 
-      onFinish();
+      titleInputRef.current?.focus();
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errMessage, errReason, errResData } = handleAsyncError(err);
@@ -359,7 +359,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
             onFinish();
           }}
         >
-          Cancel
+          {formMode === 'NEW_ITEM' ? 'Close' : 'Cancel'}
         </Button>
 
         <Button

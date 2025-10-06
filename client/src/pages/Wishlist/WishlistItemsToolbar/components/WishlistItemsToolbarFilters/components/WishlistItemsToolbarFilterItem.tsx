@@ -18,8 +18,8 @@ export default function WishlistItemsToolbarFilterItem({
   negativeFilterTitle,
 }: WishlistItemsToolbarFilterItemProps): JSX.Element {
   return (
-    <div className={filterBy !== null ? 'mb-2' : 'mb-0'}>
-      <header className='flex justify-start items-center gap-1 mb-1'>
+    <div className='grid gap-1'>
+      <header className='flex justify-start items-center gap-1'>
         <p className='text-title text-sm leading-[1]'>{title}</p>
         <ToggleSwitch
           isToggled={filterBy !== null}

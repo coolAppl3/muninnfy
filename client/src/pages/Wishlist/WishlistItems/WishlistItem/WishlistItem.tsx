@@ -1,4 +1,4 @@
-import { JSX, useState } from 'react';
+import { JSX, memo, useState } from 'react';
 import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
@@ -8,8 +8,9 @@ import WishlistItemButtonContainer from './components/WishlistItemButtonContaine
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
 };
+export default memo(WishlistItem);
 
-export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
+function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
