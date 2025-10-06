@@ -13,7 +13,7 @@ type WishlistItemsToolbarFiltersProps = {
 };
 
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
-  const { itemsFilterConfig, setItemsFilterConfig } = useWishlist();
+  const { itemsFilterConfig, setItemsFilterConfig, setLoadingWishlistItems } = useWishlist();
   const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp } = useCalendar();
 
   const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestamp);
@@ -71,38 +71,48 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   ]);
 
   function applyFilters(): void {
-    setItemsFilterConfig((prev) => ({
-      ...prev,
-      addedAfterTimestamp,
-      addedBeforeTimestamp,
-      isPurchased,
-      hasLink,
-      tagsSet,
-    }));
+    setLoadingWishlistItems(true);
 
-    displayPopupMessage('Filters applied.', 'success');
+    setTimeout(() => {
+      setItemsFilterConfig((prev) => ({
+        ...prev,
+        addedAfterTimestamp,
+        addedBeforeTimestamp,
+        isPurchased,
+        hasLink,
+        tagsSet,
+      }));
+
+      displayPopupMessage('Filters applied.', 'success');
+      setLoadingWishlistItems(false);
+    }, 0);
   }
 
   function resetFilter(): void {
-    setAddedAfterTimestamp(null);
-    setAddedBeforeTimestamp(null);
-    setIsPurchased(null);
-    setHasLink(null);
-    setTagsSet(new Set());
+    setLoadingWishlistItems(true);
 
-    setStartTimestamp(null);
-    setEndTimestamp(null);
+    setTimeout(() => {
+      setAddedAfterTimestamp(null);
+      setAddedBeforeTimestamp(null);
+      setIsPurchased(null);
+      setHasLink(null);
+      setTagsSet(new Set());
 
-    setItemsFilterConfig((prev) => ({
-      ...prev,
-      addedAfterTimestamp: null,
-      addedBeforeTimestamp: null,
-      isPurchased: null,
-      hasLink: null,
-      tagsSet: new Set(),
-    }));
+      setStartTimestamp(null);
+      setEndTimestamp(null);
 
-    displayPopupMessage('Filters reset.', 'success');
+      setItemsFilterConfig((prev) => ({
+        ...prev,
+        addedAfterTimestamp: null,
+        addedBeforeTimestamp: null,
+        isPurchased: null,
+        hasLink: null,
+        tagsSet: new Set(),
+      }));
+
+      displayPopupMessage('Filters reset.', 'success');
+      setLoadingWishlistItems(false);
+    }, 0);
   }
 
   return (
