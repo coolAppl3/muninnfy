@@ -8,8 +8,8 @@ import WishlistItemButtonContainer from './components/WishlistItemButtonContaine
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
 };
-export default memo(WishlistItem);
 
+export default memo(WishlistItem);
 function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
