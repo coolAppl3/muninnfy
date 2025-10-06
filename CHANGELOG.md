@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.0.26] (2024-10-06)
+
+### Features
+
+- Added `CrossIcon` SVG.
+- Added `TimeWindowContainer` component.
+- Implement `WishlistItemsToolbarFilters` functionality.
+
+
+### Changes
+
+- Changed `addWishlistItem()` in `WishlistItemsForm` to not collapse the form after a successful submission.
+  - This is meant to streamline the process of adding multiple items quickly.
+
+
+### Improvements
+
+- Slightly improved the UI for `TimeWindowContainer`.
+- Memoized `WishlistItem`.
+- Memoized `filteredItems` in `WishlistItems`.
+
+
+### Bug Fixes
+
+- Fixed the current year, month, and date in `Calendar` not being highlighted following the refactors in previous patches.
+- Fixed `Calendar` allowing conflicting start and end timestamps (start timestamps being after end timestamps and vice versa).
+  - If two conflicting timestamps are detected, the timestamp being added is kept, while the existing timestamp is disregarded.
+- Fixed date text overflowing in `Calendar` on screens sizes below 340 pixels.
+- Fixed inconsistencies in border colors for inputs and input-shaped elements.
+- Fixed a number of logical issues with `itemsMatchesFilterConfig()` under `WishlistProvider`.
+
+
+### Code Refactoring
+
+- Moved onClick handlers in `Calendar` to dedicated functions for better readability.
+- Removed unnecessary `!important` tailwind declarations in a few spots.
+
+
 ## [0.0.25] (2024-10-04)
 
 ### Features
