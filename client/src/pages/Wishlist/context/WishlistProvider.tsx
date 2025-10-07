@@ -60,7 +60,7 @@ export default function WishlistProvider({
         return false;
       }
 
-      if (!item.title.includes(titleQuery)) {
+      if (!item.title.toLowerCase().includes(titleQuery)) {
         return false;
       }
 
