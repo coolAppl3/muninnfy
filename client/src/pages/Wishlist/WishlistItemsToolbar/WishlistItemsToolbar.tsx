@@ -1,4 +1,4 @@
-import { JSX, useState } from 'react';
+import { JSX, useMemo, useState } from 'react';
 import Container from '../../../components/Container/Container';
 import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
@@ -6,10 +6,27 @@ import WishlistItemsToolbarOptions from './components/WishlistItemsToolbarOption
 import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';
 import WishlistItemsToolbarView from './components/WishlistItemsToolbarView';
 import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilters/WishlistItemsToolbarFilters';
+import { debounce } from '../../../utils/debounce';
+import useWishlist from '../context/useWishlist';
 
 export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
+
+  const { setItemsFilterConfig, setLoadingWishlistItems } = useWishlist();
+
+  const debounceSetTitleQuery: (query: string) => void = useMemo(
+    () =>
+      debounce((query: string) => {
+        setItemsFilterConfig((prev) => ({
+          ...prev,
+          titleQuery: query,
+        }));
+
+        setLoadingWishlistItems(false);
+      }, 300),
+    [setItemsFilterConfig, setLoadingWishlistItems]
+  );
 
   return (
     <div className='pt-2'>
@@ -42,7 +59,13 @@ export default function WishlistItemsToolbar(): JSX.Element {
           autoComplete='off'
           value={value}
           errorMessage={null}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            const newValue: string = e.target.value;
+            setValue(newValue);
+
+            setLoadingWishlistItems(true);
+            debounceSetTitleQuery(newValue.toLowerCase());
+          }}
         />
       </Container>
     </div>
