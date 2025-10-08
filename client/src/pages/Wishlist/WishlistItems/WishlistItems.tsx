@@ -5,7 +5,7 @@ import WishlistItem from './WishlistItem/WishlistItem';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 export default function WishlistItems(): JSX.Element {
-  const { wishlistItems, itemMatchesFilterConfig } = useWishlist();
+  const { wishlistItems, itemMatchesFilterConfig, wishlistItemsLoading, isSingleColumnGrid } = useWishlist();
 
   const filteredItems: WishlistItemType[] = useMemo(
     () => wishlistItems.filter((item: WishlistItemType) => itemMatchesFilterConfig(item)),
@@ -15,8 +15,10 @@ export default function WishlistItems(): JSX.Element {
   return (
     <section>
       <Container>
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-1 items-start'>
-          {filteredItems.length === 0 ? (
+        <div className={`grid grid-cols-1 ${isSingleColumnGrid ? '' : 'sm:grid-cols-2'} gap-1 items-start`}>
+          {wishlistItemsLoading ? (
+            <div className='spinner col-span-2 w-3 h-3 mx-auto'></div>
+          ) : filteredItems.length === 0 ? (
             <p className='sm:!col-span-2 text-sm font-medium text-description w-fit mx-auto'>No items found</p>
           ) : (
             filteredItems.map((item: WishlistItemType) => (

@@ -1,4 +1,4 @@
-import { Dispatch, JSX, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useMemo, useState } from 'react';
 import WishlistItemsToolbarFilterItem from './components/WishlistItemsToolbarFilterItem';
 import Button from '../../../../../components/Button/Button';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
@@ -13,7 +13,7 @@ type WishlistItemsToolbarFiltersProps = {
 };
 
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
-  const { itemsFilterConfig, setItemsFilterConfig } = useWishlist();
+  const { itemsFilterConfig, setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
   const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp } = useCalendar();
 
   const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestamp);
@@ -71,42 +71,58 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   ]);
 
   function applyFilters(): void {
-    setItemsFilterConfig((prev) => ({
-      ...prev,
-      addedAfterTimestamp,
-      addedBeforeTimestamp,
-      isPurchased,
-      hasLink,
-      tagsSet,
-    }));
+    setWishlistItemsLoading(true);
 
-    displayPopupMessage('Filters applied.', 'success');
+    setTimeout(() => {
+      setItemsFilterConfig((prev) => ({
+        ...prev,
+        addedAfterTimestamp,
+        addedBeforeTimestamp,
+        isPurchased,
+        hasLink,
+        tagsSet,
+      }));
+
+      displayPopupMessage('Filters applied.', 'success');
+      setWishlistItemsLoading(false);
+    }, 0);
   }
 
   function resetFilter(): void {
-    setAddedAfterTimestamp(null);
-    setAddedBeforeTimestamp(null);
-    setIsPurchased(null);
-    setHasLink(null);
-    setTagsSet(new Set());
+    setWishlistItemsLoading(true);
 
-    setStartTimestamp(null);
-    setEndTimestamp(null);
+    setTimeout(() => {
+      setAddedAfterTimestamp(null);
+      setAddedBeforeTimestamp(null);
+      setIsPurchased(null);
+      setHasLink(null);
+      setTagsSet(new Set());
 
-    setItemsFilterConfig((prev) => ({
-      ...prev,
-      addedAfterTimestamp: null,
-      addedBeforeTimestamp: null,
-      isPurchased: null,
-      hasLink: null,
-      tagsSet: new Set(),
-    }));
+      setStartTimestamp(null);
+      setEndTimestamp(null);
 
-    displayPopupMessage('Filters reset.', 'success');
+      setItemsFilterConfig((prev) => ({
+        ...prev,
+        addedAfterTimestamp: null,
+        addedBeforeTimestamp: null,
+        isPurchased: null,
+        hasLink: null,
+        tagsSet: new Set(),
+      }));
+
+      displayPopupMessage('Filters reset.', 'success');
+      setWishlistItemsLoading(false);
+    }, 0);
   }
 
   return (
-    <div className={`grid gap-2 bg-secondary p-2 rounded-sm shadow-simple-tiny mb-2 ${isOpen ? 'block' : 'hidden'}`}>
+    <form
+      className={`grid gap-2 bg-secondary p-2 rounded-sm shadow-simple-tiny mb-2 ${isOpen ? 'block' : 'hidden'}`}
+      onSubmit={(e: FormEvent) => {
+        e.preventDefault();
+        changesDetected && applyFilters();
+      }}
+    >
       <h4 className='text-title'>Filters</h4>
 
       <div className='grid gap-1'>
@@ -142,7 +158,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
         <Button
           className='bg-cta border-cta w-full sm:w-fit order-1 sm:order-3'
           disabled={!changesDetected}
-          onClick={applyFilters}
+          isSubmitBtn={true}
         >
           Apply filters
         </Button>
@@ -161,6 +177,6 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           Reset
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

@@ -1,4 +1,4 @@
-import { JSX, useState } from 'react';
+import { JSX, useMemo, useState } from 'react';
 import Container from '../../../components/Container/Container';
 import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
@@ -6,10 +6,27 @@ import WishlistItemsToolbarOptions from './components/WishlistItemsToolbarOption
 import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';
 import WishlistItemsToolbarView from './components/WishlistItemsToolbarView';
 import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilters/WishlistItemsToolbarFilters';
+import { debounce } from '../../../utils/debounce';
+import useWishlist from '../context/useWishlist';
 
 export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
+
+  const { setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
+
+  const debounceSetTitleQuery: (query: string) => void = useMemo(
+    () =>
+      debounce((query: string) => {
+        setItemsFilterConfig((prev) => ({
+          ...prev,
+          titleQuery: query,
+        }));
+
+        setWishlistItemsLoading(false);
+      }, 300),
+    [setItemsFilterConfig, setWishlistItemsLoading]
+  );
 
   return (
     <div className='pt-2'>
@@ -20,8 +37,10 @@ export default function WishlistItemsToolbar(): JSX.Element {
 
             <button
               type='button'
-              className='bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
+              className='bg-dark ml-auto p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
               onClick={() => setFiltersMenuOpen((prev) => !prev)}
+              title={`${filtersMenuOpen ? 'Hide' : 'View'} filters`}
+              aria-label={`${filtersMenuOpen ? 'Hide' : 'View'} filters`}
             >
               <SlidersIcon className={`w-2 h-2 transition-colors ${filtersMenuOpen ? 'text-cta' : ''}`} />
             </button>
@@ -42,7 +61,13 @@ export default function WishlistItemsToolbar(): JSX.Element {
           autoComplete='off'
           value={value}
           errorMessage={null}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            const newValue: string = e.target.value;
+            setValue(newValue);
+
+            setWishlistItemsLoading(true);
+            debounceSetTitleQuery(newValue.toLowerCase());
+          }}
         />
       </Container>
     </div>

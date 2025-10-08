@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.0.27] (2024-10-08)
+
+### Features
+
+- Added loading spinner and logic to `WishlistItems`.
+  - This is only meant for potentially heavy filtering. Normally, filtering will near instant.
+- Added `debounce` utility module.
+- Implement search query logic in `WishlistItemsToolbar`.
+- Added `isSingleColumnGrid` and `setIsSingleColumnGrid()` to `WishlistContext`.
+- Implemented `WishlistItemsToolbarView`.
+
+
+### Bug Fixes
+
+- Fixed `itemMatchesFilterConfig()` in `WishlistProvider` not converting the item's title to lowercase before comparing.
+
+
+### Code Refactoring
+
+- Renamed `loadingWishlistItems` and `setLoadingWishlistItems()` to `wishlistItemsLoading` and `setWishlistItemsLoading()`.
+- Fixed grid view button in `WishlistItemsToolbarView` not being hidden on smaller screens, where a double-column view is not allowed.
+- Fixed main `WishlistItemsToolbar` buttons not having `title` and `aria-label` attributes.
+
+
 ## [0.0.26] (2024-10-06)
 
 ### Features

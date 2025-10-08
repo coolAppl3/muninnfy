@@ -3,17 +3,6 @@ import WishlistContext, { ItemsFilterConfig, WishlistContextType } from './Wishl
 import { WishlistDetailsType } from '../../../types/wishlistTypes';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
-const defaultItemsFilterConfig: ItemsFilterConfig = {
-  addedAfterTimestamp: null,
-  addedBeforeTimestamp: null,
-
-  isPurchased: null,
-  hasLink: null,
-
-  titleQuery: '',
-  tagsSet: new Set<string>(),
-};
-
 type WishlistProviderProps = {
   initialWishlistId: string;
   initialWishlistDetails: WishlistDetailsType;
@@ -33,6 +22,8 @@ export default function WishlistProvider({
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
+  const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
+  const [isSingleColumnGrid, setIsSingleColumnGrid] = useState<boolean>(false);
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
@@ -59,7 +50,7 @@ export default function WishlistProvider({
         return false;
       }
 
-      if (!item.title.includes(titleQuery)) {
+      if (!item.title.toLowerCase().includes(titleQuery)) {
         return false;
       }
 
@@ -82,15 +73,40 @@ export default function WishlistProvider({
 
       wishlistItems,
       setWishlistItems,
-
       wishlistItemsTitleSet,
+
+      wishlistItemsLoading,
+      setWishlistItemsLoading,
 
       itemsFilterConfig,
       setItemsFilterConfig,
       itemMatchesFilterConfig,
+
+      isSingleColumnGrid,
+      setIsSingleColumnGrid,
     }),
-    [wishlistId, wishlistDetails, wishlistItems, wishlistItemsTitleSet, itemsFilterConfig, itemMatchesFilterConfig]
+    [
+      wishlistId,
+      wishlistDetails,
+      wishlistItems,
+      wishlistItemsTitleSet,
+      wishlistItemsLoading,
+      itemsFilterConfig,
+      itemMatchesFilterConfig,
+      isSingleColumnGrid,
+    ]
   );
 
   return <WishlistContext.Provider value={contextValue}>{children}</WishlistContext.Provider>;
 }
+
+const defaultItemsFilterConfig: ItemsFilterConfig = {
+  addedAfterTimestamp: null,
+  addedBeforeTimestamp: null,
+
+  isPurchased: null,
+  hasLink: null,
+
+  titleQuery: '',
+  tagsSet: new Set<string>(),
+};

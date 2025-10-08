@@ -22,12 +22,17 @@ export type WishlistContextType = {
 
   wishlistItems: WishlistItemType[];
   setWishlistItems: Dispatch<SetStateAction<WishlistItemType[]>>;
-
   wishlistItemsTitleSet: Set<string>;
+
+  wishlistItemsLoading: boolean;
+  setWishlistItemsLoading: Dispatch<SetStateAction<boolean>>;
 
   itemsFilterConfig: ItemsFilterConfig;
   setItemsFilterConfig: Dispatch<SetStateAction<ItemsFilterConfig>>;
   itemMatchesFilterConfig: (item: WishlistItemType) => boolean;
+
+  isSingleColumnGrid: boolean;
+  setIsSingleColumnGrid: Dispatch<SetStateAction<boolean>>;
 };
 
 const WishlistContext = createContext<WishlistContextType | null>(null);
