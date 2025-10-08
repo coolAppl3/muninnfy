@@ -1,10 +1,10 @@
-import { JSX, useState } from 'react';
+import { JSX } from 'react';
 import SingleColumnGridIcon from '../../../../assets/svg/SingleColumnGridIcon.svg?react';
 import DoubleColumnGridIcon from '../../../../assets/svg/DoubleColumnGridIcon.svg?react';
+import useWishlist from '../../context/useWishlist';
 
 export default function WishlistItemsToolbarView(): JSX.Element {
-  const [isSingleColumnGrid, setIsSingleColumnGrid] = useState<boolean>(false);
-  // TODO: implement logic to update the to-be-added context
+  const { isSingleColumnGrid, setIsSingleColumnGrid } = useWishlist();
 
   return (
     <button
@@ -13,6 +13,8 @@ export default function WishlistItemsToolbarView(): JSX.Element {
         isSingleColumnGrid ? 'after:translate-x-full' : ''
       }`}
       onClick={() => setIsSingleColumnGrid((prev) => !prev)}
+      title={`Switch to ${isSingleColumnGrid ? 'double' : 'single'} column grid`}
+      aria-label={`Switch to ${isSingleColumnGrid ? 'double' : 'single'} column grid`}
     >
       <DoubleColumnGridIcon className='w-2 h-2' />
       <SingleColumnGridIcon className='w-2 h-2' />
