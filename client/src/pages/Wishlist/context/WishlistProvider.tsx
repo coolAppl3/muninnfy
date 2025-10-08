@@ -33,7 +33,7 @@ export default function WishlistProvider({
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
-  const [loadingWishlistItems, setLoadingWishlistItems] = useState<boolean>(false);
+  const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
@@ -86,14 +86,14 @@ export default function WishlistProvider({
 
       wishlistItemsTitleSet,
 
-      loadingWishlistItems,
-      setLoadingWishlistItems,
+      wishlistItemsLoading,
+      setWishlistItemsLoading,
 
       itemsFilterConfig,
       setItemsFilterConfig,
       itemMatchesFilterConfig,
     }),
-    [wishlistId, wishlistDetails, wishlistItems, wishlistItemsTitleSet, loadingWishlistItems, itemsFilterConfig, itemMatchesFilterConfig]
+    [wishlistId, wishlistDetails, wishlistItems, wishlistItemsTitleSet, wishlistItemsLoading, itemsFilterConfig, itemMatchesFilterConfig]
   );
 
   return <WishlistContext.Provider value={contextValue}>{children}</WishlistContext.Provider>;

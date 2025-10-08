@@ -13,7 +13,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
-  const { setItemsFilterConfig, setLoadingWishlistItems } = useWishlist();
+  const { setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
 
   const debounceSetTitleQuery: (query: string) => void = useMemo(
     () =>
@@ -23,9 +23,9 @@ export default function WishlistItemsToolbar(): JSX.Element {
           titleQuery: query,
         }));
 
-        setLoadingWishlistItems(false);
+        setWishlistItemsLoading(false);
       }, 300),
-    [setItemsFilterConfig, setLoadingWishlistItems]
+    [setItemsFilterConfig, setWishlistItemsLoading]
   );
 
   return (
@@ -63,7 +63,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
             const newValue: string = e.target.value;
             setValue(newValue);
 
-            setLoadingWishlistItems(true);
+            setWishlistItemsLoading(true);
             debounceSetTitleQuery(newValue.toLowerCase());
           }}
         />

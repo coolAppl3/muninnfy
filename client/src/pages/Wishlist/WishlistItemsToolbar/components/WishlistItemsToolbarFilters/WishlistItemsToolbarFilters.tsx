@@ -13,7 +13,7 @@ type WishlistItemsToolbarFiltersProps = {
 };
 
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
-  const { itemsFilterConfig, setItemsFilterConfig, setLoadingWishlistItems } = useWishlist();
+  const { itemsFilterConfig, setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
   const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp } = useCalendar();
 
   const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestamp);
@@ -71,7 +71,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   ]);
 
   function applyFilters(): void {
-    setLoadingWishlistItems(true);
+    setWishlistItemsLoading(true);
 
     setTimeout(() => {
       setItemsFilterConfig((prev) => ({
@@ -84,12 +84,12 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       }));
 
       displayPopupMessage('Filters applied.', 'success');
-      setLoadingWishlistItems(false);
+      setWishlistItemsLoading(false);
     }, 0);
   }
 
   function resetFilter(): void {
-    setLoadingWishlistItems(true);
+    setWishlistItemsLoading(true);
 
     setTimeout(() => {
       setAddedAfterTimestamp(null);
@@ -111,7 +111,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       }));
 
       displayPopupMessage('Filters reset.', 'success');
-      setLoadingWishlistItems(false);
+      setWishlistItemsLoading(false);
     }, 0);
   }
 

@@ -25,8 +25,8 @@ export type WishlistContextType = {
 
   wishlistItemsTitleSet: Set<string>;
 
-  loadingWishlistItems: boolean;
-  setLoadingWishlistItems: Dispatch<SetStateAction<boolean>>;
+  wishlistItemsLoading: boolean;
+  setWishlistItemsLoading: Dispatch<SetStateAction<boolean>>;
 
   itemsFilterConfig: ItemsFilterConfig;
   setItemsFilterConfig: Dispatch<SetStateAction<ItemsFilterConfig>>;
