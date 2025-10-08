@@ -19,6 +19,8 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
         type='button'
         className='bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
         onClick={() => setIsOpen((prev) => !prev)}
+        title={`${isOpen ? 'Hide' : 'View'} context menu`}
+        aria-label={`${isOpen ? 'Hide' : 'View'} context menu`}
       >
         <TripleDotMenuIcon className={`w-2 h-2 transition-colors ${isOpen ? 'text-cta' : ''}`} />
       </button>
