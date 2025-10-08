@@ -23,7 +23,7 @@ export default function WishlistProvider({
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
   const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
-  // const [] = useState<>(false)
+  const [isSingleColumnGrid, setIsSingleColumnGrid] = useState<boolean>(false);
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
@@ -73,7 +73,6 @@ export default function WishlistProvider({
 
       wishlistItems,
       setWishlistItems,
-
       wishlistItemsTitleSet,
 
       wishlistItemsLoading,
@@ -82,8 +81,20 @@ export default function WishlistProvider({
       itemsFilterConfig,
       setItemsFilterConfig,
       itemMatchesFilterConfig,
+
+      isSingleColumnGrid,
+      setIsSingleColumnGrid,
     }),
-    [wishlistId, wishlistDetails, wishlistItems, wishlistItemsTitleSet, wishlistItemsLoading, itemsFilterConfig, itemMatchesFilterConfig]
+    [
+      wishlistId,
+      wishlistDetails,
+      wishlistItems,
+      wishlistItemsTitleSet,
+      wishlistItemsLoading,
+      itemsFilterConfig,
+      itemMatchesFilterConfig,
+      isSingleColumnGrid,
+    ]
   );
 
   return <WishlistContext.Provider value={contextValue}>{children}</WishlistContext.Provider>;
