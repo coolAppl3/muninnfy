@@ -37,7 +37,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
 
             <button
               type='button'
-              className='bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
+              className='bg-dark ml-auto p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
               onClick={() => setFiltersMenuOpen((prev) => !prev)}
             >
               <SlidersIcon className={`w-2 h-2 transition-colors ${filtersMenuOpen ? 'text-cta' : ''}`} />
