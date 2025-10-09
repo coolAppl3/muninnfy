@@ -134,19 +134,3 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
     </div>
   );
 }
-
-function Tags({ itemTags }: { itemTags: Set<string> }): JSX.Element {
-  return (
-    <>
-      {[...itemTags].map((tag: string) => (
-        <span
-          key={tag}
-          className='tag'
-          title='Remove tag'
-        >
-          {tag}
-        </span>
-      ))}
-    </>
-  );
-}
