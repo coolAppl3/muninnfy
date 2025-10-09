@@ -26,8 +26,8 @@ export default function WishlistHeaderContent(): JSX.Element {
 
       <button
         type='button'
-        title='Wishlist menu'
-        aria-label='Wishlist menu'
+        title={`${menuIsOpen ? 'Hide' : 'View'} wishlist menu`}
+        aria-label={`${menuIsOpen ? 'Hide' : 'View'} wishlist menu`}
         className='mt-[-1rem] mr-[-1.2rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer flex justify-center items-center'
         onClick={() => setMenuIsOpen((prev) => !prev)}
       >
