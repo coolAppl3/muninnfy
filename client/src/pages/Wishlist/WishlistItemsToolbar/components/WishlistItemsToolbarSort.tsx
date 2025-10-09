@@ -7,7 +7,7 @@ import usePopupMessage from '../../../../hooks/usePopupMessage';
 export default function WishlistItemsToolbarSort(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { setItemsSortingMode } = useWishlist();
+  const { itemsSortingMode, setItemsSortingMode } = useWishlist();
   const { displayPopupMessage } = usePopupMessage();
 
   function sortWishlistItems(sortingMode: ItemsSortingMode): void {
@@ -40,7 +40,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className='context-menu-btn'
+          className={`context-menu-btn ${itemsSortingMode === 'newest_first' ? 'text-cta' : ''}`}
           onClick={() => sortWishlistItems('newest_first')}
         >
           Sort by newest
@@ -48,7 +48,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
 
         <button
           type='button'
-          className='context-menu-btn'
+          className={`context-menu-btn ${itemsSortingMode === 'oldest_first' ? 'text-cta' : ''}`}
           onClick={() => sortWishlistItems('oldest_first')}
         >
           Sort by oldest
@@ -56,7 +56,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
 
         <button
           type='button'
-          className='context-menu-btn'
+          className={`context-menu-btn ${itemsSortingMode === 'alphabetical' ? 'text-cta' : ''}`}
           onClick={() => sortWishlistItems('alphabetical')}
         >
           Sort alphabetically
