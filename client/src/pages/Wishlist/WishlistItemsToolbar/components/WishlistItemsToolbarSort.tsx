@@ -1,8 +1,20 @@
 import { FocusEvent, JSX, useState } from 'react';
 import SortIcon from '../../../../assets/svg/SortIcon.svg?react';
+import useWishlist from '../../context/useWishlist';
+import { ItemsSortingMode } from '../../context/WishlistContext';
+import usePopupMessage from '../../../../hooks/usePopupMessage';
 
 export default function WishlistItemsToolbarSort(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const { setItemsSortingMode } = useWishlist();
+  const { displayPopupMessage } = usePopupMessage();
+
+  function sortWishlistItems(sortingMode: ItemsSortingMode): void {
+    setIsOpen(false);
+    setItemsSortingMode(sortingMode);
+    displayPopupMessage('Items sorted.', 'success');
+  }
 
   return (
     <div
@@ -29,10 +41,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
         <button
           type='button'
           className='context-menu-btn'
-          onClick={() => {
-            // TODO: set sorting mode
-            setIsOpen(false);
-          }}
+          onClick={() => sortWishlistItems('newest_first')}
         >
           Sort by newest
         </button>
@@ -40,10 +49,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
         <button
           type='button'
           className='context-menu-btn'
-          onClick={() => {
-            // TODO: set sorting mode
-            setIsOpen(false);
-          }}
+          onClick={() => sortWishlistItems('oldest_first')}
         >
           Sort by oldest
         </button>
@@ -51,10 +57,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
         <button
           type='button'
           className='context-menu-btn'
-          onClick={() => {
-            // TODO: set sorting mode
-            setIsOpen(false);
-          }}
+          onClick={() => sortWishlistItems('alphabetical')}
         >
           Sort alphabetically
         </button>
