@@ -1,5 +1,5 @@
-import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
-import WishlistContext, { ItemsFilterConfig, WishlistContextType } from './WishlistContext';
+import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import WishlistContext, { ItemsFilterConfig, ItemsSortingMode, WishlistContextType } from './WishlistContext';
 import { WishlistDetailsType } from '../../../types/wishlistTypes';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
@@ -22,6 +22,7 @@ export default function WishlistProvider({
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
+  const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
   const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
   const [isSingleColumnGrid, setIsSingleColumnGrid] = useState<boolean>(false);
 
@@ -63,6 +64,22 @@ export default function WishlistProvider({
     [itemsFilterConfig]
   );
 
+  useEffect(() => sortWishlistItems(), [itemsSortingMode]);
+
+  const sortWishlistItems = useCallback(() => {
+    if (itemsSortingMode === 'newest_first') {
+      setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
+      return;
+    }
+
+    if (itemsSortingMode === 'oldest_first') {
+      setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
+      return;
+    }
+
+    setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
+  }, [itemsSortingMode]);
+
   const contextValue: WishlistContextType = useMemo(
     () => ({
       wishlistId,
@@ -82,6 +99,10 @@ export default function WishlistProvider({
       setItemsFilterConfig,
       itemMatchesFilterConfig,
 
+      itemsSortingMode,
+      setItemsSortingMode,
+      sortWishlistItems,
+
       isSingleColumnGrid,
       setIsSingleColumnGrid,
     }),
@@ -93,6 +114,8 @@ export default function WishlistProvider({
       wishlistItemsLoading,
       itemsFilterConfig,
       itemMatchesFilterConfig,
+      itemsSortingMode,
+      sortWishlistItems,
       isSingleColumnGrid,
     ]
   );

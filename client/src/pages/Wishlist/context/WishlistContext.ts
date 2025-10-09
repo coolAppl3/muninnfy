@@ -13,6 +13,8 @@ export type ItemsFilterConfig = {
   tagsSet: Set<string>;
 };
 
+export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'alphabetical';
+
 export type WishlistContextType = {
   wishlistId: string;
   setWishlistId: Dispatch<SetStateAction<string>>;
@@ -30,6 +32,10 @@ export type WishlistContextType = {
   itemsFilterConfig: ItemsFilterConfig;
   setItemsFilterConfig: Dispatch<SetStateAction<ItemsFilterConfig>>;
   itemMatchesFilterConfig: (item: WishlistItemType) => boolean;
+
+  itemsSortingMode: ItemsSortingMode;
+  setItemsSortingMode: Dispatch<SetStateAction<ItemsSortingMode>>;
+  sortWishlistItems: () => void;
 
   isSingleColumnGrid: boolean;
   setIsSingleColumnGrid: Dispatch<SetStateAction<boolean>>;
