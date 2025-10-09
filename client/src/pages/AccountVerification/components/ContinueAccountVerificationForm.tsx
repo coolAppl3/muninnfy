@@ -62,7 +62,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
       <p className='text-description text-sm mb-2'>Unverified accounts are automatically deleted after 20 minutes.</p>
 
       <form
-        onSubmit={async (e: FormEvent<HTMLFormElement>) => {
+        onSubmit={async (e: FormEvent) => {
           e.preventDefault();
 
           if (isSubmitting) {
