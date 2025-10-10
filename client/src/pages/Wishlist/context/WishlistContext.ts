@@ -17,6 +17,7 @@ export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'alphabetical';
 
 export type WishlistViewConfig = {
   isSingleColumnGrid: boolean;
+  expandAllWishlistItems: boolean;
 };
 
 export type WishlistContextType = {

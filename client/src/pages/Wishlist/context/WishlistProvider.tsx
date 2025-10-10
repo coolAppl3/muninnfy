@@ -24,8 +24,10 @@ export default function WishlistProvider({
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
   const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
-
-  const [wishlistViewConfig, setWishlistViewConfig] = useState<WishlistViewConfig>({ isSingleColumnGrid: false });
+  const [wishlistViewConfig, setWishlistViewConfig] = useState<WishlistViewConfig>({
+    isSingleColumnGrid: false,
+    expandAllWishlistItems: false,
+  });
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
