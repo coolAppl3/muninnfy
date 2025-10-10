@@ -17,7 +17,7 @@ export default function InfoModal({ title, description, btnTitle, onClick }: Inf
     modalRef.current?.focus();
 
     return () => {
-      modalRef.current === null;
+      modalRef.current = null;
     };
   }, []);
 
