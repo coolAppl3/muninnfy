@@ -81,7 +81,9 @@ export default function WishlistProvider({
     setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
   }, [itemsSortingMode]);
 
-  useEffect(() => sortWishlistItems(), [itemsSortingMode, sortWishlistItems]);
+  useEffect(() => {
+    sortWishlistItems();
+  }, [itemsSortingMode, sortWishlistItems]);
 
   const contextValue: WishlistContextType = useMemo(
     () => ({
