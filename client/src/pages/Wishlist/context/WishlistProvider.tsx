@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import WishlistContext, { ItemsFilterConfig, ItemsSortingMode, WishlistContextType } from './WishlistContext';
+import WishlistContext, { ItemsFilterConfig, ItemsSortingMode, WishlistContextType, WishlistViewConfig } from './WishlistContext';
 import { WishlistDetailsType } from '../../../types/wishlistTypes';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
@@ -24,7 +24,8 @@ export default function WishlistProvider({
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
   const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
-  const [isSingleColumnGrid, setIsSingleColumnGrid] = useState<boolean>(false);
+
+  const [wishlistViewConfig, setWishlistViewConfig] = useState<WishlistViewConfig>({ isSingleColumnGrid: false });
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
@@ -103,8 +104,8 @@ export default function WishlistProvider({
       setItemsSortingMode,
       sortWishlistItems,
 
-      isSingleColumnGrid,
-      setIsSingleColumnGrid,
+      wishlistViewConfig,
+      setWishlistViewConfig,
     }),
     [
       wishlistId,
@@ -116,7 +117,7 @@ export default function WishlistProvider({
       itemMatchesFilterConfig,
       itemsSortingMode,
       sortWishlistItems,
-      isSingleColumnGrid,
+      wishlistViewConfig,
     ]
   );
 
