@@ -19,12 +19,8 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const { expandAllWishlistItems } = wishlistViewConfig;
 
   useEffect(() => {
-    if (expandAllWishlistItems === isExpanded) {
-      return;
-    }
-
     setIsExpanded(expandAllWishlistItems);
-  }, [expandAllWishlistItems, isExpanded]);
+  }, [expandAllWishlistItems]);
 
   if (isEditing) {
     return (
