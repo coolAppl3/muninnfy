@@ -67,8 +67,6 @@ export default function WishlistProvider({
     [itemsFilterConfig]
   );
 
-  useEffect(() => sortWishlistItems(), [itemsSortingMode]);
-
   const sortWishlistItems = useCallback(() => {
     if (itemsSortingMode === 'newest_first') {
       setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
@@ -82,6 +80,8 @@ export default function WishlistProvider({
 
     setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
   }, [itemsSortingMode]);
+
+  useEffect(() => sortWishlistItems(), [itemsSortingMode, sortWishlistItems]);
 
   const contextValue: WishlistContextType = useMemo(
     () => ({
