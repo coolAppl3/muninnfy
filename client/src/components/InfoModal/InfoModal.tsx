@@ -15,6 +15,10 @@ export default function InfoModal({ title, description, btnTitle, onClick }: Inf
   useEffect(() => {
     setIsVisible(true);
     modalRef.current?.focus();
+
+    return () => {
+      modalRef.current === null;
+    };
   }, []);
 
   return (

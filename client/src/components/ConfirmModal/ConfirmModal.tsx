@@ -36,6 +36,10 @@ export default function ConfirmModal({
   useEffect(() => {
     setIsVisible(true);
     modalRef.current?.focus();
+
+    return () => {
+      modalRef.current = null;
+    };
   }, []);
 
   return (
