@@ -71,7 +71,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   return (
     <form
       className='grid gap-2 w-full'
-      onSubmit={async (e: FormEvent<HTMLFormElement>) => {
+      onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
         if (isSubmitting) {

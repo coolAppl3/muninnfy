@@ -1,8 +1,12 @@
 import { FocusEvent, JSX, useState } from 'react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
+import useWishlist from '../../context/useWishlist';
 
 export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const { wishlistViewConfig, setWishlistViewConfig } = useWishlist();
+  const { expandAllWishlistItems } = wishlistViewConfig;
 
   return (
     <div
@@ -41,11 +45,11 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
           type='button'
           className='context-menu-btn'
           onClick={() => {
-            // TODO: toggle items' default look
             setIsOpen(false);
+            setWishlistViewConfig((prev) => ({ ...prev, expandAllWishlistItems: !prev.expandAllWishlistItems }));
           }}
         >
-          Expand items by default
+          {`${expandAllWishlistItems ? 'Collapse' : 'Expand'} all items`}
           {/* TODO: conditionally change between Expand/Collapse */}
         </button>
       </div>

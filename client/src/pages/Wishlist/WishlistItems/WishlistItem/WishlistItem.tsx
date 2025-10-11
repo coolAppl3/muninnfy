@@ -1,9 +1,10 @@
-import { JSX, memo, useState } from 'react';
+import { JSX, memo, useEffect, useState } from 'react';
 import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import WishlistItemButtonContainer from './components/WishlistItemButtonContainer/WishlistItemButtonContainer';
+import useWishlist from '../../context/useWishlist';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
@@ -13,6 +14,13 @@ export default memo(WishlistItem);
 function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  const { wishlistViewConfig } = useWishlist();
+  const { expandAllWishlistItems } = wishlistViewConfig;
+
+  useEffect(() => {
+    setIsExpanded(expandAllWishlistItems);
+  }, [expandAllWishlistItems]);
 
   if (isEditing) {
     return (

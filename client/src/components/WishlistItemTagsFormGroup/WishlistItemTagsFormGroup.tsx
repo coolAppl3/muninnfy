@@ -12,7 +12,6 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [nextBackspaceRemovesTag, setNextBackspaceRemovesTag] = useState<boolean>(false);
   const [inputFocused, setInputFocused] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -28,28 +27,24 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
 
     setValue(newValue);
     newValue === '' || setErrorMessage(validateItemTag(newValue));
-
-    setNextBackspaceRemovesTag(false);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
     const value: string = e.currentTarget.value;
 
     if (e.key === 'Backspace' && value === '') {
-      nextBackspaceRemovesTag ? setItemTags((prev) => new Set<string>([...prev].slice(0, -1))) : setNextBackspaceRemovesTag(true);
+      setItemTags((prev) => new Set<string>([...prev].slice(0, -1)));
       return;
     }
 
     if (e.key === ' ' && !validateItemTag(value)) {
       if (itemTags.size >= WISHLIST_ITEM_TAGS_LIMIT) {
-        displayPopupMessage('Item tags limit reached.', 'error');
+        displayPopupMessage('Tags limit reached.', 'error');
         return;
       }
 
       setItemTags((prev) => new Set(prev).add(value.toLowerCase()));
       setValue('');
-
-      setNextBackspaceRemovesTag(true);
     }
   }
 
@@ -120,7 +115,6 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
             setErrorMessage(null);
 
             setInputFocused(false);
-            setNextBackspaceRemovesTag(true);
           }}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -132,21 +126,5 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
         {errorMessage}
       </span>
     </div>
-  );
-}
-
-function Tags({ itemTags }: { itemTags: Set<string> }): JSX.Element {
-  return (
-    <>
-      {[...itemTags].map((tag: string) => (
-        <span
-          key={tag}
-          className='tag'
-          title='Remove tag'
-        >
-          {tag}
-        </span>
-      ))}
-    </>
   );
 }

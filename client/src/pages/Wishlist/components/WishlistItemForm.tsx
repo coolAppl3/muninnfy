@@ -25,7 +25,7 @@ type WishlistItemFromProps = {
 };
 
 export default function WishlistItemForm({ formMode, wishlistItem, onFinish, className }: WishlistItemFromProps): JSX.Element {
-  const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet } = useWishlist();
+  const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet, itemsSortingMode, sortWishlistItems } = useWishlist();
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -87,6 +87,8 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     try {
       const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
       setWishlistItems((prev) => [newWishlistItem, ...prev]);
+
+      itemsSortingMode === 'newest_first' || sortWishlistItems();
 
       displayPopupMessage('Item added.', 'success');
       clearForm();

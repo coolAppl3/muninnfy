@@ -180,6 +180,8 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
             type='button'
             className='bg-description p-1 rounded transition-[filter] hover:brightness-75 cursor-pointer ml-auto mr-1'
             onClick={() => navigateCalendar(-1)}
+            title='Navigate backwards'
+            aria-label='Navigate backwards'
           >
             <ChevronIcon className='w-[1.4rem] h-[1.4rem] rotate-90' />
           </button>
@@ -188,6 +190,8 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
             type='button'
             className='bg-description p-1 rounded transition-[filter] hover:brightness-75 cursor-pointer'
             onClick={() => navigateCalendar(1)}
+            title='Navigate forwards'
+            aria-label='Navigate forwards'
           >
             <ChevronIcon className='w-[1.4rem] h-[1.4rem] -rotate-90' />
           </button>

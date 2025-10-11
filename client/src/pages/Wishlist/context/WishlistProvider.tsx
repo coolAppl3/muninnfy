@@ -1,5 +1,5 @@
-import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
-import WishlistContext, { ItemsFilterConfig, WishlistContextType } from './WishlistContext';
+import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import WishlistContext, { ItemsFilterConfig, ItemsSortingMode, WishlistContextType, WishlistViewConfig } from './WishlistContext';
 import { WishlistDetailsType } from '../../../types/wishlistTypes';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
@@ -22,8 +22,12 @@ export default function WishlistProvider({
   const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
+  const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
   const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
-  const [isSingleColumnGrid, setIsSingleColumnGrid] = useState<boolean>(false);
+  const [wishlistViewConfig, setWishlistViewConfig] = useState<WishlistViewConfig>({
+    isSingleColumnGrid: false,
+    expandAllWishlistItems: false,
+  });
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
@@ -63,6 +67,24 @@ export default function WishlistProvider({
     [itemsFilterConfig]
   );
 
+  const sortWishlistItems = useCallback(() => {
+    if (itemsSortingMode === 'newest_first') {
+      setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
+      return;
+    }
+
+    if (itemsSortingMode === 'oldest_first') {
+      setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
+      return;
+    }
+
+    setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
+  }, [itemsSortingMode]);
+
+  useEffect(() => {
+    sortWishlistItems();
+  }, [itemsSortingMode, sortWishlistItems]);
+
   const contextValue: WishlistContextType = useMemo(
     () => ({
       wishlistId,
@@ -82,8 +104,12 @@ export default function WishlistProvider({
       setItemsFilterConfig,
       itemMatchesFilterConfig,
 
-      isSingleColumnGrid,
-      setIsSingleColumnGrid,
+      itemsSortingMode,
+      setItemsSortingMode,
+      sortWishlistItems,
+
+      wishlistViewConfig,
+      setWishlistViewConfig,
     }),
     [
       wishlistId,
@@ -93,7 +119,9 @@ export default function WishlistProvider({
       wishlistItemsLoading,
       itemsFilterConfig,
       itemMatchesFilterConfig,
-      isSingleColumnGrid,
+      itemsSortingMode,
+      sortWishlistItems,
+      wishlistViewConfig,
     ]
   );
 

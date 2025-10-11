@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.0.28] (2024-10-11)
+
+### Features
+
+- Implemented sorting functionality for wishlist items.
+  - Lexicographic sorting is referred to as "alphabetical" as far as the user is concerned to avoid confusing jargon.
+- Implemented functionality to expand or collapse all wishlist items.
+  - Feature has a few flaws. An improvement or a full rework is planned down the line.
+- Implemented explicit lexicographic sorting for wishlist item tags.
+
+
+### Changes
+
+- Removed accidental tag deletion protection.
+  - This was meant to prevent the user from accidentally removing a tag when trying to delete text of a would-be tag, but the behavior was unintuitive for users.
+
+
+### Improvements
+
+- Improved quality and consistency of `title` and `aria-label` attributes throughout the app.
+
+
+### Bug Fixes
+
+- Fixed both labels in `TimeWindowContainer` aiming at the first input.
+- Added missing `useEffect` cleanup functions in `ConfirmModal` and `InfoModal`.
+
+
+### Code Refactoring
+
+- Removed leftover, unused local component from `WishlistItemTagsFormGroup`.
+- Refactor `e: FormEvent<HTMLFormElement>` to `e: FormEvent` as it was overly verbose.
+
+
 ## [0.0.27] (2024-10-08)
 
 ### Features

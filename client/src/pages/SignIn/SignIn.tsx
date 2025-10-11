@@ -118,7 +118,7 @@ export default function SignIn(): JSX.Element {
             <form
               id='sign-up-form'
               className='grid grid-cols-1 gap-2 mb-2'
-              onSubmit={async (e: FormEvent<HTMLFormElement>) => {
+              onSubmit={async (e: FormEvent) => {
                 e.preventDefault();
 
                 if (isSubmitting || !allFieldsValid()) {

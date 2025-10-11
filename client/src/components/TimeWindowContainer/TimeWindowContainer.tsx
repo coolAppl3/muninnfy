@@ -21,7 +21,7 @@ export default function TimeWindowContainer({ startLabel, endLabel, className }:
           className='relative flex flex-col justify-center items-start gap-[6px]'
         >
           <label
-            htmlFor='time-window-start'
+            htmlFor={`time-window-${index === 0 ? 'start' : 'end'}`}
             className='text-sm font-medium text-title'
           >
             {index === 0 ? startLabel : endLabel}
@@ -29,7 +29,7 @@ export default function TimeWindowContainer({ startLabel, endLabel, className }:
 
           <button
             type='button'
-            id='time-window-start'
+            id={`time-window-${index === 0 ? 'start' : 'end'}`}
             onClick={() => (index === 0 ? displayCalendar('start') : displayCalendar('end'))}
             className='w-full h-4 p-1 rounded border-1 border-description/75 hover:border-cta outline-0 text-description text-start text-sm transition-colors cursor-pointer'
           >

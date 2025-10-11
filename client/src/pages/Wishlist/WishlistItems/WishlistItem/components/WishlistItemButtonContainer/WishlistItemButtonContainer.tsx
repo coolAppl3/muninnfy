@@ -119,8 +119,8 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
         className={`p-1 rounded-[50%] transition-colors cursor-pointer hover:bg-dark mt-[-8px] ${
           menuIsOpen ? 'bg-dark text-cta' : 'text-title'
         }`}
-        title='Menu'
-        aria-label='Menu'
+        title={`${menuIsOpen ? 'Hide' : 'View'} item menu`}
+        aria-label={`${menuIsOpen ? 'Hide' : 'View'} item menu`}
         onClick={() => setMenuIsOpen((prev) => !prev)}
       >
         <TripleDotMenuIcon className='w-[1.6rem] h-[1.6rem] rotate-180' />
