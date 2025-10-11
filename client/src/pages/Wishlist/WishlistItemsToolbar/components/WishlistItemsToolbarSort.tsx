@@ -56,8 +56,8 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${itemsSortingMode === 'alphabetical' ? 'text-cta' : ''}`}
-          onClick={() => sortWishlistItems('alphabetical')}
+          className={`context-menu-btn ${itemsSortingMode === 'lexicographical' ? 'text-cta' : ''}`}
+          onClick={() => sortWishlistItems('lexicographical')}
         >
           Sort alphabetically
         </button>

@@ -13,7 +13,7 @@ export type ItemsFilterConfig = {
   tagsSet: Set<string>;
 };
 
-export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'alphabetical';
+export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'lexicographical';
 
 export type WishlistViewConfig = {
   isSingleColumnGrid: boolean;
