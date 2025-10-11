@@ -29,6 +29,9 @@ export default function WishlistProvider({
     expandAllWishlistItems: false,
   });
 
+  const [selectModeActive, setSelectModeActive] = useState<boolean>(false);
+  const [selectedItemsSet, setSelectedItemsSet] = useState<Set<number>>(new Set<number>());
+
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
     [wishlistItems]
@@ -110,6 +113,12 @@ export default function WishlistProvider({
 
       wishlistViewConfig,
       setWishlistViewConfig,
+
+      selectModeActive,
+      setSelectModeActive,
+
+      selectedItemsSet,
+      setSelectedItemsSet,
     }),
     [
       wishlistId,
@@ -122,6 +131,8 @@ export default function WishlistProvider({
       itemsSortingMode,
       sortWishlistItems,
       wishlistViewConfig,
+      selectModeActive,
+      selectedItemsSet,
     ]
   );
 
