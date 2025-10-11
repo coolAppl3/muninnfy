@@ -45,8 +45,8 @@ export type WishlistContextType = {
   wishlistViewConfig: WishlistViewConfig;
   setWishlistViewConfig: Dispatch<SetStateAction<WishlistViewConfig>>;
 
-  selectModeActive: boolean;
-  setSelectModeActive: Dispatch<SetStateAction<boolean>>;
+  selectionModeActive: boolean;
+  setSelectionModeActive: Dispatch<SetStateAction<boolean>>;
 
   selectedItemsSet: Set<number>;
   setSelectedItemsSet: Dispatch<SetStateAction<Set<number>>>;

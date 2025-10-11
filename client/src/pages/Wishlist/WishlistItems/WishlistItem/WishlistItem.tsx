@@ -16,7 +16,7 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  const { wishlistViewConfig, selectModeActive, selectedItemsSet, setSelectedItemsSet } = useWishlist();
+  const { wishlistViewConfig, selectionModeActive, selectedItemsSet, setSelectedItemsSet } = useWishlist();
   const { expandAllWishlistItems } = wishlistViewConfig;
 
   useEffect(() => {
@@ -38,7 +38,7 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   return (
     <div className='bg-secondary rounded-sm shadow-simple-tiny'>
       <div className='flex justify-start items-center gap-1'>
-        {selectModeActive && (
+        {selectionModeActive && (
           <button
             type='button'
             className='bg-[#555] p-[4px] rounded-[1px] ml-1 cursor-pointer transition-[filter] hover:brightness-75'
