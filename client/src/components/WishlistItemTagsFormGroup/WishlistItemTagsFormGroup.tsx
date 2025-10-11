@@ -39,7 +39,7 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
 
     if (e.key === ' ' && !validateItemTag(value)) {
       if (itemTags.size >= WISHLIST_ITEM_TAGS_LIMIT) {
-        displayPopupMessage('Item tags limit reached.', 'error');
+        displayPopupMessage('Tags limit reached.', 'error');
         return;
       }
 
