@@ -50,7 +50,6 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
           }}
         >
           {`${expandAllWishlistItems ? 'Collapse' : 'Expand'} all items`}
-          {/* TODO: conditionally change between Expand/Collapse */}
         </button>
       </div>
     </div>
