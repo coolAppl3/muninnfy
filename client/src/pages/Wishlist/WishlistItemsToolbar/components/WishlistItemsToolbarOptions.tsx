@@ -38,7 +38,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
             setSelectionModeActive((prev) => !prev);
           }}
         >
-          {selectionModeActive ? 'Cancel items selection' : 'Select items'}
+          {selectionModeActive ? 'Cancel item selection' : 'Select items'}
         </button>
 
         <button
