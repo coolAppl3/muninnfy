@@ -17,6 +17,7 @@ import { WishlistDetailsType } from '../../types/wishlistTypes';
 import { WishlistItemType } from '../../types/wishlistItemTypes';
 import WishlistItemsToolbar from './WishlistItemsToolbar/WishlistItemsToolbar';
 import CalendarProvider from '../../providers/CalendarProvider';
+import WishlistItemsSelectionContainer from './WishlistItemsSelectionContainer/WishlistItemsSelectionContainer';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -106,6 +107,7 @@ export default function Wishlist(): JSX.Element {
 
               <NewWishlistItemFormContainer />
               <WishlistItemsToolbar />
+              <WishlistItemsSelectionContainer />
               <WishlistItems />
             </main>
           </WishlistProvider>
