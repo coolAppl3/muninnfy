@@ -201,7 +201,8 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       WHERE
         wishlist_items.wishlist_id = ?
       ORDER BY
-        wishlist_items.added_on_timestamp DESC
+        wishlist_items.added_on_timestamp DESC,
+        wishlist_item_tags.tag_name ASC
       LIMIT ?;`,
       [wishlistId, WISHLIST_ITEMS_LIMIT * WISHLIST_ITEM_TAGS_LIMIT]
     );

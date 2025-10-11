@@ -148,7 +148,9 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       FROM
         wishlist_item_tags
       WHERE
-        item_id = ?;`,
+        item_id = ?
+      ORDER BY
+        tag_name ASC;`,
       [itemId]
     );
 
@@ -348,7 +350,9 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       FROM
         wishlist_item_tags
       WHERE
-        item_id = ?;`,
+        item_id = ?
+      ORDER BY
+        tag_name ASC;`,
       [itemId]
     );
 
