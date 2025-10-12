@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import { Link, NavLink, NavigateFunction, useNavigate, Location, useLocation } from 'react-router-dom';
 import Button from '../Button/Button';
 import Container from '../Container/Container';
-import Logo from '../../assets/svg/Logo.svg';
+import Logo from '../../assets/svg/Logo.svg?react';
 import useAuth from '../../hooks/useAuth';
 import NavbarAccountMenu from '../NavbarAccountMenu/NavbarAccountMenu';
 
@@ -18,10 +18,7 @@ export default function TopNavbar(): JSX.Element {
       <Container className='flex justify-between items-center'>
         <Link to='/home'>
           <div className='flex justify-start items-center gap-1'>
-            <img
-              className='w-4 h-4'
-              src={Logo}
-            />
+            <Logo className='w-4 h-4' />
             <h2 className='font-bold text-3xl'>Muninnfy</h2>
           </div>
         </Link>
