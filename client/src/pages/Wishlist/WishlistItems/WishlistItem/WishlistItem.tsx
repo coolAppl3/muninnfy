@@ -5,6 +5,7 @@ import WishlistItemForm from '../../components/WishlistItemForm';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import WishlistItemButtonContainer from './components/WishlistItemButtonContainer/WishlistItemButtonContainer';
 import useWishlist from '../../context/useWishlist';
+import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
@@ -15,8 +16,10 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  const { wishlistViewConfig } = useWishlist();
+  const { wishlistViewConfig, selectionModeActive, selectedItemsSet, setSelectedItemsSet } = useWishlist();
   const { expandAllWishlistItems } = wishlistViewConfig;
+
+  const itemSelected: boolean = selectedItemsSet.has(wishlistItem.item_id);
 
   useEffect(() => {
     setIsExpanded(expandAllWishlistItems);
@@ -36,24 +39,51 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
 
   return (
     <div className='bg-secondary rounded-sm shadow-simple-tiny'>
-      <button
-        onClick={() => setIsExpanded((prev) => !prev)}
-        tabIndex={0}
-        title={`${isExpanded ? 'Collapse' : 'Expand'} item`}
-        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item`}
-        className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-all hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden ${
-          isExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
-        } ${
-          wishlistItem.is_purchased
-            ? 'after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1'
-            : ''
-        }`}
-      >
-        <h4 className='text-title py-[8.4px]'>{wishlistItem.title}</h4>
-        <span className='p-1 rounded-[50%] mr-[-1rem]'>
-          <ChevronIcon className='text-title w-[1.6rem] h-[1.6rem]' />
-        </span>
-      </button>
+      <div className='flex justify-start items-center gap-1'>
+        {selectionModeActive && (
+          <button
+            type='button'
+            title={itemSelected ? 'Unselect item' : 'Select item'}
+            aria-label={itemSelected ? 'Unselect item' : 'Select item'}
+            className='bg-[#555] p-[4px] rounded-[1px] ml-1 cursor-pointer transition-[filter] hover:brightness-75'
+            onClick={() =>
+              itemSelected
+                ? setSelectedItemsSet((prev) => {
+                    const newSet = new Set<number>(prev);
+                    newSet.delete(wishlistItem.item_id);
+
+                    return newSet;
+                  })
+                : setSelectedItemsSet((prev) => new Set<number>(prev).add(wishlistItem.item_id))
+            }
+          >
+            <CheckIcon
+              className={`w-[1.2rem] h-[1.2rem] transition-transform text-cta ${
+                itemSelected ? 'scale-100 rotate-0' : 'rotate-180 scale-0'
+              }`}
+            />
+          </button>
+        )}
+
+        <button
+          onClick={() => setIsExpanded((prev) => !prev)}
+          tabIndex={0}
+          title={`${isExpanded ? 'Collapse' : 'Expand'} item`}
+          aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item`}
+          className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-all hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden ${
+            isExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
+          } ${
+            wishlistItem.is_purchased
+              ? 'after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1'
+              : ''
+          }`}
+        >
+          <h4 className='text-title py-[8.4px]'>{wishlistItem.title}</h4>
+          <span className='p-1 rounded-[50%] mr-[-1rem]'>
+            <ChevronIcon className='text-title w-[1.6rem] h-[1.6rem]' />
+          </span>
+        </button>
+      </div>
 
       <div className={`justify-between items-start gap-1 p-2 pt-1 ${isExpanded ? 'flex' : 'hidden'}`}>
         <div className='w-full text-sm text-description grid gap-1'>

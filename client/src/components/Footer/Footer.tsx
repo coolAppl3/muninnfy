@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import Container from '../Container/Container';
 import { NavLink } from 'react-router-dom';
-import Logo from '../../assets/svg/Logo.svg';
+import Logo from '../../assets/svg/Logo.svg?react';
 import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
@@ -15,10 +15,7 @@ export default function Footer(): JSX.Element {
           <div>
             <Link to='/home'>
               <div className='w-fit flex justify-center items-center gap-1 mb-1 xs:mb-2'>
-                <img
-                  className='w-3 h-3'
-                  src={Logo}
-                />
+                <Logo className='w-3 h-3' />
                 <h4 className='text-title font-bold text-xl'>Muninnfy</h4>
               </div>
             </Link>

@@ -5,7 +5,7 @@ import useWishlist from '../../context/useWishlist';
 export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { wishlistViewConfig, setWishlistViewConfig } = useWishlist();
+  const { wishlistViewConfig, setWishlistViewConfig, selectionModeActive, setSelectionModeActive, setSelectedItemsSet } = useWishlist();
   const { expandAllWishlistItems } = wishlistViewConfig;
 
   return (
@@ -34,11 +34,18 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
           type='button'
           className='context-menu-btn'
           onClick={() => {
-            // TODO: toggle select mode
             setIsOpen(false);
+
+            if (!selectionModeActive) {
+              setSelectionModeActive(true);
+              return;
+            }
+
+            setSelectionModeActive(false);
+            setSelectedItemsSet(new Set<number>());
           }}
         >
-          Select items
+          {selectionModeActive ? 'Cancel item selection' : 'Select items'}
         </button>
 
         <button
@@ -50,7 +57,6 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
           }}
         >
           {`${expandAllWishlistItems ? 'Collapse' : 'Expand'} all items`}
-          {/* TODO: conditionally change between Expand/Collapse */}
         </button>
       </div>
     </div>
