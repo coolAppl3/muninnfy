@@ -3,15 +3,18 @@ import useWishlist from '../context/useWishlist';
 import Container from '../../../components/Container/Container';
 import Button from '../../../components/Button/Button';
 import useConfirmModal from '../../../hooks/useConfirmModal';
+import CheckIcon from '../../../assets/svg/CheckIcon.svg?react';
+import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 type SelectedActionType = 'mark_as_purchased' | 'mark_as_unpurchased' | 'delete';
 
 export default function WishlistItemsSelectionContainer(): JSX.Element {
-  const { selectionModeActive, setSelectionModeActive, selectedItemsSet, setSelectedItemsSet } = useWishlist();
   const [selectedAction, setSelectedAction] = useState<SelectedActionType>('mark_as_purchased');
 
+  const { selectionModeActive, setSelectionModeActive, selectedItemsSet, setSelectedItemsSet, wishlistItems } = useWishlist();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
+  const allItemsSelected: boolean = wishlistItems.length === selectedItemsSet.size;
   const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
   async function bulkUpdateWishlistItemIsPurchased(): Promise<void> {
@@ -101,7 +104,37 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
           </div>
         </div>
 
-        {/* TODO: implement a select/deselect all checkbox */}
+        <div className='h-line my-2'></div>
+
+        <div className='flex justify-start items-center gap-1 w-fit relative cursor-pointer transition-[filter] hover:brightness-75 '>
+          <button
+            type='button'
+            id='select-all-items-btn'
+            aria-label={allItemsSelected ? 'Unselect all items' : 'Select all items'}
+            className='bg-[#555] p-[4px] rounded-[1px] ml-1 after:absolute after:top-0 after:left-0 after:w-full after:h-full  cursor-pointer z-2'
+            onClick={() => {
+              if (allItemsSelected) {
+                setSelectedItemsSet(new Set<number>());
+                return;
+              }
+
+              setSelectedItemsSet(new Set<number>(wishlistItems.map((item: WishlistItemType) => item.item_id)));
+            }}
+          >
+            <CheckIcon
+              className={`w-[1.2rem] h-[1.2rem] transition-transform text-cta ${
+                allItemsSelected ? 'scale-100 rotate-0' : 'rotate-180 scale-0'
+              }`}
+            />
+          </button>
+
+          <label
+            htmlFor='select-all-items-btn'
+            className='text-sm text-title'
+          >
+            Select all items
+          </label>
+        </div>
       </Container>
     </div>
   );
