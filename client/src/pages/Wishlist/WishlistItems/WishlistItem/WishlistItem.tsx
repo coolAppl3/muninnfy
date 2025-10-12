@@ -19,6 +19,8 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const { wishlistViewConfig, selectionModeActive, selectedItemsSet, setSelectedItemsSet } = useWishlist();
   const { expandAllWishlistItems } = wishlistViewConfig;
 
+  const itemSelected: boolean = selectedItemsSet.has(wishlistItem.item_id);
+
   useEffect(() => {
     setIsExpanded(expandAllWishlistItems);
   }, [expandAllWishlistItems]);
@@ -41,9 +43,11 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
         {selectionModeActive && (
           <button
             type='button'
+            title={itemSelected ? 'Unselect item' : 'Select item'}
+            aria-label={itemSelected ? 'Unselect item' : 'Select item'}
             className='bg-[#555] p-[4px] rounded-[1px] ml-1 cursor-pointer transition-[filter] hover:brightness-75'
             onClick={() =>
-              selectedItemsSet.has(wishlistItem.item_id)
+              itemSelected
                 ? setSelectedItemsSet((prev) => {
                     const newSet = new Set<number>(prev);
                     newSet.delete(wishlistItem.item_id);
@@ -55,7 +59,7 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
           >
             <CheckIcon
               className={`w-[1.2rem] h-[1.2rem] transition-transform text-cta ${
-                selectedItemsSet.has(wishlistItem.item_id) ? 'scale-100 rotate-0' : 'rotate-180 scale-0'
+                itemSelected ? 'scale-100 rotate-0' : 'rotate-180 scale-0'
               }`}
             />
           </button>
