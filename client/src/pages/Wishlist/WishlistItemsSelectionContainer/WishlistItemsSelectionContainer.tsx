@@ -106,7 +106,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
         <div className='h-line my-2'></div>
 
-        <div className='flex justify-start items-center gap-1 w-fit relative cursor-pointer transition-[filter] hover:brightness-75 '>
+        <div className='flex justify-start items-center gap-1 w-fit relative cursor-pointer transition-[filter] hover:brightness-75'>
           <button
             type='button'
             id='select-all-items-btn'
