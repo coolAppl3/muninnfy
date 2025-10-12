@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.29] (2024-10-13)
+
+### Features
+
+- Implemented selection state and logic to wishlists
+  - Bulk update and delete actions to be implemented in a future patch. 
+
+
+### Code Refactoring
+
+- Refactored out the usage of `Logo` SVG in favour of `CrossIcon` to reduce bundle size.
+
+
 ## [0.0.28] (2024-10-11)
 
 ### Features
