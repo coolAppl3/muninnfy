@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import { NavLink, Location, useLocation } from 'react-router-dom';
 import HomeIcon from '../../assets/svg/HomeIcon.svg?react';
 import SignInIcon from '../../assets/svg/SignInIcon.svg?react';
-import AddIcon from '../../assets/svg/AddIcon.svg?react';
+import CrossIcon from '../../assets/svg/CrossIcon.svg?react';
 import useAuth from '../../hooks/useAuth';
 import NavbarAccountMenu from '../NavbarAccountMenu/NavbarAccountMenu';
 
@@ -28,7 +28,7 @@ export default function BottomNavbar(): JSX.Element {
           to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
           className={({ isActive }) => (isActive ? `text-cta ${navLinkClassname}` : navLinkClassname)}
         >
-          <AddIcon className='w-[2.4rem] h-[2.4rem]' />
+          <CrossIcon className='w-[2.4rem] h-[2.4rem]' />
           <span>New wishlist</span>
         </NavLink>
 
