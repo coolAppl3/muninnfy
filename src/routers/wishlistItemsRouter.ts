@@ -565,7 +565,7 @@ wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
       return;
     }
 
-    await dbPool.query<ResultSetHeader>(
+    const [resultSetHeader] = await dbPool.query<ResultSetHeader>(
       `DELETE FROM
         wishlist_items
       WHERE
@@ -575,7 +575,7 @@ wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
       [wishlistId, itemsIdArr]
     );
 
-    res.json({});
+    res.json({ deletedItemsCount: resultSetHeader.affectedRows });
   } catch (err: unknown) {
     console.log(err);
 
