@@ -17,7 +17,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const allItemsSelected: boolean = wishlistItems.length === selectedItemsSet.size;
   const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
-  async function bulkUpdateWishlistItemIsPurchased(): Promise<void> {
+  async function bulkSetWishlistItemIsPurchased(): Promise<void> {
     // TODO: continue implementation
   }
 
@@ -73,7 +73,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
               }`}
               onClick={async () => {
                 if (selectedAction !== 'delete') {
-                  await bulkUpdateWishlistItemIsPurchased();
+                  await bulkSetWishlistItemIsPurchased();
                   return;
                 }
 
