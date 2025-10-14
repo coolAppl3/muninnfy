@@ -97,22 +97,22 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     const takenStatus = takenStatusRows[0] as TakenStatus | undefined;
 
     if (!takenStatus) {
-      res.status(500).json({ message: 'Internal server error.' });
       await connection.rollback();
+      res.status(500).json({ message: 'Internal server error.' });
 
       return;
     }
 
     if (takenStatus.email_taken) {
-      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
       await connection.rollback();
+      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
 
       return;
     }
 
     if (takenStatus.username_taken) {
-      res.status(409).json({ message: 'Username is taken.', reason: 'usernameTaken' });
       await connection.rollback();
+      res.status(409).json({ message: 'Username is taken.', reason: 'usernameTaken' });
 
       return;
     }
@@ -464,6 +464,8 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     }
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      await connection.rollback();
+
       await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
 

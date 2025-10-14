@@ -288,8 +288,8 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
 
     if (!wishlistItemDetails) {
-      res.status(404).json({ message: 'Item not found.', reason: 'itemNotFound' });
       await connection.rollback();
+      res.status(404).json({ message: 'Item not found.', reason: 'itemNotFound' });
 
       return;
     }
