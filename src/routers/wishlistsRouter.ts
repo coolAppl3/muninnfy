@@ -74,6 +74,8 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 
     if (!accountWishlistsDetails) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to fetch wishlists_created_count.');
+
       return;
     }
 
@@ -327,6 +329,8 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update title.');
+
       return;
     }
 
@@ -421,6 +425,8 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update privacy_level.');
+
       return;
     }
 
@@ -489,6 +495,8 @@ wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to delete wishlist.');
+
       return;
     }
 

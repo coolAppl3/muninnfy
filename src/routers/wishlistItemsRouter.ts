@@ -183,13 +183,19 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
       const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
-      existingWishlistItem
-        ? res.status(409).json({
-            message: 'Wishlist already contains this item.',
-            reason: 'duplicateItemTitle',
-            resData: { existingWishlistItem },
-          })
-        : res.status(500).json({ message: 'Internal server error.' });
+
+      if (!existingWishlistItem) {
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, err, 'Detected a duplicate wishlist item title, but failed to fetch it.');
+
+        return;
+      }
+
+      res.status(409).json({
+        message: 'Another item already uses this title.',
+        reason: 'duplicateItemTitle',
+        resData: { existingWishlistItem },
+      });
 
       return;
     }
@@ -386,13 +392,18 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
       const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
 
-      existingWishlistItem
-        ? res.status(409).json({
-            message: 'Wishlist already contains this item.',
-            reason: 'duplicateItemTitle',
-            resData: { existingWishlistItem },
-          })
-        : res.status(500).json({ message: 'Internal server error.' });
+      if (!existingWishlistItem) {
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, err, 'Detected a duplicate wishlist item title, but failed to fetch it.');
+
+        return;
+      }
+
+      res.status(409).json({
+        message: 'Another item already uses this title.',
+        reason: 'duplicateItemTitle',
+        resData: { existingWishlistItem },
+      });
 
       return;
     }
@@ -468,6 +479,8 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to delete wishlist item.');
+
       return;
     }
 
@@ -480,6 +493,7 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
 
@@ -663,6 +677,8 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update is_purchased.');
+
       return;
     }
 
@@ -675,5 +691,6 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
