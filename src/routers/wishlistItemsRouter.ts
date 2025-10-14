@@ -525,13 +525,13 @@ wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
   }
 
   if (itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
-    res.status(400).json({ message: 'Invalid items selected.', reason: 'invalidItemsArr' });
+    res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
     return;
   }
 
   for (const id of itemsIdArr) {
     if (!Number.isInteger(id)) {
-      res.status(400).json({ message: 'Invalid items selected.', reason: 'invalidItemsArr' });
+      res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
       return;
     }
   }
