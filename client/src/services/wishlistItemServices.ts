@@ -34,6 +34,21 @@ export async function deleteWishlistItemService(wishlistId: string, itemId: numb
   return axios.delete(`${wishlistItemsApiUrl}?wishlistId=${wishlistId}&itemId=${itemId}`);
 }
 
+type BulkDeleteWishlistItemsServicePayload = {
+  wishlistId: string;
+  itemsIdArr: number[];
+};
+
+type BulkDeleteWishlistItemsServiceData = {
+  deletedItemsCount: number;
+};
+
+export async function bulkDeleteWishlistItemsService(
+  body: BulkDeleteWishlistItemsServicePayload
+): Promise<AxiosResponse<BulkDeleteWishlistItemsServiceData>> {
+  return axios.delete(`${wishlistItemsApiUrl}/bulk`, { data: body });
+}
+
 type SetWishlistItemIsPurchasedServicePayload = {
   wishlistId: string;
   itemId: number;
