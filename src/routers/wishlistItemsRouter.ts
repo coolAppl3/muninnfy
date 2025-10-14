@@ -483,6 +483,97 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
   }
 });
 
+wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    wishlistId: string;
+    itemsIdArr: number[];
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['wishlistId', 'itemsIdArr'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { wishlistId, itemsIdArr } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
+    res.status(400).json({ message: 'Invalid items selected.', reason: 'invalidItemsArr' });
+    return;
+  }
+
+  for (const id of itemsIdArr) {
+    if (!Number.isInteger(id)) {
+      res.status(400).json({ message: 'Invalid items selected.', reason: 'invalidItemsArr' });
+      return;
+    }
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type WishlistDetails = {
+      is_wishlist_owner: boolean;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        1 AS is_wishlist_owner
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [wishlistId, accountId]
+    );
+
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
+
+    if (!wishlistDetails || !wishlistDetails.is_wishlist_owner) {
+      res.status(400).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    await dbPool.query<ResultSetHeader>(
+      `DELETE FROM
+        wishlist_items
+      WHERE
+        wishlist_id = ? AND
+        item_id IN (?)
+      LIMIT ${WISHLIST_ITEMS_LIMIT};`,
+      [wishlistId, itemsIdArr]
+    );
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
