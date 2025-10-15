@@ -26,6 +26,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
     wishlistItems,
     setWishlistItems,
     wishlistId,
+    itemMatchesFilterConfig,
   } = useWishlist();
 
   const { referrerLocation } = useHistory();
@@ -252,7 +253,13 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
                 return;
               }
 
-              setSelectedItemsSet(new Set<number>(wishlistItems.map((item: WishlistItemType) => item.item_id)));
+              setSelectedItemsSet(
+                new Set<number>(
+                  wishlistItems
+                    .filter((item: WishlistItemType) => itemMatchesFilterConfig(item))
+                    .map((item: WishlistItemType) => item.item_id)
+                )
+              );
             }}
           >
             <CheckIcon
