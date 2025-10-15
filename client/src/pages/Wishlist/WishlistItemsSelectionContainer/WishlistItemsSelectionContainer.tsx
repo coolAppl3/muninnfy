@@ -6,7 +6,7 @@ import useConfirmModal from '../../../hooks/useConfirmModal';
 import CheckIcon from '../../../assets/svg/CheckIcon.svg?react';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
-import { bulkSetWishlistItemIsPurchasedService } from '../../../services/wishlistItemServices';
+import { bulkDeleteWishlistItemsService, bulkSetWishlistItemIsPurchasedService } from '../../../services/wishlistItemServices';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useInfoModal from '../../../hooks/useInfoModal';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
@@ -93,7 +93,52 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   }
 
   async function bulkDeleteWishlistItems(): Promise<void> {
-    // TODO: continue implementation
+    if (selectedAction !== 'delete') {
+      return;
+    }
+
+    if (selectedItemsSet.size === 0) {
+      displayPopupMessage('No items selected.', 'error');
+      return;
+    }
+
+    const expectedUpdatesCount: number = selectedItemsSet.size;
+
+    displayLoadingOverlay();
+
+    try {
+      const deletedItemsCount: number = (await bulkDeleteWishlistItemsService({ wishlistId, itemsIdArr: [...selectedItemsSet] })).data
+        .deletedItemsCount;
+
+      if (deletedItemsCount === 0) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      setWishlistItems((prev) => prev.filter((item: WishlistItemType) => !selectedItemsSet.has(item.item_id)));
+
+      setSelectionModeActive(false);
+      setSelectedAction('mark_as_purchased');
+      setSelectedItemsSet(new Set<number>());
+
+      displayPopupMessage('Items deleted.', 'success');
+
+      deletedItemsCount < expectedUpdatesCount && displayIncompleteOperationModal('delete', expectedUpdatesCount, deletedItemsCount);
+    } catch (err: unknown) {
+      console.log(err);
+      const { isHandled, status, errReason } = handleAsyncError(err);
+
+      if (isHandled) {
+        return;
+      }
+
+      if (status === 404 || (status === 400 && errReason === 'invalidWishlistId')) {
+        navigate(referrerLocation || '/account');
+        return;
+      }
+    } finally {
+      removeLoadingOverlay();
+    }
   }
 
   function displayIncompleteOperationModal(
