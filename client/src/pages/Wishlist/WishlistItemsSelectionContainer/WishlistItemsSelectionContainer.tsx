@@ -1,4 +1,4 @@
-import { JSX, useState } from 'react';
+import { JSX, useMemo, useState } from 'react';
 import useWishlist from '../context/useWishlist';
 import Container from '../../../components/Container/Container';
 import Button from '../../../components/Button/Button';
@@ -37,7 +37,13 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
-  const allItemsSelected: boolean = wishlistItems.length > 0 && wishlistItems.length === selectedItemsSet.size;
+  const allItemsSelected: boolean = useMemo(
+    () =>
+      wishlistItems.length > 0 &&
+      wishlistItems.every((item: WishlistItemType) => selectedItemsSet.has(item.item_id) || !itemMatchesFilterConfig(item)),
+    [wishlistItems, selectedItemsSet, itemMatchesFilterConfig]
+  );
+
   const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
   async function bulkSetWishlistItemIsPurchased(): Promise<void> {
