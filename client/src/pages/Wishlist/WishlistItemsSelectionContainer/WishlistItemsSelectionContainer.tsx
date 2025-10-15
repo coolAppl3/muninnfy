@@ -251,7 +251,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
           <button
             type='button'
             id='select-all-items-btn'
-            aria-label={allItemsSelected ? 'Unselect all items' : 'Select all items'}
+            aria-label={`${allItemsSelected ? 'Unselect' : 'Select'} all items`}
             className='bg-[#555] p-[4px] rounded-[1px] ml-1 after:absolute after:top-0 after:left-0 after:w-full after:h-full  cursor-pointer z-2'
             onClick={() => {
               if (allItemsSelected) {
