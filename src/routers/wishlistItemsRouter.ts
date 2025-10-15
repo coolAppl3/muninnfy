@@ -561,7 +561,7 @@ wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
     const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails || !wishlistDetails.is_wishlist_owner) {
-      res.status(400).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
@@ -765,7 +765,7 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
     const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails || !wishlistDetails.is_wishlist_owner) {
-      res.status(400).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
