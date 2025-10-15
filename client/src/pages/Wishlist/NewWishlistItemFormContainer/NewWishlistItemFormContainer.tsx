@@ -13,7 +13,7 @@ export default function NewWishlistItemFormContainer(): JSX.Element {
           <button
             type='button'
             onClick={() => setIsExpanded((prev) => !prev)}
-            className={`w-full flex justify-between items-center p-2 bg-secondary text-title transition-all hover:brightness-110 hover:text-cta cursor-pointer border-b-1 ${
+            className={`w-full flex justify-between items-center p-2 bg-secondary text-title transition-all hover:brightness-110 hover:text-cta cursor-pointer border-b-1 rounded-sm ${
               isExpanded ? 'border-b-light-gray rounded-bl-none rounded-br-none' : 'border-b-secondary rounded-sm'
             }`}
           >
