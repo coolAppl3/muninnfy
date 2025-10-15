@@ -13,7 +13,7 @@ type WishlistItemsToolbarFiltersProps = {
 };
 
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
-  const { itemsFilterConfig, setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
+  const { itemsFilterConfig, setItemsFilterConfig, setWishlistItemsLoading, setSelectedItemsSet } = useWishlist();
   const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp } = useCalendar();
 
   const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestamp);
@@ -74,6 +74,8 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setWishlistItemsLoading(true);
 
     setTimeout(() => {
+      setSelectedItemsSet(new Set<number>());
+
       setItemsFilterConfig((prev) => ({
         ...prev,
         addedAfterTimestamp,
@@ -92,6 +94,8 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setWishlistItemsLoading(true);
 
     setTimeout(() => {
+      setSelectedItemsSet(new Set<number>());
+
       setAddedAfterTimestamp(null);
       setAddedBeforeTimestamp(null);
       setIsPurchased(null);
