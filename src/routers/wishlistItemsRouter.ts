@@ -524,7 +524,7 @@ wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
     return;
   }
 
-  if (itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
+  if (itemsIdArr.length === 0 || itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
     res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
     return;
   }
@@ -728,7 +728,7 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
     return;
   }
 
-  if (itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
+  if (itemsIdArr.length === 0 || itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
     res.status(400).json({ message: 'Invalid items selection', reason: 'invalidItemsArr' });
     return;
   }
