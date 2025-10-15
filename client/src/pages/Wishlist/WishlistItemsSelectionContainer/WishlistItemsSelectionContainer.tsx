@@ -37,7 +37,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
-  const allItemsSelected: boolean = wishlistItems.length === selectedItemsSet.size;
+  const allItemsSelected: boolean = wishlistItems.length > 0 && wishlistItems.length === selectedItemsSet.size;
   const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
   async function bulkSetWishlistItemIsPurchased(): Promise<void> {
