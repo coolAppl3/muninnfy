@@ -5,24 +5,110 @@ import Button from '../../../components/Button/Button';
 import useConfirmModal from '../../../hooks/useConfirmModal';
 import CheckIcon from '../../../assets/svg/CheckIcon.svg?react';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
+import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
+import { bulkSetWishlistItemIsPurchasedService } from '../../../services/wishlistItemServices';
+import usePopupMessage from '../../../hooks/usePopupMessage';
+import useInfoModal from '../../../hooks/useInfoModal';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useHistory from '../../../hooks/useHistory';
 
 type SelectedActionType = 'mark_as_purchased' | 'mark_as_unpurchased' | 'delete';
 
 export default function WishlistItemsSelectionContainer(): JSX.Element {
   const [selectedAction, setSelectedAction] = useState<SelectedActionType>('mark_as_purchased');
 
-  const { selectionModeActive, setSelectionModeActive, selectedItemsSet, setSelectedItemsSet, wishlistItems } = useWishlist();
+  const {
+    selectionModeActive,
+    setSelectionModeActive,
+    selectedItemsSet,
+    setSelectedItemsSet,
+    wishlistItems,
+    setWishlistItems,
+    wishlistId,
+  } = useWishlist();
+
+  const { referrerLocation } = useHistory();
+  const navigate: NavigateFunction = useNavigate();
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
+  const { displayPopupMessage } = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
+  const { displayInfoModal, removeInfoModal } = useInfoModal();
 
   const allItemsSelected: boolean = wishlistItems.length === selectedItemsSet.size;
   const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
   async function bulkSetWishlistItemIsPurchased(): Promise<void> {
-    // TODO: continue implementation
+    if (selectedAction === 'delete') {
+      return;
+    }
+
+    if (selectedItemsSet.size === 0) {
+      displayPopupMessage('No items selected.', 'error');
+      return;
+    }
+
+    const newPurchaseStatus: boolean = selectedAction === 'mark_as_purchased' ? true : false;
+    const expectedUpdatesCount: number = selectedItemsSet.size;
+
+    displayLoadingOverlay();
+
+    try {
+      const updatedItemsCount: number = (
+        await bulkSetWishlistItemIsPurchasedService({ wishlistId, itemsIdArr: [...selectedItemsSet], newPurchaseStatus })
+      ).data.updatedItemsCount;
+
+      if (updatedItemsCount === 0) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      setWishlistItems((prev) =>
+        prev.map((item: WishlistItemType) => (selectedItemsSet.has(item.item_id) ? { ...item, is_purchased: newPurchaseStatus } : item))
+      );
+
+      setSelectionModeActive(false);
+      setSelectedAction('mark_as_purchased');
+      setSelectedItemsSet(new Set<number>());
+
+      displayPopupMessage('Items updated.', 'success');
+
+      updatedItemsCount < expectedUpdatesCount && displayIncompleteOperationModal('update', expectedUpdatesCount, updatedItemsCount);
+    } catch (err: unknown) {
+      console.log(err);
+      const { isHandled, status, errReason } = handleAsyncError(err);
+
+      if (isHandled) {
+        return;
+      }
+
+      if (status === 404 || (status === 400 && errReason === 'invalidWishlistId')) {
+        navigate(referrerLocation || '/account');
+        return;
+      }
+    } finally {
+      removeLoadingOverlay();
+    }
   }
 
   async function bulkDeleteWishlistItems(): Promise<void> {
     // TODO: continue implementation
+  }
+
+  function displayIncompleteOperationModal(
+    actionType: 'update' | 'delete',
+    expectedAffectedItems: number,
+    actualAffectedItems: number
+  ): void {
+    displayInfoModal({
+      title: 'Partial success.',
+      description: `We couldn't ${actionType} ${
+        expectedAffectedItems - actualAffectedItems
+      } of the ${expectedAffectedItems} selected items.`,
+      btnTitle: 'Okay',
+      onClick: removeInfoModal,
+    });
   }
 
   if (!selectionModeActive) {
