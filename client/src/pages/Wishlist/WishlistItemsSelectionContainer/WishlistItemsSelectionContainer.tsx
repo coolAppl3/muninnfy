@@ -215,7 +215,10 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
                   isDangerous: true,
                   confirmBtnTitle: `Delete ${selectedItemsSet.size === 1 ? 'item' : 'items'}`,
                   cancelBtnTitle: 'Cancel',
-                  onConfirm: async () => await bulkDeleteWishlistItems(),
+                  onConfirm: async () => {
+                    removeConfirmModal();
+                    await bulkDeleteWishlistItems();
+                  },
                   onCancel: removeConfirmModal,
                 });
               }}
