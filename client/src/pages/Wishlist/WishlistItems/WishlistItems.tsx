@@ -8,7 +8,7 @@ export default function WishlistItems(): JSX.Element {
   const { wishlistItems, itemMatchesFilterConfig, wishlistItemsLoading, wishlistViewConfig } = useWishlist();
 
   const filteredItems: WishlistItemType[] = useMemo(
-    () => wishlistItems.filter((item: WishlistItemType) => itemMatchesFilterConfig(item)),
+    () => wishlistItems.filter(itemMatchesFilterConfig),
     [wishlistItems, itemMatchesFilterConfig]
   );
 

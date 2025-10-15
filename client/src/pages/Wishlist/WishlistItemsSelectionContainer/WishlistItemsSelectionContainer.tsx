@@ -260,11 +260,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
               }
 
               setSelectedItemsSet(
-                new Set<number>(
-                  wishlistItems
-                    .filter((item: WishlistItemType) => itemMatchesFilterConfig(item))
-                    .map((item: WishlistItemType) => item.item_id)
-                )
+                new Set<number>(wishlistItems.filter(itemMatchesFilterConfig).map((item: WishlistItemType) => item.item_id))
               );
             }}
           >
