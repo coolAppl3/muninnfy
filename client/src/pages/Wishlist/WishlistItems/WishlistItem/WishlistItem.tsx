@@ -1,4 +1,4 @@
-import { JSX, memo, useEffect, useState } from 'react';
+import { JSX, memo, useState } from 'react';
 import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
@@ -13,17 +13,12 @@ type WishlistItemProps = {
 
 export default memo(WishlistItem);
 function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  const { wishlistViewConfig, selectionModeActive, selectedItemsSet, setSelectedItemsSet } = useWishlist();
-  const { expandAllWishlistItems } = wishlistViewConfig;
+  const { expandedItemsSet, setExpandedItemsSet, selectionModeActive, selectedItemsSet, setSelectedItemsSet } = useWishlist();
 
   const itemSelected: boolean = selectedItemsSet.has(wishlistItem.item_id);
-
-  useEffect(() => {
-    setIsExpanded(expandAllWishlistItems);
-  }, [expandAllWishlistItems]);
+  const itemExpanded: boolean = expandedItemsSet.has(wishlistItem.item_id);
 
   if (isEditing) {
     return (
@@ -66,12 +61,23 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
         )}
 
         <button
-          onClick={() => setIsExpanded((prev) => !prev)}
+          onClick={() =>
+            setExpandedItemsSet((prev) => {
+              if (itemExpanded) {
+                const newSet = new Set<number>(prev);
+                newSet.delete(wishlistItem.item_id);
+
+                return newSet;
+              }
+
+              return new Set<number>(prev).add(wishlistItem.item_id);
+            })
+          }
           tabIndex={0}
-          title={`${isExpanded ? 'Collapse' : 'Expand'} item`}
-          aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item`}
+          title={`${itemExpanded ? 'Collapse' : 'Expand'} item`}
+          aria-label={`${itemExpanded ? 'Collapse' : 'Expand'} item`}
           className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-all hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden ${
-            isExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
+            itemExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
           } ${
             wishlistItem.is_purchased
               ? 'after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1'
@@ -85,7 +91,7 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
         </button>
       </div>
 
-      <div className={`justify-between items-start gap-1 p-2 pt-1 ${isExpanded ? 'flex' : 'hidden'}`}>
+      <div className={`justify-between items-start gap-1 p-2 pt-1 ${itemExpanded ? 'flex' : 'hidden'}`}>
         <div className='w-full text-sm text-description grid gap-1'>
           <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
             <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
