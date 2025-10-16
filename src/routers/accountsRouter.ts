@@ -97,22 +97,23 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     const takenStatus = takenStatusRows[0] as TakenStatus | undefined;
 
     if (!takenStatus) {
-      res.status(500).json({ message: 'Internal server error.' });
       await connection.rollback();
+      res.status(500).json({ message: 'Internal server error.' });
 
+      await logUnexpectedError(req, null, 'Failed to fetch taken status.');
       return;
     }
 
     if (takenStatus.email_taken) {
-      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
       await connection.rollback();
+      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
 
       return;
     }
 
     if (takenStatus.username_taken) {
-      res.status(409).json({ message: 'Username is taken.', reason: 'usernameTaken' });
       await connection.rollback();
+      res.status(409).json({ message: 'Username is taken.', reason: 'usernameTaken' });
 
       return;
     }
@@ -277,6 +278,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
 
@@ -464,6 +466,8 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     }
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      await connection.rollback();
+
       await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
 
@@ -485,6 +489,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
         await connection.rollback();
         res.status(500).json({ message: 'Internal server error.' });
 
+        await logUnexpectedError(req, null, 'Failed to update is_verified.');
         return;
       }
 
@@ -616,6 +621,8 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     const authSessionCreated: boolean = await createAuthSession(res, accountDetails.account_id, keepSignedIn);
     if (!authSessionCreated) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to create authSession.');
+
       return;
     }
 

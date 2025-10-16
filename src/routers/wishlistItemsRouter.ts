@@ -183,13 +183,19 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
       const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
-      existingWishlistItem
-        ? res.status(409).json({
-            message: 'Wishlist already contains this item.',
-            reason: 'duplicateItemTitle',
-            resData: { existingWishlistItem },
-          })
-        : res.status(500).json({ message: 'Internal server error.' });
+
+      if (!existingWishlistItem) {
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, err, 'Detected a duplicate wishlist item title, but failed to fetch it.');
+
+        return;
+      }
+
+      res.status(409).json({
+        message: 'Another item already uses this title.',
+        reason: 'duplicateItemTitle',
+        resData: { existingWishlistItem },
+      });
 
       return;
     }
@@ -288,8 +294,8 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
 
     if (!wishlistItemDetails) {
-      res.status(404).json({ message: 'Item not found.', reason: 'itemNotFound' });
       await connection.rollback();
+      res.status(404).json({ message: 'Item not found.', reason: 'itemNotFound' });
 
       return;
     }
@@ -386,13 +392,18 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
       const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
 
-      existingWishlistItem
-        ? res.status(409).json({
-            message: 'Wishlist already contains this item.',
-            reason: 'duplicateItemTitle',
-            resData: { existingWishlistItem },
-          })
-        : res.status(500).json({ message: 'Internal server error.' });
+      if (!existingWishlistItem) {
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, err, 'Detected a duplicate wishlist item title, but failed to fetch it.');
+
+        return;
+      }
+
+      res.status(409).json({
+        message: 'Another item already uses this title.',
+        reason: 'duplicateItemTitle',
+        resData: { existingWishlistItem },
+      });
 
       return;
     }
@@ -468,6 +479,8 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to delete wishlist item.');
+
       return;
     }
 
@@ -480,6 +493,98 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    wishlistId: string;
+    itemsIdArr: number[];
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['wishlistId', 'itemsIdArr'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { wishlistId, itemsIdArr } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (itemsIdArr.length === 0 || itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
+    res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
+    return;
+  }
+
+  for (const id of itemsIdArr) {
+    if (!Number.isInteger(id)) {
+      res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
+      return;
+    }
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type WishlistDetails = {
+      is_wishlist_owner: boolean;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        1 AS is_wishlist_owner
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [wishlistId, accountId]
+    );
+
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
+
+    if (!wishlistDetails || !wishlistDetails.is_wishlist_owner) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.query<ResultSetHeader>(
+      `DELETE FROM
+        wishlist_items
+      WHERE
+        wishlist_id = ? AND
+        item_id IN (?)
+      LIMIT ${WISHLIST_ITEMS_LIMIT};`,
+      [wishlistId, itemsIdArr]
+    );
+
+    res.json({ deletedItemsCount: resultSetHeader.affectedRows });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
 
@@ -572,6 +677,8 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update is_purchased.');
+
       return;
     }
 
@@ -584,5 +691,105 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    wishlistId: string;
+    itemsIdArr: number[];
+    newPurchaseStatus: boolean;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['wishlistId', 'itemsIdArr', 'newPurchaseStatus'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { wishlistId, itemsIdArr, newPurchaseStatus } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (typeof newPurchaseStatus !== 'boolean') {
+    res.status(400).json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
+    return;
+  }
+
+  if (itemsIdArr.length === 0 || itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
+    res.status(400).json({ message: 'Invalid items selection', reason: 'invalidItemsArr' });
+    return;
+  }
+
+  for (const id of itemsIdArr) {
+    if (!Number.isInteger(id)) {
+      res.status(400).json({ message: 'Invalid items selection', reason: 'invalidItemsArr' });
+      return;
+    }
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type WishlistDetails = {
+      is_wishlist_owner: boolean;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        1 AS is_wishlist_owner
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [wishlistId, accountId]
+    );
+
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
+
+    if (!wishlistDetails || !wishlistDetails.is_wishlist_owner) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.query<ResultSetHeader>(
+      `UPDATE
+        wishlist_items
+      SET
+        is_purchased = ?
+      WHERE
+        wishlist_id = ? AND
+        item_id IN (?)
+      LIMIT ${WISHLIST_ITEMS_LIMIT};`,
+      [newPurchaseStatus, wishlistId, itemsIdArr]
+    );
+
+    res.json({ updatedItemsCount: resultSetHeader.affectedRows });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });

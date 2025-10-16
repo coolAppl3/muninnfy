@@ -1,12 +1,17 @@
 import { FocusEvent, JSX, useState } from 'react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import useWishlist from '../../context/useWishlist';
+import { WishlistItemType } from '../../../../types/wishlistItemTypes';
+import usePopupMessage from '../../../../hooks/usePopupMessage';
 
 export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { wishlistViewConfig, setWishlistViewConfig, selectionModeActive, setSelectionModeActive, setSelectedItemsSet } = useWishlist();
-  const { expandAllWishlistItems } = wishlistViewConfig;
+  const { expandedItemsSet, setExpandedItemsSet, wishlistItems, selectionModeActive, setSelectionModeActive, setSelectedItemsSet } =
+    useWishlist();
+  const { displayPopupMessage } = usePopupMessage();
+
+  const allItemsExpanded: boolean = expandedItemsSet.size === wishlistItems.length;
 
   return (
     <div
@@ -53,10 +58,19 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
           className='context-menu-btn'
           onClick={() => {
             setIsOpen(false);
-            setWishlistViewConfig((prev) => ({ ...prev, expandAllWishlistItems: !prev.expandAllWishlistItems }));
+
+            if (allItemsExpanded) {
+              setExpandedItemsSet(new Set<number>());
+              displayPopupMessage('Collapsed items.', 'success');
+
+              return;
+            }
+
+            setExpandedItemsSet(new Set<number>(wishlistItems.map((item: WishlistItemType) => item.item_id)));
+            displayPopupMessage('Expanded items.', 'success');
           }}
         >
-          {`${expandAllWishlistItems ? 'Collapse' : 'Expand'} all items`}
+          {`${allItemsExpanded ? 'Collapse' : 'Expand'} all items`}
         </button>
       </div>
     </div>

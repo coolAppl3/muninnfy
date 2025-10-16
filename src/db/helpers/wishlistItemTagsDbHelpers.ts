@@ -27,7 +27,7 @@ export async function insertWishlistItemTags(
 
 export async function deleteWishlistItemTags(itemId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
   try {
-    await executor.query<ResultSetHeader>(
+    await executor.execute<ResultSetHeader>(
       `DELETE FROM
         wishlist_item_tags
       WHERE

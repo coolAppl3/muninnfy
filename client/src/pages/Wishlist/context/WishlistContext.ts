@@ -15,11 +15,6 @@ export type ItemsFilterConfig = {
 
 export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'lexicographical';
 
-export type WishlistViewConfig = {
-  isSingleColumnGrid: boolean;
-  expandAllWishlistItems: boolean;
-};
-
 export type WishlistContextType = {
   wishlistId: string;
   setWishlistId: Dispatch<SetStateAction<string>>;
@@ -42,14 +37,17 @@ export type WishlistContextType = {
   setItemsSortingMode: Dispatch<SetStateAction<ItemsSortingMode>>;
   sortWishlistItems: () => void;
 
-  wishlistViewConfig: WishlistViewConfig;
-  setWishlistViewConfig: Dispatch<SetStateAction<WishlistViewConfig>>;
-
   selectionModeActive: boolean;
   setSelectionModeActive: Dispatch<SetStateAction<boolean>>;
 
   selectedItemsSet: Set<number>;
   setSelectedItemsSet: Dispatch<SetStateAction<Set<number>>>;
+
+  isSingleColumnView: boolean;
+  setIsSingleColumnView: Dispatch<SetStateAction<boolean>>;
+
+  expandedItemsSet: Set<number>;
+  setExpandedItemsSet: Dispatch<SetStateAction<Set<number>>>;
 };
 
 const WishlistContext = createContext<WishlistContextType | null>(null);
