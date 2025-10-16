@@ -3,7 +3,7 @@ import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
-import WishlistItemButtonContainer from './components/WishlistItemButtonContainer/WishlistItemButtonContainer';
+import WishlistItemButtonContainer from './components/WishlistItemButtonContainer';
 import useWishlist from '../../context/useWishlist';
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 

@@ -1,15 +1,15 @@
 import { Dispatch, FocusEvent, JSX, SetStateAction, useState } from 'react';
-import useWishlist from '../../../../context/useWishlist';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../../hooks/useAsyncErrorHandler';
-import useHistory from '../../../../../../hooks/useHistory';
+import useWishlist from '../../../context/useWishlist';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
+import useHistory from '../../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import useLoadingOverlay from '../../../../../../hooks/useLoadingOverlay';
-import usePopupMessage from '../../../../../../hooks/usePopupMessage';
-import useConfirmModal from '../../../../../../hooks/useConfirmModal';
-import { WishlistItemType } from '../../../../../../types/wishlistItemTypes';
-import TripleDotMenuIcon from '../../../../../../assets/svg/TripleDotMenuIcon.svg?react';
-import CheckIcon from '../../../../../../assets/svg/CheckIcon.svg?react';
-import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '../../../../../../services/wishlistItemServices';
+import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
+import usePopupMessage from '../../../../../hooks/usePopupMessage';
+import useConfirmModal from '../../../../../hooks/useConfirmModal';
+import { WishlistItemType } from '../../../../../types/wishlistItemTypes';
+import TripleDotMenuIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
+import CheckIcon from '../../../../../assets/svg/CheckIcon.svg?react';
+import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '../../../../../services/wishlistItemServices';
 
 type WishlistItemButtonContainerProps = {
   wishlistItem: WishlistItemType;
