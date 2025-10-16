@@ -86,7 +86,7 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
         >
           <h4 className='text-title py-[8.4px]'>{wishlistItem.title}</h4>
           <span className='p-1 rounded-[50%] mr-[-1rem]'>
-            <ChevronIcon className='text-title w-[1.6rem] h-[1.6rem]' />
+            <ChevronIcon className={`text-title w-[1.6rem] h-[1.6rem] ${itemExpanded ? 'rotate-180' : ''}`} />
           </span>
         </button>
       </div>
