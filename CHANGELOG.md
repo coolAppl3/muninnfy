@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.1.0] (2024-10-16)
+
+### Features
+
+- Implemented bulk action logic for wishlist items, thus completing all the main features for the `Wishlist` page.
+- Added the following endpoints:
+  - DELETE `wishlistItems/bulk`.
+  - PATCH `wishlistItems/purchaseSTatus/bulk`.
+- Added the following services in `wishlistItemServices`:
+  - `bulkDeleteWishlistItemsService()`.
+  - `bulkSetWishlistItemIsPurchasedService()`.
+- Added a popup message when the wishlist items column view is changed.
+- Added a popup message when all wishlist items are expanded or collapsed.
+
+
+### Improvements
+
+- Updating or resetting wishlist filters now resets the selected items.
+- Added subtle gradient to the header in `NewWishlistItemFormContainer` to improve visual separation.
+- Split `wishlistViewConfig` state in `WishlistContext` and `WishlistProvider`:
+  - Renamed `isSingleColumnGrid` and `setIsSingleColumnGrid` to `isSingleColumnView` and `setIsSingleColumnView`.
+  - Replace `expandAllWishlistItems` and `expandAllWishlistItems` with `expandedItemsSet` and `setExpandedItemsSet`, to handle wishlist item expansion logic and address all the flaws with the previous implementing.
+
+
+### Bug Fixes
+
+- Fixed `removeRequestCookie()` being called after a response is sent in `authDbHelpers`.
+- Fixed `await connection.rollback();` not being called before a response is sent in a few endpoints.
+- Fixed a few 500 error responses not logging errors in a number of endpoints.
+- Fixed `ConfirmModal` not being removed before `bulkDeleteWishlistItems()` is called.
+- Fixed "Select all items" button not accounting for any active filters.
+- Fixed "Select all items" button being checked when there aren't any items in the wishlist.
+- Fixed header in `NewWishlistItemFormContainer` not having rounded corners on the top when expanded.
+- Fixed `ChevronIcon` not rotating upon item expansion in `WishlistItem`.
+
+
+### Code Refactoring
+
+- Renamed `bulkUpdateWishlistItemIsPurchased()` (stub) to `bulkSetWishlistItemIsPurchased()`.
+- Simplified how `itemMatchesFilterConfig()` is passed to a `.filter()` call in `WishlistItem` and `WishlistItemsSelectionContainer`.
+
+
 ## [0.0.29] (2024-10-13)
 
 ### Features
