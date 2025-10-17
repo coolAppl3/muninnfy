@@ -57,6 +57,11 @@ export default function EditWishlistTitleForm(): JSX.Element {
         return;
       }
 
+      if (status === 409) {
+        setTitleErrorMessage(errMessage);
+        return;
+      }
+
       if (errReason && status === 400) {
         if (errReason === 'invalidTitle') {
           setTitleErrorMessage(errMessage);
