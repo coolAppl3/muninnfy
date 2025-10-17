@@ -292,17 +292,28 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
   try {
     type WishlistDetails = {
       title: string;
+      new_title_used_elsewhere: boolean;
     };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        title
+        title,
+        EXISTS (
+          SELECT
+            1
+          FROM
+            wishlists
+          WHERE
+            title = :newTitle AND
+            account_id = :accountId AND
+            wishlist_id != :wishlistId
+        ) AS new_title_used_elsewhere
       FROM
         wishlists
       WHERE
-        wishlist_id = ? AND
-        account_id = ?;`,
-      [wishlistId, accountId]
+        wishlist_id = :wishlistId AND
+        account_id = :accountId;`,
+      { newTitle, wishlistId, accountId }
     );
 
     const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
@@ -314,6 +325,11 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
 
     if (wishlistDetails.title === newTitle) {
       res.status(409).json({ message: 'Wishlist already has this title.', reason: 'identicalTitle' });
+      return;
+    }
+
+    if (wishlistDetails.new_title_used_elsewhere) {
+      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
       return;
     }
 
@@ -339,6 +355,18 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      return;
+    }
+
+    if (!isSqlError(err)) {
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
+
+      return;
+    }
+
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
+      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
       return;
     }
 
