@@ -11,8 +11,7 @@ type WishlistItemProps = {
   wishlistItem: WishlistItemType;
 };
 
-export default memo(WishlistItem);
-function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
+export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const { expandedItemsSet, setExpandedItemsSet, selectionModeActive, selectedItemsSet, setSelectedItemsSet } = useWishlist();
@@ -91,51 +90,53 @@ function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
         </button>
       </div>
 
-      <div className={`justify-between items-start gap-1 p-2 pt-1 ${itemExpanded ? 'flex' : 'hidden'}`}>
-        <div className='w-full text-sm text-description grid gap-1'>
-          <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
-            <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
+      {itemExpanded && (
+        <div className='flex justify-between items-start gap-1 p-2 pt-1'>
+          <div className='w-full text-sm text-description grid gap-1'>
+            <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
+              <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
 
-            <p>
-              Link:{' '}
-              {wishlistItem.link ? (
-                <a
-                  href={/^https?:\/\//.test(wishlistItem.link) ? wishlistItem.link : `https://${wishlistItem.link}`}
-                  target='_blank'
-                  className='link'
+              <p>
+                Link:{' '}
+                {wishlistItem.link ? (
+                  <a
+                    href={/^https?:\/\//.test(wishlistItem.link) ? wishlistItem.link : `https://${wishlistItem.link}`}
+                    target='_blank'
+                    className='link'
+                  >
+                    {wishlistItem.link}
+                  </a>
+                ) : (
+                  <span className='brightness-75'>None</span>
+                )}
+              </p>
+            </div>
+
+            <div className='tags'>
+              {wishlistItem.tags.map((tag: { id: number; name: string }) => (
+                <span
+                  key={tag.id}
+                  className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] font-medium'
                 >
-                  {wishlistItem.link}
-                </a>
-              ) : (
-                <span className='brightness-75'>None</span>
-              )}
-            </p>
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+
+            {wishlistItem.description && (
+              <>
+                <div className='h-line'></div>
+                <p className='whitespace-break-spaces'>{wishlistItem.description}</p>
+              </>
+            )}
           </div>
 
-          <div className='tags'>
-            {wishlistItem.tags.map((tag: { id: number; name: string }) => (
-              <span
-                key={tag.id}
-                className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] font-medium'
-              >
-                {tag.name}
-              </span>
-            ))}
-          </div>
-
-          {wishlistItem.description && (
-            <>
-              <div className='h-line'></div>
-              <p className='whitespace-break-spaces'>{wishlistItem.description}</p>
-            </>
-          )}
+          <WishlistItemButtonContainer
+            wishlistItem={wishlistItem}
+            setIsEditing={setIsEditing}
+          />
         </div>
-
-        <WishlistItemButtonContainer
-          wishlistItem={wishlistItem}
-          setIsEditing={setIsEditing}
-        />
-      </div>
+      )}
     </div>
   );
 }
