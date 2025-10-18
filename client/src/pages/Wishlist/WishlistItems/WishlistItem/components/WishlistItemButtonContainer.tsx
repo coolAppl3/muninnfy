@@ -20,7 +20,7 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
   const { wishlistId, setWishlistItems } = useWishlist();
 
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
-  const [updatingPurchaseStatus, setUpdatingPurchaseState] = useState<boolean>(false);
+  const [updatingPurchaseStatus, setUpdatingPurchaseStatus] = useState<boolean>(false);
 
   const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
@@ -30,7 +30,7 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   async function setWishlistItemIsPurchased(): Promise<void> {
-    setUpdatingPurchaseState(true);
+    setUpdatingPurchaseStatus(true);
 
     try {
       await setWishlistItemIsPurchasedService({ wishlistId, itemId: wishlistItem.item_id, newPurchaseStatus: !wishlistItem.is_purchased });
@@ -70,7 +70,7 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
 
       setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
     } finally {
-      setUpdatingPurchaseState(false);
+      setUpdatingPurchaseStatus(false);
     }
   }
 
