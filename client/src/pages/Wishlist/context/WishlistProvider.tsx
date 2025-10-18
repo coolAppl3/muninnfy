@@ -25,9 +25,7 @@ export default function WishlistProvider({
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
   const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
   const [selectionModeActive, setSelectionModeActive] = useState<boolean>(false);
-  const [selectedItemsSet, setSelectedItemsSet] = useState<Set<number>>(new Set<number>());
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
-  const [expandedItemsSet, setExpandedItemsSet] = useState<Set<number>>(new Set<number>());
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
@@ -111,14 +109,8 @@ export default function WishlistProvider({
       selectionModeActive,
       setSelectionModeActive,
 
-      selectedItemsSet,
-      setSelectedItemsSet,
-
       isSingleColumnView,
       setIsSingleColumnView,
-
-      expandedItemsSet,
-      setExpandedItemsSet,
     }),
     [
       wishlistId,
@@ -131,9 +123,7 @@ export default function WishlistProvider({
       itemsSortingMode,
       sortWishlistItems,
       selectionModeActive,
-      selectedItemsSet,
       isSingleColumnView,
-      expandedItemsSet,
     ]
   );
 

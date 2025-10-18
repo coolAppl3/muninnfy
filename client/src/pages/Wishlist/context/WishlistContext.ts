@@ -40,14 +40,8 @@ export type WishlistContextType = {
   selectionModeActive: boolean;
   setSelectionModeActive: Dispatch<SetStateAction<boolean>>;
 
-  selectedItemsSet: Set<number>;
-  setSelectedItemsSet: Dispatch<SetStateAction<Set<number>>>;
-
   isSingleColumnView: boolean;
   setIsSingleColumnView: Dispatch<SetStateAction<boolean>>;
-
-  expandedItemsSet: Set<number>;
-  setExpandedItemsSet: Dispatch<SetStateAction<Set<number>>>;
 };
 
 const WishlistContext = createContext<WishlistContextType | null>(null);

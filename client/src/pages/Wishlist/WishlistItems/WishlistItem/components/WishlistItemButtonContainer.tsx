@@ -142,41 +142,43 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
         </button>
       )}
 
-      <div className={`absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
-        <button
-          type='button'
-          className='context-menu-btn'
-          onClick={() => {
-            setMenuIsOpen(false);
-            setIsEditing(true);
-          }}
-        >
-          Edit
-        </button>
+      {menuIsOpen && (
+        <div className={`absolute block top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny`}>
+          <button
+            type='button'
+            className='context-menu-btn'
+            onClick={() => {
+              setMenuIsOpen(false);
+              setIsEditing(true);
+            }}
+          >
+            Edit
+          </button>
 
-        <button
-          type='button'
-          className='context-menu-btn danger'
-          onClick={() =>
-            displayConfirmModal({
-              title: 'Are you sure you want to remove this item:',
-              description: wishlistItem.title,
-              confirmBtnTitle: 'Remove item',
-              cancelBtnTitle: 'Cancel',
-              isDangerous: true,
-              onConfirm: async () => {
-                removeConfirmModal();
-                setMenuIsOpen(false);
+          <button
+            type='button'
+            className='context-menu-btn danger'
+            onClick={() =>
+              displayConfirmModal({
+                title: 'Are you sure you want to remove this item:',
+                description: wishlistItem.title,
+                confirmBtnTitle: 'Remove item',
+                cancelBtnTitle: 'Cancel',
+                isDangerous: true,
+                onConfirm: async () => {
+                  removeConfirmModal();
+                  setMenuIsOpen(false);
 
-                await removeWishlistItem();
-              },
-              onCancel: removeConfirmModal,
-            })
-          }
-        >
-          Remove
-        </button>
-      </div>
+                  await removeWishlistItem();
+                },
+                onCancel: removeConfirmModal,
+              })
+            }
+          >
+            Remove
+          </button>
+        </div>
+      )}
     </div>
   );
 }

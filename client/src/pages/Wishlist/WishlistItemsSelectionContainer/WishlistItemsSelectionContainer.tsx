@@ -1,4 +1,4 @@
-import { JSX, useMemo, useState } from 'react';
+import { JSX, useState } from 'react';
 import useWishlist from '../context/useWishlist';
 import Container from '../../../components/Container/Container';
 import Button from '../../../components/Button/Button';
@@ -12,22 +12,15 @@ import useInfoModal from '../../../hooks/useInfoModal';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../hooks/useHistory';
+import { selectAllWishlistItems, unselectAllWishlistItems, useWishlistItemsSelectionSet } from '../stores/wishlistItemsSelectionStore';
 
 type SelectedActionType = 'mark_as_purchased' | 'mark_as_unpurchased' | 'delete';
 
 export default function WishlistItemsSelectionContainer(): JSX.Element {
   const [selectedAction, setSelectedAction] = useState<SelectedActionType>('mark_as_purchased');
 
-  const {
-    selectionModeActive,
-    setSelectionModeActive,
-    selectedItemsSet,
-    setSelectedItemsSet,
-    wishlistItems,
-    setWishlistItems,
-    wishlistId,
-    itemMatchesFilterConfig,
-  } = useWishlist();
+  const { selectionModeActive, setSelectionModeActive, wishlistItems, setWishlistItems, wishlistId, itemMatchesFilterConfig } =
+    useWishlist();
 
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
@@ -37,12 +30,11 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
-  const allItemsSelected: boolean = useMemo(
-    () =>
-      wishlistItems.length > 0 &&
-      wishlistItems.every((item: WishlistItemType) => selectedItemsSet.has(item.item_id) || !itemMatchesFilterConfig(item)),
-    [wishlistItems, selectedItemsSet, itemMatchesFilterConfig]
-  );
+  const selectedItemsSet: Set<number> = useWishlistItemsSelectionSet();
+
+  const allItemsSelected: boolean =
+    wishlistItems.length > 0 &&
+    wishlistItems.every((item: WishlistItemType) => selectedItemsSet.has(item.item_id) || !itemMatchesFilterConfig(item));
 
   const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
@@ -77,7 +69,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
       setSelectionModeActive(false);
       setSelectedAction('mark_as_purchased');
-      setSelectedItemsSet(new Set<number>());
+      unselectAllWishlistItems();
 
       displayPopupMessage('Items updated.', 'success');
 
@@ -126,7 +118,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
       setSelectionModeActive(false);
       setSelectedAction('mark_as_purchased');
-      setSelectedItemsSet(new Set<number>());
+      unselectAllWishlistItems();
 
       displayPopupMessage('Items deleted.', 'success');
 
@@ -237,7 +229,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
               className='bg-dark border-title text-title w-full sm:w-fit order-2 sm:order-1'
               onClick={() => {
                 setSelectionModeActive(false);
-                setSelectedItemsSet(new Set<number>());
+                unselectAllWishlistItems();
               }}
             >
               Cancel selection
@@ -255,13 +247,11 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
             className='bg-[#555] p-[4px] rounded-[1px] ml-1 after:absolute after:top-0 after:left-0 after:w-full after:h-full  cursor-pointer z-2'
             onClick={() => {
               if (allItemsSelected) {
-                setSelectedItemsSet(new Set<number>());
+                unselectAllWishlistItems();
                 return;
               }
 
-              setSelectedItemsSet(
-                new Set<number>(wishlistItems.filter(itemMatchesFilterConfig).map((item: WishlistItemType) => item.item_id))
-              );
+              selectAllWishlistItems(wishlistItems.filter(itemMatchesFilterConfig).map((item: WishlistItemType) => item.item_id));
             }}
           >
             <CheckIcon

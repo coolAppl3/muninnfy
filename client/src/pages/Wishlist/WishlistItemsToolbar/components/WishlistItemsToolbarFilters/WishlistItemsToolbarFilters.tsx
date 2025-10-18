@@ -6,6 +6,7 @@ import WishlistItemTagsFormGroup from '../../../../../components/WishlistItemTag
 import useWishlist from '../../../context/useWishlist';
 import useCalendar from '../../../../../hooks/useCalendar';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
+import { unselectAllWishlistItems } from '../../../stores/wishlistItemsSelectionStore';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -13,7 +14,7 @@ type WishlistItemsToolbarFiltersProps = {
 };
 
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
-  const { itemsFilterConfig, setItemsFilterConfig, setWishlistItemsLoading, setSelectedItemsSet } = useWishlist();
+  const { itemsFilterConfig, setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
   const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp } = useCalendar();
 
   const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestamp);
@@ -74,7 +75,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setWishlistItemsLoading(true);
 
     setTimeout(() => {
-      setSelectedItemsSet(new Set<number>());
+      unselectAllWishlistItems();
 
       setItemsFilterConfig((prev) => ({
         ...prev,
@@ -94,7 +95,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setWishlistItemsLoading(true);
 
     setTimeout(() => {
-      setSelectedItemsSet(new Set<number>());
+      unselectAllWishlistItems();
 
       setAddedAfterTimestamp(null);
       setAddedBeforeTimestamp(null);
