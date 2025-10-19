@@ -1,4 +1,4 @@
-import { JSX, Profiler, ReactNode, useMemo } from 'react';
+import { JSX, ReactNode, useMemo } from 'react';
 import useWishlist from '../context/useWishlist';
 import Container from '../../../components/Container/Container';
 import WishlistItem from './WishlistItem/WishlistItem';

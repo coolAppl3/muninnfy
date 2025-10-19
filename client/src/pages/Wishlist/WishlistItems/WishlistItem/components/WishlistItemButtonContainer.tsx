@@ -143,7 +143,7 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
       )}
 
       {menuIsOpen && (
-        <div className={`absolute block top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny`}>
+        <div className='absolute block top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny'>
           <button
             type='button'
             className='context-menu-btn'
