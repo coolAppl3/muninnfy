@@ -1,14 +1,14 @@
 import { FocusEvent, JSX, useState } from 'react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
-import useWishlist from '../../context/useWishlist';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import { collapseAllWishlistItems, expandAllWishlistItems, useWishlistItemsExpansionSet } from '../../stores/wishlistItemsExpansionStore';
+import useWishlistItems from '../../hooks/useWishlistItems';
 
 export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { wishlistItems, selectionModeActive, setSelectionModeActive } = useWishlist();
+  const { wishlistItems, selectionModeActive, setSelectionModeActive } = useWishlistItems();
   const { displayPopupMessage } = usePopupMessage();
 
   const expandedItemsSet: Set<number> = useWishlistItemsExpansionSet();

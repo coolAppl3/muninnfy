@@ -3,10 +3,10 @@ import WishlistItemsToolbarFilterItem from './components/WishlistItemsToolbarFil
 import Button from '../../../../../components/Button/Button';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 import WishlistItemTagsFormGroup from '../../../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
-import useWishlist from '../../../context/useWishlist';
 import useCalendar from '../../../../../hooks/useCalendar';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import { unselectAllWishlistItems } from '../../../stores/wishlistItemsSelectionStore';
+import useWishlistItems from '../../../hooks/useWishlistItems';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -14,7 +14,7 @@ type WishlistItemsToolbarFiltersProps = {
 };
 
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
-  const { itemsFilterConfig, setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
+  const { itemsFilterConfig, setItemsFilterConfig, setWishlistItemsLoading } = useWishlistItems();
   const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp } = useCalendar();
 
   const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestamp);

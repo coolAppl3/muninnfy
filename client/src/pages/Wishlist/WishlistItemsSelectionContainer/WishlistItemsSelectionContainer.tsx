@@ -1,5 +1,5 @@
 import { JSX, useState } from 'react';
-import useWishlist from '../context/useWishlist';
+import useWishlist from '../hooks/useWishlist';
 import Container from '../../../components/Container/Container';
 import Button from '../../../components/Button/Button';
 import useConfirmModal from '../../../hooks/useConfirmModal';
@@ -13,14 +13,15 @@ import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/u
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../hooks/useHistory';
 import { selectAllWishlistItems, unselectAllWishlistItems, useWishlistItemsSelectionSet } from '../stores/wishlistItemsSelectionStore';
+import useWishlistItems from '../hooks/useWishlistItems';
 
 type SelectedActionType = 'mark_as_purchased' | 'mark_as_unpurchased' | 'delete';
 
 export default function WishlistItemsSelectionContainer(): JSX.Element {
   const [selectedAction, setSelectedAction] = useState<SelectedActionType>('mark_as_purchased');
 
-  const { selectionModeActive, setSelectionModeActive, wishlistItems, setWishlistItems, wishlistId, itemMatchesFilterConfig } =
-    useWishlist();
+  const { wishlistId } = useWishlist();
+  const { selectionModeActive, setSelectionModeActive, wishlistItems, setWishlistItems, itemMatchesFilterConfig } = useWishlistItems();
 
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();

@@ -4,10 +4,10 @@ import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import WishlistItemButtonContainer from './components/WishlistItemButtonContainer';
-import useWishlist from '../../context/useWishlist';
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 import { useWishlistItemSelected, toggleWishlistItemSelection } from '../../stores/wishlistItemsSelectionStore';
 import { toggleWishlistItemExpansion, useWishlistItemExpansion } from '../../stores/wishlistItemsExpansionStore';
+import useWishlistItems from '../../hooks/useWishlistItems';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
@@ -15,7 +15,7 @@ type WishlistItemProps = {
 
 export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.Element {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const { selectionModeActive } = useWishlist();
+  const { selectionModeActive } = useWishlistItems();
 
   const isSelected: boolean = useWishlistItemSelected(wishlistItem.item_id);
   const isExpanded: boolean = useWishlistItemExpansion(wishlistItem.item_id);

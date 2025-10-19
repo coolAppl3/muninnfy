@@ -10,12 +10,13 @@ import {
 } from '../../../utils/validation/wishlistItemValidation';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
-import useWishlist from '../context/useWishlist';
+import useWishlist from '../hooks/useWishlist';
 import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
+import useWishlistItems from '../hooks/useWishlistItems';
 
 type WishlistItemFromProps = {
   formMode: 'NEW_ITEM' | 'EDIT_ITEM';
@@ -25,7 +26,8 @@ type WishlistItemFromProps = {
 };
 
 export default function WishlistItemForm({ formMode, wishlistItem, onFinish, className }: WishlistItemFromProps): JSX.Element {
-  const { wishlistId, wishlistItems, setWishlistItems, wishlistItemsTitleSet, itemsSortingMode, sortWishlistItems } = useWishlist();
+  const { wishlistId } = useWishlist();
+  const { wishlistItems, setWishlistItems, wishlistItemsTitleSet, itemsSortingMode, sortWishlistItems } = useWishlistItems();
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 

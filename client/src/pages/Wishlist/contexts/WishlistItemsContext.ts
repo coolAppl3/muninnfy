@@ -1,5 +1,4 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
-import { WishlistDetailsType } from '../../../types/wishlistTypes';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 export type ItemsFilterConfig = {
@@ -15,13 +14,7 @@ export type ItemsFilterConfig = {
 
 export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'lexicographical';
 
-export type WishlistContextType = {
-  wishlistId: string;
-  setWishlistId: Dispatch<SetStateAction<string>>;
-
-  wishlistDetails: WishlistDetailsType;
-  setWishlistDetails: Dispatch<SetStateAction<WishlistDetailsType>>;
-
+export type WishlistItemsContextType = {
   wishlistItems: WishlistItemType[];
   setWishlistItems: Dispatch<SetStateAction<WishlistItemType[]>>;
   wishlistItemsTitleSet: Set<string>;
@@ -44,5 +37,5 @@ export type WishlistContextType = {
   setIsSingleColumnView: Dispatch<SetStateAction<boolean>>;
 };
 
-const WishlistContext = createContext<WishlistContextType | null>(null);
-export default WishlistContext;
+const WishlistItemsContext = createContext<WishlistItemsContextType | null>(null);
+export default WishlistItemsContext;

@@ -5,7 +5,7 @@ import { getWishlistPrivacyLevelName } from '../../../utils/wishlistUtils';
 import useWishlistHeader from './context/useWishlistHeader';
 import WishlistHeaderEditingContainer from './components/WishlistHeaderEditingContainer';
 import WishlistHeaderContent from './components/WishlistHeaderContent';
-import useWishlist from '../context/useWishlist';
+import useWishlist from '../hooks/useWishlist';
 
 export default function WishlistHeader(): JSX.Element {
   const { wishlistDetails } = useWishlist();

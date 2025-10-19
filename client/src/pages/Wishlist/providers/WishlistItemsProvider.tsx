@@ -1,25 +1,13 @@
 import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import WishlistContext, { ItemsFilterConfig, ItemsSortingMode, WishlistContextType } from './WishlistContext';
-import { WishlistDetailsType } from '../../../types/wishlistTypes';
+import WishlistItemsContext, { ItemsFilterConfig, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
-type WishlistProviderProps = {
-  initialWishlistId: string;
-  initialWishlistDetails: WishlistDetailsType;
+type WishlistItemsProviderProps = {
   initialWishlistItems: WishlistItemType[];
-
   children: ReactNode;
 };
 
-export default function WishlistProvider({
-  initialWishlistId,
-  initialWishlistDetails,
-  initialWishlistItems,
-
-  children,
-}: WishlistProviderProps): JSX.Element {
-  const [wishlistId, setWishlistId] = useState<string>(initialWishlistId);
-  const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
+export default function WishlistItemsProvider({ initialWishlistItems, children }: WishlistItemsProviderProps): JSX.Element {
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
@@ -83,14 +71,8 @@ export default function WishlistProvider({
     sortWishlistItems();
   }, [itemsSortingMode, sortWishlistItems]);
 
-  const contextValue: WishlistContextType = useMemo(
+  const contextValue: WishlistItemsContextType = useMemo(
     () => ({
-      wishlistId,
-      setWishlistId,
-
-      wishlistDetails,
-      setWishlistDetails,
-
       wishlistItems,
       setWishlistItems,
       wishlistItemsTitleSet,
@@ -113,8 +95,6 @@ export default function WishlistProvider({
       setIsSingleColumnView,
     }),
     [
-      wishlistId,
-      wishlistDetails,
       wishlistItems,
       wishlistItemsTitleSet,
       wishlistItemsLoading,
@@ -127,7 +107,7 @@ export default function WishlistProvider({
     ]
   );
 
-  return <WishlistContext.Provider value={contextValue}>{children}</WishlistContext.Provider>;
+  return <WishlistItemsContext.Provider value={contextValue}>{children}</WishlistItemsContext.Provider>;
 }
 
 const defaultItemsFilterConfig: ItemsFilterConfig = {

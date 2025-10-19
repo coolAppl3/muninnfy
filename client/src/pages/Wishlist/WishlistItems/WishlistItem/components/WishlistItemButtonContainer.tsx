@@ -1,5 +1,5 @@
 import { Dispatch, FocusEvent, JSX, SetStateAction, useState } from 'react';
-import useWishlist from '../../../context/useWishlist';
+import useWishlist from '../../../hooks/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
 import useHistory from '../../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { WishlistItemType } from '../../../../../types/wishlistItemTypes';
 import TripleDotMenuIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import CheckIcon from '../../../../../assets/svg/CheckIcon.svg?react';
 import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '../../../../../services/wishlistItemServices';
+import useWishlistItems from '../../../hooks/useWishlistItems';
 
 type WishlistItemButtonContainerProps = {
   wishlistItem: WishlistItemType;
@@ -17,7 +18,8 @@ type WishlistItemButtonContainerProps = {
 };
 
 export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing }: WishlistItemButtonContainerProps): JSX.Element {
-  const { wishlistId, setWishlistItems } = useWishlist();
+  const { wishlistId } = useWishlist();
+  const { setWishlistItems } = useWishlistItems();
 
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [updatingPurchaseStatus, setUpdatingPurchaseStatus] = useState<boolean>(false);

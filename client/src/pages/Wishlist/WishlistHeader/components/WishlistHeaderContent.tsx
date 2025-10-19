@@ -3,7 +3,7 @@ import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?reac
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useWishlistHeader from '../context/useWishlistHeader';
 import { copyToClipboard } from '../../../../utils/globalUtils';
-import useWishlist from '../../context/useWishlist';
+import useWishlist from '../../hooks/useWishlist';
 
 export default function WishlistHeaderContent(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();

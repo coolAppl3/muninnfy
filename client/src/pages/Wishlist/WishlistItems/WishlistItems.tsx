@@ -1,11 +1,11 @@
 import { JSX, ReactNode, useMemo } from 'react';
-import useWishlist from '../context/useWishlist';
 import Container from '../../../components/Container/Container';
 import WishlistItem from './WishlistItem/WishlistItem';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
+import useWishlistItems from '../hooks/useWishlistItems';
 
 export default function WishlistItems(): JSX.Element {
-  const { wishlistItems, itemMatchesFilterConfig, wishlistItemsLoading, isSingleColumnView } = useWishlist();
+  const { wishlistItems, itemMatchesFilterConfig, wishlistItemsLoading, isSingleColumnView } = useWishlistItems();
 
   const filteredItems: WishlistItemType[] = useMemo(
     () => wishlistItems.filter(itemMatchesFilterConfig),

@@ -7,13 +7,13 @@ import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';
 import WishlistItemsToolbarView from './components/WishlistItemsToolbarView';
 import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilters/WishlistItemsToolbarFilters';
 import { debounce } from '../../../utils/debounce';
-import useWishlist from '../context/useWishlist';
+import useWishlistItems from '../hooks/useWishlistItems';
 
 export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
-  const { setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
+  const { setItemsFilterConfig, setWishlistItemsLoading } = useWishlistItems();
 
   const debounceSetTitleQuery: (query: string) => void = useMemo(
     () =>
