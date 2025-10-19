@@ -99,22 +99,24 @@ export default function Wishlist(): JSX.Element {
       <Head title='Wishlist - Muninnfy' />
 
       {isLoaded && initialWishlistProviderData ? (
-        <CalendarProvider>
-          <WishlistProvider {...initialWishlistProviderData}>
-            <main className='py-4 grid gap-2'>
-              <WishlistHeaderProvider>
-                <WishlistHeader />
-              </WishlistHeaderProvider>
+        <WishlistProvider {...initialWishlistProviderData}>
+          <main className='py-4 grid gap-2'>
+            <WishlistHeaderProvider>
+              <WishlistHeader />
+            </WishlistHeaderProvider>
 
-              <WishlistItemsProvider initialWishlistItems={initialWishlistProviderData.initialWishlistItems}>
-                <NewWishlistItemFormContainer />
+            <WishlistItemsProvider initialWishlistItems={initialWishlistProviderData.initialWishlistItems}>
+              <NewWishlistItemFormContainer />
+
+              <CalendarProvider>
                 <WishlistItemsToolbar />
-                <WishlistItemsSelectionContainer />
-                <WishlistItems />
-              </WishlistItemsProvider>
-            </main>
-          </WishlistProvider>
-        </CalendarProvider>
+              </CalendarProvider>
+
+              <WishlistItemsSelectionContainer />
+              <WishlistItems />
+            </WishlistItemsProvider>
+          </main>
+        </WishlistProvider>
       ) : (
         <LoadingSkeleton />
       )}
