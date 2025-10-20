@@ -1,4 +1,4 @@
-import { JSX, useState } from 'react';
+import { JSX, useEffect, useRef, useState } from 'react';
 import { getShortenedDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
@@ -20,6 +20,27 @@ export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.E
   const isSelected: boolean = useWishlistItemSelected(wishlistItem.item_id);
   const isExpanded: boolean = useWishlistItemExpansion(wishlistItem.item_id);
 
+  const [isInView, setIsInView] = useState<boolean>(true);
+  const wishlistItemRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          setIsInView(entry.isIntersecting);
+        }
+      },
+      { root: null, rootMargin: '50px', threshold: 0 }
+    );
+
+    wishlistItemRef.current && observer.observe(wishlistItemRef.current);
+
+    return () => {
+      wishlistItemRef.current && observer.unobserve(wishlistItemRef.current);
+      observer.disconnect();
+    };
+  }, []);
+
   if (isEditing) {
     return (
       <div className='py-2 bg-secondary rounded-sm shadow-simple-tiny'>
@@ -33,7 +54,10 @@ export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.E
   }
 
   return (
-    <div className='bg-secondary rounded-sm shadow-simple-tiny'>
+    <div
+      className='bg-secondary rounded-sm shadow-simple-tiny'
+      ref={wishlistItemRef}
+    >
       <div className='flex justify-start items-center gap-1'>
         {selectionModeActive && (
           <button
@@ -69,7 +93,7 @@ export default function WishlistItem({ wishlistItem }: WishlistItemProps): JSX.E
         </button>
       </div>
 
-      {isExpanded && (
+      {isExpanded && isInView && (
         <div className='flex justify-between items-start gap-1 p-2 pt-1'>
           <div className='w-full text-sm text-description grid gap-1'>
             <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
