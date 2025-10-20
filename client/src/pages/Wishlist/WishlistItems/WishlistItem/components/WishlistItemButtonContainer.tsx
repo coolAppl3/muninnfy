@@ -1,8 +1,7 @@
-import { Dispatch, FocusEvent, JSX, SetStateAction, useState } from 'react';
-import useWishlist from '../../../hooks/useWishlist';
+import { Dispatch, FocusEvent, JSX, SetStateAction, useMemo, useState } from 'react';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
 import useHistory from '../../../../../hooks/useHistory';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useConfirmModal from '../../../../../hooks/useConfirmModal';
@@ -18,7 +17,6 @@ type WishlistItemButtonContainerProps = {
 };
 
 export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing }: WishlistItemButtonContainerProps): JSX.Element {
-  const { wishlistId } = useWishlist();
   const { setWishlistItems } = useWishlistItems();
 
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
@@ -30,6 +28,10 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
+
+  // workaround to avoid consuming WishlistProvider
+  const locationParams = useParams();
+  const wishlistId = useMemo(() => locationParams.wishlistId, [locationParams]) as string;
 
   async function setWishlistItemIsPurchased(): Promise<void> {
     setUpdatingPurchaseStatus(true);
