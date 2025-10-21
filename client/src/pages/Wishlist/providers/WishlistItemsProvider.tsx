@@ -11,7 +11,6 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
-  const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
   const [selectionModeActive, setSelectionModeActive] = useState<boolean>(false);
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
 
@@ -77,9 +76,6 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
       setWishlistItems,
       wishlistItemsTitleSet,
 
-      wishlistItemsLoading,
-      setWishlistItemsLoading,
-
       itemsFilterConfig,
       setItemsFilterConfig,
       itemMatchesFilterConfig,
@@ -97,7 +93,6 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
     [
       wishlistItems,
       wishlistItemsTitleSet,
-      wishlistItemsLoading,
       itemsFilterConfig,
       itemMatchesFilterConfig,
       itemsSortingMode,
