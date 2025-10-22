@@ -6,9 +6,6 @@ import Logo from '../../assets/svg/Logo.svg?react';
 import useAuth from '../../hooks/useAuth';
 import NavbarAccountMenu from '../NavbarAccountMenu/NavbarAccountMenu';
 
-const navLinkClassname: string =
-  'relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[3px] after:rounded-pill after:bg-cta/0 hover:after:bg-cta/100 after:transition-[background]';
-
 export default function TopNavbar(): JSX.Element {
   const { authStatus } = useAuth();
   const { pathname }: Location = useLocation();
@@ -82,3 +79,6 @@ function AdditionalLinks(): JSX.Element {
     </div>
   );
 }
+
+const navLinkClassname: string =
+  'relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[3px] after:rounded-pill after:bg-cta/0 hover:after:bg-cta/100 after:transition-[background]';

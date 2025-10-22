@@ -2,9 +2,6 @@ import { JSX } from 'react';
 import Container from '../Container/Container';
 
 export default function LoadingSkeleton(): JSX.Element {
-  const textClassname: string = 'w-full bg-cta/15 rounded-pill animate-pulse';
-  const skeletonContainerClassname: string = 'bg-dark p-2 rounded-sm shadow-simple-tiny';
-
   return (
     <div className='py-4'>
       <Container>
@@ -42,3 +39,6 @@ export default function LoadingSkeleton(): JSX.Element {
     </div>
   );
 }
+
+const textClassname: string = 'w-full bg-cta/15 rounded-pill animate-pulse';
+const skeletonContainerClassname: string = 'bg-dark p-2 rounded-sm shadow-simple-tiny';
