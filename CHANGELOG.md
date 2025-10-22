@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.1] (2024-10-22)
+
+### Improvements
+
+- Improve a number of render-related performance issues throughout `Wishlist`.
+  - This included splitting the context into `WishlistContext` and `WishlistItemsContext`, as well as adding `wishlistItemsExpansionStore` and `wishlistItemsSelectionStore`.
+  - Further improvements or refinements may be implemented down the line.
+
+
+### Bug Fixes
+
+- Fixed PATCH `wishlists/change/title` not checking, or account, for duplicate titles.
+  - Added missing handling for duplicate titles in `EditWishlistTitleForm`.
+
+
 ## [0.1.0] (2024-10-16)
 
 ### Features
