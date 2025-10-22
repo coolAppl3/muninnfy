@@ -12,7 +12,7 @@ import {
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../../../utils/constants/wishlistConstants';
-import useWishlist from '../../context/useWishlist';
+import useWishlist from '../../hooks/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export default function EditPrivacyLevelContainer(): JSX.Element {

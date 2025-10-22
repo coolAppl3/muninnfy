@@ -1,16 +1,17 @@
 import { FocusEvent, JSX, useState } from 'react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
-import useWishlist from '../../context/useWishlist';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
+import { collapseAllWishlistItems, expandAllWishlistItems, useWishlistItemsExpansionSet } from '../../stores/wishlistItemsExpansionStore';
+import useWishlistItems from '../../hooks/useWishlistItems';
 
 export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { expandedItemsSet, setExpandedItemsSet, wishlistItems, selectionModeActive, setSelectionModeActive, setSelectedItemsSet } =
-    useWishlist();
+  const { wishlistItems, selectionModeActive, setSelectionModeActive } = useWishlistItems();
   const { displayPopupMessage } = usePopupMessage();
 
+  const expandedItemsSet: Set<number> = useWishlistItemsExpansionSet();
   const allItemsExpanded: boolean = expandedItemsSet.size === wishlistItems.length;
 
   return (
@@ -47,7 +48,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
             }
 
             setSelectionModeActive(false);
-            setSelectedItemsSet(new Set<number>());
+            collapseAllWishlistItems();
           }}
         >
           {selectionModeActive ? 'Cancel item selection' : 'Select items'}
@@ -60,14 +61,14 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
             setIsOpen(false);
 
             if (allItemsExpanded) {
-              setExpandedItemsSet(new Set<number>());
-              displayPopupMessage('Collapsed items.', 'success');
+              collapseAllWishlistItems();
+              displayPopupMessage('Items collapsed.', 'success');
 
               return;
             }
 
-            setExpandedItemsSet(new Set<number>(wishlistItems.map((item: WishlistItemType) => item.item_id)));
-            displayPopupMessage('Expanded items.', 'success');
+            expandAllWishlistItems(wishlistItems.map((item: WishlistItemType) => item.item_id));
+            displayPopupMessage('Items expanded.', 'success');
           }}
         >
           {`${allItemsExpanded ? 'Collapse' : 'Expand'} all items`}

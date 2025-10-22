@@ -1,11 +1,11 @@
 import { JSX } from 'react';
 import SingleColumnGridIcon from '../../../../assets/svg/SingleColumnGridIcon.svg?react';
 import DoubleColumnGridIcon from '../../../../assets/svg/DoubleColumnGridIcon.svg?react';
-import useWishlist from '../../context/useWishlist';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
+import useWishlistItems from '../../hooks/useWishlistItems';
 
 export default function WishlistItemsToolbarView(): JSX.Element {
-  const { isSingleColumnView, setIsSingleColumnView } = useWishlist();
+  const { isSingleColumnView, setIsSingleColumnView } = useWishlistItems();
   const { displayPopupMessage } = usePopupMessage();
 
   return (

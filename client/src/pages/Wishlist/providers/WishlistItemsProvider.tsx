@@ -1,33 +1,18 @@
 import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import WishlistContext, { ItemsFilterConfig, ItemsSortingMode, WishlistContextType } from './WishlistContext';
-import { WishlistDetailsType } from '../../../types/wishlistTypes';
+import WishlistItemsContext, { ItemsFilterConfig, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
-type WishlistProviderProps = {
-  initialWishlistId: string;
-  initialWishlistDetails: WishlistDetailsType;
+type WishlistItemsProviderProps = {
   initialWishlistItems: WishlistItemType[];
-
   children: ReactNode;
 };
 
-export default function WishlistProvider({
-  initialWishlistId,
-  initialWishlistDetails,
-  initialWishlistItems,
-
-  children,
-}: WishlistProviderProps): JSX.Element {
-  const [wishlistId, setWishlistId] = useState<string>(initialWishlistId);
-  const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
+export default function WishlistItemsProvider({ initialWishlistItems, children }: WishlistItemsProviderProps): JSX.Element {
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
-  const [wishlistItemsLoading, setWishlistItemsLoading] = useState<boolean>(false);
   const [selectionModeActive, setSelectionModeActive] = useState<boolean>(false);
-  const [selectedItemsSet, setSelectedItemsSet] = useState<Set<number>>(new Set<number>());
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
-  const [expandedItemsSet, setExpandedItemsSet] = useState<Set<number>>(new Set<number>());
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
     () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
@@ -85,20 +70,11 @@ export default function WishlistProvider({
     sortWishlistItems();
   }, [itemsSortingMode, sortWishlistItems]);
 
-  const contextValue: WishlistContextType = useMemo(
+  const contextValue: WishlistItemsContextType = useMemo(
     () => ({
-      wishlistId,
-      setWishlistId,
-
-      wishlistDetails,
-      setWishlistDetails,
-
       wishlistItems,
       setWishlistItems,
       wishlistItemsTitleSet,
-
-      wishlistItemsLoading,
-      setWishlistItemsLoading,
 
       itemsFilterConfig,
       setItemsFilterConfig,
@@ -111,33 +87,22 @@ export default function WishlistProvider({
       selectionModeActive,
       setSelectionModeActive,
 
-      selectedItemsSet,
-      setSelectedItemsSet,
-
       isSingleColumnView,
       setIsSingleColumnView,
-
-      expandedItemsSet,
-      setExpandedItemsSet,
     }),
     [
-      wishlistId,
-      wishlistDetails,
       wishlistItems,
       wishlistItemsTitleSet,
-      wishlistItemsLoading,
       itemsFilterConfig,
       itemMatchesFilterConfig,
       itemsSortingMode,
       sortWishlistItems,
       selectionModeActive,
-      selectedItemsSet,
       isSingleColumnView,
-      expandedItemsSet,
     ]
   );
 
-  return <WishlistContext.Provider value={contextValue}>{children}</WishlistContext.Provider>;
+  return <WishlistItemsContext.Provider value={contextValue}>{children}</WishlistItemsContext.Provider>;
 }
 
 const defaultItemsFilterConfig: ItemsFilterConfig = {

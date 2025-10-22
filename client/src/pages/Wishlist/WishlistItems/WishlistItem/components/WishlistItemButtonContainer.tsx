@@ -1,8 +1,7 @@
-import { Dispatch, FocusEvent, JSX, SetStateAction, useState } from 'react';
-import useWishlist from '../../../context/useWishlist';
+import { Dispatch, FocusEvent, JSX, memo, SetStateAction, useMemo, useState } from 'react';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
 import useHistory from '../../../../../hooks/useHistory';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useConfirmModal from '../../../../../hooks/useConfirmModal';
@@ -14,13 +13,13 @@ import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '..
 type WishlistItemButtonContainerProps = {
   wishlistItem: WishlistItemType;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
+  setWishlistItems: Dispatch<SetStateAction<WishlistItemType[]>>;
 };
 
-export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing }: WishlistItemButtonContainerProps): JSX.Element {
-  const { wishlistId, setWishlistItems } = useWishlist();
-
+export default memo(WishlistItemButtonContainer);
+function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistItems }: WishlistItemButtonContainerProps): JSX.Element {
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
-  const [updatingPurchaseStatus, setUpdatingPurchaseState] = useState<boolean>(false);
+  const [updatingPurchaseStatus, setUpdatingPurchaseStatus] = useState<boolean>(false);
 
   const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
@@ -29,8 +28,12 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
   const { displayPopupMessage } = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
+  // workaround to avoid consuming WishlistProvider
+  const locationParams = useParams();
+  const wishlistId = useMemo(() => locationParams.wishlistId, [locationParams]) as string;
+
   async function setWishlistItemIsPurchased(): Promise<void> {
-    setUpdatingPurchaseState(true);
+    setUpdatingPurchaseStatus(true);
 
     try {
       await setWishlistItemIsPurchasedService({ wishlistId, itemId: wishlistItem.item_id, newPurchaseStatus: !wishlistItem.is_purchased });
@@ -42,6 +45,7 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
 
           return {
             ...item,
+            tags: [...item.tags],
             is_purchased: !wishlistItem.is_purchased,
           };
         })
@@ -70,7 +74,7 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
 
       setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
     } finally {
-      setUpdatingPurchaseState(false);
+      setUpdatingPurchaseStatus(false);
     }
   }
 
@@ -142,41 +146,43 @@ export default function WishlistItemButtonContainer({ wishlistItem, setIsEditing
         </button>
       )}
 
-      <div className={`absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
-        <button
-          type='button'
-          className='context-menu-btn'
-          onClick={() => {
-            setMenuIsOpen(false);
-            setIsEditing(true);
-          }}
-        >
-          Edit
-        </button>
+      {menuIsOpen && (
+        <div className='absolute block top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny'>
+          <button
+            type='button'
+            className='context-menu-btn'
+            onClick={() => {
+              setMenuIsOpen(false);
+              setIsEditing(true);
+            }}
+          >
+            Edit
+          </button>
 
-        <button
-          type='button'
-          className='context-menu-btn danger'
-          onClick={() =>
-            displayConfirmModal({
-              title: 'Are you sure you want to remove this item:',
-              description: wishlistItem.title,
-              confirmBtnTitle: 'Remove item',
-              cancelBtnTitle: 'Cancel',
-              isDangerous: true,
-              onConfirm: async () => {
-                removeConfirmModal();
-                setMenuIsOpen(false);
+          <button
+            type='button'
+            className='context-menu-btn danger'
+            onClick={() =>
+              displayConfirmModal({
+                title: 'Are you sure you want to remove this item:',
+                description: wishlistItem.title,
+                confirmBtnTitle: 'Remove item',
+                cancelBtnTitle: 'Cancel',
+                isDangerous: true,
+                onConfirm: async () => {
+                  removeConfirmModal();
+                  setMenuIsOpen(false);
 
-                await removeWishlistItem();
-              },
-              onCancel: removeConfirmModal,
-            })
-          }
-        >
-          Remove
-        </button>
-      </div>
+                  await removeWishlistItem();
+                },
+                onCancel: removeConfirmModal,
+              })
+            }
+          >
+            Remove
+          </button>
+        </div>
+      )}
     </div>
   );
 }

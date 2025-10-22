@@ -12,33 +12,44 @@ export default function AccountVerification(): JSX.Element {
   const publicAccountId: string | null = urlSearchParams.get('publicAccountId');
   const verificationToken: string | null = urlSearchParams.get('verificationToken');
 
-  const renderedJsx: JSX.Element = determineRenderedJsx(publicAccountId, verificationToken);
-
   return (
     <>
       <Head title='Account Verification - Muninnfy' />
 
       <section className='py-4 h-available flex justify-center items-center'>
         <Container>
-          <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>{renderedJsx}</div>
+          <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
+            {
+              <AccountVerificationChildren
+                publicAccountId={publicAccountId}
+                verificationToken={verificationToken}
+              />
+            }
+          </div>
         </Container>
       </section>
     </>
   );
 }
 
-function determineRenderedJsx(publicAccountId: string | null, verificationToken: string | null): JSX.Element {
-  if (publicAccountId) {
-    // verificationToken on its own is not useful and will be ignored
-    return verificationToken ? (
-      <ConfirmAccountVerification
-        publicAccountId={publicAccountId}
-        verificationToken={verificationToken}
-      />
-    ) : (
-      <ResendAccountVerificationEmail publicAccountId={publicAccountId} />
-    );
+type AccountVerificationChildrenProps = {
+  publicAccountId: string | null;
+  verificationToken: string | null;
+};
+
+function AccountVerificationChildren({ publicAccountId, verificationToken }: AccountVerificationChildrenProps): JSX.Element {
+  if (!publicAccountId) {
+    return <ContinueAccountVerificationForm />;
   }
 
-  return <ContinueAccountVerificationForm />;
+  if (!verificationToken) {
+    return <ResendAccountVerificationEmail publicAccountId={publicAccountId} />;
+  }
+
+  return (
+    <ConfirmAccountVerification
+      publicAccountId={publicAccountId}
+      verificationToken={verificationToken}
+    />
+  );
 }

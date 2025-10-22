@@ -1,13 +1,13 @@
 import { FocusEvent, JSX, useState } from 'react';
 import SortIcon from '../../../../assets/svg/SortIcon.svg?react';
-import useWishlist from '../../context/useWishlist';
-import { ItemsSortingMode } from '../../context/WishlistContext';
+import { ItemsSortingMode } from '../../contexts/WishlistContext';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
+import useWishlistItems from '../../hooks/useWishlistItems';
 
 export default function WishlistItemsToolbarSort(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { itemsSortingMode, setItemsSortingMode } = useWishlist();
+  const { itemsSortingMode, setItemsSortingMode } = useWishlistItems();
   const { displayPopupMessage } = usePopupMessage();
 
   function sortWishlistItems(sortingMode: ItemsSortingMode): void {

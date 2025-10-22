@@ -8,7 +8,7 @@ import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import DefaultFormGroup from '../../../../components/DefaultFormGroup/DefaultFormGroup';
 import { validateWishlistTitle } from '../../../../utils/validation/wishlistValidation';
 import Button from '../../../../components/Button/Button';
-import useWishlist from '../../context/useWishlist';
+import useWishlist from '../../hooks/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export default function EditWishlistTitleForm(): JSX.Element {
@@ -54,6 +54,11 @@ export default function EditWishlistTitleForm(): JSX.Element {
 
       if (status === 404) {
         navigate(referrerLocation || '/account');
+        return;
+      }
+
+      if (status === 409) {
+        setTitleErrorMessage(errMessage);
         return;
       }
 

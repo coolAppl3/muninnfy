@@ -7,13 +7,13 @@ import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';
 import WishlistItemsToolbarView from './components/WishlistItemsToolbarView';
 import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilters/WishlistItemsToolbarFilters';
 import { debounce } from '../../../utils/debounce';
-import useWishlist from '../context/useWishlist';
+import useWishlistItems from '../hooks/useWishlistItems';
 
 export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
-  const { setItemsFilterConfig, setWishlistItemsLoading } = useWishlist();
+  const { setItemsFilterConfig } = useWishlistItems();
 
   const debounceSetTitleQuery: (query: string) => void = useMemo(
     () =>
@@ -22,10 +22,8 @@ export default function WishlistItemsToolbar(): JSX.Element {
           ...prev,
           titleQuery: query,
         }));
-
-        setWishlistItemsLoading(false);
-      }, 300),
-    [setItemsFilterConfig, setWishlistItemsLoading]
+      }, 200),
+    [setItemsFilterConfig]
   );
 
   return (
@@ -65,7 +63,6 @@ export default function WishlistItemsToolbar(): JSX.Element {
             const newValue: string = e.target.value;
             setValue(newValue);
 
-            setWishlistItemsLoading(true);
             debounceSetTitleQuery(newValue.toLowerCase());
           }}
         />
