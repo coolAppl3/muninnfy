@@ -45,7 +45,6 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
 
           return {
             ...item,
-            tags: [...item.tags],
             is_purchased: !wishlistItem.is_purchased,
           };
         })
