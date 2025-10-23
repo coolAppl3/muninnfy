@@ -205,7 +205,10 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const existingWishlistItem = errResData.existingWishlistItem as WishlistItemType;
     const itemExists: boolean = wishlistItems.some((item: WishlistItemType) => item.item_id === existingWishlistItem.item_id);
 
-    itemExists || setWishlistItems((prev) => [...prev, existingWishlistItem].sort((a, b) => b.added_on_timestamp - a.added_on_timestamp));
+    if (itemExists) {
+      setWishlistItems((prev) => [...prev, existingWishlistItem]);
+      sortWishlistItems();
+    }
   }
 
   function allFieldsValid(): boolean {
