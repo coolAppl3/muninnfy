@@ -45,9 +45,9 @@ export default function CalendarProvider({ children }: CalendarProviderProps): J
   );
 
   return (
-    <CalendarContext.Provider value={contextValue}>
+    <CalendarContext value={contextValue}>
       {children}
       {calendarMode ? <Calendar calendarMode={calendarMode} /> : null}
-    </CalendarContext.Provider>
+    </CalendarContext>
   );
 }

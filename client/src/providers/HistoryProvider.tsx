@@ -34,5 +34,5 @@ export default function HistoryProvider({ children }: HistoryProviderProps): JSX
     [referrerLocation, postAuthNavigate]
   );
 
-  return <HistoryContext.Provider value={contextValue}>{children}</HistoryContext.Provider>;
+  return <HistoryContext value={contextValue}>{children}</HistoryContext>;
 }

@@ -29,5 +29,5 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
   }, []);
 
   const contextValue: AuthContextType = useMemo(() => ({ authStatus, setAuthStatus }), [authStatus]);
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return <AuthContext value={contextValue}>{children}</AuthContext>;
 }

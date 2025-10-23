@@ -102,7 +102,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
     ]
   );
 
-  return <WishlistItemsContext.Provider value={contextValue}>{children}</WishlistItemsContext.Provider>;
+  return <WishlistItemsContext value={contextValue}>{children}</WishlistItemsContext>;
 }
 
 const defaultItemsFilterConfig: ItemsFilterConfig = {

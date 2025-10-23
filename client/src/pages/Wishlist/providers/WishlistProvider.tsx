@@ -29,5 +29,5 @@ export default function WishlistProvider({
     [wishlistId, wishlistDetails]
   );
 
-  return <WishlistContext.Provider value={contextValue}>{children}</WishlistContext.Provider>;
+  return <WishlistContext value={contextValue}>{children}</WishlistContext>;
 }

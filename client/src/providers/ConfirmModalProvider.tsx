@@ -62,10 +62,10 @@ export default function ConfirmModalProvider({ children }: ConfirmModalProviderP
   );
 
   return (
-    <ConfirmModalContext.Provider value={contextValue}>
+    <ConfirmModalContext value={contextValue}>
       {children}
 
       {isVisible && <ConfirmModal {...confirmModalState} />}
-    </ConfirmModalContext.Provider>
+    </ConfirmModalContext>
   );
 }
