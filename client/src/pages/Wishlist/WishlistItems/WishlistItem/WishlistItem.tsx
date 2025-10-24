@@ -6,7 +6,8 @@ import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import WishlistItemButtonContainer from './components/WishlistItemButtonContainer';
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 import { useWishlistItemSelected, toggleWishlistItemSelection } from '../../stores/wishlistItemsSelectionStore';
-import { toggleWishlistItemExpansion, useWishlistItemExpansion } from '../../stores/wishlistItemsExpansionStore';
+import { useWishlistItemsExpansionStore } from '../../stores/wishlistItemsExpansionStore';
+import { useShallow } from 'zustand/react/shallow';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
@@ -18,8 +19,14 @@ export default memo(WishlistItem);
 function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: WishlistItemProps): JSX.Element {
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
+  const { toggleWishlistItemExpansion, isExpanded } = useWishlistItemsExpansionStore(
+    useShallow((store) => ({
+      toggleWishlistItemExpansion: store.toggleWishlistItemsExpansion,
+      isExpanded: store.expandedItemsIdsSet.has(wishlistItem.item_id),
+    }))
+  );
+
   const isSelected: boolean = useWishlistItemSelected(wishlistItem.item_id);
-  const isExpanded: boolean = useWishlistItemExpansion(wishlistItem.item_id);
 
   if (isEditing) {
     return (

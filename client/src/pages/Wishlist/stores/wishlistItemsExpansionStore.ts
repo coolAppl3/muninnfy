@@ -1,49 +1,23 @@
-import { useSyncExternalStore } from 'react';
+import { create } from 'zustand';
 
-const expandedItemsListeners = new Set<() => void>();
-let expandedItemIdsSet = new Set<number>();
+export type WishlistItemsExpansionStoreType = {
+  expandedItemsIdsSet: Set<number>;
 
-let allItemsExpanded: boolean = false;
+  expandAllWishlistItems: (itemIdsArr: number[]) => void;
+  collapseAllWishlistItems: () => void;
+  toggleWishlistItemsExpansion: (itemId: number) => void;
+};
 
-function emit() {
-  for (const listener of expandedItemsListeners) {
-    listener();
-  }
-}
+export const useWishlistItemsExpansionStore = create<WishlistItemsExpansionStoreType>((set, get) => ({
+  expandedItemsIdsSet: new Set<number>(),
 
-function subscribe(listener: () => void) {
-  expandedItemsListeners.add(listener);
-  return () => expandedItemsListeners.delete(listener);
-}
+  expandAllWishlistItems: (itemIdsArr: number[]) => set({ expandedItemsIdsSet: new Set<number>(itemIdsArr) }),
+  collapseAllWishlistItems: () => set({ expandedItemsIdsSet: new Set<number>() }),
 
-export function toggleWishlistItemExpansion(itemId: number) {
-  const newSet = new Set<number>(expandedItemIdsSet);
-  newSet.has(itemId) ? newSet.delete(itemId) : newSet.add(itemId);
+  toggleWishlistItemsExpansion: (itemId: number) => {
+    const nextSet = new Set<number>(get().expandedItemsIdsSet);
+    nextSet.has(itemId) ? nextSet.delete(itemId) : nextSet.add(itemId);
 
-  expandedItemIdsSet = newSet;
-  emit();
-}
-
-export function expandAllWishlistItems(itemIdsArr: number[]): void {
-  expandedItemIdsSet = new Set<number>(itemIdsArr);
-  allItemsExpanded = true;
-
-  emit();
-}
-
-export function collapseAllWishlistItems(): void {
-  expandedItemIdsSet = new Set<number>();
-  allItemsExpanded = false;
-
-  emit();
-}
-
-// hooks
-
-export function useWishlistItemExpansion(itemId: number) {
-  return useSyncExternalStore(subscribe, () => expandedItemIdsSet.has(itemId));
-}
-
-export function useWishlistItemsExpansionSet(): Set<number> {
-  return useSyncExternalStore(subscribe, () => expandedItemIdsSet);
-}
+    set({ expandedItemsIdsSet: nextSet });
+  },
+}));
