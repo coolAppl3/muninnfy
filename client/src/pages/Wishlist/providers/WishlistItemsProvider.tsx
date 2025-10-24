@@ -1,4 +1,4 @@
-import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
 import WishlistItemsContext, { ItemsFilterConfig, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
@@ -52,23 +52,24 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
     [itemsFilterConfig]
   );
 
-  const sortWishlistItems = useCallback(() => {
-    if (itemsSortingMode === 'newest_first') {
-      setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
-      return;
-    }
+  const sortWishlistItems = useCallback(
+    (explicitSortingMode?: ItemsSortingMode) => {
+      const sortingMode: string = explicitSortingMode || itemsSortingMode;
 
-    if (itemsSortingMode === 'oldest_first') {
-      setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
-      return;
-    }
+      if (sortingMode === 'newest_first') {
+        setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
+        return;
+      }
 
-    setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
-  }, [itemsSortingMode]);
+      if (sortingMode === 'oldest_first') {
+        setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
+        return;
+      }
 
-  useEffect(() => {
-    sortWishlistItems();
-  }, [itemsSortingMode, sortWishlistItems]);
+      setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
+    },
+    [itemsSortingMode]
+  );
 
   const contextValue: WishlistItemsContextType = useMemo(
     () => ({

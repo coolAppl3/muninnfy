@@ -25,7 +25,7 @@ export type WishlistItemsContextType = {
 
   itemsSortingMode: ItemsSortingMode;
   setItemsSortingMode: Dispatch<SetStateAction<ItemsSortingMode>>;
-  sortWishlistItems: () => void;
+  sortWishlistItems: (explicitSortingMode?: ItemsSortingMode) => void;
 
   selectionModeActive: boolean;
   setSelectionModeActive: Dispatch<SetStateAction<boolean>>;
