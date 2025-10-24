@@ -8,7 +8,7 @@ type WishlistItemsSelectionStoreType = {
   toggleWishlistItemSelection: (itemId: number) => void;
 };
 
-export const useWishlistItemsSelectionStore = create<WishlistItemsSelectionStoreType>((set, get) => ({
+const useWishlistItemsSelectionStore = create<WishlistItemsSelectionStoreType>((set, get) => ({
   selectedItemsIdsSet: new Set<number>(),
 
   selectAllWishlistItems: (itemIdsArr: number[]) => set({ selectedItemsIdsSet: new Set<number>(itemIdsArr) }),
@@ -21,3 +21,5 @@ export const useWishlistItemsSelectionStore = create<WishlistItemsSelectionStore
     set({ selectedItemsIdsSet: nextSet });
   },
 }));
+
+export default useWishlistItemsSelectionStore;

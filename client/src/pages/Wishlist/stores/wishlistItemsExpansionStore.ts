@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type WishlistItemsExpansionStoreType = {
+type WishlistItemsExpansionStoreType = {
   expandedItemsIdsSet: Set<number>;
 
   expandAllWishlistItems: (itemIdsArr: number[]) => void;
@@ -8,7 +8,7 @@ export type WishlistItemsExpansionStoreType = {
   toggleWishlistItemsExpansion: (itemId: number) => void;
 };
 
-export const useWishlistItemsExpansionStore = create<WishlistItemsExpansionStoreType>((set, get) => ({
+const useWishlistItemsExpansionStore = create<WishlistItemsExpansionStoreType>((set, get) => ({
   expandedItemsIdsSet: new Set<number>(),
 
   expandAllWishlistItems: (itemIdsArr: number[]) => set({ expandedItemsIdsSet: new Set<number>(itemIdsArr) }),
@@ -21,3 +21,5 @@ export const useWishlistItemsExpansionStore = create<WishlistItemsExpansionStore
     set({ expandedItemsIdsSet: nextSet });
   },
 }));
+
+export default useWishlistItemsExpansionStore;

@@ -5,9 +5,9 @@ import WishlistItemForm from '../../components/WishlistItemForm';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import WishlistItemButtonContainer from './components/WishlistItemButtonContainer';
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
-import { useWishlistItemsExpansionStore } from '../../stores/wishlistItemsExpansionStore';
+import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionStore';
 import { useShallow } from 'zustand/react/shallow';
-import { useWishlistItemsSelectionStore } from '../../stores/wishlistItemsSelectionStore';
+import useWishlistItemsSelectionStore from '../../stores/wishlistItemsSelectionStore';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;

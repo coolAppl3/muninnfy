@@ -6,7 +6,7 @@ import WishlistItemTagsFormGroup from '../../../../../components/WishlistItemTag
 import useCalendar from '../../../../../hooks/useCalendar';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../../hooks/useWishlistItems';
-import { useWishlistItemsSelectionStore } from '../../../stores/wishlistItemsSelectionStore';
+import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;

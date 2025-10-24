@@ -14,7 +14,7 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../hooks/useHistory';
 import useWishlistItems from '../hooks/useWishlistItems';
 import { useShallow } from 'zustand/react/shallow';
-import { useWishlistItemsSelectionStore } from '../stores/wishlistItemsSelectionStore';
+import useWishlistItemsSelectionStore from '../stores/wishlistItemsSelectionStore';
 
 type SelectedActionType = 'mark_as_purchased' | 'mark_as_unpurchased' | 'delete';
 

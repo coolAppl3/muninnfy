@@ -3,7 +3,7 @@ import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?reac
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../hooks/useWishlistItems';
-import { useWishlistItemsExpansionStore } from '../../stores/wishlistItemsExpansionStore';
+import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionStore';
 import { useShallow } from 'zustand/react/shallow';
 
 export default function WishlistItemsToolbarOptions(): JSX.Element {
