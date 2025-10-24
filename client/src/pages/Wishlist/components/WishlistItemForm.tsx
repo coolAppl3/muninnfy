@@ -88,8 +88,8 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
     try {
       const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
-      setWishlistItems((prev) => [newWishlistItem, ...prev]);
 
+      setWishlistItems((prev) => [newWishlistItem, ...prev]);
       itemsSortingMode === 'newest_first' || sortWishlistItems();
 
       displayPopupMessage('Item added.', 'success');
