@@ -12,8 +12,9 @@ import useInfoModal from '../../../hooks/useInfoModal';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../hooks/useHistory';
-import { selectAllWishlistItems, unselectAllWishlistItems, useWishlistItemsSelectionSet } from '../stores/wishlistItemsSelectionStore';
 import useWishlistItems from '../hooks/useWishlistItems';
+import { useShallow } from 'zustand/react/shallow';
+import { useWishlistItemsSelectionStore } from '../stores/wishlistItemsSelectionStore';
 
 type SelectedActionType = 'mark_as_purchased' | 'mark_as_unpurchased' | 'delete';
 
@@ -23,6 +24,14 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const { wishlistId } = useWishlist();
   const { selectionModeActive, setSelectionModeActive, wishlistItems, setWishlistItems, itemMatchesFilterConfig } = useWishlistItems();
 
+  const { selectedItemsSet, selectAllWishlistItems, unselectAllWishlistItems } = useWishlistItemsSelectionStore(
+    useShallow((store) => ({
+      selectedItemsSet: store.selectedItemsIdsSet,
+      selectAllWishlistItems: store.selectAllWishlistItems,
+      unselectAllWishlistItems: store.unselectAllWishlistItems,
+    }))
+  );
+
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
@@ -30,14 +39,6 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const { displayPopupMessage } = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
-
-  const selectedItemsSet: Set<number> = useWishlistItemsSelectionSet();
-
-  const allItemsSelected: boolean =
-    wishlistItems.length > 0 &&
-    wishlistItems.every((item: WishlistItemType) => selectedItemsSet.has(item.item_id) || !itemMatchesFilterConfig(item));
-
-  const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
   async function bulkSetWishlistItemIsPurchased(): Promise<void> {
     if (selectedAction === 'delete') {
@@ -159,6 +160,12 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   if (!selectionModeActive) {
     return <></>;
   }
+
+  const allItemsSelected: boolean =
+    wishlistItems.length > 0 &&
+    wishlistItems.every((item: WishlistItemType) => selectedItemsSet.has(item.item_id) || !itemMatchesFilterConfig(item));
+
+  const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
   return (
     <div>

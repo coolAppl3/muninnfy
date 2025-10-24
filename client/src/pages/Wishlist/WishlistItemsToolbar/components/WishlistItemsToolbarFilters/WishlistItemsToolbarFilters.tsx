@@ -5,8 +5,8 @@ import TimeWindowContainer from '../../../../../components/TimeWindowContainer/T
 import WishlistItemTagsFormGroup from '../../../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
 import useCalendar from '../../../../../hooks/useCalendar';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import { unselectAllWishlistItems } from '../../../stores/wishlistItemsSelectionStore';
 import useWishlistItems from '../../../hooks/useWishlistItems';
+import { useWishlistItemsSelectionStore } from '../../../stores/wishlistItemsSelectionStore';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -16,6 +16,7 @@ type WishlistItemsToolbarFiltersProps = {
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
   const { itemsFilterConfig, setItemsFilterConfig } = useWishlistItems();
   const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp } = useCalendar();
+  const unselectAllWishlistItems: () => void = useWishlistItemsSelectionStore((store) => store.unselectAllWishlistItems);
 
   const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestamp);
   const [addedBeforeTimestamp, setAddedBeforeTimestamp] = useState<number | null>(endTimestamp);

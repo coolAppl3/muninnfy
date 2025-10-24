@@ -5,9 +5,9 @@ import WishlistItemForm from '../../components/WishlistItemForm';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import WishlistItemButtonContainer from './components/WishlistItemButtonContainer';
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
-import { useWishlistItemSelected, toggleWishlistItemSelection } from '../../stores/wishlistItemsSelectionStore';
 import { useWishlistItemsExpansionStore } from '../../stores/wishlistItemsExpansionStore';
 import { useShallow } from 'zustand/react/shallow';
+import { useWishlistItemsSelectionStore } from '../../stores/wishlistItemsSelectionStore';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
@@ -26,7 +26,12 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
     }))
   );
 
-  const isSelected: boolean = useWishlistItemSelected(wishlistItem.item_id);
+  const { toggleWishlistItemSelection, isSelected } = useWishlistItemsSelectionStore(
+    useShallow((store) => ({
+      toggleWishlistItemSelection: store.toggleWishlistItemSelection,
+      isSelected: store.selectedItemsIdsSet.has(wishlistItem.item_id),
+    }))
+  );
 
   if (isEditing) {
     return (
