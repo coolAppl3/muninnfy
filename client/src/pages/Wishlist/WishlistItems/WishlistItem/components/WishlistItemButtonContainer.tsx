@@ -1,4 +1,4 @@
-import { Dispatch, FocusEvent, JSX, memo, SetStateAction, useMemo, useState } from 'react';
+import { Dispatch, FocusEvent, JSX, memo, SetStateAction, useState } from 'react';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
 import useHistory from '../../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
@@ -30,7 +30,7 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
 
   // workaround to avoid consuming WishlistProvider
   const locationParams = useParams();
-  const wishlistId = useMemo(() => locationParams.wishlistId, [locationParams]) as string;
+  const wishlistId = locationParams.wishlistId as string;
 
   async function setWishlistItemIsPurchased(): Promise<void> {
     setUpdatingPurchaseStatus(true);

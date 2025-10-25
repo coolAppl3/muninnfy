@@ -1,4 +1,4 @@
-import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useState } from 'react';
 import WishlistItemsToolbarFilterItem from './components/WishlistItemsToolbarFilterItem';
 import Button from '../../../../../components/Button/Button';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
@@ -31,7 +31,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setAddedBeforeTimestamp(endTimestamp);
   }, [startTimestamp, endTimestamp]);
 
-  const changesDetected = useMemo((): boolean => {
+  function changesDetected(): boolean {
     if (addedAfterTimestamp !== itemsFilterConfig.addedAfterTimestamp) {
       return true;
     }
@@ -59,18 +59,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     }
 
     return false;
-  }, [
-    addedAfterTimestamp,
-    addedBeforeTimestamp,
-    isPurchased,
-    hasLink,
-    tagsSet,
-    itemsFilterConfig.addedAfterTimestamp,
-    itemsFilterConfig.addedBeforeTimestamp,
-    itemsFilterConfig.isPurchased,
-    itemsFilterConfig.hasLink,
-    itemsFilterConfig.tagsSet,
-  ]);
+  }
 
   function applyFilters(): void {
     unselectAllWishlistItems();
@@ -115,7 +104,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       className={`grid gap-2 bg-secondary p-2 rounded-sm shadow-simple-tiny mb-2 ${isOpen ? 'block' : 'hidden'}`}
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
-        changesDetected && applyFilters();
+        changesDetected() && applyFilters();
       }}
     >
       <h4 className='text-title'>Filters</h4>
@@ -152,7 +141,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       <div className='btn-container flex flex-col sm:flex-row justify-start items-start gap-1'>
         <Button
           className='bg-cta border-cta w-full sm:w-fit order-1 sm:order-3'
-          disabled={!changesDetected}
+          disabled={!changesDetected()}
           isSubmitBtn={true}
         >
           Apply filters

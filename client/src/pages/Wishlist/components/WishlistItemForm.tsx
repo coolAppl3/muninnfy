@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, Dispatch, FormEvent, JSX, SetStateAction, useEffect, useRef, useState } from 'react';
 import TextareaFormGroup from '../../../components/TextareaFormGroup/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
 import WishlistItemTagsFormGroup from '../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
@@ -184,15 +184,6 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     }
   }
 
-  const wishlistItemErrFieldRecord: Record<string, (errorMessage: string | null) => void> = useMemo(
-    () => ({
-      invalidTitle: setTitleErrorMessage,
-      invalidDescription: setDescriptionErrorMessage,
-      invalidLink: setLinkErrorMessage,
-    }),
-    []
-  );
-
   function handleDuplicateItemTitle(errResData: unknown): void {
     if (!errResData || typeof errResData !== 'object') {
       return;
@@ -284,6 +275,12 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
     setItemTags(new Set<string>());
   }
+
+  const wishlistItemErrFieldRecord: Record<string, Dispatch<SetStateAction<string | null>>> = {
+    invalidTitle: setTitleErrorMessage,
+    invalidDescription: setDescriptionErrorMessage,
+    invalidLink: setLinkErrorMessage,
+  };
 
   return (
     <form
