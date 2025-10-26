@@ -1,6 +1,6 @@
 import { FocusEvent, JSX, useState } from 'react';
 import SortIcon from '../../../../assets/svg/SortIcon.svg?react';
-import { ItemsSortingMode } from '../../contexts/WishlistContext';
+import { ItemsSortingMode } from '../../contexts/WishlistItemsContext';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../hooks/useWishlistItems';
 
