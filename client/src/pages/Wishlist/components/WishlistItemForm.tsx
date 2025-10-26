@@ -333,7 +333,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       <WishlistItemTagsFormGroup
         itemTags={itemTags}
         setItemTags={setItemTags}
-        label='Tags - space to add'
+        label='Tags - click space to add'
       />
 
       <TextareaFormGroup

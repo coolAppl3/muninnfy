@@ -181,7 +181,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       <WishlistItemTagsFormGroup
         itemTags={tagsSet}
         setItemTags={setTagsSet}
-        label='Tags - space to add'
+        label='Tags - click space to add'
       />
 
       <div className='btn-container flex flex-col sm:flex-row justify-start items-start gap-1'>
