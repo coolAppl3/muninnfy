@@ -10,8 +10,11 @@ type CalendarProps = {
 };
 
 export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
-  const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp, removeCalendar } = useCalendar();
+  const { calendarKey, startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap, removeCalendar } = useCalendar();
   const [renderMode, setRenderMode] = useState<'years' | 'months' | 'dates'>('years');
+
+  const startTimestamp: number | undefined = startTimestampsMap.get(calendarKey);
+  const endTimestamp: number | undefined = endTimestampsMap.get(calendarKey);
 
   const dateObject: Date = new Date();
   const [selectedYear, setSelectedYear] = useState<number>(dateObject.getFullYear());
@@ -66,7 +69,9 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
     }
 
     const timestamp: number = new Date(selectedYear, selectedMonth, newSelectedDate).getTime();
-    calendarMode === 'start' ? setStartTimestamp(timestamp) : setEndTimestamp(timestamp);
+    calendarMode === 'start'
+      ? setStartTimestampsMap((prev) => new Map<string, number>(prev).set(calendarKey, timestamp))
+      : setEndTimestampsMap((prev) => new Map<string, number>(prev).set(calendarKey, timestamp));
 
     removeConflictingTimestamp(timestamp);
     removeCalendar();
@@ -74,12 +79,22 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
 
   function removeConflictingTimestamp(timestamp: number): void {
     if (calendarMode === 'start' && endTimestamp && timestamp > endTimestamp) {
-      setEndTimestamp(null);
+      setEndTimestampsMap((prev) => {
+        const nextMap = new Map<string, number>(prev);
+        nextMap.delete(calendarKey);
+
+        return nextMap;
+      });
       return;
     }
 
     if (calendarMode === 'end' && startTimestamp && timestamp < startTimestamp) {
-      setStartTimestamp(null);
+      setStartTimestampsMap((prev) => {
+        const nextMap = new Map<string, number>(prev);
+        nextMap.delete(calendarKey);
+
+        return nextMap;
+      });
     }
   }
 

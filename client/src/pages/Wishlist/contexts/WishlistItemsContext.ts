@@ -5,6 +5,9 @@ export type ItemsFilterConfig = {
   addedAfterTimestamp: number | null;
   addedBeforeTimestamp: number | null;
 
+  purchasedAfterTimestamp: number | null;
+  purchasedBeforeTimestamp: number | null;
+
   isPurchased: boolean | null;
   hasLink: boolean | null;
 

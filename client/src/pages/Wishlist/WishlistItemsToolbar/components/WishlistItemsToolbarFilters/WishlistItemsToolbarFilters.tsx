@@ -15,11 +15,22 @@ type WishlistItemsToolbarFiltersProps = {
 
 export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
   const { itemsFilterConfig, setItemsFilterConfig } = useWishlistItems();
-  const { startTimestamp, endTimestamp, setStartTimestamp, setEndTimestamp } = useCalendar();
+  const { calendarKey, startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
   const unselectAllWishlistItems: () => void = useWishlistItemsSelectionStore((store) => store.unselectAllWishlistItems);
 
-  const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestamp);
-  const [addedBeforeTimestamp, setAddedBeforeTimestamp] = useState<number | null>(endTimestamp);
+  const addedTimestampsKey: string = 'addTimestamps';
+  const purchasedTimestampsKey: string = 'purchasedTimestamps';
+
+  const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestampsMap.get(addedTimestampsKey) || null);
+  const [addedBeforeTimestamp, setAddedBeforeTimestamp] = useState<number | null>(endTimestampsMap.get(addedTimestampsKey) || null);
+
+  const [purchasedAfterTimestamp, setPurchasedAfterTimestamp] = useState<number | null>(
+    startTimestampsMap.get(purchasedTimestampsKey) || null
+  );
+  const [purchasedBeforeTimestamp, setPurchasedBeforeTimestamp] = useState<number | null>(
+    endTimestampsMap.get(purchasedTimestampsKey) || null
+  );
+
   const [isPurchased, setIsPurchased] = useState<boolean | null>(itemsFilterConfig.isPurchased);
   const [hasLink, setHasLink] = useState<boolean | null>(itemsFilterConfig.hasLink);
   const [tagsSet, setTagsSet] = useState<Set<string>>(new Set(itemsFilterConfig.tagsSet));
@@ -27,9 +38,16 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   const { displayPopupMessage } = usePopupMessage();
 
   useEffect(() => {
-    setAddedAfterTimestamp(startTimestamp);
-    setAddedBeforeTimestamp(endTimestamp);
-  }, [startTimestamp, endTimestamp]);
+    if (calendarKey === addedTimestampsKey) {
+      setAddedAfterTimestamp(startTimestampsMap.get(addedTimestampsKey) || null);
+      setAddedBeforeTimestamp(endTimestampsMap.get(addedTimestampsKey) || null);
+
+      return;
+    }
+
+    setPurchasedAfterTimestamp(startTimestampsMap.get(purchasedTimestampsKey) || null);
+    setPurchasedBeforeTimestamp(endTimestampsMap.get(purchasedTimestampsKey) || null);
+  }, [calendarKey, startTimestampsMap, endTimestampsMap]);
 
   function changesDetected(): boolean {
     if (addedAfterTimestamp !== itemsFilterConfig.addedAfterTimestamp) {
@@ -37,6 +55,14 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     }
 
     if (addedBeforeTimestamp !== itemsFilterConfig.addedBeforeTimestamp) {
+      return true;
+    }
+
+    if (purchasedAfterTimestamp !== itemsFilterConfig.purchasedAfterTimestamp) {
+      return true;
+    }
+
+    if (purchasedBeforeTimestamp !== itemsFilterConfig.purchasedBeforeTimestamp) {
       return true;
     }
 
@@ -65,8 +91,12 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     unselectAllWishlistItems();
     setItemsFilterConfig((prev) => ({
       ...prev,
+
       addedAfterTimestamp,
       addedBeforeTimestamp,
+      purchasedAfterTimestamp,
+      purchasedBeforeTimestamp,
+
       isPurchased,
       hasLink,
       tagsSet,
@@ -80,17 +110,24 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
     setAddedAfterTimestamp(null);
     setAddedBeforeTimestamp(null);
+    setPurchasedAfterTimestamp(null);
+    setPurchasedBeforeTimestamp(null);
+
     setIsPurchased(null);
     setHasLink(null);
     setTagsSet(new Set());
 
-    setStartTimestamp(null);
-    setEndTimestamp(null);
+    setStartTimestampsMap(new Map<string, number>());
+    setEndTimestampsMap(new Map<string, number>());
 
     setItemsFilterConfig((prev) => ({
       ...prev,
+
       addedAfterTimestamp: null,
       addedBeforeTimestamp: null,
+      purchasedAfterTimestamp: null,
+      purchasedBeforeTimestamp: null,
+
       isPurchased: null,
       hasLink: null,
       tagsSet: new Set(),
@@ -128,9 +165,18 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       </div>
 
       <TimeWindowContainer
+        calendarKey={addedTimestampsKey}
         startLabel='Added after'
         endLabel='Added before'
       />
+
+      {isPurchased && (
+        <TimeWindowContainer
+          calendarKey={purchasedTimestampsKey}
+          startLabel='Purchased after'
+          endLabel='Purchased before'
+        />
+      )}
 
       <WishlistItemTagsFormGroup
         itemTags={tagsSet}

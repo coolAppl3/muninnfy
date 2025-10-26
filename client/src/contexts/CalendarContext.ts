@@ -2,13 +2,15 @@ import { createContext, Dispatch, SetStateAction } from 'react';
 
 export type CalendarMode = 'start' | 'end';
 export type CalendarContextType = {
-  startTimestamp: number | null;
-  setStartTimestamp: Dispatch<SetStateAction<number | null>>;
+  calendarKey: string;
 
-  endTimestamp: number | null;
-  setEndTimestamp: Dispatch<SetStateAction<number | null>>;
+  startTimestampsMap: Map<string, number>;
+  setStartTimestampsMap: Dispatch<SetStateAction<Map<string, number>>>;
 
-  displayCalendar: (calendarMode: CalendarMode) => void;
+  endTimestampsMap: Map<string, number>;
+  setEndTimestampsMap: Dispatch<SetStateAction<Map<string, number>>>;
+
+  displayCalendar: (calendarMode: CalendarMode, calendarKey: string) => void;
   removeCalendar: () => void;
   clearCalendar: () => void;
 };

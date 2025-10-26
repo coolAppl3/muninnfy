@@ -21,13 +21,30 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
 
   const itemMatchesFilterConfig = useCallback(
     (item: WishlistItemType): boolean => {
-      const { addedAfterTimestamp, addedBeforeTimestamp, isPurchased, hasLink, titleQuery, tagsSet } = itemsFilterConfig;
+      const {
+        addedAfterTimestamp,
+        addedBeforeTimestamp,
+        purchasedAfterTimestamp,
+        purchasedBeforeTimestamp,
+        isPurchased,
+        hasLink,
+        titleQuery,
+        tagsSet,
+      } = itemsFilterConfig;
 
       if (addedAfterTimestamp && item.added_on_timestamp < addedAfterTimestamp) {
         return false;
       }
 
       if (addedBeforeTimestamp && item.added_on_timestamp > addedBeforeTimestamp) {
+        return false;
+      }
+
+      if (purchasedAfterTimestamp && item.purchased_on_timestamp && item.purchased_on_timestamp < purchasedAfterTimestamp) {
+        return false;
+      }
+
+      if (purchasedBeforeTimestamp && item.purchased_on_timestamp && item.purchased_on_timestamp > purchasedBeforeTimestamp) {
         return false;
       }
 
@@ -109,6 +126,9 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
 const defaultItemsFilterConfig: ItemsFilterConfig = {
   addedAfterTimestamp: null,
   addedBeforeTimestamp: null,
+
+  purchasedAfterTimestamp: null,
+  purchasedBeforeTimestamp: null,
 
   isPurchased: null,
   hasLink: null,
