@@ -12,9 +12,7 @@ type CheckboxFormGroupProps = {
 export default function CheckboxFormGroup({ label, id, isChecked, onClick, className }: CheckboxFormGroupProps): JSX.Element {
   return (
     <div
-      className={`asd flex justify-start items-center gap-1 relative transition-[filter] hover:brightness-75 max-w-fit ${
-        className ? className : ''
-      }`}
+      className={`asd flex justify-start items-center gap-1 relative transition-[filter] hover:brightness-75 max-w-fit ${className || ''}`}
     >
       <button
         type='button'

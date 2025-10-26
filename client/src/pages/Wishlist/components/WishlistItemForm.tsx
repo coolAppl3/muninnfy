@@ -284,7 +284,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
   return (
     <form
-      className={`px-2 grid gap-2 overflow-hidden relative z-0 ${className ? className : ''}`}
+      className={`px-2 grid gap-2 overflow-hidden relative z-0 ${className || ''}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
