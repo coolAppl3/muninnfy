@@ -303,7 +303,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     >
       <DefaultFormGroup
         id='item-title'
-        label='Title'
+        label='Title (required)'
         autoComplete='off'
         ref={formMode === 'NEW_ITEM' ? titleInputRef : null}
         value={titleValue}
@@ -318,7 +318,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
       <DefaultFormGroup
         id='item-link'
-        label='Link (optional)'
+        label='Link'
         autoComplete='off'
         value={linkValue}
         errorMessage={linkErrorMessage}
@@ -333,12 +333,12 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       <WishlistItemTagsFormGroup
         itemTags={itemTags}
         setItemTags={setItemTags}
-        label='Tags (optional) - space to add'
+        label='Tags - space to add'
       />
 
       <TextareaFormGroup
         id='item-description'
-        label='Description (optional)'
+        label='Description'
         value={descriptionValue}
         errorMessage={descriptionErrorMessage}
         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
