@@ -88,6 +88,10 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
             <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
               <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
 
+              {wishlistItem.purchased_on_timestamp && (
+                <p className='mb-1'>Purchased: {getShortenedDateString(wishlistItem.purchased_on_timestamp)}</p>
+              )}
+
               <p>
                 Link:{' '}
                 {wishlistItem.link ? (
