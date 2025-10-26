@@ -50,15 +50,15 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
       return;
     }
 
-    const newPurchaseStatus: boolean = selectedAction === 'mark_as_purchased' ? true : false;
+    const markAsPurchased: boolean = selectedAction === 'mark_as_purchased' ? true : false;
     const expectedUpdatesCount: number = selectedItemsSet.size;
 
     displayLoadingOverlay();
 
     try {
-      const updatedItemsCount: number = (
-        await bulkSetWishlistItemIsPurchasedService({ wishlistId, itemsIdArr: [...selectedItemsSet], newPurchaseStatus })
-      ).data.updatedItemsCount;
+      const { newPurchasedOnTimestamp, updatedItemsCount } = (
+        await bulkSetWishlistItemIsPurchasedService({ wishlistId, itemsIdArr: [...selectedItemsSet], markAsPurchased })
+      ).data;
 
       if (updatedItemsCount === 0) {
         displayPopupMessage('Something went wrong.', 'error');
@@ -66,7 +66,9 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
       }
 
       setWishlistItems((prev) =>
-        prev.map((item: WishlistItemType) => (selectedItemsSet.has(item.item_id) ? { ...item, is_purchased: newPurchaseStatus } : item))
+        prev.map((item: WishlistItemType) =>
+          selectedItemsSet.has(item.item_id) ? { ...item, purchased_on_timestamp: newPurchasedOnTimestamp } : item
+        )
       );
 
       setSelectionModeActive(false);

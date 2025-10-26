@@ -36,7 +36,14 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
     setUpdatingPurchaseStatus(true);
 
     try {
-      await setWishlistItemIsPurchasedService({ wishlistId, itemId: wishlistItem.item_id, newPurchaseStatus: !wishlistItem.is_purchased });
+      const newPurchasedOnTimestamp: number | null = (
+        await setWishlistItemIsPurchasedService({
+          wishlistId,
+          itemId: wishlistItem.item_id,
+          markAsPurchased: !Boolean(wishlistItem.purchased_on_timestamp),
+        })
+      ).data.newPurchasedOnTimestamp;
+
       setWishlistItems((prev) =>
         prev.map((item: WishlistItemType) => {
           if (item.item_id !== wishlistItem.item_id) {
@@ -45,7 +52,7 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
 
           return {
             ...item,
-            is_purchased: !wishlistItem.is_purchased,
+            purchased_on_timestamp: newPurchasedOnTimestamp,
           };
         })
       );
@@ -135,10 +142,10 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
         <button
           type='button'
           className={`p-1 rounded-[50%] transition-colors cursor-pointer  ${
-            wishlistItem.is_purchased ? 'bg-cta hover:bg-cta/75' : 'bg-light/50 hover:bg-light'
+            wishlistItem.purchased_on_timestamp ? 'bg-cta hover:bg-cta/75' : 'bg-light/50 hover:bg-light'
           }`}
-          title={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'unpurchased'}`}
-          aria-label={`Mark as ${wishlistItem.is_purchased ? 'purchased' : 'unpurchased'}`}
+          title={`Mark as ${wishlistItem.purchased_on_timestamp ? 'purchased' : 'unpurchased'}`}
+          aria-label={`Mark as ${wishlistItem.purchased_on_timestamp ? 'purchased' : 'unpurchased'}`}
           onClick={async () => await setWishlistItemIsPurchased()}
         >
           <CheckIcon className='w-[1.6rem] h-[1.6rem] text-dark' />

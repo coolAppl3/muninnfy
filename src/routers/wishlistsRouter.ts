@@ -12,6 +12,7 @@ import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
 import { MappedWishlistItem } from './wishlistItemsRouter';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
+import { WishlistItem } from '../db/helpers/wishlistItemsDbHelpers';
 
 export const wishlistsRouter: Router = express.Router();
 
@@ -175,17 +176,6 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       return;
     }
 
-    type WishlistItem = {
-      item_id: number;
-      added_on_timestamp: number;
-      title: string;
-      description: string | null;
-      link: string | null;
-      is_purchased: boolean;
-      tag_id: number;
-      tag_name: string;
-    };
-
     const [wishlistItems] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         wishlist_items.item_id,
@@ -193,7 +183,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
         wishlist_items.title,
         wishlist_items.description,
         wishlist_items.link,
-        wishlist_items.is_purchased,
+        wishlist_items.purchased_on_timestamp,
         wishlist_item_tags.tag_id,
         wishlist_item_tags.tag_name
       FROM 

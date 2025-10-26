@@ -70,7 +70,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
           className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-all hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden ${
             isExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
           } ${
-            wishlistItem.is_purchased
+            wishlistItem.purchased_on_timestamp
               ? 'after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1'
               : ''
           }`}

@@ -31,7 +31,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return false;
       }
 
-      if (isPurchased !== null && item.is_purchased !== isPurchased) {
+      if (isPurchased !== null && Boolean(item.purchased_on_timestamp) !== isPurchased) {
         return false;
       }
 
