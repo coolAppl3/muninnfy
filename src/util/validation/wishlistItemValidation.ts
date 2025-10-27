@@ -42,7 +42,12 @@ export function isValidWishlistItemPrice(value: any): boolean {
   }
 
   const decimalPortion: string | undefined = value.toString().split('.')[1];
-  if (!decimalPortion || decimalPortion.length > 2) {
+
+  if (decimalPortion === undefined) {
+    return true;
+  }
+
+  if (decimalPortion.length === 0 || decimalPortion.length > 2) {
     return false;
   }
 

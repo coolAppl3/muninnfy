@@ -68,11 +68,6 @@ export function validateWishlistItemPrice(value: string): string | null {
     return null;
   }
 
-  const decimalPortion: string | undefined = value.toString().split('.')[1];
-  if (!decimalPortion || decimalPortion.length > 2) {
-    return `Price can't exceed 2 decimal places.`;
-  }
-
   const valueAsNumber: number = +value;
 
   if (Number.isNaN(+value)) {
@@ -85,6 +80,20 @@ export function validateWishlistItemPrice(value: string): string | null {
 
   if (valueAsNumber > WISHLIST_ITEM_MAX_PRICE) {
     return `Maximum can't exceed 99,999,999.99.`;
+  }
+
+  const decimalPortion: string | undefined = value.toString().split('.')[1];
+
+  if (decimalPortion === undefined) {
+    return null;
+  }
+
+  if (decimalPortion.length === 0) {
+    return 'Price must be a valid number.';
+  }
+
+  if (decimalPortion.length > 2) {
+    return `Price can't exceed 2 decimal places.`;
   }
 
   return null;
