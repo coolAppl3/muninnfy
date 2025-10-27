@@ -6,6 +6,7 @@ import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGr
 import {
   validateWishlistItemDescription,
   validateWishlistItemLink,
+  validateWishlistItemPrice,
   validateWishlistItemTitle,
 } from '../../../utils/validation/wishlistItemValidation';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
@@ -34,11 +35,14 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   const [titleValue, setTitleValue] = useState<string>(wishlistItem?.title || '');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
-  const [descriptionValue, setDescriptionValue] = useState<string>(wishlistItem?.description || '');
-  const [descriptionErrorMessage, setDescriptionErrorMessage] = useState<string | null>(null);
+  const [priceValue, setPriceValue] = useState<string>(wishlistItem?.price?.toString() || '');
+  const [priceErrorMessage, setPriceErrorMessage] = useState<string | null>(null);
 
   const [linkValue, setLinkValue] = useState<string>(wishlistItem?.link || '');
   const [linkErrorMessage, setLinkErrorMessage] = useState<string | null>(null);
+
+  const [descriptionValue, setDescriptionValue] = useState<string>(wishlistItem?.description || '');
+  const [descriptionErrorMessage, setDescriptionErrorMessage] = useState<string | null>(null);
 
   const [itemTags, setItemTags] = useState<Set<string>>(new Set<string>(wishlistItem?.tags.map(({ name }) => name) || []));
 
@@ -84,10 +88,11 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const title: string = titleValue;
     const description: string | null = descriptionValue || null;
     const link: string | null = linkValue || null;
+    const price: number | null = priceValue.length === 0 ? null : +priceValue;
     const tags: string[] = [...itemTags];
 
     try {
-      const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
+      const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, price, tags })).data;
 
       setWishlistItems((prev) => [newWishlistItem, ...prev]);
       itemsSortingMode === 'newest_first' || sortWishlistItems();
@@ -134,11 +139,13 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const title: string = titleValue;
     const description: string | null = descriptionValue || null;
     const link: string | null = linkValue || null;
+    const price: number | null = priceValue.length === 0 ? null : +priceValue;
     const tags: string[] = [...itemTags];
 
     try {
-      const updatedWishlistItem: WishlistItemType = (await editWishlistItemService({ wishlistId, itemId, title, description, link, tags }))
-        .data;
+      const updatedWishlistItem: WishlistItemType = (
+        await editWishlistItemService({ wishlistId, itemId, title, description, link, price, tags })
+      ).data;
 
       setWishlistItems((prev) =>
         prev.map((item: WishlistItemType) => {
@@ -212,7 +219,10 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const newLinkErrorMessage: string | null = validateWishlistItemLink(linkValue);
     setLinkErrorMessage(newLinkErrorMessage);
 
-    for (const errorMessage of [newTitleErrorMessage, newDescriptionErrorMessage, newLinkErrorMessage]) {
+    const newPriceErrorMessage: string | null = validateWishlistItemPrice(priceValue);
+    setPriceErrorMessage(newPriceErrorMessage);
+
+    for (const errorMessage of [newTitleErrorMessage, newDescriptionErrorMessage, newLinkErrorMessage, priceErrorMessage]) {
       if (errorMessage) {
         displayPopupMessage(errorMessage, 'error');
         return false;
@@ -250,6 +260,10 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       return true;
     }
 
+    if (priceValue !== wishlistItem.price) {
+      return true;
+    }
+
     if (itemTags.size !== wishlistItem.tags.length) {
       return true;
     }
@@ -273,6 +287,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     setLinkValue('');
     setLinkErrorMessage(null);
 
+    setPriceValue('');
+    setPriceErrorMessage(null);
+
     setItemTags(new Set<string>());
   }
 
@@ -280,6 +297,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     invalidTitle: setTitleErrorMessage,
     invalidDescription: setDescriptionErrorMessage,
     invalidLink: setLinkErrorMessage,
+    invalidPrice: setPriceErrorMessage,
   };
 
   return (
@@ -313,6 +331,20 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
           setTitleValue(newValue);
           setTitleErrorMessage(validateWishlistItemTitle(newValue));
+        }}
+      />
+
+      <DefaultFormGroup
+        id='item-price'
+        label='Price'
+        autoComplete='off'
+        value={priceValue}
+        errorMessage={priceErrorMessage}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          const newValue: string = e.target.value;
+
+          setPriceValue(newValue);
+          setPriceErrorMessage(validateWishlistItemPrice(newValue));
         }}
       />
 

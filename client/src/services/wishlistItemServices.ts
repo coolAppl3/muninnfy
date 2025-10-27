@@ -10,6 +10,7 @@ type AddWishlistItemServicePayload = {
   title: string;
   description: string | null;
   link: string | null;
+  price: number | null;
   tags: string[];
 };
 
@@ -23,6 +24,7 @@ type EditWishlistItemServicePayload = {
   title: string;
   description: string | null;
   link: string | null;
+  price: number | null;
   tags: string[];
 };
 
