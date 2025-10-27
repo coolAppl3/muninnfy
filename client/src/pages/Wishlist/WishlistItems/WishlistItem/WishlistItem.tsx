@@ -92,9 +92,9 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
             <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
               <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
 
-              {wishlistItem.purchased_on_timestamp && (
-                <p className='mb-1'>Purchased: {getShortenedDateString(wishlistItem.purchased_on_timestamp)}</p>
-              )}
+              {wishlistItem.purchased_on_timestamp && <p>Purchased: {getShortenedDateString(wishlistItem.purchased_on_timestamp)}</p>}
+
+              {wishlistItem.price && <p> Price: {getCurrencyFormatting(wishlistItem.price)}</p>}
 
               {wishlistItem.link && (
                 <p>
@@ -108,8 +108,6 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
                   </a>
                 </p>
               )}
-
-              {wishlistItem.price && <p> Price: {getCurrencyFormatting(wishlistItem.price)}</p>}
             </div>
 
             {wishlistItem.tags.length > 0 && (
