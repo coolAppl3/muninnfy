@@ -183,6 +183,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
         wishlist_items.title,
         wishlist_items.description,
         wishlist_items.link,
+        wishlist_items.price,
         wishlist_items.purchased_on_timestamp,
         wishlist_item_tags.tag_id,
         wishlist_item_tags.tag_name

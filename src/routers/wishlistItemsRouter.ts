@@ -4,6 +4,7 @@ import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import {
   isValidWishlistItemDescription,
   isValidWishlistItemLink,
+  isValidWishlistItemPrice,
   isValidWishlistItemTitle,
 } from '../util/validation/wishlistItemValidation';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
@@ -26,6 +27,7 @@ export type MappedWishlistItem = {
   title: string;
   description: string | null;
   link: string | null;
+  price: number | null;
   purchased_on_timestamp: number | null;
   tags: {
     id: number;
@@ -45,18 +47,19 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     title: string;
     description: string | null;
     link: string | null;
+    price: number | null;
     tags: string[];
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'title', 'description', 'link', 'tags'];
+  const expectedKeys: string[] = ['wishlistId', 'title', 'description', 'link', 'price', 'tags'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { wishlistId, title, description, link, tags } = requestData;
+  const { wishlistId, title, description, link, price, tags } = requestData;
 
   if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
@@ -75,6 +78,11 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
   if (link && !isValidWishlistItemLink(link)) {
     res.status(400).json({ message: 'Invalid link.', reason: 'invalidLink' });
+    return;
+  }
+
+  if (price && !isValidWishlistItemPrice(price)) {
+    res.status(400).json({ message: 'Invalid price.', reason: 'invalidPrice' });
     return;
   }
 
@@ -126,9 +134,10 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
         title,
         description,
         link,
+        price,
         purchased_on_timestamp
-      ) VALUES (${generatePlaceHolders(6)});`,
-      [wishlistId, currentTimestamp, title, description, link, null]
+      ) VALUES (${generatePlaceHolders(7)});`,
+      [wishlistId, currentTimestamp, title, description, link, price, null]
     );
 
     const itemId: number = resultSetHeader.insertId;
@@ -160,8 +169,9 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       title,
       description,
       link,
+      price,
       purchased_on_timestamp: null,
-      tags: [...(itemTags as Tag[])],
+      tags: itemTags as Tag[],
     };
 
     await connection.commit();
@@ -220,18 +230,19 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     title: string;
     description: string | null;
     link: string | null;
+    price: number | null;
     tags: string[];
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'itemId', 'title', 'description', 'link', 'tags'];
+  const expectedKeys: string[] = ['wishlistId', 'itemId', 'title', 'description', 'link', 'price', 'tags'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { wishlistId, itemId, title, description, link, tags } = requestData;
+  const { wishlistId, itemId, title, description, link, price, tags } = requestData;
 
   if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
@@ -255,6 +266,11 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
   if (link && !isValidWishlistItemLink(link)) {
     res.status(400).json({ message: 'Invalid link.', reason: 'invalidLink' });
+    return;
+  }
+
+  if (price && !isValidWishlistItemPrice(price)) {
+    res.status(400).json({ message: 'Invalid price.', reason: 'invalidPrice' });
     return;
   }
 
@@ -313,10 +329,11 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       SET
         title = ?,
         description = ?,
-        link = ?
+        link = ?,
+        price = ?
       WHERE
         item_id = ?;`,
-      [title, description, link, itemId]
+      [title, description, link, price, itemId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
@@ -368,6 +385,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       title,
       description,
       link,
+      price,
       purchased_on_timestamp: wishlistItemDetails.purchased_on_timestamp,
       tags: itemTags as Tag[],
     };
