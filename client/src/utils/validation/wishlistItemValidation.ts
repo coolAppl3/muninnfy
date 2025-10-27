@@ -1,3 +1,5 @@
+import { WISHLIST_ITEM_MAX_PRICE } from '../constants/wishlistItemConstants';
+
 export function validateWishlistItemTitle(value: string): string | null {
   if (value === '') {
     return 'A valid item title is required.';
@@ -56,6 +58,33 @@ export function validateWishlistItemLink(value: string): string | null {
   const regex: RegExp = /^(https?:\/\/)?[^\s]{1,2000}$/i;
   if (!regex.test(value)) {
     return 'Invalid link.';
+  }
+
+  return null;
+}
+
+export function validateWishlistItemPrice(value: string): string | null {
+  if (value === '') {
+    return null;
+  }
+
+  const decimalPortion: string | undefined = value.toString().split('.')[1];
+  if (!decimalPortion || decimalPortion.length > 2) {
+    return `Price can't exceed 2 decimal places.`;
+  }
+
+  const valueAsNumber: number = +value;
+
+  if (Number.isNaN(+value)) {
+    return 'Price must be a valid number.';
+  }
+
+  if (valueAsNumber < 0) {
+    return `Price can't be negative.`;
+  }
+
+  if (valueAsNumber > WISHLIST_ITEM_MAX_PRICE) {
+    return `Maximum can't exceed 99,999,999.99.`;
   }
 
   return null;
