@@ -33,6 +33,10 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
     }))
   );
 
+  function getCurrencyFormatting(price: number): string {
+    return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
   if (isEditing) {
     return (
       <div className='py-2 bg-secondary rounded-sm shadow-simple-tiny'>
@@ -92,9 +96,9 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
                 <p className='mb-1'>Purchased: {getShortenedDateString(wishlistItem.purchased_on_timestamp)}</p>
               )}
 
-              <p>
-                Link:{' '}
-                {wishlistItem.link ? (
+              {wishlistItem.link && (
+                <p>
+                  Link:{' '}
                   <a
                     href={/^https?:\/\//.test(wishlistItem.link) ? wishlistItem.link : `https://${wishlistItem.link}`}
                     target='_blank'
@@ -102,10 +106,10 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
                   >
                     {wishlistItem.link}
                   </a>
-                ) : (
-                  <span className='brightness-75'>None</span>
-                )}
-              </p>
+                </p>
+              )}
+
+              {wishlistItem.price && <p> Price: {getCurrencyFormatting(wishlistItem.price)}</p>}
             </div>
 
             {wishlistItem.tags.length > 0 && (
