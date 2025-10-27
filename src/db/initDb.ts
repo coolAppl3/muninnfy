@@ -174,6 +174,7 @@ async function createWishlistItemsTable(): Promise<void> {
         title VARCHAR(100) NOT NULL,
         description VARCHAR(600),
         link VARCHAR(2048),
+        price DECIMAL(10, 2) UNSIGNED,
         purchased_on_timestamp BIGINT UNSIGNED,
         FOREIGN KEY (wishlist_id) REFERENCES wishlists(wishlist_id) ON DELETE CASCADE,
         UNIQUE(title, wishlist_id)
