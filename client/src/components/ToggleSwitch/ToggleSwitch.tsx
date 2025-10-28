@@ -13,11 +13,11 @@ export default function ToggleSwitch({ isToggled, setIsToggled, className }: Tog
       title={isToggled ? 'Disable' : 'Enable'}
       aria-label={isToggled ? 'Disable' : 'Enable'}
       onClick={() => setIsToggled((prev) => !prev)}
-      className={`flex justify-start items-center h-[1.4rem] w-4 rounded-pill cursor-pointer hover:brightness-75 transition-all ${
+      className={`flex justify-start items-center h-[1.6rem] w-[3.8rem] rounded-pill cursor-pointer hover:brightness-75 transition-all ${
         isToggled ? 'bg-cta/30 brightness-100' : 'bg-dark brightness-50'
       } ${className || ''}`}
     >
-      <div className={`h-2 w-2 bg-cta rounded-[50%] transition-transform ${isToggled ? 'translate-x-full' : ''}`}></div>
+      <div className={`h-[1.6rem] w-[1.6rem] bg-cta rounded-[50%] transition-transform ${isToggled ? 'translate-x-[2.2rem]' : ''}`}></div>
     </button>
   );
 }
