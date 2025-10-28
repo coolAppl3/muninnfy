@@ -58,6 +58,22 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
 
         <button
           type='button'
+          className={`context-menu-btn ${itemsSortingMode === 'cheapest_first' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('cheapest_first')}
+        >
+          Sort by cheapest
+        </button>
+
+        <button
+          type='button'
+          className={`context-menu-btn ${itemsSortingMode === 'priciest_first' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('priciest_first')}
+        >
+          Sort by priciest
+        </button>
+
+        <button
+          type='button'
           className={`context-menu-btn ${itemsSortingMode === 'lexicographical' ? 'text-cta' : ''}`}
           onClick={() => handleSortBtnClick('lexicographical')}
         >

@@ -76,7 +76,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
 
   const sortWishlistItems = useCallback(
     (explicitSortingMode?: ItemsSortingMode) => {
-      const sortingMode: string = explicitSortingMode || itemsSortingMode;
+      const sortingMode: ItemsSortingMode = explicitSortingMode || itemsSortingMode;
 
       if (sortingMode === 'newest_first') {
         setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
@@ -85,6 +85,16 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
 
       if (sortingMode === 'oldest_first') {
         setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
+        return;
+      }
+
+      if (sortingMode === 'cheapest_first') {
+        setWishlistItems((prev) => prev.toSorted((a, b) => (a.price || 0) - (b.price || 0)));
+        return;
+      }
+
+      if (sortingMode === 'priciest_first') {
+        setWishlistItems((prev) => prev.toSorted((a, b) => (b.price || 0) - (a.price || 0)));
         return;
       }
 
