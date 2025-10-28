@@ -94,7 +94,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
 
               {wishlistItem.purchased_on_timestamp && <p>Purchased: {getShortenedDateString(wishlistItem.purchased_on_timestamp)}</p>}
 
-              {wishlistItem.price && <p> Price: {getCurrencyFormatting(wishlistItem.price)}</p>}
+              {wishlistItem.price === null ? null : <p> Price: {getCurrencyFormatting(wishlistItem.price)}</p>}
 
               {wishlistItem.link && (
                 <p>
