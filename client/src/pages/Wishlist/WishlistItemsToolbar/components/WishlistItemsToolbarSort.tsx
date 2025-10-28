@@ -45,7 +45,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
           className={`context-menu-btn ${itemsSortingMode === 'newest_first' ? 'text-cta' : ''}`}
           onClick={() => handleSortBtnClick('newest_first')}
         >
-          Sort by newest
+          Newest first
         </button>
 
         <button
@@ -53,7 +53,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
           className={`context-menu-btn ${itemsSortingMode === 'oldest_first' ? 'text-cta' : ''}`}
           onClick={() => handleSortBtnClick('oldest_first')}
         >
-          Sort by oldest
+          Oldest first
         </button>
 
         <button
@@ -61,7 +61,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
           className={`context-menu-btn ${itemsSortingMode === 'cheapest_first' ? 'text-cta' : ''}`}
           onClick={() => handleSortBtnClick('cheapest_first')}
         >
-          Sort by cheapest
+          Cheapest first
         </button>
 
         <button
@@ -69,7 +69,7 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
           className={`context-menu-btn ${itemsSortingMode === 'priciest_first' ? 'text-cta' : ''}`}
           onClick={() => handleSortBtnClick('priciest_first')}
         >
-          Sort by priciest
+          Priciest first
         </button>
 
         <button
