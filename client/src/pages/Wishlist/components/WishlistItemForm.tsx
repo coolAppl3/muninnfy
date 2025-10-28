@@ -147,15 +147,8 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
         await editWishlistItemService({ wishlistId, itemId, title, description, link, price, tags })
       ).data;
 
-      setWishlistItems((prev) =>
-        prev.map((item: WishlistItemType) => {
-          if (item.item_id !== itemId) {
-            return item;
-          }
-
-          return updatedWishlistItem;
-        })
-      );
+      setWishlistItems((prev) => prev.map((item: WishlistItemType) => (item.item_id === itemId ? updatedWishlistItem : item)));
+      sortWishlistItems();
 
       displayPopupMessage('Item updated.', 'success');
       onFinish();
