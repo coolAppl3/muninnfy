@@ -10,6 +10,7 @@ export type ItemsFilterConfig = {
 
   isPurchased: boolean | null;
   hasLink: boolean | null;
+  hasPrice: boolean | null;
 
   titleQuery: string;
   tagsSet: Set<string>;

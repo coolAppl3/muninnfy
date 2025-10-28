@@ -33,6 +33,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
   const [isPurchased, setIsPurchased] = useState<boolean | null>(itemsFilterConfig.isPurchased);
   const [hasLink, setHasLink] = useState<boolean | null>(itemsFilterConfig.hasLink);
+  const [hasPrice, setHasPrice] = useState<boolean | null>(itemsFilterConfig.hasPrice);
   const [tagsSet, setTagsSet] = useState<Set<string>>(new Set(itemsFilterConfig.tagsSet));
 
   const { displayPopupMessage } = usePopupMessage();
@@ -74,6 +75,10 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       return true;
     }
 
+    if (hasPrice !== itemsFilterConfig.hasPrice) {
+      return true;
+    }
+
     if (tagsSet.size !== itemsFilterConfig.tagsSet.size) {
       return true;
     }
@@ -99,6 +104,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
       isPurchased,
       hasLink,
+      hasPrice,
       tagsSet,
     }));
 
@@ -115,6 +121,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
     setIsPurchased(null);
     setHasLink(null);
+    setHasPrice(null);
     setTagsSet(new Set());
 
     setStartTimestampsMap(new Map<string, number>());
@@ -130,6 +137,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
       isPurchased: null,
       hasLink: null,
+      hasPrice: null,
       tagsSet: new Set(),
     }));
 
@@ -161,6 +169,14 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           title='Link'
           positiveFilterTitle='Contains a link'
           negativeFilterTitle={`Doesn't contain a link`}
+        />
+
+        <WishlistItemsToolbarFilterItem
+          filterBy={hasPrice}
+          setFilterBy={setHasPrice}
+          title='Price'
+          positiveFilterTitle='Has a price'
+          negativeFilterTitle={`Doesn't have a price`}
         />
       </div>
 

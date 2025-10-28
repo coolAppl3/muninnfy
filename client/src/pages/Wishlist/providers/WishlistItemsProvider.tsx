@@ -28,6 +28,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         purchasedBeforeTimestamp,
         isPurchased,
         hasLink,
+        hasPrice,
         titleQuery,
         tagsSet,
       } = itemsFilterConfig;
@@ -53,6 +54,10 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
       }
 
       if (hasLink !== null && Boolean(item.link) !== hasLink) {
+        return false;
+      }
+
+      if (hasPrice !== null && Boolean(item.price) !== hasPrice) {
         return false;
       }
 
@@ -132,6 +137,7 @@ const defaultItemsFilterConfig: ItemsFilterConfig = {
 
   isPurchased: null,
   hasLink: null,
+  hasPrice: null,
 
   titleQuery: '',
   tagsSet: new Set<string>(),
