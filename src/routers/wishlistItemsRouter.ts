@@ -4,6 +4,7 @@ import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import {
   isValidWishlistItemDescription,
   isValidWishlistItemLink,
+  isValidWishlistItemPrice,
   isValidWishlistItemTitle,
 } from '../util/validation/wishlistItemValidation';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
@@ -26,7 +27,8 @@ export type MappedWishlistItem = {
   title: string;
   description: string | null;
   link: string | null;
-  is_purchased: boolean;
+  price: number | null;
+  purchased_on_timestamp: number | null;
   tags: {
     id: number;
     name: string;
@@ -45,18 +47,19 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     title: string;
     description: string | null;
     link: string | null;
+    price: number | null;
     tags: string[];
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'title', 'description', 'link', 'tags'];
+  const expectedKeys: string[] = ['wishlistId', 'title', 'description', 'link', 'price', 'tags'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { wishlistId, title, description, link, tags } = requestData;
+  const { wishlistId, title, description, link, price, tags } = requestData;
 
   if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
@@ -75,6 +78,11 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
   if (link && !isValidWishlistItemLink(link)) {
     res.status(400).json({ message: 'Invalid link.', reason: 'invalidLink' });
+    return;
+  }
+
+  if (price && !isValidWishlistItemPrice(price)) {
+    res.status(400).json({ message: 'Invalid price.', reason: 'invalidPrice' });
     return;
   }
 
@@ -126,9 +134,10 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
         title,
         description,
         link,
-        is_purchased
-      ) VALUES (${generatePlaceHolders(6)});`,
-      [wishlistId, currentTimestamp, title, description, link, false]
+        price,
+        purchased_on_timestamp
+      ) VALUES (${generatePlaceHolders(7)});`,
+      [wishlistId, currentTimestamp, title, description, link, price, null]
     );
 
     const itemId: number = resultSetHeader.insertId;
@@ -160,8 +169,9 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
       title,
       description,
       link,
-      is_purchased: false,
-      tags: [...(itemTags as Tag[])],
+      price,
+      purchased_on_timestamp: null,
+      tags: itemTags as Tag[],
     };
 
     await connection.commit();
@@ -220,18 +230,19 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     title: string;
     description: string | null;
     link: string | null;
+    price: number | null;
     tags: string[];
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'itemId', 'title', 'description', 'link', 'tags'];
+  const expectedKeys: string[] = ['wishlistId', 'itemId', 'title', 'description', 'link', 'price', 'tags'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { wishlistId, itemId, title, description, link, tags } = requestData;
+  const { wishlistId, itemId, title, description, link, price, tags } = requestData;
 
   if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
@@ -258,6 +269,11 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     return;
   }
 
+  if (price && !isValidWishlistItemPrice(price)) {
+    res.status(400).json({ message: 'Invalid price.', reason: 'invalidPrice' });
+    return;
+  }
+
   const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
 
   if (!accountId) {
@@ -272,7 +288,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     type WishlistItemDetails = {
       added_on_timestamp: number;
-      is_purchased: boolean;
+      purchased_on_timestamp: number | null;
       tags_count: number;
       is_wishlist_owner: boolean;
     };
@@ -280,7 +296,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     const [wishlistItemRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         added_on_timestamp,
-        is_purchased,
+        purchased_on_timestamp,
         (SELECT COUNT(*) FROM wishlist_item_tags WHERE item_id = :itemId) AS tags_count,
         EXISTS (SELECT 1 FROM wishlists WHERE wishlist_id = :wishlistId AND account_id = :accountId) AS is_wishlist_owner
       FROM
@@ -313,10 +329,11 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       SET
         title = ?,
         description = ?,
-        link = ?
+        link = ?,
+        price = ?
       WHERE
         item_id = ?;`,
-      [title, description, link, itemId]
+      [title, description, link, price, itemId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
@@ -368,7 +385,8 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       title,
       description,
       link,
-      is_purchased: wishlistItemDetails.is_purchased,
+      price,
+      purchased_on_timestamp: wishlistItemDetails.purchased_on_timestamp,
       tags: itemTags as Tag[],
     };
 
@@ -598,18 +616,18 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
   type RequestData = {
     wishlistId: string;
     itemId: number;
-    newPurchaseStatus: boolean;
+    markAsPurchased: boolean;
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'itemId', 'newPurchaseStatus'];
+  const expectedKeys: string[] = ['wishlistId', 'itemId', 'markAsPurchased'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { wishlistId, itemId, newPurchaseStatus } = requestData;
+  const { wishlistId, itemId, markAsPurchased } = requestData;
 
   if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
@@ -621,7 +639,7 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
     return;
   }
 
-  if (typeof newPurchaseStatus !== 'boolean') {
+  if (typeof markAsPurchased !== 'boolean') {
     res.status(400).json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
     return;
   }
@@ -634,18 +652,20 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
 
   try {
     type WishlistItemDetails = {
-      is_purchased: boolean | null;
+      item_exists: boolean;
+      purchased_on_timestamp: number | null;
     };
 
     const [wishlistItemRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        (SELECT is_purchased FROM wishlist_items WHERE item_id = ?) AS is_purchased
+        EXISTS (SELECT 1 FROM wishlist_items WHERE item_id = :itemId) AS item_exists,
+        (SELECT purchased_on_timestamp FROM wishlist_items WHERE item_id = :itemId) AS purchased_on_timestamp
       FROM
         wishlists
       WHERE
-        wishlist_id = ? AND
-        account_id = ?;`,
-      [itemId, wishlistId, accountId]
+        wishlist_id = :wishlistId AND
+        account_id = :accountId;`,
+      { itemId, wishlistId, accountId }
     );
 
     const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
@@ -655,34 +675,36 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
       return;
     }
 
-    if (wishlistItemDetails.is_purchased === null) {
+    if (!wishlistItemDetails.item_exists) {
       res.status(404).json({ message: 'Wishlist Item not found.', reason: 'itemNotfound' });
       return;
     }
 
-    if (Boolean(wishlistItemDetails.is_purchased) === newPurchaseStatus) {
-      res.json({});
+    if (Boolean(wishlistItemDetails.purchased_on_timestamp) === markAsPurchased) {
+      res.json({ newPurchasedOnTimestamp: wishlistItemDetails.purchased_on_timestamp });
       return;
     }
+
+    const newPurchasedOnTimestamp: number | null = markAsPurchased ? Date.now() : null;
 
     const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
       `UPDATE
         wishlist_items
       SET
-        is_purchased = ?
+        purchased_on_timestamp = ?
       WHERE
         item_id = ?;`,
-      [newPurchaseStatus, itemId]
+      [newPurchasedOnTimestamp, itemId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
-      await logUnexpectedError(req, null, 'Failed to update is_purchased.');
+      await logUnexpectedError(req, null, 'Failed to update purchased_on_timestamp.');
 
       return;
     }
 
-    res.json({});
+    res.json({ newPurchasedOnTimestamp });
   } catch (err: unknown) {
     console.log(err);
 
@@ -705,25 +727,25 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
   type RequestData = {
     wishlistId: string;
     itemsIdArr: number[];
-    newPurchaseStatus: boolean;
+    markAsPurchased: boolean;
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'itemsIdArr', 'newPurchaseStatus'];
+  const expectedKeys: string[] = ['wishlistId', 'itemsIdArr', 'markAsPurchased'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { wishlistId, itemsIdArr, newPurchaseStatus } = requestData;
+  const { wishlistId, itemsIdArr, markAsPurchased } = requestData;
 
   if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (typeof newPurchaseStatus !== 'boolean') {
+  if (typeof markAsPurchased !== 'boolean') {
     res.status(400).json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
     return;
   }
@@ -769,19 +791,21 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
       return;
     }
 
+    const newPurchasedOnTimestamp: number | null = markAsPurchased ? Date.now() : null;
+
     const [resultSetHeader] = await dbPool.query<ResultSetHeader>(
       `UPDATE
         wishlist_items
       SET
-        is_purchased = ?
+        purchased_on_timestamp = ?
       WHERE
         wishlist_id = ? AND
         item_id IN (?)
       LIMIT ${WISHLIST_ITEMS_LIMIT};`,
-      [newPurchaseStatus, wishlistId, itemsIdArr]
+      [newPurchasedOnTimestamp, wishlistId, itemsIdArr]
     );
 
-    res.json({ updatedItemsCount: resultSetHeader.affectedRows });
+    res.json({ newPurchasedOnTimestamp, updatedItemsCount: resultSetHeader.affectedRows });
   } catch (err: unknown) {
     console.log(err);
 

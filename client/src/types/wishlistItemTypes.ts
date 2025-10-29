@@ -4,7 +4,8 @@ export type WishlistItemType = {
   title: string;
   description: string | null;
   link: string | null;
-  is_purchased: boolean;
+  price: number | null;
+  purchased_on_timestamp: number | null;
   tags: {
     id: number;
     name: string;

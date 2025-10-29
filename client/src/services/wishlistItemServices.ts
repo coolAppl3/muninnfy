@@ -10,6 +10,7 @@ type AddWishlistItemServicePayload = {
   title: string;
   description: string | null;
   link: string | null;
+  price: number | null;
   tags: string[];
 };
 
@@ -23,6 +24,7 @@ type EditWishlistItemServicePayload = {
   title: string;
   description: string | null;
   link: string | null;
+  price: number | null;
   tags: string[];
 };
 
@@ -49,13 +51,30 @@ export async function bulkDeleteWishlistItemsService(
   return axios.delete(`${wishlistItemsApiUrl}/bulk`, { data: body });
 }
 
+type SetWishlistItemIsPurchasedServicePayload = {
+  wishlistId: string;
+  itemId: number;
+  markAsPurchased: boolean;
+};
+
+type SetWishlistItemIsPurchasedServiceData = {
+  newPurchasedOnTimestamp: number | null;
+};
+
+export async function setWishlistItemIsPurchasedService(
+  body: SetWishlistItemIsPurchasedServicePayload
+): Promise<AxiosResponse<SetWishlistItemIsPurchasedServiceData>> {
+  return axios.patch(`${wishlistItemsApiUrl}/purchaseStatus`, body);
+}
+
 type BulkSetWishlistItemIsPurchasedService = {
   wishlistId: string;
   itemsIdArr: number[];
-  newPurchaseStatus: boolean;
+  markAsPurchased: boolean;
 };
 
 type BulkSetWishlistItemIsPurchasedData = {
+  newPurchasedOnTimestamp: number | null;
   updatedItemsCount: number;
 };
 
@@ -63,14 +82,4 @@ export async function bulkSetWishlistItemIsPurchasedService(
   body: BulkSetWishlistItemIsPurchasedService
 ): Promise<AxiosResponse<BulkSetWishlistItemIsPurchasedData>> {
   return axios.patch(`${wishlistItemsApiUrl}/purchaseStatus/bulk`, body);
-}
-
-type SetWishlistItemIsPurchasedServicePayload = {
-  wishlistId: string;
-  itemId: number;
-  newPurchaseStatus: boolean;
-};
-
-export async function setWishlistItemIsPurchasedService(body: SetWishlistItemIsPurchasedServicePayload): Promise<AxiosResponse> {
-  return axios.patch(`${wishlistItemsApiUrl}/purchaseStatus`, body);
 }

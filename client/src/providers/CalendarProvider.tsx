@@ -9,20 +9,25 @@ type CalendarProviderProps = {
 
 export default function CalendarProvider({ children }: CalendarProviderProps): JSX.Element {
   const [calendarMode, setCalendarMode] = useState<CalendarMode | null>(null);
+  const [calendarKey, setCalendarKey] = useState<string>('');
 
-  const [startTimestamp, setStartTimestamp] = useState<number | null>(null);
-  const [endTimestamp, setEndTimestamp] = useState<number | null>(null);
+  const [startTimestampsMap, setStartTimestampsMap] = useState<Map<string, number>>(new Map<string, number>());
+  const [endTimestampsMap, setEndTimestampsMap] = useState<Map<string, number>>(new Map<string, number>());
 
   const routerLocation: Location = useLocation();
 
-  const displayCalendar = useCallback((mode: CalendarMode) => setCalendarMode(mode), []);
+  const displayCalendar = useCallback((mode: CalendarMode, calendarKey: string) => {
+    setCalendarMode(mode);
+    setCalendarKey(calendarKey);
+  }, []);
+
   const removeCalendar = useCallback(() => setCalendarMode(null), []);
 
   const clearCalendar = useCallback(() => {
     setCalendarMode(null);
 
-    setStartTimestamp(null);
-    setEndTimestamp(null);
+    setStartTimestampsMap(new Map<string, number>());
+    setEndTimestampsMap(new Map<string, number>());
   }, []);
 
   useEffect(() => {
@@ -31,23 +36,25 @@ export default function CalendarProvider({ children }: CalendarProviderProps): J
 
   const contextValue: CalendarContextType = useMemo(
     () => ({
-      startTimestamp,
-      setStartTimestamp,
+      calendarKey,
 
-      endTimestamp,
-      setEndTimestamp,
+      startTimestampsMap,
+      setStartTimestampsMap,
+
+      endTimestampsMap,
+      setEndTimestampsMap,
 
       displayCalendar,
       removeCalendar,
       clearCalendar,
     }),
-    [startTimestamp, endTimestamp, displayCalendar, removeCalendar, clearCalendar]
+    [calendarKey, startTimestampsMap, endTimestampsMap, displayCalendar, removeCalendar, clearCalendar]
   );
 
   return (
-    <CalendarContext.Provider value={contextValue}>
+    <CalendarContext value={contextValue}>
       {children}
       {calendarMode ? <Calendar calendarMode={calendarMode} /> : null}
-    </CalendarContext.Provider>
+    </CalendarContext>
   );
 }

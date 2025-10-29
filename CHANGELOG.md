@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.1.2] (2024-10-29)
+
+### Features
+
+- Added `zustand`.
+- Wishlist items now store the purchase date.
+  - Implemented purchase date filtering.
+- Wishlist items now allow an optional `price` property.
+  - Implemented price filtering and sorting.
+  - Added `WishlistItemToolbarPriceRange`.
+
+
+### Improvements
+
+- Abolished the use of `useEffect` in `WishlistItemsProvider` to sort items when the sorting mode is changed to avoid an extra rerender.
+- Reworked `wishlistItemsExpansionStore` and `wishlistItemsSelectionStore` with `zustand`.
+- Removed a few unnecessary uses of `useMemo`.
+- Improved phrasing of required and optional fields in `WishlistItemForm`.
+- Improved phrasing of label  or `WishlistItemTagsFormGroup`.
+- Improve phrasing of sorting options.
+- Improved the look and proportion of `ToggleSwitch`.
+
+
+### Bug Fixes
+
+- Fixed manual sorting being used in `handleDuplicateItemTitle()` instead of calling `sortWishlistItems()` in `EditPrivacyLevelContainer`.
+- Removed leftover type exports in `WishlistContext` being used in `WishlistItemsToolbarSort`.
+- Fixed `z-index` in `WishlistItemsToolbar` to prevent elements blocking context menus.
+- Fixed wishlist items not being resorted when an item is updated.
+
+
+### Code Refactoring
+
+- Refactored out unnecessary `.Provider` calls in providers throughout the app.
+- Refactored out unnecessary cloning of the tags array in `setWishlistItems()` call in `WishlistItemButtonContainer`.
+- Refactored collapse button in `EditPrivacyLevelContainer`to better fit the surrounding UI.
+
+
 ## [0.1.1] (2024-10-22)
 
 ### Improvements

@@ -1,4 +1,4 @@
-import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
 import WishlistItemsContext, { ItemsFilterConfig, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
@@ -21,7 +21,19 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
 
   const itemMatchesFilterConfig = useCallback(
     (item: WishlistItemType): boolean => {
-      const { addedAfterTimestamp, addedBeforeTimestamp, isPurchased, hasLink, titleQuery, tagsSet } = itemsFilterConfig;
+      const {
+        addedAfterTimestamp,
+        addedBeforeTimestamp,
+        purchasedAfterTimestamp,
+        purchasedBeforeTimestamp,
+        priceFrom,
+        priceTo,
+        isPurchased,
+        hasLink,
+        hasPrice,
+        titleQuery,
+        tagsSet,
+      } = itemsFilterConfig;
 
       if (addedAfterTimestamp && item.added_on_timestamp < addedAfterTimestamp) {
         return false;
@@ -31,11 +43,31 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return false;
       }
 
-      if (isPurchased !== null && item.is_purchased !== isPurchased) {
+      if (purchasedAfterTimestamp && item.purchased_on_timestamp && item.purchased_on_timestamp < purchasedAfterTimestamp) {
+        return false;
+      }
+
+      if (purchasedBeforeTimestamp && item.purchased_on_timestamp && item.purchased_on_timestamp > purchasedBeforeTimestamp) {
+        return false;
+      }
+
+      if (priceFrom && item.price !== null && item.price < priceFrom) {
+        return false;
+      }
+
+      if (priceTo && item.price !== null && item.price > priceTo) {
+        return false;
+      }
+
+      if (isPurchased !== null && Boolean(item.purchased_on_timestamp) !== isPurchased) {
         return false;
       }
 
       if (hasLink !== null && Boolean(item.link) !== hasLink) {
+        return false;
+      }
+
+      if (hasPrice !== null && Boolean(item.price === 0 ? true : item.price) !== hasPrice) {
         return false;
       }
 
@@ -52,23 +84,34 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
     [itemsFilterConfig]
   );
 
-  const sortWishlistItems = useCallback(() => {
-    if (itemsSortingMode === 'newest_first') {
-      setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
-      return;
-    }
+  const sortWishlistItems = useCallback(
+    (explicitSortingMode?: ItemsSortingMode) => {
+      const sortingMode: ItemsSortingMode = explicitSortingMode || itemsSortingMode;
 
-    if (itemsSortingMode === 'oldest_first') {
-      setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
-      return;
-    }
+      if (sortingMode === 'newest_first') {
+        setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
+        return;
+      }
 
-    setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
-  }, [itemsSortingMode]);
+      if (sortingMode === 'oldest_first') {
+        setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
+        return;
+      }
 
-  useEffect(() => {
-    sortWishlistItems();
-  }, [itemsSortingMode, sortWishlistItems]);
+      if (sortingMode === 'cheapest_first') {
+        setWishlistItems((prev) => prev.toSorted((a, b) => (a.price || 0) - (b.price || 0)));
+        return;
+      }
+
+      if (sortingMode === 'priciest_first') {
+        setWishlistItems((prev) => prev.toSorted((a, b) => (b.price || 0) - (a.price || 0)));
+        return;
+      }
+
+      setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
+    },
+    [itemsSortingMode]
+  );
 
   const contextValue: WishlistItemsContextType = useMemo(
     () => ({
@@ -102,15 +145,22 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
     ]
   );
 
-  return <WishlistItemsContext.Provider value={contextValue}>{children}</WishlistItemsContext.Provider>;
+  return <WishlistItemsContext value={contextValue}>{children}</WishlistItemsContext>;
 }
 
 const defaultItemsFilterConfig: ItemsFilterConfig = {
   addedAfterTimestamp: null,
   addedBeforeTimestamp: null,
 
+  purchasedAfterTimestamp: null,
+  purchasedBeforeTimestamp: null,
+
+  priceFrom: null,
+  priceTo: null,
+
   isPurchased: null,
   hasLink: null,
+  hasPrice: null,
 
   titleQuery: '',
   tagsSet: new Set<string>(),

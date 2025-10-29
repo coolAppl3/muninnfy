@@ -5,14 +5,21 @@ export type ItemsFilterConfig = {
   addedAfterTimestamp: number | null;
   addedBeforeTimestamp: number | null;
 
+  purchasedAfterTimestamp: number | null;
+  purchasedBeforeTimestamp: number | null;
+
+  priceFrom: number | null;
+  priceTo: number | null;
+
   isPurchased: boolean | null;
   hasLink: boolean | null;
+  hasPrice: boolean | null;
 
   titleQuery: string;
   tagsSet: Set<string>;
 };
 
-export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'lexicographical';
+export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'cheapest_first' | 'priciest_first' | 'lexicographical';
 
 export type WishlistItemsContextType = {
   wishlistItems: WishlistItemType[];
@@ -25,7 +32,7 @@ export type WishlistItemsContextType = {
 
   itemsSortingMode: ItemsSortingMode;
   setItemsSortingMode: Dispatch<SetStateAction<ItemsSortingMode>>;
-  sortWishlistItems: () => void;
+  sortWishlistItems: (explicitSortingMode?: ItemsSortingMode) => void;
 
   selectionModeActive: boolean;
   setSelectionModeActive: Dispatch<SetStateAction<boolean>>;

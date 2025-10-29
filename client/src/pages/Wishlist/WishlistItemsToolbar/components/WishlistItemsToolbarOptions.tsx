@@ -2,17 +2,25 @@ import { FocusEvent, JSX, useState } from 'react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
-import { collapseAllWishlistItems, expandAllWishlistItems, useWishlistItemsExpansionSet } from '../../stores/wishlistItemsExpansionStore';
 import useWishlistItems from '../../hooks/useWishlistItems';
+import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionStore';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const { expandedItemsIdsSet, expandAllWishlistItems, collapseAllWishlistItems } = useWishlistItemsExpansionStore(
+    useShallow((store) => ({
+      expandedItemsIdsSet: store.expandedItemsIdsSet,
+      expandAllWishlistItems: store.expandAllWishlistItems,
+      collapseAllWishlistItems: store.collapseAllWishlistItems,
+    }))
+  );
+
   const { wishlistItems, selectionModeActive, setSelectionModeActive } = useWishlistItems();
   const { displayPopupMessage } = usePopupMessage();
 
-  const expandedItemsSet: Set<number> = useWishlistItemsExpansionSet();
-  const allItemsExpanded: boolean = expandedItemsSet.size === wishlistItems.length;
+  const allItemsExpanded: boolean = expandedItemsIdsSet.size === wishlistItems.length;
 
   return (
     <div

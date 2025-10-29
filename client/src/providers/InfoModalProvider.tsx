@@ -41,7 +41,7 @@ export default function InfoModalProvider({ children }: InfoModalProviderProps):
   const contextValue: InfoModalContextType = useMemo(() => ({ displayInfoModal, removeInfoModal }), [displayInfoModal, removeInfoModal]);
 
   return (
-    <InfoModalContext.Provider value={contextValue}>
+    <InfoModalContext value={contextValue}>
       {children}
 
       {isVisible && (
@@ -52,6 +52,6 @@ export default function InfoModalProvider({ children }: InfoModalProviderProps):
           onClick={onClick}
         />
       )}
-    </InfoModalContext.Provider>
+    </InfoModalContext>
   );
 }

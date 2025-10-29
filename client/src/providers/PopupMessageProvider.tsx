@@ -36,7 +36,7 @@ export default function PopupMessageProvider({ children }: PopupMessageProviderP
   const contextValue: PopupMessageContextType = useMemo(() => ({ displayPopupMessage }), [displayPopupMessage]);
 
   return (
-    <PopupMessageContext.Provider value={contextValue}>
+    <PopupMessageContext value={contextValue}>
       {children}
 
       {isVisible && (
@@ -47,6 +47,6 @@ export default function PopupMessageProvider({ children }: PopupMessageProviderP
           {message}
         </PopupMessage>
       )}
-    </PopupMessageContext.Provider>
+    </PopupMessageContext>
   );
 }

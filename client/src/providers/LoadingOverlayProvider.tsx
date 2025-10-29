@@ -23,7 +23,7 @@ export default function LoadingOverlayProvider({ children }: LoadingOverlayProvi
   }, [routerLocation]);
 
   return (
-    <LoadingOverlayContext.Provider value={contextValue}>
+    <LoadingOverlayContext value={contextValue}>
       {children}
 
       {isVisible && (
@@ -31,6 +31,6 @@ export default function LoadingOverlayProvider({ children }: LoadingOverlayProvi
           <div className='spinner w-3 h-3'></div>
         </div>
       )}
-    </LoadingOverlayContext.Provider>
+    </LoadingOverlayContext>
   );
 }

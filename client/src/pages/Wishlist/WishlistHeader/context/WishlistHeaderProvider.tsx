@@ -24,5 +24,5 @@ export default function WishlistHeaderProvider({ children }: WishlistHeaderProvi
     [editMode, menuIsOpen, isSubmitting]
   );
 
-  return <WishlistHeaderContext.Provider value={contextValue}>{children}</WishlistHeaderContext.Provider>;
+  return <WishlistHeaderContext value={contextValue}>{children}</WishlistHeaderContext>;
 }

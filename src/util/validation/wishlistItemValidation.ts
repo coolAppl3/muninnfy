@@ -1,3 +1,4 @@
+import { WISHLIST_ITEM_MAX_PRICE } from '../constants/wishlistItemConstants';
 import { containsInvalidWhitespace } from '../globalUtils';
 
 export function isValidWishlistItemTitle(value: any): boolean {
@@ -29,4 +30,26 @@ export function isValidWishlistItemLink(value: any): boolean {
 
   const regex: RegExp = /^(https?:\/\/)?[^\s]{1,2000}$/i;
   return regex.test(value);
+}
+
+export function isValidWishlistItemPrice(value: any): boolean {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return false;
+  }
+
+  if (value < 0 || value > WISHLIST_ITEM_MAX_PRICE) {
+    return false;
+  }
+
+  const decimalPortion: string | undefined = value.toString().split('.')[1];
+
+  if (decimalPortion === undefined) {
+    return true;
+  }
+
+  if (decimalPortion.length === 0 || decimalPortion.length > 2) {
+    return false;
+  }
+
+  return true;
 }

@@ -15,7 +15,7 @@ export default function SecondaryButton({ children, onClick, className, disabled
       onClick={onClick}
       className={`btn-secondary block min-w-fit p-0 underline transition-colors ease-out font-bold text-description  ${
         disabled ? 'opacity-25 cursor-default hover:text-description' : 'hover:text-cta cursor-pointer'
-      } ${className ? className : ''}`}
+      } ${className || ''}`}
     >
       {children}
     </button>

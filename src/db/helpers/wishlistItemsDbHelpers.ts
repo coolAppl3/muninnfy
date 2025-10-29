@@ -3,23 +3,24 @@ import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
 import { MappedWishlistItem } from '../../routers/wishlistItemsRouter';
 
+export type WishlistItem = {
+  item_id: number;
+  added_on_timestamp: number;
+  title: string;
+  description: string | null;
+  link: string | null;
+  price: number | null;
+  purchased_on_timestamp: number | null;
+  tag_id: number;
+  tag_name: string;
+};
+
 export async function getWishlistItemByTitle(
   itemTitle: string,
   wishlistId: string,
   executor: Pool | PoolConnection,
   req: Request
 ): Promise<MappedWishlistItem | null> {
-  type WishlistItemDetails = {
-    item_id: number;
-    added_on_timestamp: number;
-    title: string;
-    description: string | null;
-    link: string | null;
-    is_purchased: boolean;
-    tag_id: number;
-    tag_name: string;
-  };
-
   try {
     const [wishlistItemRows] = await executor.execute<RowDataPacket[]>(
       `SELECT
@@ -28,7 +29,8 @@ export async function getWishlistItemByTitle(
         wishlist_items.title,
         wishlist_items.description,
         wishlist_items.link,
-        wishlist_items.is_purchased,
+        wishlist_items.price,
+        wishlist_items.purchased_on_timestamp,
         wishlist_item_tags.tag_id,
         wishlist_item_tags.tag_name
       FROM
@@ -41,7 +43,7 @@ export async function getWishlistItemByTitle(
       [itemTitle, wishlistId]
     );
 
-    const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
+    const wishlistItemDetails = wishlistItemRows[0] as WishlistItem | undefined;
 
     if (!wishlistItemDetails) {
       return null;

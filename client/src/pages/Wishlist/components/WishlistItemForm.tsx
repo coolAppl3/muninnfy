@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, Dispatch, FormEvent, JSX, SetStateAction, useEffect, useRef, useState } from 'react';
 import TextareaFormGroup from '../../../components/TextareaFormGroup/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
 import WishlistItemTagsFormGroup from '../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
@@ -6,6 +6,7 @@ import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGr
 import {
   validateWishlistItemDescription,
   validateWishlistItemLink,
+  validateWishlistItemPrice,
   validateWishlistItemTitle,
 } from '../../../utils/validation/wishlistItemValidation';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
@@ -34,11 +35,14 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   const [titleValue, setTitleValue] = useState<string>(wishlistItem?.title || '');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
-  const [descriptionValue, setDescriptionValue] = useState<string>(wishlistItem?.description || '');
-  const [descriptionErrorMessage, setDescriptionErrorMessage] = useState<string | null>(null);
+  const [priceValue, setPriceValue] = useState<string>(wishlistItem?.price?.toString() || '');
+  const [priceErrorMessage, setPriceErrorMessage] = useState<string | null>(null);
 
   const [linkValue, setLinkValue] = useState<string>(wishlistItem?.link || '');
   const [linkErrorMessage, setLinkErrorMessage] = useState<string | null>(null);
+
+  const [descriptionValue, setDescriptionValue] = useState<string>(wishlistItem?.description || '');
+  const [descriptionErrorMessage, setDescriptionErrorMessage] = useState<string | null>(null);
 
   const [itemTags, setItemTags] = useState<Set<string>>(new Set<string>(wishlistItem?.tags.map(({ name }) => name) || []));
 
@@ -84,12 +88,13 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const title: string = titleValue;
     const description: string | null = descriptionValue || null;
     const link: string | null = linkValue || null;
+    const price: number | null = priceValue.length === 0 ? null : +priceValue;
     const tags: string[] = [...itemTags];
 
     try {
-      const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, tags })).data;
-      setWishlistItems((prev) => [newWishlistItem, ...prev]);
+      const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, price, tags })).data;
 
+      setWishlistItems((prev) => [newWishlistItem, ...prev]);
       itemsSortingMode === 'newest_first' || sortWishlistItems();
 
       displayPopupMessage('Item added.', 'success');
@@ -134,21 +139,16 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const title: string = titleValue;
     const description: string | null = descriptionValue || null;
     const link: string | null = linkValue || null;
+    const price: number | null = priceValue.length === 0 ? null : +priceValue;
     const tags: string[] = [...itemTags];
 
     try {
-      const updatedWishlistItem: WishlistItemType = (await editWishlistItemService({ wishlistId, itemId, title, description, link, tags }))
-        .data;
+      const updatedWishlistItem: WishlistItemType = (
+        await editWishlistItemService({ wishlistId, itemId, title, description, link, price, tags })
+      ).data;
 
-      setWishlistItems((prev) =>
-        prev.map((item: WishlistItemType) => {
-          if (item.item_id !== itemId) {
-            return item;
-          }
-
-          return updatedWishlistItem;
-        })
-      );
+      setWishlistItems((prev) => prev.map((item: WishlistItemType) => (item.item_id === itemId ? updatedWishlistItem : item)));
+      sortWishlistItems();
 
       displayPopupMessage('Item updated.', 'success');
       onFinish();
@@ -184,15 +184,6 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     }
   }
 
-  const wishlistItemErrFieldRecord: Record<string, (errorMessage: string | null) => void> = useMemo(
-    () => ({
-      invalidTitle: setTitleErrorMessage,
-      invalidDescription: setDescriptionErrorMessage,
-      invalidLink: setLinkErrorMessage,
-    }),
-    []
-  );
-
   function handleDuplicateItemTitle(errResData: unknown): void {
     if (!errResData || typeof errResData !== 'object') {
       return;
@@ -205,7 +196,10 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const existingWishlistItem = errResData.existingWishlistItem as WishlistItemType;
     const itemExists: boolean = wishlistItems.some((item: WishlistItemType) => item.item_id === existingWishlistItem.item_id);
 
-    itemExists || setWishlistItems((prev) => [...prev, existingWishlistItem].sort((a, b) => b.added_on_timestamp - a.added_on_timestamp));
+    if (itemExists) {
+      setWishlistItems((prev) => [...prev, existingWishlistItem]);
+      sortWishlistItems();
+    }
   }
 
   function allFieldsValid(): boolean {
@@ -218,7 +212,10 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const newLinkErrorMessage: string | null = validateWishlistItemLink(linkValue);
     setLinkErrorMessage(newLinkErrorMessage);
 
-    for (const errorMessage of [newTitleErrorMessage, newDescriptionErrorMessage, newLinkErrorMessage]) {
+    const newPriceErrorMessage: string | null = validateWishlistItemPrice(priceValue);
+    setPriceErrorMessage(newPriceErrorMessage);
+
+    for (const errorMessage of [newTitleErrorMessage, newDescriptionErrorMessage, newLinkErrorMessage, priceErrorMessage]) {
       if (errorMessage) {
         displayPopupMessage(errorMessage, 'error');
         return false;
@@ -256,6 +253,10 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       return true;
     }
 
+    if (+priceValue !== wishlistItem.price) {
+      return true;
+    }
+
     if (itemTags.size !== wishlistItem.tags.length) {
       return true;
     }
@@ -279,12 +280,22 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     setLinkValue('');
     setLinkErrorMessage(null);
 
+    setPriceValue('');
+    setPriceErrorMessage(null);
+
     setItemTags(new Set<string>());
   }
 
+  const wishlistItemErrFieldRecord: Record<string, Dispatch<SetStateAction<string | null>>> = {
+    invalidTitle: setTitleErrorMessage,
+    invalidDescription: setDescriptionErrorMessage,
+    invalidLink: setLinkErrorMessage,
+    invalidPrice: setPriceErrorMessage,
+  };
+
   return (
     <form
-      className={`px-2 grid gap-2 overflow-hidden relative z-0 ${className ? className : ''}`}
+      className={`px-2 grid gap-2 overflow-hidden relative z-0 ${className || ''}`}
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -303,7 +314,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     >
       <DefaultFormGroup
         id='item-title'
-        label='Title'
+        label='Title (required)'
         autoComplete='off'
         ref={formMode === 'NEW_ITEM' ? titleInputRef : null}
         value={titleValue}
@@ -317,8 +328,22 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       />
 
       <DefaultFormGroup
+        id='item-price'
+        label='Price'
+        autoComplete='off'
+        value={priceValue}
+        errorMessage={priceErrorMessage}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          const newValue: string = e.target.value;
+
+          setPriceValue(newValue);
+          setPriceErrorMessage(validateWishlistItemPrice(newValue));
+        }}
+      />
+
+      <DefaultFormGroup
         id='item-link'
-        label='Link (optional)'
+        label='Link'
         autoComplete='off'
         value={linkValue}
         errorMessage={linkErrorMessage}
@@ -333,12 +358,12 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       <WishlistItemTagsFormGroup
         itemTags={itemTags}
         setItemTags={setItemTags}
-        label='Tags (optional) - space to add'
+        label='Tags - click space to add'
       />
 
       <TextareaFormGroup
         id='item-description'
-        label='Description (optional)'
+        label='Description'
         value={descriptionValue}
         errorMessage={descriptionErrorMessage}
         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {

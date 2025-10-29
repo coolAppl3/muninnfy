@@ -5,8 +5,9 @@ import WishlistItemForm from '../../components/WishlistItemForm';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
 import WishlistItemButtonContainer from './components/WishlistItemButtonContainer';
 import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
-import { useWishlistItemSelected, toggleWishlistItemSelection } from '../../stores/wishlistItemsSelectionStore';
-import { toggleWishlistItemExpansion, useWishlistItemExpansion } from '../../stores/wishlistItemsExpansionStore';
+import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionStore';
+import { useShallow } from 'zustand/react/shallow';
+import useWishlistItemsSelectionStore from '../../stores/wishlistItemsSelectionStore';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
@@ -18,8 +19,23 @@ export default memo(WishlistItem);
 function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: WishlistItemProps): JSX.Element {
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  const isSelected: boolean = useWishlistItemSelected(wishlistItem.item_id);
-  const isExpanded: boolean = useWishlistItemExpansion(wishlistItem.item_id);
+  const { toggleWishlistItemExpansion, isExpanded } = useWishlistItemsExpansionStore(
+    useShallow((store) => ({
+      toggleWishlistItemExpansion: store.toggleWishlistItemsExpansion,
+      isExpanded: store.expandedItemsIdsSet.has(wishlistItem.item_id),
+    }))
+  );
+
+  const { toggleWishlistItemSelection, isSelected } = useWishlistItemsSelectionStore(
+    useShallow((store) => ({
+      toggleWishlistItemSelection: store.toggleWishlistItemSelection,
+      isSelected: store.selectedItemsIdsSet.has(wishlistItem.item_id),
+    }))
+  );
+
+  function getCurrencyFormatting(price: number): string {
+    return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
 
   if (isEditing) {
     return (
@@ -58,7 +74,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
           className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-all hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden ${
             isExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
           } ${
-            wishlistItem.is_purchased
+            wishlistItem.purchased_on_timestamp
               ? 'after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1'
               : ''
           }`}
@@ -76,9 +92,13 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
             <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
               <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
 
-              <p>
-                Link:{' '}
-                {wishlistItem.link ? (
+              {wishlistItem.purchased_on_timestamp && <p>Purchased: {getShortenedDateString(wishlistItem.purchased_on_timestamp)}</p>}
+
+              {wishlistItem.price === null ? null : <p> Price: {getCurrencyFormatting(wishlistItem.price)}</p>}
+
+              {wishlistItem.link && (
+                <p>
+                  Link:{' '}
                   <a
                     href={/^https?:\/\//.test(wishlistItem.link) ? wishlistItem.link : `https://${wishlistItem.link}`}
                     target='_blank'
@@ -86,10 +106,8 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
                   >
                     {wishlistItem.link}
                   </a>
-                ) : (
-                  <span className='brightness-75'>None</span>
-                )}
-              </p>
+                </p>
+              )}
             </div>
 
             {wishlistItem.tags.length > 0 && (

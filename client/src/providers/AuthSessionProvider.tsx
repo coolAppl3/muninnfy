@@ -31,5 +31,5 @@ export default function AuthSessionProvider({ children }: AuthSessionProviderPro
   }, [setAuthStatus, displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage]);
 
   const contextValue: AuthSessionContextType = useMemo(() => ({ signOut }), [signOut]);
-  return <AuthSessionContext.Provider value={contextValue}>{children}</AuthSessionContext.Provider>;
+  return <AuthSessionContext value={contextValue}>{children}</AuthSessionContext>;
 }

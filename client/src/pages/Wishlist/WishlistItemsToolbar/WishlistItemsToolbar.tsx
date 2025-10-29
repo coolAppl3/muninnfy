@@ -27,7 +27,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
   );
 
   return (
-    <div className='pt-2'>
+    <div className='pt-2 relative z-2'>
       <Container>
         <div>
           <header className='flex justify-start items-center gap-1 mb-1 text-title relative z-3'>

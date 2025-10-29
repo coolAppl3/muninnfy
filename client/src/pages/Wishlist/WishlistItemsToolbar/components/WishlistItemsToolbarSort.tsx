@@ -1,18 +1,20 @@
 import { FocusEvent, JSX, useState } from 'react';
 import SortIcon from '../../../../assets/svg/SortIcon.svg?react';
-import { ItemsSortingMode } from '../../contexts/WishlistContext';
+import { ItemsSortingMode } from '../../contexts/WishlistItemsContext';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../hooks/useWishlistItems';
 
 export default function WishlistItemsToolbarSort(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { itemsSortingMode, setItemsSortingMode } = useWishlistItems();
+  const { itemsSortingMode, setItemsSortingMode, sortWishlistItems } = useWishlistItems();
   const { displayPopupMessage } = usePopupMessage();
 
-  function sortWishlistItems(sortingMode: ItemsSortingMode): void {
-    setIsOpen(false);
+  function handleSortBtnClick(sortingMode: ItemsSortingMode): void {
     setItemsSortingMode(sortingMode);
+    sortWishlistItems(sortingMode);
+
+    setIsOpen(false);
     displayPopupMessage('Items sorted.', 'success');
   }
 
@@ -41,23 +43,39 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
         <button
           type='button'
           className={`context-menu-btn ${itemsSortingMode === 'newest_first' ? 'text-cta' : ''}`}
-          onClick={() => sortWishlistItems('newest_first')}
+          onClick={() => handleSortBtnClick('newest_first')}
         >
-          Sort by newest
+          Newest first
         </button>
 
         <button
           type='button'
           className={`context-menu-btn ${itemsSortingMode === 'oldest_first' ? 'text-cta' : ''}`}
-          onClick={() => sortWishlistItems('oldest_first')}
+          onClick={() => handleSortBtnClick('oldest_first')}
         >
-          Sort by oldest
+          Oldest first
+        </button>
+
+        <button
+          type='button'
+          className={`context-menu-btn ${itemsSortingMode === 'cheapest_first' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('cheapest_first')}
+        >
+          Cheapest first
+        </button>
+
+        <button
+          type='button'
+          className={`context-menu-btn ${itemsSortingMode === 'priciest_first' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('priciest_first')}
+        >
+          Priciest first
         </button>
 
         <button
           type='button'
           className={`context-menu-btn ${itemsSortingMode === 'lexicographical' ? 'text-cta' : ''}`}
-          onClick={() => sortWishlistItems('lexicographical')}
+          onClick={() => handleSortBtnClick('lexicographical')}
         >
           Sort alphabetically
         </button>

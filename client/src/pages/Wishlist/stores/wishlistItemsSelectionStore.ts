@@ -1,43 +1,25 @@
-import { useSyncExternalStore } from 'react';
+import { create } from 'zustand';
 
-const selectedItemsListeners = new Set<() => void>();
-let selectedItemIdsSet = new Set<number>();
+type WishlistItemsSelectionStoreType = {
+  selectedItemsIdsSet: Set<number>;
 
-function emit() {
-  for (const listener of selectedItemsListeners) {
-    listener();
-  }
-}
+  selectAllWishlistItems: (itemIdsArr: number[]) => void;
+  unselectAllWishlistItems: () => void;
+  toggleWishlistItemSelection: (itemId: number) => void;
+};
 
-function subscribe(listener: () => void) {
-  selectedItemsListeners.add(listener);
-  return () => selectedItemsListeners.delete(listener);
-}
+const useWishlistItemsSelectionStore = create<WishlistItemsSelectionStoreType>((set, get) => ({
+  selectedItemsIdsSet: new Set<number>(),
 
-export function toggleWishlistItemSelection(itemId: number) {
-  const newSet = new Set<number>(selectedItemIdsSet);
-  newSet.has(itemId) ? newSet.delete(itemId) : newSet.add(itemId);
+  selectAllWishlistItems: (itemIdsArr: number[]) => set({ selectedItemsIdsSet: new Set<number>(itemIdsArr) }),
+  unselectAllWishlistItems: () => set({ selectedItemsIdsSet: new Set<number>() }),
 
-  selectedItemIdsSet = newSet;
-  emit();
-}
+  toggleWishlistItemSelection: (itemId: number) => {
+    const nextSet = new Set<number>(get().selectedItemsIdsSet);
+    nextSet.has(itemId) ? nextSet.delete(itemId) : nextSet.add(itemId);
 
-export function selectAllWishlistItems(itemIdsArr: number[]) {
-  selectedItemIdsSet = new Set<number>(itemIdsArr);
-  emit();
-}
+    set({ selectedItemsIdsSet: nextSet });
+  },
+}));
 
-export function unselectAllWishlistItems() {
-  selectedItemIdsSet = new Set<number>();
-  emit();
-}
-
-// hooks
-
-export function useWishlistItemSelected(itemId: number): boolean {
-  return useSyncExternalStore(subscribe, () => selectedItemIdsSet.has(itemId));
-}
-
-export function useWishlistItemsSelectionSet(): Set<number> {
-  return useSyncExternalStore(subscribe, () => selectedItemIdsSet);
-}
+export default useWishlistItemsSelectionStore;

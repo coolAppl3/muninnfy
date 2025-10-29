@@ -14,6 +14,7 @@ import {
 } from '../../../../utils/constants/wishlistConstants';
 import useWishlist from '../../hooks/useWishlist';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
+import Button from '../../../../components/Button/Button';
 
 export default function EditPrivacyLevelContainer(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
@@ -114,15 +115,15 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
         </button>
       </div>
 
-      <button
-        className='link text-sm text-start mt-1'
+      <Button
+        className='bg-secondary border-title text-title mt-[1.4rem] sm:w-fit'
         onClick={() => {
           setEditMode(null);
           setMenuIsOpen(false);
         }}
       >
-        Collapse
-      </button>
+        Cancel
+      </Button>
     </div>
   );
 }

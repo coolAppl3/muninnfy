@@ -14,6 +14,7 @@ export const dbPool: Pool = mysql.createPool({
   queueLimit: 10,
   multipleStatements: true,
   namedPlaceholders: true,
+  decimalNumbers: true,
   typeCast: (field: mysql.TypeCastField, next) => {
     if (field.type === 'TINY' && field.length === 1) {
       const value: unknown = next();

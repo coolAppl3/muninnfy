@@ -19,7 +19,7 @@ export default function PasswordFormGroup({ id, label, value, errorMessage, onCh
   }
 
   return (
-    <div className={`flex flex-col justify-center items-start gap-[6px] ${className ? className : ''}`}>
+    <div className={`flex flex-col justify-center items-start gap-[6px] ${className || ''}`}>
       <label
         htmlFor={id}
         className='text-sm font-medium text-title'
