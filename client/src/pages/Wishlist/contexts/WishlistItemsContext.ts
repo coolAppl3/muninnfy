@@ -8,6 +8,9 @@ export type ItemsFilterConfig = {
   purchasedAfterTimestamp: number | null;
   purchasedBeforeTimestamp: number | null;
 
+  priceFrom: number | null;
+  priceTo: number | null;
+
   isPurchased: boolean | null;
   hasLink: boolean | null;
   hasPrice: boolean | null;

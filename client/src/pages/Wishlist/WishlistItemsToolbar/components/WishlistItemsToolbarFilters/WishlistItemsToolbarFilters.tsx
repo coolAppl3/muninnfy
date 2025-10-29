@@ -7,6 +7,7 @@ import useCalendar from '../../../../../hooks/useCalendar';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../../hooks/useWishlistItems';
 import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
+import WishlistItemToolbarPriceRange from './components/WishlistItemToolbarPriceRange';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -30,6 +31,10 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   const [purchasedBeforeTimestamp, setPurchasedBeforeTimestamp] = useState<number | null>(
     endTimestampsMap.get(purchasedTimestampsKey) || null
   );
+
+  const [priceFrom, setPriceFrom] = useState<number | null>(null);
+  const [priceTo, setPriceTo] = useState<number | null>(null);
+  const [priceRangeValid, setPriceRangeValid] = useState<boolean>(true);
 
   const [isPurchased, setIsPurchased] = useState<boolean | null>(itemsFilterConfig.isPurchased);
   const [hasLink, setHasLink] = useState<boolean | null>(itemsFilterConfig.hasLink);
@@ -67,6 +72,14 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       return true;
     }
 
+    if (priceFrom !== itemsFilterConfig.priceFrom) {
+      return true;
+    }
+
+    if (priceTo !== itemsFilterConfig.priceTo) {
+      return true;
+    }
+
     if (isPurchased !== itemsFilterConfig.isPurchased) {
       return true;
     }
@@ -93,6 +106,11 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   }
 
   function applyFilters(): void {
+    if (!priceRangeValid) {
+      displayPopupMessage('Invalid price range.', 'error');
+      return;
+    }
+
     unselectAllWishlistItems();
     setItemsFilterConfig((prev) => ({
       ...prev,
@@ -101,6 +119,8 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       addedBeforeTimestamp,
       purchasedAfterTimestamp,
       purchasedBeforeTimestamp,
+      priceFrom,
+      priceTo,
 
       isPurchased,
       hasLink,
@@ -118,6 +138,8 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setAddedBeforeTimestamp(null);
     setPurchasedAfterTimestamp(null);
     setPurchasedBeforeTimestamp(null);
+    setPriceFrom(null);
+    setPriceTo(null);
 
     setIsPurchased(null);
     setHasLink(null);
@@ -134,6 +156,8 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       addedBeforeTimestamp: null,
       purchasedAfterTimestamp: null,
       purchasedBeforeTimestamp: null,
+      priceFrom: null,
+      priceTo: null,
 
       isPurchased: null,
       hasLink: null,
@@ -191,6 +215,14 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           calendarKey={purchasedTimestampsKey}
           startLabel='Purchased after'
           endLabel='Purchased before'
+        />
+      )}
+
+      {hasPrice && (
+        <WishlistItemToolbarPriceRange
+          setPriceFrom={setPriceFrom}
+          setPriceTo={setPriceTo}
+          setPriceRangeValid={setPriceRangeValid}
         />
       )}
 
