@@ -8,6 +8,7 @@ import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../../hooks/useWishlistItems';
 import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
 import WishlistItemToolbarPriceRange from './components/WishlistItemToolbarPriceRange';
+import { ItemsFilterConfig } from '../../../contexts/WishlistItemsContext';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -56,40 +57,22 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   }, [calendarKey, startTimestampsMap, endTimestampsMap]);
 
   function changesDetected(): boolean {
-    if (addedAfterTimestamp !== itemsFilterConfig.addedAfterTimestamp) {
-      return true;
-    }
+    const stateRecord = {
+      addedAfterTimestamp,
+      addedBeforeTimestamp,
+      purchasedAfterTimestamp,
+      purchasedBeforeTimestamp,
+      priceFrom,
+      priceTo,
+      isPurchased,
+      hasLink,
+      hasPrice,
+    };
 
-    if (addedBeforeTimestamp !== itemsFilterConfig.addedBeforeTimestamp) {
-      return true;
-    }
-
-    if (purchasedAfterTimestamp !== itemsFilterConfig.purchasedAfterTimestamp) {
-      return true;
-    }
-
-    if (purchasedBeforeTimestamp !== itemsFilterConfig.purchasedBeforeTimestamp) {
-      return true;
-    }
-
-    if (priceFrom !== itemsFilterConfig.priceFrom) {
-      return true;
-    }
-
-    if (priceTo !== itemsFilterConfig.priceTo) {
-      return true;
-    }
-
-    if (isPurchased !== itemsFilterConfig.isPurchased) {
-      return true;
-    }
-
-    if (hasLink !== itemsFilterConfig.hasLink) {
-      return true;
-    }
-
-    if (hasPrice !== itemsFilterConfig.hasPrice) {
-      return true;
+    for (const key of Object.keys(stateRecord) as (keyof typeof stateRecord)[]) {
+      if (stateRecord[key] !== itemsFilterConfig[key]) {
+        return true;
+      }
     }
 
     if (tagsSet.size !== itemsFilterConfig.tagsSet.size) {
