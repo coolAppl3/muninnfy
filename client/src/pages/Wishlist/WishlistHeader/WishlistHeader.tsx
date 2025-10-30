@@ -36,7 +36,9 @@ export default function WishlistHeader(): JSX.Element {
             <p className='text-sm text-description '>
               Cost to complete:{' '}
               <span className='font-medium text-title'>
-                {wishlistItems.reduce((acc: number, curr: WishlistItemType) => acc + (curr.price || 0), 0).toFixed(2)}
+                {wishlistItems
+                  .reduce((acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)), 0)
+                  .toFixed(2)}
               </span>
             </p>
           </div>
