@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
-import WishlistItemsContext, { ItemsFilterConfig, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
+import WishlistItemsContext, { ItemsFilterConfigType, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 type WishlistItemsProviderProps = {
@@ -9,7 +9,7 @@ type WishlistItemsProviderProps = {
 
 export default function WishlistItemsProvider({ initialWishlistItems, children }: WishlistItemsProviderProps): JSX.Element {
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
-  const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
+  const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfigType>(defaultItemsFilterConfig);
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
   const [selectionModeActive, setSelectionModeActive] = useState<boolean>(false);
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
@@ -148,7 +148,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
   return <WishlistItemsContext value={contextValue}>{children}</WishlistItemsContext>;
 }
 
-const defaultItemsFilterConfig: ItemsFilterConfig = {
+const defaultItemsFilterConfig: ItemsFilterConfigType = {
   addedAfterTimestamp: null,
   addedBeforeTimestamp: null,
 

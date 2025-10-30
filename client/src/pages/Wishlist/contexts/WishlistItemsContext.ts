@@ -1,7 +1,7 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
-export type ItemsFilterConfig = {
+export type ItemsFilterConfigType = {
   addedAfterTimestamp: number | null;
   addedBeforeTimestamp: number | null;
 
@@ -26,8 +26,8 @@ export type WishlistItemsContextType = {
   setWishlistItems: Dispatch<SetStateAction<WishlistItemType[]>>;
   wishlistItemsTitleSet: Set<string>;
 
-  itemsFilterConfig: ItemsFilterConfig;
-  setItemsFilterConfig: Dispatch<SetStateAction<ItemsFilterConfig>>;
+  itemsFilterConfig: ItemsFilterConfigType;
+  setItemsFilterConfig: Dispatch<SetStateAction<ItemsFilterConfigType>>;
   itemMatchesFilterConfig: (item: WishlistItemType) => boolean;
 
   itemsSortingMode: ItemsSortingMode;
