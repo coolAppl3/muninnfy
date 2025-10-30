@@ -34,7 +34,7 @@ export default function WishlistItemToolbarPriceRange({
     }
 
     const fromNumberValue: number | null = fromValue === '' ? null : +fromValue;
-    const toNumberValue: number | null = fromValue === '' ? null : +toValue;
+    const toNumberValue: number | null = toValue === '' ? null : +toValue;
 
     setPriceFrom(fromNumberValue);
     setPriceTo(toNumberValue);
@@ -64,8 +64,8 @@ export default function WishlistItemToolbarPriceRange({
         value={localPriceFromValue}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
-          setLocalPriceFromValue(newValue);
 
+          setLocalPriceFromValue(newValue);
           validateRange(newValue, localPriceToValue);
         }}
       />
@@ -78,8 +78,8 @@ export default function WishlistItemToolbarPriceRange({
         value={localPriceToValue}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
-          setLocalPriceToValue(newValue);
 
+          setLocalPriceToValue(newValue);
           validateRange(localPriceFromValue, newValue);
         }}
       />
