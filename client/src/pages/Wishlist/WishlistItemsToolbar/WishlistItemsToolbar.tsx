@@ -13,7 +13,22 @@ export default function WishlistItemsToolbar(): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
-  const { setItemsFilterConfig } = useWishlistItems();
+  const { itemsFilterConfig, setItemsFilterConfig } = useWishlistItems();
+
+  const filtersAppliedCount: number = Object.values(itemsFilterConfig).reduce(
+    (acc: number, cur: string | number | boolean | Set<String> | null) => {
+      if (cur === null || typeof cur === 'string') {
+        return acc;
+      }
+
+      if (typeof cur === 'object') {
+        return cur.size > 0 ? acc + cur.size : acc;
+      }
+
+      return acc + 1;
+    },
+    0
+  );
 
   const debounceSetTitleQuery: (query: string) => void = useMemo(
     () =>
@@ -59,6 +74,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
           autoComplete='off'
           value={value}
           errorMessage={null}
+          className='mb-1'
           onChange={(e) => {
             const newValue: string = e.target.value;
             setValue(newValue);
@@ -66,6 +82,12 @@ export default function WishlistItemsToolbar(): JSX.Element {
             debounceSetTitleQuery(newValue.toLowerCase());
           }}
         />
+
+        {filtersAppliedCount > 0 && (
+          <span className='text-cta font-medium text-sm flex gap-1'>
+            {filtersAppliedCount === 1 ? '1 filter' : `${filtersAppliedCount} filters`} applied
+          </span>
+        )}
       </Container>
     </div>
   );
