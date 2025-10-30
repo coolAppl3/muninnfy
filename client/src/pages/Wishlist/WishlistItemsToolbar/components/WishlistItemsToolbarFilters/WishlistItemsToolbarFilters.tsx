@@ -8,7 +8,6 @@ import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../../hooks/useWishlistItems';
 import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
 import WishlistItemToolbarPriceRange from './components/WishlistItemToolbarPriceRange';
-import { ItemsFilterConfig } from '../../../contexts/WishlistItemsContext';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
