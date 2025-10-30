@@ -160,6 +160,18 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     >
       <h4 className='text-title'>Filters</h4>
 
+      <TimeWindowContainer
+        calendarKey={addedTimestampsKey}
+        startLabel='Added after'
+        endLabel='Added before'
+      />
+
+      <WishlistItemTagsFormGroup
+        itemTags={tagsSet}
+        setItemTags={setTagsSet}
+        label='Tags - click space to add'
+      />
+
       <div className='grid gap-1'>
         <WishlistItemsToolbarFilterItem
           filterBy={isPurchased}
@@ -169,13 +181,14 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           negativeFilterTitle='Unpurchased'
         />
 
-        <WishlistItemsToolbarFilterItem
-          filterBy={hasLink}
-          setFilterBy={setHasLink}
-          title='Link'
-          positiveFilterTitle='Contains a link'
-          negativeFilterTitle={`Doesn't contain a link`}
-        />
+        {isPurchased && (
+          <TimeWindowContainer
+            calendarKey={purchasedTimestampsKey}
+            startLabel='Purchased after'
+            endLabel='Purchased before'
+            className='mb-1'
+          />
+        )}
 
         <WishlistItemsToolbarFilterItem
           filterBy={hasPrice}
@@ -184,35 +197,24 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           positiveFilterTitle='Has a price'
           negativeFilterTitle={`Doesn't have a price`}
         />
+
+        {hasPrice && (
+          <WishlistItemToolbarPriceRange
+            setPriceFrom={setPriceFrom}
+            setPriceTo={setPriceTo}
+            setPriceRangeValid={setPriceRangeValid}
+            className='mb-1'
+          />
+        )}
+
+        <WishlistItemsToolbarFilterItem
+          filterBy={hasLink}
+          setFilterBy={setHasLink}
+          title='Link'
+          positiveFilterTitle='Contains a link'
+          negativeFilterTitle={`Doesn't contain a link`}
+        />
       </div>
-
-      <TimeWindowContainer
-        calendarKey={addedTimestampsKey}
-        startLabel='Added after'
-        endLabel='Added before'
-      />
-
-      {isPurchased && (
-        <TimeWindowContainer
-          calendarKey={purchasedTimestampsKey}
-          startLabel='Purchased after'
-          endLabel='Purchased before'
-        />
-      )}
-
-      {hasPrice && (
-        <WishlistItemToolbarPriceRange
-          setPriceFrom={setPriceFrom}
-          setPriceTo={setPriceTo}
-          setPriceRangeValid={setPriceRangeValid}
-        />
-      )}
-
-      <WishlistItemTagsFormGroup
-        itemTags={tagsSet}
-        setItemTags={setTagsSet}
-        label='Tags - click space to add'
-      />
 
       <div className='btn-container flex flex-col sm:flex-row justify-start items-start gap-1'>
         <Button

@@ -13,7 +13,7 @@ export default function ToggleSwitch({ isToggled, setIsToggled, className }: Tog
       title={isToggled ? 'Disable' : 'Enable'}
       aria-label={isToggled ? 'Disable' : 'Enable'}
       onClick={() => setIsToggled((prev) => !prev)}
-      className={`flex justify-start items-center h-[1.6rem] w-[3.8rem] rounded-pill cursor-pointer hover:brightness-75 transition-all ${
+      className={`flex justify-start items-center h-[1.4rem] w-[3.8rem] rounded-pill cursor-pointer hover:brightness-75 transition-all ${
         isToggled ? 'bg-cta/30 brightness-100' : 'bg-dark brightness-50'
       } ${className || ''}`}
     >
