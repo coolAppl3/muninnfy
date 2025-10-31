@@ -8,6 +8,7 @@ import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../../hooks/useWishlistItems';
 import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
 import WishlistItemToolbarPriceRange from './components/WishlistItemToolbarPriceRange';
+import CheckboxFormGroup from '../../../../../components/CheckboxFormGroup/CheckboxFormGroup';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -39,7 +40,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   const [isPurchased, setIsPurchased] = useState<boolean | null>(itemsFilterConfig.isPurchased);
   const [hasLink, setHasLink] = useState<boolean | null>(itemsFilterConfig.hasLink);
   const [hasPrice, setHasPrice] = useState<boolean | null>(itemsFilterConfig.hasPrice);
+
   const [tagsSet, setTagsSet] = useState<Set<string>>(new Set(itemsFilterConfig.tagsSet));
+  const [requireAllFilterTags, setRequireAllFilterTags] = useState<boolean>(false);
 
   const { displayPopupMessage } = usePopupMessage();
 
@@ -66,6 +69,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       isPurchased,
       hasLink,
       hasPrice,
+      requireAllFilterTags,
     };
 
     for (const key of Object.keys(stateRecord) as (keyof typeof stateRecord)[]) {
@@ -107,7 +111,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       isPurchased,
       hasLink,
       hasPrice,
+
       tagsSet,
+      requireAllFilterTags,
     }));
 
     displayPopupMessage('Filters applied.', 'success');
@@ -126,7 +132,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setIsPurchased(null);
     setHasLink(null);
     setHasPrice(null);
+
     setTagsSet(new Set());
+    setRequireAllFilterTags(false);
 
     setStartTimestampsMap(new Map<string, number>());
     setEndTimestampsMap(new Map<string, number>());
@@ -144,7 +152,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       isPurchased: null,
       hasLink: null,
       hasPrice: null,
+
       tagsSet: new Set(),
+      requireAllFilterTags: false,
     }));
 
     displayPopupMessage('Filters reset.', 'success');
@@ -166,11 +176,21 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
         endLabel='Added before'
       />
 
-      <WishlistItemTagsFormGroup
-        itemTags={tagsSet}
-        setItemTags={setTagsSet}
-        label='Tags - click space to add'
-      />
+      <div>
+        <WishlistItemTagsFormGroup
+          itemTags={tagsSet}
+          setItemTags={setTagsSet}
+          label='Tags - click space to add'
+        />
+
+        <CheckboxFormGroup
+          id='require-all-tags'
+          label='Require all tags'
+          isChecked={requireAllFilterTags}
+          onClick={() => setRequireAllFilterTags((prev) => !prev)}
+          className='mt-1'
+        />
+      </div>
 
       <div className='grid gap-1'>
         <WishlistItemsToolbarFilterItem

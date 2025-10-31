@@ -16,7 +16,9 @@ export type ItemsFilterConfigType = {
   hasPrice: boolean | null;
 
   titleQuery: string;
+
   tagsSet: Set<string>;
+  requireAllFilterTags: boolean;
 };
 
 export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'cheapest_first' | 'priciest_first' | 'lexicographical';

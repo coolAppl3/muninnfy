@@ -33,6 +33,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         hasPrice,
         titleQuery,
         tagsSet,
+        requireAllFilterTags,
       } = itemsFilterConfig;
 
       if (addedAfterTimestamp && item.added_on_timestamp < addedAfterTimestamp) {
@@ -79,7 +80,18 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return true;
       }
 
-      return item.tags.some(({ name }) => tagsSet.has(name));
+      if (!requireAllFilterTags) {
+        return item.tags.some(({ name }) => tagsSet.has(name));
+      }
+
+      const itemTagsSet = new Set<string>(item.tags.map(({ name }) => name));
+      for (const tag of tagsSet) {
+        if (!itemTagsSet.has(tag)) {
+          return false;
+        }
+      }
+
+      return true;
     },
     [itemsFilterConfig]
   );
@@ -163,5 +175,7 @@ const defaultItemsFilterConfig: ItemsFilterConfigType = {
   hasPrice: null,
 
   titleQuery: '',
+
   tagsSet: new Set<string>(),
+  requireAllFilterTags: false,
 };
