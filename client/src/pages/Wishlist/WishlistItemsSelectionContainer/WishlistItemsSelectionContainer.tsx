@@ -173,9 +173,32 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
     <div>
       <Container>
         <div className='p-2 bg-dark rounded-sm shadow-simple-tiny'>
-          <p className='text-title text-sm font-medium mb-1'>
-            {selectedItemsSet.size} {selectedItemsSet.size === 1 ? 'item' : 'items'} selected
-          </p>
+          <div className='text-description text-sm mb-[1.6rem]'>
+            <p>
+              Items selected: <span className='text-title font-medium'>{selectedItemsSet.size}</span>
+            </p>
+
+            <p>
+              Cost to purchase:{' '}
+              <span className='text-title font-medium'>
+                {wishlistItems
+                  .reduce((acc: number, curr: WishlistItemType) => {
+                    const itemSelected: boolean = selectedItemsSet.has(curr.item_id);
+
+                    if (!itemSelected || !curr.price) {
+                      return acc;
+                    }
+
+                    if (curr.purchased_on_timestamp) {
+                      return acc;
+                    }
+
+                    return acc + curr.price;
+                  }, 0)
+                  .toFixed(2)}
+              </span>
+            </p>
+          </div>
 
           <div className='text-description font-medium text-sm flex flex-col sm:flex-row justify-start items-start gap-1 mb-2'>
             <button
