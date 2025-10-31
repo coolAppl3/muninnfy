@@ -15,14 +15,18 @@ export default function WishlistItemsToolbar(): JSX.Element {
 
   const { itemsFilterConfig, setItemsFilterConfig } = useWishlistItems();
 
-  const filtersAppliedCount: number = Object.values(itemsFilterConfig).reduce(
-    (acc: number, cur: string | number | boolean | Set<String> | null) => {
-      if (cur === null || typeof cur === 'string') {
+  const filtersAppliedCount: number = Object.entries(itemsFilterConfig).reduce(
+    (acc: number, [key, value]: [string, number | string | boolean | Set<string> | null]) => {
+      if (value === null) {
         return acc;
       }
 
-      if (typeof cur === 'object') {
-        return cur.size > 0 ? acc + cur.size : acc;
+      if (key === 'requireAllFilterTags' || key === 'titleQuery') {
+        return acc;
+      }
+
+      if (key === 'tagsSet' && typeof value === 'object') {
+        return value.size > 0 ? acc + 1 : acc;
       }
 
       return acc + 1;
