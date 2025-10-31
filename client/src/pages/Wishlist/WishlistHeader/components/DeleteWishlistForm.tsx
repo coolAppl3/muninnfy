@@ -44,7 +44,6 @@ export default function DeleteWishlistForm(): JSX.Element {
 
   return (
     <form
-      className='grid gap-2 w-full'
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -61,7 +60,7 @@ export default function DeleteWishlistForm(): JSX.Element {
         removeLoadingOverlay();
       }}
     >
-      <div className='text-description'>
+      <div className='text-description mb-1'>
         <p className='font-medium mb-[6px]'>Are you sure you want to delete this wishlist?</p>
         <p className='text-sm'>
           <span className='text-danger'>This action is irreversible.</span> To proceed, confirm your wishlist title below:
@@ -74,6 +73,7 @@ export default function DeleteWishlistForm(): JSX.Element {
         autoComplete='name'
         value={confirmationTitleValue}
         errorMessage={null}
+        className='mb-2'
         onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmationTitleValue(e.target.value)}
       />
 

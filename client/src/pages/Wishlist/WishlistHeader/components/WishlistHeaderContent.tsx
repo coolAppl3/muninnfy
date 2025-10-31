@@ -13,7 +13,7 @@ export default function WishlistHeaderContent(): JSX.Element {
 
   return (
     <div
-      className='flex justify-between items-start gap-1 mb-1 relative'
+      className='flex justify-between items-start gap-1 relative'
       onBlur={(e: FocusEvent<HTMLDivElement>) => {
         if (e.relatedTarget?.classList.contains('context-menu-btn')) {
           return;

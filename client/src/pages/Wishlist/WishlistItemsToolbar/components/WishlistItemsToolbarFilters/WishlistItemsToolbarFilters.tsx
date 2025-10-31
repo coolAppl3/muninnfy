@@ -8,7 +8,7 @@ import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../../hooks/useWishlistItems';
 import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
 import WishlistItemToolbarPriceRange from './components/WishlistItemToolbarPriceRange';
-import { ItemsFilterConfig } from '../../../contexts/WishlistItemsContext';
+import CheckboxFormGroup from '../../../../../components/CheckboxFormGroup/CheckboxFormGroup';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -40,7 +40,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   const [isPurchased, setIsPurchased] = useState<boolean | null>(itemsFilterConfig.isPurchased);
   const [hasLink, setHasLink] = useState<boolean | null>(itemsFilterConfig.hasLink);
   const [hasPrice, setHasPrice] = useState<boolean | null>(itemsFilterConfig.hasPrice);
+
   const [tagsSet, setTagsSet] = useState<Set<string>>(new Set(itemsFilterConfig.tagsSet));
+  const [requireAllFilterTags, setRequireAllFilterTags] = useState<boolean>(false);
 
   const { displayPopupMessage } = usePopupMessage();
 
@@ -67,6 +69,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       isPurchased,
       hasLink,
       hasPrice,
+      requireAllFilterTags,
     };
 
     for (const key of Object.keys(stateRecord) as (keyof typeof stateRecord)[]) {
@@ -108,7 +111,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       isPurchased,
       hasLink,
       hasPrice,
+
       tagsSet,
+      requireAllFilterTags,
     }));
 
     displayPopupMessage('Filters applied.', 'success');
@@ -127,7 +132,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setIsPurchased(null);
     setHasLink(null);
     setHasPrice(null);
+
     setTagsSet(new Set());
+    setRequireAllFilterTags(false);
 
     setStartTimestampsMap(new Map<string, number>());
     setEndTimestampsMap(new Map<string, number>());
@@ -145,7 +152,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       isPurchased: null,
       hasLink: null,
       hasPrice: null,
+
       tagsSet: new Set(),
+      requireAllFilterTags: false,
     }));
 
     displayPopupMessage('Filters reset.', 'success');
@@ -161,6 +170,28 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     >
       <h4 className='text-title'>Filters</h4>
 
+      <TimeWindowContainer
+        calendarKey={addedTimestampsKey}
+        startLabel='Added after'
+        endLabel='Added before'
+      />
+
+      <div>
+        <WishlistItemTagsFormGroup
+          itemTags={tagsSet}
+          setItemTags={setTagsSet}
+          label='Tags - click space to add'
+        />
+
+        <CheckboxFormGroup
+          id='require-all-tags'
+          label='Require all tags'
+          isChecked={requireAllFilterTags}
+          onClick={() => setRequireAllFilterTags((prev) => !prev)}
+          className='mt-1'
+        />
+      </div>
+
       <div className='grid gap-1'>
         <WishlistItemsToolbarFilterItem
           filterBy={isPurchased}
@@ -170,13 +201,14 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           negativeFilterTitle='Unpurchased'
         />
 
-        <WishlistItemsToolbarFilterItem
-          filterBy={hasLink}
-          setFilterBy={setHasLink}
-          title='Link'
-          positiveFilterTitle='Contains a link'
-          negativeFilterTitle={`Doesn't contain a link`}
-        />
+        {isPurchased && (
+          <TimeWindowContainer
+            calendarKey={purchasedTimestampsKey}
+            startLabel='Purchased after'
+            endLabel='Purchased before'
+            className='mb-1'
+          />
+        )}
 
         <WishlistItemsToolbarFilterItem
           filterBy={hasPrice}
@@ -185,35 +217,24 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           positiveFilterTitle='Has a price'
           negativeFilterTitle={`Doesn't have a price`}
         />
+
+        {hasPrice && (
+          <WishlistItemToolbarPriceRange
+            setPriceFrom={setPriceFrom}
+            setPriceTo={setPriceTo}
+            setPriceRangeValid={setPriceRangeValid}
+            className='mb-1'
+          />
+        )}
+
+        <WishlistItemsToolbarFilterItem
+          filterBy={hasLink}
+          setFilterBy={setHasLink}
+          title='Link'
+          positiveFilterTitle='Contains a link'
+          negativeFilterTitle={`Doesn't contain a link`}
+        />
       </div>
-
-      <TimeWindowContainer
-        calendarKey={addedTimestampsKey}
-        startLabel='Added after'
-        endLabel='Added before'
-      />
-
-      {isPurchased && (
-        <TimeWindowContainer
-          calendarKey={purchasedTimestampsKey}
-          startLabel='Purchased after'
-          endLabel='Purchased before'
-        />
-      )}
-
-      {hasPrice && (
-        <WishlistItemToolbarPriceRange
-          setPriceFrom={setPriceFrom}
-          setPriceTo={setPriceTo}
-          setPriceRangeValid={setPriceRangeValid}
-        />
-      )}
-
-      <WishlistItemTagsFormGroup
-        itemTags={tagsSet}
-        setItemTags={setTagsSet}
-        label='Tags - click space to add'
-      />
 
       <div className='btn-container flex flex-col sm:flex-row justify-start items-start gap-1'>
         <Button

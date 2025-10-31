@@ -101,11 +101,11 @@ export default function Wishlist(): JSX.Element {
       {isLoaded && initialWishlistProviderData ? (
         <WishlistProvider {...initialWishlistProviderData}>
           <main className='py-4 grid gap-2'>
-            <WishlistHeaderProvider>
-              <WishlistHeader />
-            </WishlistHeaderProvider>
-
             <WishlistItemsProvider initialWishlistItems={initialWishlistProviderData.initialWishlistItems}>
+              <WishlistHeaderProvider>
+                <WishlistHeader />
+              </WishlistHeaderProvider>
+
               <NewWishlistItemFormContainer />
 
               <CalendarProvider>

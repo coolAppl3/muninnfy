@@ -6,9 +6,12 @@ import useWishlistHeader from './context/useWishlistHeader';
 import WishlistHeaderEditingContainer from './components/WishlistHeaderEditingContainer';
 import WishlistHeaderContent from './components/WishlistHeaderContent';
 import useWishlist from '../hooks/useWishlist';
+import useWishlistItems from '../hooks/useWishlistItems';
+import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 export default function WishlistHeader(): JSX.Element {
   const { wishlistDetails } = useWishlist();
+  const { wishlistItems } = useWishlistItems();
   const { editMode } = useWishlistHeader();
 
   return (
@@ -25,8 +28,18 @@ export default function WishlistHeader(): JSX.Element {
             <p className='text-sm text-description'>
               Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
             </p>
+
             <p className='text-sm text-description'>
               Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
+            </p>
+
+            <p className='text-sm text-description '>
+              Cost to complete:{' '}
+              <span className='font-medium text-title'>
+                {wishlistItems
+                  .reduce((acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)), 0)
+                  .toFixed(2)}
+              </span>
             </p>
           </div>
 

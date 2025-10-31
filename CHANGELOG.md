@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.1.3] (2024-10-31)
+
+### Features
+
+- Added "Cost to complete" information in `WishlistHeader`.
+- Added "Cost to purchase" information in `WishlistItemsSelectionContainer`, conveying the cost of purchasing selected items.
+- Added an indicator for the user to show if, and how many, filters are applied.
+- Added the option to require all the filter tags.
+  - By default, any item containing at least one of the filter tags is included in the results. Checking "Require all tags" would only allow wishlist items that include all the filter tags to be shown in the results.
+
+
+### Improvements
+
+- Newly added wishlist items will be expanded by default if all other items are expanded when its added, improving user experience.
+- Reworked UI look and structure of `WishlistItemsToolbarFilters`, making it more intuitive and easier to use.
+  - This included UI improvements to `ToggleSwitch`.
+
+
+### Bug Fixes
+
+- Fixed price range filtering issues caused by a typo using the wrong variable in `WishlistItemToolbarPriceRange`.
+
+
+### Code Refactoring
+
+- Minor margin adjustments in `DeleteWishlistForm` and `WishlistHeaderContent`.
+- Renamed `ItemsFilterConfig` type to `ItemsFilterConfigType` for better clarity.
+
+
 ## [0.1.2] (2024-10-29)
 
 ### Features

@@ -18,6 +18,8 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import useWishlistItems from '../hooks/useWishlistItems';
+import useWishlistItemsExpansionStore from '../stores/wishlistItemsExpansionStore';
+import { useShallow } from 'zustand/react/shallow';
 
 type WishlistItemFromProps = {
   formMode: 'NEW_ITEM' | 'EDIT_ITEM';
@@ -29,6 +31,13 @@ type WishlistItemFromProps = {
 export default function WishlistItemForm({ formMode, wishlistItem, onFinish, className }: WishlistItemFromProps): JSX.Element {
   const { wishlistId } = useWishlist();
   const { wishlistItems, setWishlistItems, wishlistItemsTitleSet, itemsSortingMode, sortWishlistItems } = useWishlistItems();
+
+  const { expandedItemsIdsSet, toggleWishlistItemExpansion } = useWishlistItemsExpansionStore(
+    useShallow((store) => ({
+      expandedItemsIdsSet: store.expandedItemsIdsSet,
+      toggleWishlistItemExpansion: store.toggleWishlistItemsExpansion,
+    }))
+  );
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -96,6 +105,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
       setWishlistItems((prev) => [newWishlistItem, ...prev]);
       itemsSortingMode === 'newest_first' || sortWishlistItems();
+
+      const allItemsExpanded: boolean = expandedItemsIdsSet.size === wishlistItems.length;
+      allItemsExpanded && toggleWishlistItemExpansion(newWishlistItem.item_id);
 
       displayPopupMessage('Item added.', 'success');
       clearForm();

@@ -20,11 +20,11 @@ export default function WishlistItemsToolbarFilterItem({
   return (
     <div className='grid gap-1'>
       <header className='flex justify-start items-center gap-1'>
-        <p className='text-title text-sm leading-[1]'>{title}</p>
         <ToggleSwitch
           isToggled={filterBy !== null}
           setIsToggled={() => setFilterBy((prev) => (prev === null ? true : null))}
         />
+        <p className='text-title text-sm leading-[1]'>{title}</p>
       </header>
 
       <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>

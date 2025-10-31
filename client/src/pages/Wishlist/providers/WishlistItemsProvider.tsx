@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
-import WishlistItemsContext, { ItemsFilterConfig, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
+import WishlistItemsContext, { ItemsFilterConfigType, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 type WishlistItemsProviderProps = {
@@ -9,7 +9,7 @@ type WishlistItemsProviderProps = {
 
 export default function WishlistItemsProvider({ initialWishlistItems, children }: WishlistItemsProviderProps): JSX.Element {
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
-  const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfig>(defaultItemsFilterConfig);
+  const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfigType>(defaultItemsFilterConfig);
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
   const [selectionModeActive, setSelectionModeActive] = useState<boolean>(false);
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
@@ -33,6 +33,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         hasPrice,
         titleQuery,
         tagsSet,
+        requireAllFilterTags,
       } = itemsFilterConfig;
 
       if (addedAfterTimestamp && item.added_on_timestamp < addedAfterTimestamp) {
@@ -79,7 +80,18 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return true;
       }
 
-      return item.tags.some(({ name }) => tagsSet.has(name));
+      if (!requireAllFilterTags) {
+        return item.tags.some(({ name }) => tagsSet.has(name));
+      }
+
+      const itemTagsSet = new Set<string>(item.tags.map(({ name }) => name));
+      for (const tag of tagsSet) {
+        if (!itemTagsSet.has(tag)) {
+          return false;
+        }
+      }
+
+      return true;
     },
     [itemsFilterConfig]
   );
@@ -148,7 +160,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
   return <WishlistItemsContext value={contextValue}>{children}</WishlistItemsContext>;
 }
 
-const defaultItemsFilterConfig: ItemsFilterConfig = {
+const defaultItemsFilterConfig: ItemsFilterConfigType = {
   addedAfterTimestamp: null,
   addedBeforeTimestamp: null,
 
@@ -163,5 +175,7 @@ const defaultItemsFilterConfig: ItemsFilterConfig = {
   hasPrice: null,
 
   titleQuery: '',
+
   tagsSet: new Set<string>(),
+  requireAllFilterTags: false,
 };
