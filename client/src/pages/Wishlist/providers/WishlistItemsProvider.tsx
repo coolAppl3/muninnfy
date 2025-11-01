@@ -15,7 +15,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
-    () => new Set<string>(wishlistItems.map((item: WishlistItemType) => item.title.toLowerCase())),
+    () => new Set<string>(wishlistItems.map(({ title }: WishlistItemType) => title.toLowerCase())),
     [wishlistItems]
   );
 
@@ -84,7 +84,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return item.tags.some(({ name }) => tagsSet.has(name));
       }
 
-      const itemTagsSet = new Set<string>(item.tags.map(({ name }) => name));
+      const itemTagsSet = new Set<string>(item.tags.map(({ name }: { id: number; name: string }) => name));
       for (const tag of tagsSet) {
         if (!itemTagsSet.has(tag)) {
           return false;

@@ -53,7 +53,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   const [descriptionValue, setDescriptionValue] = useState<string>(wishlistItem?.description || '');
   const [descriptionErrorMessage, setDescriptionErrorMessage] = useState<string | null>(null);
 
-  const [itemTags, setItemTags] = useState<Set<string>>(new Set<string>(wishlistItem?.tags.map(({ name }) => name) || []));
+  const [tagsSet, setTagsSet] = useState<Set<string>>(
+    new Set<string>(wishlistItem?.tags.map(({ name }: { id: number; name: string }) => name) || [])
+  );
 
   const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { referrerLocation } = useHistory();
@@ -98,7 +100,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const description: string | null = descriptionValue || null;
     const link: string | null = linkValue || null;
     const price: number | null = priceValue.length === 0 ? null : +priceValue;
-    const tags: string[] = [...itemTags];
+    const tags: string[] = [...tagsSet];
 
     try {
       const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, price, tags })).data;
@@ -152,7 +154,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const description: string | null = descriptionValue || null;
     const link: string | null = linkValue || null;
     const price: number | null = priceValue.length === 0 ? null : +priceValue;
-    const tags: string[] = [...itemTags];
+    const tags: string[] = [...tagsSet];
 
     try {
       const updatedWishlistItem: WishlistItemType = (
@@ -183,7 +185,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
           return;
         }
 
-        setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
+        setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id));
         return;
       }
 
@@ -269,12 +271,12 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       return true;
     }
 
-    if (itemTags.size !== wishlistItem.tags.length) {
+    if (tagsSet.size !== wishlistItem.tags.length) {
       return true;
     }
 
     for (const { name } of wishlistItem.tags) {
-      if (!itemTags.has(name)) {
+      if (!tagsSet.has(name)) {
         return true;
       }
     }
@@ -295,7 +297,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     setPriceValue('');
     setPriceErrorMessage(null);
 
-    setItemTags(new Set<string>());
+    setTagsSet(new Set<string>());
   }
 
   const wishlistItemErrFieldRecord: Record<string, Dispatch<SetStateAction<string | null>>> = {
@@ -368,8 +370,8 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       />
 
       <WishlistItemTagsFormGroup
-        itemTags={itemTags}
-        setItemTags={setItemTags}
+        tagsSet={tagsSet}
+        setTagsSet={setTagsSet}
         label='Tags - click space to add'
       />
 

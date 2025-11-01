@@ -112,12 +112,12 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
 
             {wishlistItem.tags.length > 0 && (
               <div>
-                {wishlistItem.tags.map((tag: { id: number; name: string }) => (
+                {wishlistItem.tags.map(({ id, name }: { id: number; name: string }) => (
                   <span
-                    key={tag.id}
+                    key={id}
                     className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] font-medium'
                   >
-                    {tag.name}
+                    {name}
                   </span>
                 ))}
               </div>

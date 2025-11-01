@@ -118,7 +118,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
         return;
       }
 
-      setWishlistItems((prev) => prev.filter((item: WishlistItemType) => !selectedItemsSet.has(item.item_id)));
+      setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => !selectedItemsSet.has(item_id)));
 
       setSelectionModeActive(false);
       setSelectedAction('mark_as_purchased');
@@ -284,7 +284,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
                 return;
               }
 
-              selectAllWishlistItems(wishlistItems.filter(itemMatchesFilterConfig).map((item: WishlistItemType) => item.item_id));
+              selectAllWishlistItems(wishlistItems.filter(itemMatchesFilterConfig).map(({ item_id }: WishlistItemType) => item_id));
             }}
           >
             <CheckIcon

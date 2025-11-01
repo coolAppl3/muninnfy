@@ -178,8 +178,8 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
       <div>
         <WishlistItemTagsFormGroup
-          itemTags={tagsSet}
-          setItemTags={setTagsSet}
+          tagsSet={tagsSet}
+          setTagsSet={setTagsSet}
           label='Tags - click space to add'
         />
 
