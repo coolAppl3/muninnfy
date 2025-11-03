@@ -23,6 +23,8 @@ import {
   resetFailedSignInAttempts,
 } from '../db/helpers/accountDbHelpers';
 import { createAuthSession } from '../auth/authSessions';
+import { getAuthSessionId } from '../auth/authUtils';
+import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 
 export const accountsRouter: Router = express.Router();
 
@@ -627,6 +629,89 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     }
 
     res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+accountsRouter.get('/', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      public_account_id: string;
+      email: string;
+      username: string;
+      display_name: string;
+      created_on_timestamp: string;
+      wishlist_count: number;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        public_account_id,
+        email,
+        username,
+        display_name,
+        created_on_timestamp,
+        (SELECT COUNT(*) FROM wishlists WHERE account_id = :accountId) AS wishlists_count
+      FROM
+        accounts
+      WHERE
+        account_id = :accountId;`,
+      { accountId }
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    type Wishlist = {
+      wishlist_id: string;
+      privacy_level: string;
+      title: string;
+      created_on_timestamp: number;
+      items_count: number;
+    };
+
+    const [wishlists] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        wishlists.wishlist_id,
+        wishlists.privacy_level,
+        wishlists.title,
+        wishlists.created_on_timestamp,
+        (SELECT COUNT(*) FROM wishlist_items WHERE wishlist_id = wishlists.wishlist_id) AS items_count
+      FROM
+        wishlists
+      WHERE
+        account_id = ?
+      ORDER BY
+        items_count DESC
+      LIMIT 3;`,
+      [accountId]
+    );
+
+    res.json({ accountDetails, wishlists: wishlists as Wishlist[] });
   } catch (err: unknown) {
     console.log(err);
 
