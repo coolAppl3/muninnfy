@@ -29,7 +29,7 @@ export default function WishlistHeader(): JSX.Element {
               Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
             </p>
 
-            <p className='text-sm text-description mb-1'>
+            <p className='text-sm text-description mb-[6px]'>
               Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
             </p>
 
