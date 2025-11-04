@@ -29,11 +29,15 @@ export default function WishlistHeader(): JSX.Element {
               Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
             </p>
 
-            <p className='text-sm text-description'>
+            <p className='text-sm text-description mb-1'>
               Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
             </p>
 
-            <p className='text-sm text-description '>
+            <p className='text-sm text-description'>
+              Total items: <span className='font-medium text-title'>{wishlistItems.length}</span>
+            </p>
+
+            <p className='text-sm text-description'>
               Cost to complete:{' '}
               <span className='font-medium text-title'>
                 {wishlistItems
