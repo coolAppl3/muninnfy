@@ -22,7 +22,7 @@ export default function WishlistHeaderContent(): JSX.Element {
         setMenuIsOpen(false);
       }}
     >
-      <h3 className='text-title font-medium mb-1 break-words leading-[1]'>{wishlistDetails.title}</h3>
+      <h3 className='text-title font-medium mb-1 leading-[1] wrap-anywhere break-normal'>{wishlistDetails.title}</h3>
 
       <button
         type='button'

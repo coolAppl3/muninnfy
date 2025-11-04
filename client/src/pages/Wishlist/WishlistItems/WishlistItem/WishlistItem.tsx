@@ -89,7 +89,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
       {isExpanded && (
         <div className='flex justify-between items-start gap-1 p-2 pt-1'>
           <div className='w-full text-sm text-description grid gap-1'>
-            <div className='pr-1 whitespace-nowrap overflow-hidden text-ellipsis'>
+            <div className='pr-1 whitespace-nowrap overflow-hidden'>
               <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
 
               {wishlistItem.purchased_on_timestamp && <p>Purchased: {getShortenedDateString(wishlistItem.purchased_on_timestamp)}</p>}
@@ -97,7 +97,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
               {wishlistItem.price === null ? null : <p> Price: {getCurrencyFormatting(wishlistItem.price)}</p>}
 
               {wishlistItem.link && (
-                <p>
+                <p className='block max-w-full overflow-hidden text-ellipsis'>
                   Link:{' '}
                   <a
                     href={/^https?:\/\//.test(wishlistItem.link) ? wishlistItem.link : `https://${wishlistItem.link}`}
@@ -126,7 +126,12 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
             {wishlistItem.description && (
               <>
                 <div className='h-line'></div>
-                <p className='whitespace-break-spaces'>{wishlistItem.description}</p>
+                <p
+                  className='whitespace-break-spaces word'
+                  style={{ wordBreak: 'break-word' }}
+                >
+                  {wishlistItem.description}
+                </p>
               </>
             )}
           </div>
