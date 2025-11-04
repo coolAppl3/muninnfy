@@ -25,26 +25,28 @@ export default function WishlistHeader(): JSX.Element {
           <div>
             <WishlistHeaderContent />
 
-            <p className='text-sm text-description'>
-              Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
-            </p>
+            <div className='text-sm text-description'>
+              <p>
+                Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
+              </p>
 
-            <p className='text-sm text-description mb-[6px]'>
-              Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
-            </p>
+              <p className='mb-[6px]'>
+                Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
+              </p>
 
-            <p className='text-sm text-description'>
-              Total items: <span className='font-medium text-title'>{wishlistItems.length}</span>
-            </p>
+              <p>
+                Total items: <span className='font-medium text-title'>{wishlistItems.length}</span>
+              </p>
 
-            <p className='text-sm text-description'>
-              Cost to complete:{' '}
-              <span className='font-medium text-title'>
-                {wishlistItems
-                  .reduce((acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)), 0)
-                  .toFixed(2)}
-              </span>
-            </p>
+              <p>
+                Cost to complete:{' '}
+                <span className='font-medium text-title'>
+                  {wishlistItems
+                    .reduce((acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)), 0)
+                    .toFixed(2)}
+                </span>
+              </p>
+            </div>
           </div>
 
           <div className='overflow-hidden relative z-0'>
