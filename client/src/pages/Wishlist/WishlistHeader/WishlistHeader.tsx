@@ -27,24 +27,24 @@ export default function WishlistHeader(): JSX.Element {
 
             <div className='text-sm text-description'>
               <p>
-                Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
-              </p>
-
-              <p className='mb-[6px]'>
-                Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
-              </p>
-
-              <p>
                 Total items: <span className='font-medium text-title'>{wishlistItems.length}</span>
               </p>
 
-              <p>
+              <p className='mb-[6px]'>
                 Cost to complete:{' '}
                 <span className='font-medium text-title'>
                   {wishlistItems
                     .reduce((acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)), 0)
                     .toFixed(2)}
                 </span>
+              </p>
+
+              <p>
+                Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
+              </p>
+
+              <p>
+                Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
               </p>
             </div>
           </div>
