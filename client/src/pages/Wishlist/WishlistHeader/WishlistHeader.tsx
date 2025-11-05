@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import Container from '../../../components/Container/Container';
 import { getFullDateString } from '../../../utils/globalUtils';
-import { getWishlistPrivacyLevelName } from '../../../utils/wishlistUtils';
+import { getFormattedPrice, getWishlistPrivacyLevelName } from '../../../utils/wishlistUtils';
 import useWishlistHeader from './context/useWishlistHeader';
 import WishlistHeaderEditingContainer from './components/WishlistHeaderEditingContainer';
 import WishlistHeaderContent from './components/WishlistHeaderContent';
@@ -25,28 +25,33 @@ export default function WishlistHeader(): JSX.Element {
           <div>
             <WishlistHeaderContent />
 
-            <div className='text-sm text-description'>
-              <p>
-                Total items: <span className='font-medium text-title'>{wishlistItems.length}</span>
-              </p>
+            <div className='h-line mt-1'></div>
 
-              <p className='mb-[6px]'>
-                Cost to complete:{' '}
+            <div className='text-sm text-description grid grid-cols-3 mt-1 relative z-0'>
+              <div className='grid'>
+                <span className='font-medium text-title'>{wishlistItems.length}</span>
+                <span className='text-xs font-medium'>Items</span>
+              </div>
+
+              <div className='grid'>
                 <span className='font-medium text-title'>
-                  {wishlistItems
-                    .reduce((acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)), 0)
-                    .toFixed(2)}
+                  {getFormattedPrice(
+                    wishlistItems.reduce(
+                      (acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)),
+                      0
+                    )
+                  )}
                 </span>
-              </p>
+                <span className='text-xs font-medium'>Worth</span>
+              </div>
 
-              <p>
-                Privacy level: <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
-              </p>
-
-              <p>
-                Created on: <span className='font-medium text-title'>{getFullDateString(wishlistDetails.created_on_timestamp)}</span>
-              </p>
+              <div className='grid'>
+                <span className='font-medium text-title'>{getWishlistPrivacyLevelName(wishlistDetails.privacy_level)}</span>
+                <span className='text-xs font-medium'>Privacy</span>
+              </div>
             </div>
+
+            <p className='text-sm text-description font-medium mt-2'>{getFullDateString(wishlistDetails.created_on_timestamp)}</p>
           </div>
 
           <div className='overflow-hidden relative z-0'>

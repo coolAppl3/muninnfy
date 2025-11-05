@@ -10,7 +10,7 @@ export function getWishlistPrivacyLevelName(privacyLevel: number): string {
   }
 
   if (privacyLevel === FOLLOWERS_WISHLIST_PRIVACY_LEVEL) {
-    return 'Followers only';
+    return 'Followers';
   }
 
   if (privacyLevel === PRIVATE_WISHLIST_PRIVACY_LEVEL) {
@@ -18,4 +18,18 @@ export function getWishlistPrivacyLevelName(privacyLevel: number): string {
   }
 
   return '';
+}
+
+const priceFormatter = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  compactDisplay: 'short',
+  maximumFractionDigits: 1,
+});
+
+export function getFormattedPrice(price: number): string {
+  if (price < 1000) {
+    return price.toFixed(2);
+  }
+
+  return priceFormatter.format(price);
 }
