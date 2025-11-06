@@ -3,6 +3,7 @@ import { getFormattedPrice } from '../../utils/wishlistUtils';
 import { getFullDateString } from '../../utils/globalUtils';
 import { Link } from 'react-router-dom';
 import WishlistPrivacyLevelIcon from '../WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
+import RedirectIcon from '../../assets/svg/RedirectIcon.svg?react';
 
 type WishlistCardProps = {
   wishlistId: string;
@@ -55,6 +56,8 @@ export default function WishlistCard({
         to={`/wishlist/${wishlistId}`}
         className='absolute top-0 left-0 h-full w-full'
       />
+
+      <RedirectIcon className='w-[1.6rem] h-[1.6rem] text-description absolute top-1 right-1 transition-colors group-hover:text-cta' />
     </div>
   );
 }
