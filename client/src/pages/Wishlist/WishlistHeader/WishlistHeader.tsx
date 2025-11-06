@@ -8,10 +8,7 @@ import WishlistHeaderContent from './components/WishlistHeaderContent';
 import useWishlist from '../hooks/useWishlist';
 import useWishlistItems from '../hooks/useWishlistItems';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
-import LockIcon from '../../../assets/svg/LockIcon.svg?react';
-import PersonIcon from '../../../assets/svg/PersonIcon.svg?react';
-import EyeIcon from '../../../assets/svg/EyeIcon.svg?react';
-import { FOLLOWERS_WISHLIST_PRIVACY_LEVEL, PRIVATE_WISHLIST_PRIVACY_LEVEL } from '../../../utils/constants/wishlistConstants';
+import WishlistPrivacyLevelIcon from '../../../components/WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
 
 export default function WishlistHeader(): JSX.Element {
   const { wishlistDetails } = useWishlist();
@@ -59,7 +56,7 @@ export default function WishlistHeader(): JSX.Element {
 
             <div className='text-description flex justify-between items-center mt-2'>
               <p className='text-sm font-medium'>{getFullDateString(wishlistDetails.created_on_timestamp)}</p>
-              <PrivacyLevelIcon privacyLevel={wishlistDetails.privacy_level} />
+              <WishlistPrivacyLevelIcon privacyLevel={wishlistDetails.privacy_level} />
             </div>
           </div>
 
@@ -70,40 +67,5 @@ export default function WishlistHeader(): JSX.Element {
         </div>
       </Container>
     </header>
-  );
-}
-
-function PrivacyLevelIcon({ privacyLevel }: { privacyLevel: number }): JSX.Element {
-  const className = 'w-2 h-2';
-
-  if (privacyLevel === PRIVATE_WISHLIST_PRIVACY_LEVEL) {
-    return (
-      <span
-        title='Private'
-        aria-label='Private wishlist'
-      >
-        <LockIcon className={className} />
-      </span>
-    );
-  }
-
-  if (privacyLevel === FOLLOWERS_WISHLIST_PRIVACY_LEVEL) {
-    return (
-      <span
-        title='Followers'
-        aria-label='Followers only wishlist'
-      >
-        <PersonIcon className={className} />
-      </span>
-    );
-  }
-
-  return (
-    <span
-      title='Public'
-      aria-label='Public wishlist'
-    >
-      <EyeIcon className={className} />
-    </span>
   );
 }
