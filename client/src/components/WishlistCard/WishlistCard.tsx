@@ -1,0 +1,60 @@
+import { JSX } from 'react';
+import { getFormattedPrice } from '../../utils/wishlistUtils';
+import { getFullDateString } from '../../utils/globalUtils';
+import { Link } from 'react-router-dom';
+import WishlistPrivacyLevelIcon from '../WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
+
+type WishlistCardProps = {
+  wishlistId: string;
+  title: string;
+  privacyLevel: number;
+  createdOnTimestamp: number;
+  itemsCount: number;
+  totalItemsPrice: number;
+  priceToComplete: number;
+};
+
+export default function WishlistCard({
+  wishlistId,
+  title,
+  privacyLevel,
+  createdOnTimestamp,
+  itemsCount,
+  totalItemsPrice,
+  priceToComplete,
+}: WishlistCardProps): JSX.Element {
+  return (
+    <div className='relative p-2 bg-secondary rounded-sm shadow-simple-tiny border-transparent transition-all duration-200 hover:scale-102 hover:brightness-110 hover:cursor-pointer will-change-transform group'>
+      <h3 className='text-title font-medium mb-1 leading-[1] wrap-anywhere'>{title}</h3>
+
+      <div className='h-line mt-1'></div>
+
+      <div className='text-sm text-description grid grid-cols-3 mt-1 relative z-0'>
+        <div className='grid'>
+          <span className='font-medium text-title'>{itemsCount}</span>
+          <span className='text-xs font-medium'>Items</span>
+        </div>
+
+        <div className='grid'>
+          <span className='font-medium text-title'>{getFormattedPrice(totalItemsPrice)}</span>
+          <span className='text-xs font-medium'>Worth</span>
+        </div>
+
+        <div className='grid'>
+          <span className='font-medium text-title'>{getFormattedPrice(priceToComplete)}</span>
+          <span className='text-xs font-medium'>To complete</span>
+        </div>
+      </div>
+
+      <div className='text-description flex justify-between items-center mt-2'>
+        <p className='text-sm font-medium'>{getFullDateString(createdOnTimestamp)}</p>
+        <WishlistPrivacyLevelIcon privacyLevel={privacyLevel} />
+      </div>
+
+      <Link
+        to={`/wishlist/${wishlistId}`}
+        className='absolute top-0 left-0 h-full w-full'
+      />
+    </div>
+  );
+}
