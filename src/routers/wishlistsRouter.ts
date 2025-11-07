@@ -6,7 +6,7 @@ import { FieldPacket, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
-import { TOTAL_WISHLISTS_LIMIT, WISHLIST_FETCH_BATCH_SIZE, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
+import { TOTAL_WISHLISTS_LIMIT, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
@@ -129,21 +129,13 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   }
 });
 
-wishlistsRouter.get('/offset/:offset', async (req: Request, res: Response) => {
+wishlistsRouter.get('/all', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
   if (!authSessionId) {
     return;
   }
 
-  const offsetParam: string | undefined = req.params.offset;
-
-  if (!offsetParam || !Number.isInteger(+offsetParam)) {
-    res.status(400).json({ message: 'Invalid wishlists offset value.', reason: 'invalidOffset' });
-    return;
-  }
-
-  const offset: number = +offsetParam;
   const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
 
   if (!accountId) {
@@ -186,8 +178,8 @@ wishlistsRouter.get('/offset/:offset', async (req: Request, res: Response) => {
         wishlists.wishlist_id
       ORDER BY
         created_on_timestamp DESC
-      LIMIT ? OFFSET ?;`,
-      [accountId, WISHLIST_FETCH_BATCH_SIZE, offset]
+      LIMIT ?;`,
+      [accountId, TOTAL_WISHLISTS_LIMIT]
     )) as [Wishlist[], FieldPacket[]];
 
     res.json(wishlists);
