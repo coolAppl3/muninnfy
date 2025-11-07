@@ -21,7 +21,7 @@ export async function createWishlistAsAccountService(
   return axios.post(wishlistsApiUrl, body);
 }
 
-type getWishlistDetailsData = {
+type GetWishlistDetailsData = {
   wishlistDetails: WishlistDetailsType;
   wishlistItems: WishlistItemType[];
 };
@@ -29,7 +29,7 @@ type getWishlistDetailsData = {
 export async function getWishlistDetailsService(
   wishlistId: string,
   abortSignal: AbortSignal
-): Promise<AxiosResponse<getWishlistDetailsData>> {
+): Promise<AxiosResponse<GetWishlistDetailsData>> {
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
 }
 
