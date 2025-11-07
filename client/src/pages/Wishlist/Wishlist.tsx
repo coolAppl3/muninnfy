@@ -50,14 +50,13 @@ export default function Wishlist(): JSX.Element {
       return;
     }
 
-    let ignore: boolean = false;
     const abortController: AbortController = new AbortController();
 
     const getWishlistDetails = async () => {
       try {
         const { wishlistDetails, wishlistItems } = (await getWishlistDetailsService(wishlistId, abortController.signal)).data;
 
-        if (ignore) {
+        if (abortController.signal.aborted) {
           return;
         }
 
@@ -75,7 +74,7 @@ export default function Wishlist(): JSX.Element {
 
         setIsLoaded(true);
       } catch (err: unknown) {
-        if (ignore || err instanceof CanceledError) {
+        if (err instanceof CanceledError) {
           return;
         }
 
@@ -88,10 +87,7 @@ export default function Wishlist(): JSX.Element {
 
     getWishlistDetails();
 
-    return () => {
-      ignore = true;
-      abortController.abort();
-    };
+    return () => abortController.abort();
   }, [isLoaded, referrerLocation, urlParams, displayPopupMessage, navigate, handleAsyncError]);
 
   return (
