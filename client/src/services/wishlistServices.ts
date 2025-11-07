@@ -33,8 +33,8 @@ export async function getWishlistDetailsService(
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
 }
 
-export async function getWishlistsService(offset: number): Promise<AxiosResponse<ExtendedWishlistDetailsType[]>> {
-  return axios.get(`${wishlistsApiUrl}/offset/${offset}`);
+export async function getAllWishlistsService(abortSignal: AbortSignal): Promise<AxiosResponse<ExtendedWishlistDetailsType[]>> {
+  return axios.get(`${wishlistsApiUrl}/all`, { signal: abortSignal });
 }
 
 type ChangeWishlistTitleServicePayload = {
