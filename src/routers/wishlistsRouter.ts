@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from 'express';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { FieldPacket, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
@@ -161,7 +161,7 @@ wishlistsRouter.get('/offset/:offset', async (req: Request, res: Response) => {
       price_to_complete: number;
     };
 
-    const [wishlists] = await dbPool.execute<RowDataPacket[]>(
+    const [wishlists] = (await dbPool.execute<RowDataPacket[]>(
       `SELECT
         wishlists.wishlist_id,
         wishlists.privacy_level,
@@ -188,9 +188,9 @@ wishlistsRouter.get('/offset/:offset', async (req: Request, res: Response) => {
         created_on_timestamp DESC
       LIMIT ? OFFSET ?;`,
       [accountId, WISHLIST_FETCH_BATCH_SIZE, offset]
-    );
+    )) as [Wishlist[], FieldPacket[]];
 
-    res.json({ wishlists: wishlists as Wishlist[] });
+    res.json(wishlists);
   } catch (err: unknown) {
     console.log(err);
 
