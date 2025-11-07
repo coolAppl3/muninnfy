@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.1.4] (2024-11-08)
+
+### Features
+
+- Added the following endpoints:
+  - GET `accounts`.
+  - GET `wishlists/all`.
+- Added the following components:
+  - `WishlistPrivacyLevelIcon`.
+  - `WishlistCard`.
+- Added the following SVGs:
+  - `LockIcon`.
+  - `PersonIcon`.
+  - `RedirectIcon`.
+- Added `WISHLIST_FETCH_BATCH_SIZE` to to both `wishlistConstants` modules.
+- Added `getAllWishlistsService()`.
+- Implement fetching for `Wishlists`.
+
+
+### Improvements
+
+- Redesigned UI for `WishlistHeader`, improving visuals and displaying the total number of wishlist items.
+
+
+### Changes
+
+- Reduced wishlists limit per user to 100.
+
+
+### Bug Fixes
+
+- Fixed text wrapping and breaking issues in `WishlistItem` and `WishlistHeaderContent`.
+
+
+### Code Refactoring
+
+- Minor refactors to variable and type naming.
+- Other minor refactors.
+
+
+### Chore Changes
+
+- Audited packages.
+
+
 ## [0.1.3] (2024-10-31)
 
 ### Features
