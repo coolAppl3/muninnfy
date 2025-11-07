@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { WishlistDetailsType } from '../types/wishlistTypes';
+import { ExtendedWishlistDetailsType, WishlistDetailsType } from '../types/wishlistTypes';
 import { WishlistItemType } from '../types/wishlistItemTypes';
 
 axios.defaults.withCredentials = true;
@@ -31,6 +31,10 @@ export async function getWishlistDetailsService(
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<GetWishlistDetailsData>> {
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
+}
+
+export async function getWishlistsService(offset: number): Promise<AxiosResponse<ExtendedWishlistDetailsType[]>> {
+  return axios.get(`${wishlistsApiUrl}/offset/${offset}`);
 }
 
 type ChangeWishlistTitleServicePayload = {
