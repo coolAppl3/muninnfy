@@ -52,7 +52,7 @@ export async function getWishlistItemByTitle(
     const { tag_id: _, tag_name: __, ...rest } = wishlistItemDetails;
     const mappedWishlistItem: MappedWishlistItem = {
       ...rest,
-      tags: wishlistItemRows.map(({ tag_id, tag_name }) => ({
+      tags: (wishlistItemRows as WishlistItem[]).map(({ tag_id, tag_name }: WishlistItem) => ({
         id: tag_id,
         name: tag_name,
       })),

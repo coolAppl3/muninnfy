@@ -78,7 +78,7 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
         return;
       }
 
-      setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
+      setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id));
     } finally {
       setUpdatingPurchaseStatus(false);
     }
@@ -89,7 +89,7 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
 
     try {
       await deleteWishlistItemService(wishlistId, wishlistItem.item_id);
-      setWishlistItems((prev) => prev.filter((item: WishlistItemType) => item.item_id !== wishlistItem.item_id));
+      setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id));
 
       displayPopupMessage('Item removed.', 'success');
     } catch (err: unknown) {

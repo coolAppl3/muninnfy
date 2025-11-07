@@ -75,7 +75,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
               return;
             }
 
-            expandAllWishlistItems(wishlistItems.map((item: WishlistItemType) => item.item_id));
+            expandAllWishlistItems(wishlistItems.map(({ item_id }: WishlistItemType) => item_id));
             displayPopupMessage('Items expanded.', 'success');
           }}
         >

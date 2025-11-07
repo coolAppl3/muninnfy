@@ -69,13 +69,13 @@ function LinksContainer({ title, links }: LinksContainerProps): JSX.Element {
       <h3 className='text-title text-lg font-medium mb-2'>{title}</h3>
 
       <ul className='text-description font-medium flex flex-col justify-center items-start gap-[4px]'>
-        {links.map((link: { title: string; path: string }) => (
-          <li key={`${link.title}-${link.path}`}>
+        {links.map(({ title, path }: { title: string; path: string }) => (
+          <li key={`${title}-${path}`}>
             <NavLink
-              to={link.path}
+              to={path}
               className='transition-colors hover:text-cta'
             >
-              {link.title}
+              {title}
             </NavLink>
           </li>
         ))}

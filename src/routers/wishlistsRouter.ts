@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from 'express';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { FieldPacket, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
@@ -121,6 +121,72 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
       res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistsRouter.get('/all', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type Wishlist = {
+      wishlist_id: string;
+      privacy_level: string;
+      title: string;
+      created_on_timestamp: number;
+      items_count: number;
+      total_items_price: number;
+      price_to_complete: number;
+    };
+
+    const [wishlists] = (await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        wishlists.wishlist_id,
+        wishlists.privacy_level,
+        wishlists.title,
+        wishlists.created_on_timestamp,
+        COUNT(wishlist_items.item_id) AS items_count,
+        COALESCE(SUM(wishlist_items.price), 0) AS total_items_price,
+        COALESCE(SUM(
+          CASE
+            WHEN wishlist_items.purchased_on_timestamp IS NULL
+            THEN wishlist_items.price
+            ELSE 0
+          END
+        ), 0) AS price_to_complete
+      FROM
+        wishlists
+      LEFT JOIN
+        wishlist_items USING(wishlist_id)
+      WHERE
+        wishlists.account_id = ?
+      GROUP BY
+        wishlists.wishlist_id
+      ORDER BY
+        created_on_timestamp DESC
+      LIMIT ?;`,
+      [accountId, TOTAL_WISHLISTS_LIMIT]
+    )) as [Wishlist[], FieldPacket[]];
+
+    res.json(wishlists);
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
       return;
     }
 

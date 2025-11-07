@@ -3,12 +3,12 @@ import { WISHLIST_ITEM_TAGS_LIMIT } from '../../utils/constants/wishlistItemCons
 import usePopupMessage from '../../hooks/usePopupMessage';
 
 type WishlistItemTagsFormGroupProps = {
-  itemTags: Set<string>;
-  setItemTags: Dispatch<SetStateAction<Set<string>>>;
+  tagsSet: Set<string>;
+  setTagsSet: Dispatch<SetStateAction<Set<string>>>;
   label: string;
 };
 
-export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label }: WishlistItemTagsFormGroupProps): JSX.Element {
+export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }: WishlistItemTagsFormGroupProps): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -33,17 +33,17 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
     const value: string = e.currentTarget.value;
 
     if (e.key === 'Backspace' && value === '') {
-      setItemTags((prev) => new Set<string>([...prev].slice(0, -1)));
+      setTagsSet((prev) => new Set<string>([...prev].slice(0, -1)));
       return;
     }
 
     if (e.key === ' ' && !validateItemTag(value)) {
-      if (itemTags.size >= WISHLIST_ITEM_TAGS_LIMIT) {
+      if (tagsSet.size >= WISHLIST_ITEM_TAGS_LIMIT) {
         displayPopupMessage('Tags limit reached.', 'error');
         return;
       }
 
-      setItemTags((prev) => new Set(prev).add(value.toLowerCase()));
+      setTagsSet((prev) => new Set(prev).add(value.toLowerCase()));
       setValue('');
     }
   }
@@ -83,7 +83,7 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
 
           const tag: string = e.target.textContent;
 
-          setItemTags((prev) => {
+          setTagsSet((prev) => {
             const newSet = new Set<string>(prev);
             newSet.delete(tag.toLowerCase());
 
@@ -91,7 +91,7 @@ export default function WishlistItemTagsFormGroup({ itemTags, setItemTags, label
           });
         }}
       >
-        {[...itemTags].map((tag: string) => (
+        {[...tagsSet].map((tag: string) => (
           <span
             key={tag}
             title='Remove tag'

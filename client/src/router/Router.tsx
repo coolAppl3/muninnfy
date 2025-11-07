@@ -56,22 +56,22 @@ export default function Router(): JSX.Element {
 
         {/* auth-only routes */}
         <Route element={<AuthOnlyRoute authStatus={authStatus} />}>
-          {authOnlyRoutes.map((route: RouteDetails) => (
+          {authOnlyRoutes.map(({ path, element }: RouteDetails) => (
             <Route
-              key={route.path}
-              path={route.path}
-              element={route.element}
+              key={path}
+              path={path}
+              element={element}
             />
           ))}
         </Route>
 
         {/* non-auth-only routes */}
         <Route element={<NonAuthOnlyRoute authStatus={authStatus} />}>
-          {nonAuthOnlyRoutes.map((route: RouteDetails) => (
+          {nonAuthOnlyRoutes.map(({ path, element }: RouteDetails) => (
             <Route
-              key={route.path}
-              path={route.path}
-              element={route.element}
+              key={path}
+              path={path}
+              element={element}
             />
           ))}
         </Route>
@@ -82,11 +82,11 @@ export default function Router(): JSX.Element {
           element={<ViewWishlist />}
         />
 
-        {publicRoutes.map((route: RouteDetails) => (
+        {publicRoutes.map(({ path, element }: RouteDetails) => (
           <Route
-            key={route.path}
-            path={route.path}
-            element={route.element}
+            key={path}
+            path={path}
+            element={element}
           />
         ))}
       </Route>
