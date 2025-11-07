@@ -6,7 +6,7 @@ export type WishlistDetailsType = {
 
 export type ExtendedWishlistDetailsType = {
   wishlist_id: string;
-  privacy_level: string;
+  privacy_level: number;
   title: string;
   created_on_timestamp: number;
   items_count: number;
