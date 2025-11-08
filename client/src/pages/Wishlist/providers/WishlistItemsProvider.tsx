@@ -120,7 +120,7 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return;
       }
 
-      setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })));
+      setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' })));
     },
     [itemsSortingMode]
   );
