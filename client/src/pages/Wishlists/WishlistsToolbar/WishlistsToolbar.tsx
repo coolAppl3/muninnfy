@@ -5,6 +5,7 @@ import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGr
 import { debounce } from '../../../utils/debounce';
 import useWishlists from '../hooks/useWishlists';
 import WishlistsToolbarView from './components/WishlistsToolbarView';
+import WishlistsToolbarSort from './components/WishlistsToolbarSort';
 
 export function WishlistsToolbar(): JSX.Element {
   const [titleQueryValue, setTitleQueryValue] = useState<string>('');
@@ -46,7 +47,7 @@ export function WishlistsToolbar(): JSX.Element {
               <SlidersIcon className={`w-2 h-2 transition-colors ${filtersMenuOpen ? 'text-cta' : ''}`} />
             </button>
 
-            {/* TODO: implement wishlists sort */}
+            <WishlistsToolbarSort />
           </header>
 
           {/* TODO: implement wishlists filters */}
