@@ -55,6 +55,14 @@ export async function changeWishlistPrivacyLevelService(body: ChangeWishlistPriv
   return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);
 }
 
+type DeleteEmptyWishlistsServiceData = {
+  deletedWishlistsCount: number;
+};
+
+export async function deleteEmptyWishlistsService(): Promise<AxiosResponse<DeleteEmptyWishlistsServiceData>> {
+  return axios.delete(`${wishlistsApiUrl}/empty`);
+}
+
 export async function deleteWishlistService(wishlistId: string): Promise<AxiosResponse> {
   return axios.delete(`${wishlistsApiUrl}/${wishlistId}`);
 }
