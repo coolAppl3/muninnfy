@@ -88,7 +88,7 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       }
 
       if (sortingMode === 'largest_first') {
-        setWishlists((prev) => prev.toSorted((a, b) => b.items_count - a.created_on_timestamp));
+        setWishlists((prev) => prev.toSorted((a, b) => b.items_count - a.items_count));
         return;
       }
 
