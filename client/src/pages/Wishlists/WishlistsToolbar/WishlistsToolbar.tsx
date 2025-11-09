@@ -6,6 +6,7 @@ import { debounce } from '../../../utils/debounce';
 import useWishlists from '../hooks/useWishlists';
 import WishlistsToolbarView from './components/WishlistsToolbarView';
 import WishlistsToolbarSort from './components/WishlistsToolbarSort';
+import WishlistsToolbarOptions from './components/WishlistsToolbarOptions';
 
 export function WishlistsToolbar(): JSX.Element {
   const [titleQueryValue, setTitleQueryValue] = useState<string>('');
@@ -48,6 +49,7 @@ export function WishlistsToolbar(): JSX.Element {
             </button>
 
             <WishlistsToolbarSort />
+            <WishlistsToolbarOptions />
           </header>
 
           {/* TODO: implement wishlists filters */}
