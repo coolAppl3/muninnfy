@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { JSX, memo } from 'react';
 import { getFormattedPrice } from '../../utils/wishlistUtils';
 import { getFullDateString } from '../../utils/globalUtils';
 import { Link } from 'react-router-dom';
@@ -10,7 +10,8 @@ type WishlistCardProps = {
   wishlist: ExtendedWishlistDetailsType;
 };
 
-export default function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
+export default memo(WishlistCard);
+function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
   const { wishlist_id, title, privacy_level, created_on_timestamp, items_count, total_items_price, price_to_complete } = wishlist;
 
   return (
