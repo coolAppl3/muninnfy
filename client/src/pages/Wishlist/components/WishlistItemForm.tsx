@@ -267,7 +267,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       return true;
     }
 
-    if (+priceValue !== wishlistItem.price) {
+    if ((priceValue === '' && wishlistItem.price !== null) || +priceValue !== wishlistItem.price) {
       return true;
     }
 
