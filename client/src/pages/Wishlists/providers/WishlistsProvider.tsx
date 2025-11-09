@@ -2,8 +2,13 @@ import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
 import WishlistsContext, { WishlistsContextType, WishlistsFilterConfigType, WishlistsSortingMode } from '../contexts/WishlistsContext';
 import { ExtendedWishlistDetailsType } from '../../../types/wishlistTypes';
 
-export default function WishlistsProvider({ children }: { children: ReactNode }): JSX.Element {
-  const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>([]);
+type WishlistsProviderProps = {
+  initialWishlists: ExtendedWishlistDetailsType[];
+  children: ReactNode;
+};
+
+export default function WishlistsProvider({ initialWishlists, children }: WishlistsProviderProps): JSX.Element {
+  const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>(initialWishlists);
   const [wishlistsFilterConfig, setWishlistsFilterConfig] = useState<WishlistsFilterConfigType>(defaultWishlistsFilterConfig);
   const [wishlistsSortingMode, setWishlistsSortingMode] = useState<WishlistsSortingMode>('newest_first');
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
