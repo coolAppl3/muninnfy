@@ -1,12 +1,12 @@
 import { JSX, useEffect, useState } from 'react';
 import Head from '../../components/Head/Head';
-import Container from '../../components/Container/Container';
-import WishlistCard from '../../components/WishlistCard/WishlistCard';
 import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
 import { getAllWishlistsService } from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
+import WishlistsProvider from './providers/WishlistsProvider';
+import WishlistsContainer from './WishlistsContainer/WishlistsContainer';
 
 export default function Wishlists(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -47,20 +47,11 @@ export default function Wishlists(): JSX.Element {
       <Head title='Wishlists - Muninnfy' />
 
       {isLoaded ? (
-        <main className='py-4 grid gap-2'>
-          <section>
-            <Container>
-              <div className='grid gap-1 sm:grid-cols-2'>
-                {wishlists.map((wishlist: ExtendedWishlistDetailsType) => (
-                  <WishlistCard
-                    key={wishlist.wishlist_id}
-                    {...wishlist}
-                  />
-                ))}
-              </div>
-            </Container>
-          </section>
-        </main>
+        <WishlistsProvider initialWishlists={wishlists}>
+          <main className='py-4 grid gap-2'>
+            <WishlistsContainer />
+          </main>
+        </WishlistsProvider>
       ) : (
         <LoadingSkeleton />
       )}
