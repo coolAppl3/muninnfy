@@ -46,7 +46,7 @@ export default function WishlistCard({ wishlist }: WishlistCardProps): JSX.Eleme
         className='absolute top-0 left-0 h-full w-full'
       />
 
-      <RedirectIcon className='w-[1.6rem] h-[1.6rem] text-description absolute top-1 right-1 transition-colors group-hover:text-cta' />
+      <RedirectIcon className='w-[1.6rem] h-[1.6rem] text-description absolute top-1 right-1 transition-colors group-hover:text-cta z-0' />
     </div>
   );
 }
