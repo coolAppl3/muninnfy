@@ -22,7 +22,7 @@ export default function WishlistsContainer(): JSX.Element {
             filteredWishlists.map((wishlist: ExtendedWishlistDetailsType) => (
               <WishlistCard
                 key={wishlist.wishlist_id}
-                {...wishlist}
+                wishlist={wishlist}
               />
             ))
           )}

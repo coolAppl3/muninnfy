@@ -4,26 +4,15 @@ import { getFullDateString } from '../../utils/globalUtils';
 import { Link } from 'react-router-dom';
 import WishlistPrivacyLevelIcon from '../WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
 import RedirectIcon from '../../assets/svg/RedirectIcon.svg?react';
+import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
 
 type WishlistCardProps = {
-  wishlist_id: string;
-  privacy_level: number;
-  title: string;
-  created_on_timestamp: number;
-  items_count: number;
-  total_items_price: number;
-  price_to_complete: number;
+  wishlist: ExtendedWishlistDetailsType;
 };
 
-export default function WishlistCard({
-  wishlist_id,
-  privacy_level,
-  title,
-  created_on_timestamp,
-  items_count,
-  total_items_price,
-  price_to_complete,
-}: WishlistCardProps): JSX.Element {
+export default function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
+  const { wishlist_id, title, privacy_level, created_on_timestamp, items_count, total_items_price, price_to_complete } = wishlist;
+
   return (
     <div className='relative p-2 bg-secondary rounded-sm shadow-simple-tiny border-transparent transition-all duration-200 hover:scale-102 hover:brightness-110 hover:cursor-pointer will-change-transform group'>
       <h3 className='text-title font-medium mb-1 leading-[1] wrap-anywhere'>{title}</h3>
