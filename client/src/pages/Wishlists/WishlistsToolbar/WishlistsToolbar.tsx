@@ -4,6 +4,7 @@ import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
 import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import { debounce } from '../../../utils/debounce';
 import useWishlists from '../hooks/useWishlists';
+import WishlistsToolbarView from './components/WishlistsToolbarView';
 
 export function WishlistsToolbar(): JSX.Element {
   const [titleQueryValue, setTitleQueryValue] = useState<string>('');
@@ -33,7 +34,7 @@ export function WishlistsToolbar(): JSX.Element {
       <Container>
         <div>
           <header className='flex justify-start items-center gap-1 mb-1 text-title relative z-3'>
-            {/* TODO: implement wishlists column view */}
+            <WishlistsToolbarView />
 
             <button
               type='button'

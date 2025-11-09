@@ -5,7 +5,7 @@ import WishlistCard from '../../../components/WishlistCard/WishlistCard';
 import { ExtendedWishlistDetailsType } from '../../../types/wishlistTypes';
 
 export default function WishlistsContainer(): JSX.Element {
-  const { wishlists, wishlistMatchesFilterConfig } = useWishlists();
+  const { wishlists, wishlistMatchesFilterConfig, isSingleColumnView } = useWishlists();
 
   const filteredWishlists: ExtendedWishlistDetailsType[] = useMemo(
     () => wishlists.filter(wishlistMatchesFilterConfig),
@@ -15,7 +15,7 @@ export default function WishlistsContainer(): JSX.Element {
   return (
     <section>
       <Container>
-        <div className='grid gap-1 sm:grid-cols-2'>
+        <div className={`grid grid-cols-1 ${isSingleColumnView ? '' : 'sm:grid-cols-2'} gap-1 items-start`}>
           {filteredWishlists.length === 0 ? (
             <p className='sm:!col-span-2 text-sm font-medium text-description w-fit mx-auto'>No wishlists found</p>
           ) : (
