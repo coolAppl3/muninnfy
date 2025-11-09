@@ -177,7 +177,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       GROUP BY
         wishlists.wishlist_id
       ORDER BY
-        created_on_timestamp DESC
+        created_on_timestamp ASC
       LIMIT ?;`,
       [accountId, TOTAL_WISHLISTS_LIMIT]
     )) as [Wishlist[], FieldPacket[]];
