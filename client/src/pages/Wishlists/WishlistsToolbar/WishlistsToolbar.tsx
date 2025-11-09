@@ -18,12 +18,12 @@ export function WishlistsToolbar(): JSX.Element {
     0
   );
 
-  const debounceSetTitleQuery: (query: string) => void = useMemo(
+  const debounceSetTitleQuery: (titleQuery: string) => void = useMemo(
     () =>
-      debounce((query: string) => {
+      debounce((titleQuery: string) => {
         setWishlistsFilterConfig((prev) => ({
           ...prev,
-          titleQuery: query,
+          titleQuery,
         }));
       }, 200),
     [setWishlistsFilterConfig]
