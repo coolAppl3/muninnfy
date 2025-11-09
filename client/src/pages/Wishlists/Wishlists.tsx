@@ -7,6 +7,7 @@ import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useA
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import WishlistsProvider from './providers/WishlistsProvider';
 import WishlistsContainer from './WishlistsContainer/WishlistsContainer';
+import { WishlistsToolbar } from './WishlistsToolbar/WishlistsToolbar';
 
 export default function Wishlists(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -49,6 +50,7 @@ export default function Wishlists(): JSX.Element {
       {isLoaded ? (
         <WishlistsProvider initialWishlists={wishlists}>
           <main className='py-4 grid gap-2'>
+            <WishlistsToolbar />
             <WishlistsContainer />
           </main>
         </WishlistsProvider>
