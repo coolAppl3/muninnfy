@@ -528,6 +528,45 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
   }
 });
 
+wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `DELETE FROM
+        wishlists
+      WHERE
+        account_id = ? AND
+        NOT EXISTS (
+          SELECT 1 FROM wishlist_items WHERE wishlist_items.wishlist_id = wishlists.wishlist_id
+        )
+      LIMIT ?;`,
+      [accountId, TOTAL_WISHLISTS_LIMIT]
+    );
+
+    res.json({ deletedWishlistsCount: resultSetHeader.affectedRows });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
