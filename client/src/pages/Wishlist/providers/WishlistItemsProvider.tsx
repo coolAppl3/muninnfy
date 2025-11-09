@@ -36,27 +36,27 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         requireAllFilterTags,
       } = itemsFilterConfig;
 
-      if (addedAfterTimestamp && item.added_on_timestamp < addedAfterTimestamp) {
+      if (addedAfterTimestamp !== null && item.added_on_timestamp < addedAfterTimestamp) {
         return false;
       }
 
-      if (addedBeforeTimestamp && item.added_on_timestamp > addedBeforeTimestamp) {
+      if (addedBeforeTimestamp !== null && item.added_on_timestamp > addedBeforeTimestamp) {
         return false;
       }
 
-      if (purchasedAfterTimestamp && item.purchased_on_timestamp && item.purchased_on_timestamp < purchasedAfterTimestamp) {
+      if (purchasedAfterTimestamp !== null && item.purchased_on_timestamp && item.purchased_on_timestamp < purchasedAfterTimestamp) {
         return false;
       }
 
-      if (purchasedBeforeTimestamp && item.purchased_on_timestamp && item.purchased_on_timestamp > purchasedBeforeTimestamp) {
+      if (purchasedBeforeTimestamp !== null && item.purchased_on_timestamp && item.purchased_on_timestamp > purchasedBeforeTimestamp) {
         return false;
       }
 
-      if (priceFrom && item.price !== null && item.price < priceFrom) {
+      if (priceFrom !== null && item.price !== null && item.price < priceFrom) {
         return false;
       }
 
-      if (priceTo && item.price !== null && item.price > priceTo) {
+      if (priceTo !== null && item.price !== null && item.price > priceTo) {
         return false;
       }
 
