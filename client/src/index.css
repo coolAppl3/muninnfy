@@ -120,9 +120,5 @@
     &.danger {
       @apply !text-danger last:border-t-1 last:border-t-description/50;
     }
-
-    &.disabled {
-      @apply brightness-50 hover:brightness-50 cursor-default;
-    }
   }
 }
