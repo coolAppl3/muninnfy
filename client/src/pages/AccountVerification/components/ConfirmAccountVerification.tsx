@@ -39,10 +39,6 @@ export default function ConfirmAccountVerification({ publicAccountId, verificati
         console.log(err);
         const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
-        if (isHandled) {
-          return;
-        }
-
         if (status === 500) {
           setVerificationFailed(true);
           displayPopupMessage('Something went wrong.', 'error');
@@ -51,6 +47,10 @@ export default function ConfirmAccountVerification({ publicAccountId, verificati
           setDescription('Account verification failed due to an unexpected error.');
           setBtnTitle('Try again');
 
+          return;
+        }
+
+        if (isHandled) {
           return;
         }
 

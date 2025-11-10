@@ -28,11 +28,7 @@ export default function WishlistsToolbarOptions(): JSX.Element {
       displayPopupMessage(emptyWishlistsCount === 1 ? 'Wishlist deleted.' : 'Wishlists deleted.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const { isHandled } = handleAsyncError(err);
-
-      if (!isHandled) {
-        displayPopupMessage('Something went wrong.', 'error');
-      }
+      handleAsyncError(err);
     }
   }
 
