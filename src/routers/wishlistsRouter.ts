@@ -542,7 +542,7 @@ wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
   }
 
   try {
-    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute<ResultSetHeader>(
       `DELETE FROM
         wishlists
       WHERE
@@ -554,7 +554,7 @@ wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
       [accountId, TOTAL_WISHLISTS_LIMIT]
     );
 
-    res.json({ deletedWishlistsCount: resultSetHeader.affectedRows });
+    res.json({});
   } catch (err: unknown) {
     console.log(err);
 
