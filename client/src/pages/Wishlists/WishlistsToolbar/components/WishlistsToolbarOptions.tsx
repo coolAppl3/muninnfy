@@ -1,16 +1,39 @@
-import { FocusEvent, JSX, useState } from 'react';
+import { FocusEvent, JSX, useMemo, useState } from 'react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useConfirmModal from '../../../../hooks/useConfirmModal';
+import { deleteEmptyWishlistsService } from '../../../../services/wishlistServices';
+import useWishlists from '../../hooks/useWishlists';
+import { ExtendedWishlistDetailsType } from '../../../../types/wishlistTypes';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
 export default function WishlistsToolbarOptions(): JSX.Element {
+  const { wishlists, setWishlists } = useWishlists();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { displayPopupMessage } = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
+  const emptyWishlistsCount: number = useMemo(
+    () => wishlists.reduce((acc: number, cur: ExtendedWishlistDetailsType) => (cur.items_count > 0 ? acc : acc + 1), 0),
+    [wishlists]
+  );
+
   async function deleteEmptyWishlists(): Promise<void> {
-    // TODO: continue implementation
+    try {
+      await deleteEmptyWishlistsService();
+      setWishlists((prev) => prev.filter((wishlist: ExtendedWishlistDetailsType) => wishlist.items_count > 0));
+
+      displayPopupMessage(emptyWishlistsCount === 1 ? 'Wishlist deleted.' : 'Wishlists deleted.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+      const { isHandled } = handleAsyncError(err);
+
+      if (!isHandled) {
+        displayPopupMessage('Something went wrong.', 'error');
+      }
+    }
   }
 
   return (
@@ -37,16 +60,28 @@ export default function WishlistsToolbarOptions(): JSX.Element {
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className='context-menu-btn text-danger'
+          className={`context-menu-btn text-danger ${emptyWishlistsCount === 0 ? 'disabled' : ''}`}
+          disabled={emptyWishlistsCount === 0}
+          title={emptyWishlistsCount === 0 ? 'No empty wishlists.' : undefined}
           onClick={() => {
             setIsOpen(false);
+
+            if (emptyWishlistsCount === 0) {
+              displayPopupMessage('No empty wishlists to delete.', 'success');
+              return;
+            }
+
             displayConfirmModal({
               title: 'Are you sure you want to delete all empty wishlists?',
+              description: `This action will delete ${emptyWishlistsCount === 1 ? '1 wishlist.' : `${emptyWishlistsCount} wishlists.`}`,
               confirmBtnTitle: 'Delete wishlists',
               cancelBtnTitle: 'Cancel',
               isDangerous: true,
               onCancel: removeConfirmModal,
-              onConfirm: async () => await deleteEmptyWishlists(),
+              onConfirm: async () => {
+                removeConfirmModal();
+                await deleteEmptyWishlists();
+              },
             });
           }}
         >
