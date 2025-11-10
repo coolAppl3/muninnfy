@@ -36,7 +36,7 @@ export default function WishlistsToolbarOptions(): JSX.Element {
     <div
       className='relative'
       onBlur={(e: FocusEvent) => {
-        if (e.relatedTarget?.classList.contains('context-menu-btn')) {
+        if (e.relatedTarget?.classList.contains('context-menu-btn') || e.target.getAttribute('disabled')) {
           return;
         }
 
@@ -56,9 +56,19 @@ export default function WishlistsToolbarOptions(): JSX.Element {
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className={`context-menu-btn text-danger ${emptyWishlistsCount === 0 ? 'disabled' : ''}`}
-          disabled={emptyWishlistsCount === 0}
-          title={emptyWishlistsCount === 0 ? 'No empty wishlists.' : undefined}
+          className='context-menu-btn'
+          onClick={() => {
+            setIsOpen(false);
+
+            // TODO: implement cross-wishlist items search
+          }}
+        >
+          Search across wishlists
+        </button>
+
+        <button
+          type='button'
+          className={'context-menu-btn danger'}
           onClick={() => {
             setIsOpen(false);
 
