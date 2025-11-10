@@ -28,7 +28,7 @@ export default function WishlistHeaderContent(): JSX.Element {
         type='button'
         title={`${menuIsOpen ? 'Hide' : 'View'} wishlist menu`}
         aria-label={`${menuIsOpen ? 'Hide' : 'View'} wishlist menu`}
-        className='mt-[-1rem] mr-[-1.2rem] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer flex justify-center items-center'
+        className='mt-[-1rem] mr-[-9px] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer flex justify-center items-center'
         onClick={() => setMenuIsOpen((prev) => !prev)}
       >
         <TripleDotMenuIcon className={`w-[1.4rem] h-[1.4rem] transition-colors ${menuIsOpen ? 'text-cta' : 'text-title'}`} />
