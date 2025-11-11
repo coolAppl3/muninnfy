@@ -49,7 +49,7 @@ export default function Wishlists(): JSX.Element {
     getAllWishlists();
 
     return () => abortController.abort();
-  }, [handleAsyncError]);
+  }, [handleAsyncError, navigate, referrerLocation]);
 
   return (
     <>
