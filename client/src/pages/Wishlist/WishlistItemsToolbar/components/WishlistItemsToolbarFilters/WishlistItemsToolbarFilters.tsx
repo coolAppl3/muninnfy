@@ -20,7 +20,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   const { calendarKey, startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
   const unselectAllWishlistItems: () => void = useWishlistItemsSelectionStore((store) => store.unselectAllWishlistItems);
 
-  const addedTimestampsKey: string = 'addTimestamps';
+  const addedTimestampsKey: string = 'addedTimestamps';
   const purchasedTimestampsKey: string = 'purchasedTimestamps';
 
   const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestampsMap.get(addedTimestampsKey) || null);
