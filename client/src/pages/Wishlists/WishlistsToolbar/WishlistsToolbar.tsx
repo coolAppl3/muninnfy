@@ -7,6 +7,8 @@ import useWishlists from '../hooks/useWishlists';
 import WishlistsToolbarView from './components/WishlistsToolbarView';
 import WishlistsToolbarSort from './components/WishlistsToolbarSort';
 import WishlistsToolbarOptions from './components/WishlistsToolbarOptions';
+import CalendarProvider from '../../../providers/CalendarProvider';
+import WishlistsToolbarFilters from './components/WishlistsToolbarFilters/WishlistsToolbarFilters';
 
 export function WishlistsToolbar(): JSX.Element {
   const [titleQueryValue, setTitleQueryValue] = useState<string>('');
@@ -52,7 +54,12 @@ export function WishlistsToolbar(): JSX.Element {
             <WishlistsToolbarOptions />
           </header>
 
-          {/* TODO: implement wishlists filters */}
+          <CalendarProvider>
+            <WishlistsToolbarFilters
+              isOpen={filtersMenuOpen}
+              setIsOpen={setFiltersMenuOpen}
+            />
+          </CalendarProvider>
         </div>
 
         <DefaultFormGroup
