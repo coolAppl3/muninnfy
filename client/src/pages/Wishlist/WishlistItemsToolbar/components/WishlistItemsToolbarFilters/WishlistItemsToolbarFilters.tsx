@@ -7,8 +7,9 @@ import useCalendar from '../../../../../hooks/useCalendar';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../../hooks/useWishlistItems';
 import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
-import WishlistItemToolbarPriceRange from './components/WishlistItemToolbarPriceRange';
 import CheckboxFormGroup from '../../../../../components/CheckboxFormGroup/CheckboxFormGroup';
+import PriceRangeFormGroup from '../../../../../components/PriceRangeFormGroup/PriceRangeFormGroup';
+import { WISHLIST_ITEM_MAX_PRICE } from '../../../../../utils/constants/wishlistItemConstants';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -219,10 +220,11 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
         />
 
         {hasPrice && (
-          <WishlistItemToolbarPriceRange
+          <PriceRangeFormGroup
             setPriceFrom={setPriceFrom}
             setPriceTo={setPriceTo}
             setPriceRangeValid={setPriceRangeValid}
+            maxPrice={WISHLIST_ITEM_MAX_PRICE}
             className='mb-1'
           />
         )}
