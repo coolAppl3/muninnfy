@@ -1,15 +1,15 @@
 import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useState } from 'react';
-import WishlistItemsToolbarFilterItem from './components/WishlistItemsToolbarFilterItem';
-import Button from '../../../../../components/Button/Button';
-import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
-import WishlistItemTagsFormGroup from '../../../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
-import useCalendar from '../../../../../hooks/useCalendar';
-import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import useWishlistItems from '../../../hooks/useWishlistItems';
-import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
-import CheckboxFormGroup from '../../../../../components/CheckboxFormGroup/CheckboxFormGroup';
-import PriceRangeFormGroup from '../../../../../components/PriceRangeFormGroup/PriceRangeFormGroup';
-import { WISHLIST_ITEM_MAX_PRICE } from '../../../../../utils/constants/wishlistItemConstants';
+import Button from '../../../../components/Button/Button';
+import TimeWindowContainer from '../../../../components/TimeWindowContainer/TimeWindowContainer';
+import WishlistItemTagsFormGroup from '../../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
+import useCalendar from '../../../../hooks/useCalendar';
+import usePopupMessage from '../../../../hooks/usePopupMessage';
+import useWishlistItems from '../../hooks/useWishlistItems';
+import useWishlistItemsSelectionStore from '../../stores/wishlistItemsSelectionStore';
+import CheckboxFormGroup from '../../../../components/CheckboxFormGroup/CheckboxFormGroup';
+import PriceRangeFormGroup from '../../../../components/PriceRangeFormGroup/PriceRangeFormGroup';
+import { WISHLIST_ITEM_MAX_PRICE } from '../../../../utils/constants/wishlistItemConstants';
+import FilterToggler from '../../../../components/FilterToggler/FilterToggler';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -194,7 +194,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       </div>
 
       <div className='grid gap-1'>
-        <WishlistItemsToolbarFilterItem
+        <FilterToggler
           filterBy={isPurchased}
           setFilterBy={setIsPurchased}
           title='Purchase status'
@@ -211,7 +211,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           />
         )}
 
-        <WishlistItemsToolbarFilterItem
+        <FilterToggler
           filterBy={hasPrice}
           setFilterBy={setHasPrice}
           title='Price'
@@ -229,7 +229,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           />
         )}
 
-        <WishlistItemsToolbarFilterItem
+        <FilterToggler
           filterBy={hasLink}
           setFilterBy={setHasLink}
           title='Link'

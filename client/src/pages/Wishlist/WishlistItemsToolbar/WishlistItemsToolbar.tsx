@@ -5,7 +5,7 @@ import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
 import WishlistItemsToolbarOptions from './components/WishlistItemsToolbarOptions';
 import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';
 import WishlistItemsToolbarView from './components/WishlistItemsToolbarView';
-import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilters/WishlistItemsToolbarFilters';
+import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilters';
 import { debounce } from '../../../utils/debounce';
 import useWishlistItems from '../hooks/useWishlistItems';
 

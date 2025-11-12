@@ -1,8 +1,8 @@
 import { Dispatch, JSX, MouseEventHandler, SetStateAction } from 'react';
-import ToggleSwitch from '../../../../../../components/ToggleSwitch/ToggleSwitch';
-import CheckIcon from '../../../../../../assets/svg/CheckIcon.svg?react';
+import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
+import CheckIcon from '../../assets/svg/CheckIcon.svg?react';
 
-type WishlistItemsToolbarFilterItemProps = {
+type FilterTogglerProps = {
   filterBy: boolean | null;
   setFilterBy: Dispatch<SetStateAction<boolean | null>>;
   title: string;
@@ -10,13 +10,13 @@ type WishlistItemsToolbarFilterItemProps = {
   negativeFilterTitle: string;
 };
 
-export default function WishlistItemsToolbarFilterItem({
+export default function FilterToggler({
   filterBy,
   setFilterBy,
   title,
   positiveFilterTitle,
   negativeFilterTitle,
-}: WishlistItemsToolbarFilterItemProps): JSX.Element {
+}: FilterTogglerProps): JSX.Element {
   return (
     <div className='grid gap-1'>
       <header className='flex justify-start items-center gap-1'>
@@ -28,13 +28,13 @@ export default function WishlistItemsToolbarFilterItem({
       </header>
 
       <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>
-        <FilterItemButton
+        <FilterTogglerBtn
           onClick={() => setFilterBy(true)}
           title={positiveFilterTitle}
           isChecked={filterBy === true}
         />
 
-        <FilterItemButton
+        <FilterTogglerBtn
           onClick={() => setFilterBy(false)}
           title={negativeFilterTitle}
           isChecked={filterBy === false}
@@ -44,7 +44,13 @@ export default function WishlistItemsToolbarFilterItem({
   );
 }
 
-function FilterItemButton({ onClick, title, isChecked }: { onClick: MouseEventHandler; title: string; isChecked: boolean }): JSX.Element {
+type FilterTogglerBtnProps = {
+  onClick: MouseEventHandler;
+  title: string;
+  isChecked: boolean;
+};
+
+function FilterTogglerBtn({ onClick, title, isChecked }: FilterTogglerBtnProps): JSX.Element {
   return (
     <button
       type='button'
