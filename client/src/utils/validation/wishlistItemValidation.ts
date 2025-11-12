@@ -79,7 +79,7 @@ export function validateWishlistItemPrice(value: string): string | null {
   }
 
   if (valueAsNumber > WISHLIST_ITEM_MAX_PRICE) {
-    return `Maximum can't exceed 99,999,999.99.`;
+    return `Price can't exceed 99,999,999.99.`;
   }
 
   const decimalPortion: string | undefined = value.toString().split('.')[1];
