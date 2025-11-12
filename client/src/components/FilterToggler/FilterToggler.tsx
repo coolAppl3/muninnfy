@@ -6,8 +6,8 @@ type FilterTogglerProps = {
   filterBy: boolean | null;
   setFilterBy: Dispatch<SetStateAction<boolean | null>>;
   title: string;
-  positiveFilterTitle: string;
-  negativeFilterTitle: string;
+  positiveFilterTitle: string | null;
+  negativeFilterTitle: string | null;
 };
 
 export default function FilterToggler({
@@ -27,19 +27,21 @@ export default function FilterToggler({
         <p className='text-title text-sm leading-[1]'>{title}</p>
       </header>
 
-      <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>
-        <FilterTogglerBtn
-          onClick={() => setFilterBy(true)}
-          title={positiveFilterTitle}
-          isChecked={filterBy === true}
-        />
+      {positiveFilterTitle && negativeFilterTitle && (
+        <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>
+          <FilterTogglerBtn
+            onClick={() => setFilterBy(true)}
+            title={positiveFilterTitle}
+            isChecked={filterBy === true}
+          />
 
-        <FilterTogglerBtn
-          onClick={() => setFilterBy(false)}
-          title={negativeFilterTitle}
-          isChecked={filterBy === false}
-        />
-      </div>
+          <FilterTogglerBtn
+            onClick={() => setFilterBy(false)}
+            title={negativeFilterTitle}
+            isChecked={filterBy === false}
+          />
+        </div>
+      )}
     </div>
   );
 }
