@@ -2,7 +2,7 @@ import { ChangeEvent, Dispatch, JSX, SetStateAction, useState } from 'react';
 import DefaultFormGroup from '../DefaultFormGroup/DefaultFormGroup';
 import { validatePrice } from '../../utils/validation/sharedValidation';
 
-type WishlistItemToolbarPriceRangeProps = {
+type PriceRangeFormGroupProps = {
   setPriceFrom: Dispatch<SetStateAction<number | null>>;
   setPriceTo: Dispatch<SetStateAction<number | null>>;
   setPriceRangeValid: Dispatch<SetStateAction<boolean>>;
@@ -16,7 +16,7 @@ export default function PriceRangeFormGroup({
   setPriceRangeValid,
   maxPrice,
   className,
-}: WishlistItemToolbarPriceRangeProps): JSX.Element {
+}: PriceRangeFormGroupProps): JSX.Element {
   const [localPriceFromValue, setLocalPriceFromValue] = useState<string>('');
   const [localPriceToValue, setLocalPriceToValue] = useState<string>('');
 
