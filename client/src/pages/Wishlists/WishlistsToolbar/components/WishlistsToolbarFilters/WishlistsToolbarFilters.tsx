@@ -107,6 +107,9 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
     setPriceToCompleteFrom(null);
     setPriceToCompleteTo(null);
 
+    setStartTimestampsMap(new Map<string, number>());
+    setEndTimestampsMap(new Map<string, number>());
+
     setWishlistsFilterConfig((prev) => ({
       ...prev,
 
