@@ -127,8 +127,10 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     setAddedBeforeTimestamp(null);
     setPurchasedAfterTimestamp(null);
     setPurchasedBeforeTimestamp(null);
+
     setPriceFrom(null);
     setPriceTo(null);
+    setPriceRangeValid(true);
 
     setIsPurchased(null);
     setHasLink(null);
