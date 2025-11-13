@@ -93,7 +93,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
     displayPopupMessage('Filters applied.', 'success');
   }
 
-  function resetFilter(): void {
+  function resetFilters(): void {
     setFilterByItemsCount(false);
     setFilterByTotalItemsPrice(false);
     setFilterByPriceToComplete(false);
@@ -251,7 +251,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
 
         <Button
           className='bg-description border-description w-full sm:w-fit order-3 sm:order-1 mt-1 sm:mt-0'
-          onClick={resetFilter}
+          onClick={resetFilters}
         >
           Reset
         </Button>
