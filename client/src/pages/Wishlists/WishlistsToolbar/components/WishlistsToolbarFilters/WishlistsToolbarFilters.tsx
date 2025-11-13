@@ -122,6 +122,8 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
       priceToCompleteFrom: null,
       priceToCompleteTo: null,
     }));
+
+    displayPopupMessage('Filters reset.', 'success');
   }
 
   return (
