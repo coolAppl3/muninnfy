@@ -1,22 +1,22 @@
 import { Dispatch, JSX, MouseEventHandler, SetStateAction } from 'react';
-import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
-import CheckIcon from '../../assets/svg/CheckIcon.svg?react';
+import ToggleSwitch from '../../../../../../components/ToggleSwitch/ToggleSwitch';
+import CheckIcon from '../../../../../../assets/svg/CheckIcon.svg?react';
 
-type FilterTogglerProps = {
+type WishlistItemsFilterTogglerProps = {
   filterBy: boolean | null;
   setFilterBy: Dispatch<SetStateAction<boolean | null>>;
   title: string;
-  positiveFilterTitle: string | null;
-  negativeFilterTitle: string | null;
+  positiveFilterTitle: string;
+  negativeFilterTitle: string;
 };
 
-export default function FilterToggler({
+export default function WishlistItemsFilterToggler({
   filterBy,
   setFilterBy,
   title,
   positiveFilterTitle,
   negativeFilterTitle,
-}: FilterTogglerProps): JSX.Element {
+}: WishlistItemsFilterTogglerProps): JSX.Element {
   return (
     <div className='grid gap-1'>
       <header className='flex justify-start items-center gap-1'>
@@ -27,21 +27,19 @@ export default function FilterToggler({
         <p className='text-title text-sm leading-[1]'>{title}</p>
       </header>
 
-      {positiveFilterTitle && negativeFilterTitle && (
-        <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>
-          <FilterTogglerBtn
-            onClick={() => setFilterBy(true)}
-            title={positiveFilterTitle}
-            isChecked={filterBy === true}
-          />
+      <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>
+        <FilterTogglerBtn
+          onClick={() => setFilterBy(true)}
+          title={positiveFilterTitle}
+          isChecked={filterBy === true}
+        />
 
-          <FilterTogglerBtn
-            onClick={() => setFilterBy(false)}
-            title={negativeFilterTitle}
-            isChecked={filterBy === false}
-          />
-        </div>
-      )}
+        <FilterTogglerBtn
+          onClick={() => setFilterBy(false)}
+          title={negativeFilterTitle}
+          isChecked={filterBy === false}
+        />
+      </div>
     </div>
   );
 }
