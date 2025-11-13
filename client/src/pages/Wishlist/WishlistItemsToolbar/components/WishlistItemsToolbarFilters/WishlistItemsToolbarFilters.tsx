@@ -60,6 +60,10 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   }, [calendarKey, startTimestampsMap, endTimestampsMap]);
 
   function changesDetected(): boolean {
+    if (!priceRangeValid) {
+      return false;
+    }
+
     const stateRecord = {
       addedAfterTimestamp,
       addedBeforeTimestamp,
