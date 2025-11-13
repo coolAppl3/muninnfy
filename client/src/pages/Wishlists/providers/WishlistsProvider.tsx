@@ -24,7 +24,6 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
         totalItemsPriceTo,
         priceToCompleteFrom,
         priceToCompleteTo,
-        isCompleted,
         titleQuery,
       } = wishlistsFilterConfig;
 
@@ -57,10 +56,6 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       }
 
       if (priceToCompleteTo !== null && wishlist.price_to_complete > priceToCompleteTo) {
-        return false;
-      }
-
-      if (isCompleted !== null && wishlist.price_to_complete !== 0) {
         return false;
       }
 
@@ -137,6 +132,5 @@ const defaultWishlistsFilterConfig: WishlistsFilterConfigType = {
   priceToCompleteFrom: null,
   priceToCompleteTo: null,
 
-  isCompleted: null,
   titleQuery: '',
 };
