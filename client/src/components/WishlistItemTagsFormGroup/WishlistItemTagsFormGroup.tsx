@@ -30,6 +30,10 @@ export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>): void {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+
     const value: string = e.currentTarget.value;
 
     if (e.key === 'Backspace' && value === '') {
@@ -37,7 +41,7 @@ export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }
       return;
     }
 
-    if (e.key === ' ' && !validateItemTag(value)) {
+    if ((e.key === ' ' || e.key === 'Enter') && !validateItemTag(value)) {
       if (tagsSet.size >= WISHLIST_ITEM_TAGS_LIMIT) {
         displayPopupMessage('Tags limit reached.', 'error');
         return;

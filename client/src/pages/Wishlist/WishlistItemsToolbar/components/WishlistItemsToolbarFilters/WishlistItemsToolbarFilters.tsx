@@ -187,7 +187,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
         <WishlistItemTagsFormGroup
           tagsSet={tagsSet}
           setTagsSet={setTagsSet}
-          label='Tags - click space to add'
+          label='Tags'
         />
 
         <CheckboxFormGroup
