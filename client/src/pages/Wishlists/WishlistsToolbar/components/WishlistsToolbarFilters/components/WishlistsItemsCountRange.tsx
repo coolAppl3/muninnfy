@@ -1,57 +1,44 @@
-import { ChangeEvent, Dispatch, JSX, SetStateAction, useState } from 'react';
+import { ActionDispatch, ChangeEvent, JSX, useState } from 'react';
 import DefaultFormGroup from '../../../../../../components/DefaultFormGroup/DefaultFormGroup';
 import { WISHLIST_ITEMS_LIMIT } from '../../../../../../utils/constants/wishlistConstants';
+import { WishlistsToolbarFiltersReducerAction } from '../wishlistsToolbarFiltersReducer';
 
 type WishlistsItemsCountRangeProps = {
-  setCountFrom: Dispatch<SetStateAction<number | null>>;
-  setCountTo: Dispatch<SetStateAction<number | null>>;
-  setCountRangeValid: Dispatch<SetStateAction<boolean>>;
+  dispatch: ActionDispatch<[action: WishlistsToolbarFiltersReducerAction]>;
   className?: string;
 };
 
-export default function WishlistsItemsCountRange({
-  setCountFrom,
-  setCountTo,
-  setCountRangeValid,
-  className,
-}: WishlistsItemsCountRangeProps): JSX.Element {
-  const [localCountFrom, setLocalCountFrom] = useState<string>('');
-  const [localCountTo, setLocalCountTo] = useState<string>('');
+export default function WishlistsItemsCountRange({ dispatch, className }: WishlistsItemsCountRangeProps): JSX.Element {
+  const [countFrom, setCountFrom] = useState<string>('');
+  const [countTo, setCountTo] = useState<string>('');
 
   const [countFromErrorMessage, setCountFromErrorMessage] = useState<string | null>(null);
   const [countToErrorMessage, setCountToErrorMessage] = useState<string | null>(null);
 
   function validateRange(fromValue: string, toValue: string): void {
-    const fromErrorMessage: string | null = validateCount(fromValue);
-    const toErrorMessage: string | null = validateCount(toValue);
+    const countFromErrorMessage: string | null = validateCount(fromValue);
+    const countToErrorMessage: string | null = validateCount(toValue);
 
-    setCountFromErrorMessage(fromErrorMessage);
-    setCountToErrorMessage(toErrorMessage);
+    setCountFromErrorMessage(countFromErrorMessage);
+    setCountToErrorMessage(countToErrorMessage);
 
-    if (fromErrorMessage || toErrorMessage) {
-      setCountRangeValid(false);
+    if (countFromErrorMessage || countToErrorMessage) {
+      dispatch({ type: 'SET_ITEMS_COUNT_RANGE_VALID', payload: { newValue: false } });
       return;
     }
 
-    const fromNumberValue: number | null = fromValue === '' ? null : +fromValue;
-    const toNumberValue: number | null = toValue === '' ? null : +toValue;
+    const finalCountFrom: number | null = fromValue === '' ? null : +fromValue;
+    const finalCountTo: number | null = toValue === '' ? null : +toValue;
 
-    setCountFrom(fromNumberValue);
-    setCountTo(toNumberValue);
-
-    if (!fromNumberValue || !toNumberValue) {
-      setCountRangeValid(true);
-      return;
-    }
-
-    if (fromNumberValue > toNumberValue) {
-      setCountRangeValid(false);
+    if (finalCountFrom && finalCountTo && finalCountFrom > finalCountTo) {
+      dispatch({ type: 'SET_ITEMS_COUNT_RANGE_VALID', payload: { newValue: false } });
       setCountToErrorMessage(`Can't be lower than the start of the range.`);
 
       return;
     }
 
-    setCountRangeValid(true);
+    dispatch({ type: 'SET_ITEMS_COUNT', payload: { fromValue: finalCountFrom, toValue: finalCountTo } });
+    dispatch({ type: 'SET_ITEMS_COUNT_RANGE_VALID', payload: { newValue: true } });
   }
 
   function validateCount(value: string): string | null {
@@ -83,12 +70,12 @@ export default function WishlistsItemsCountRange({
         label='From'
         autoComplete='off'
         errorMessage={countFromErrorMessage}
-        value={localCountFrom}
+        value={countFrom}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
-          setLocalCountFrom(newValue);
-          validateRange(newValue, localCountTo);
+          setCountFrom(newValue);
+          validateRange(newValue, countTo);
         }}
       />
 
@@ -97,12 +84,12 @@ export default function WishlistsItemsCountRange({
         label='To'
         autoComplete='off'
         errorMessage={countToErrorMessage}
-        value={localCountTo}
+        value={countTo}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
-          setLocalCountTo(newValue);
-          validateRange(localCountFrom, newValue);
+          setCountTo(newValue);
+          validateRange(countFrom, newValue);
         }}
       />
     </div>

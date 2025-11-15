@@ -1,59 +1,50 @@
-import { ChangeEvent, Dispatch, JSX, SetStateAction, useState } from 'react';
+import { ChangeEvent, JSX, useState } from 'react';
 import DefaultFormGroup from '../DefaultFormGroup/DefaultFormGroup';
 import { validatePrice } from '../../utils/validation/sharedValidation';
 
 type PriceRangeFormGroupProps = {
-  setPriceFrom: Dispatch<SetStateAction<number | null>>;
-  setPriceTo: Dispatch<SetStateAction<number | null>>;
-  setPriceRangeValid: Dispatch<SetStateAction<boolean>>;
+  setRangeValue: (newRange: { fromValue: number | null; toValue: number | null }) => void;
+  setRangeIsValid: (newValue: boolean) => void;
   maxPrice: number;
   className?: string;
 };
 
 export default function PriceRangeFormGroup({
-  setPriceFrom,
-  setPriceTo,
-  setPriceRangeValid,
+  setRangeValue,
+  setRangeIsValid,
   maxPrice,
   className,
 }: PriceRangeFormGroupProps): JSX.Element {
-  const [localPriceFromValue, setLocalPriceFromValue] = useState<string>('');
-  const [localPriceToValue, setLocalPriceToValue] = useState<string>('');
+  const [priceFrom, setLocalPriceFromValue] = useState<string>('');
+  const [priceTo, setLocalPriceToValue] = useState<string>('');
 
   const [priceFromErrorMessage, setPriceFromErrorMessage] = useState<string | null>(null);
   const [priceToErrorMessage, setPriceToErrorMessage] = useState<string | null>(null);
 
   function validateRange(fromValue: string, toValue: string): void {
-    const fromErrorMessage: string | null = validatePrice(fromValue, maxPrice);
-    const toErrorMessage: string | null = validatePrice(toValue, maxPrice);
+    const priceFromErrorMessage: string | null = validatePrice(fromValue, maxPrice);
+    const priceToErrorMessage: string | null = validatePrice(toValue, maxPrice);
 
-    setPriceFromErrorMessage(fromErrorMessage);
-    setPriceToErrorMessage(toErrorMessage);
+    setPriceFromErrorMessage(priceFromErrorMessage);
+    setPriceToErrorMessage(priceToErrorMessage);
 
-    if (fromErrorMessage || toErrorMessage) {
-      setPriceRangeValid(false);
+    if (priceFromErrorMessage || priceToErrorMessage) {
+      setRangeIsValid(false);
       return;
     }
 
-    const fromNumberValue: number | null = fromValue === '' ? null : +fromValue;
-    const toNumberValue: number | null = toValue === '' ? null : +toValue;
+    const finalPriceFrom: number | null = fromValue === '' ? null : +fromValue;
+    const finalPriceTo: number | null = toValue === '' ? null : +toValue;
 
-    setPriceFrom(fromNumberValue);
-    setPriceTo(toNumberValue);
-
-    if (!fromNumberValue || !toNumberValue) {
-      setPriceRangeValid(true);
-      return;
-    }
-
-    if (fromNumberValue > toNumberValue) {
-      setPriceRangeValid(false);
+    if (finalPriceFrom && finalPriceTo && finalPriceFrom > finalPriceTo) {
       setPriceToErrorMessage(`Can't be lower than the start of the range.`);
+      setRangeIsValid(false);
 
       return;
     }
 
-    setPriceRangeValid(true);
+    setRangeValue({ fromValue: finalPriceFrom, toValue: finalPriceTo });
+    setRangeIsValid(true);
   }
 
   return (
@@ -63,12 +54,12 @@ export default function PriceRangeFormGroup({
         label='Price from'
         autoComplete='off'
         errorMessage={priceFromErrorMessage}
-        value={localPriceFromValue}
+        value={priceFrom}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
           setLocalPriceFromValue(newValue);
-          validateRange(newValue, localPriceToValue);
+          validateRange(newValue, priceTo);
         }}
       />
 
@@ -77,12 +68,12 @@ export default function PriceRangeFormGroup({
         label='Price to'
         autoComplete='off'
         errorMessage={priceToErrorMessage}
-        value={localPriceToValue}
+        value={priceTo}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
           setLocalPriceToValue(newValue);
-          validateRange(localPriceFromValue, newValue);
+          validateRange(priceFrom, newValue);
         }}
       />
     </div>

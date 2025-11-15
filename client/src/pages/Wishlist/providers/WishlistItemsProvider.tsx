@@ -28,9 +28,9 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         purchasedBeforeTimestamp,
         priceFrom,
         priceTo,
-        isPurchased,
-        hasLink,
-        hasPrice,
+        filterByIsPurchased,
+        filterByPrice,
+        filterByLink,
         titleQuery,
         tagsSet,
         requireAllFilterTags,
@@ -60,15 +60,15 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return false;
       }
 
-      if (isPurchased !== null && Boolean(item.purchased_on_timestamp) !== isPurchased) {
+      if (filterByIsPurchased !== null && Boolean(item.purchased_on_timestamp) !== filterByIsPurchased) {
         return false;
       }
 
-      if (hasLink !== null && Boolean(item.link) !== hasLink) {
+      if (filterByPrice !== null && Boolean(item.price === 0 ? true : item.price) !== filterByPrice) {
         return false;
       }
 
-      if (hasPrice !== null && Boolean(item.price === 0 ? true : item.price) !== hasPrice) {
+      if (filterByLink !== null && Boolean(item.link) !== filterByLink) {
         return false;
       }
 
@@ -170,9 +170,9 @@ const defaultItemsFilterConfig: ItemsFilterConfigType = {
   priceFrom: null,
   priceTo: null,
 
-  isPurchased: null,
-  hasLink: null,
-  hasPrice: null,
+  filterByIsPurchased: null,
+  filterByLink: null,
+  filterByPrice: null,
 
   titleQuery: '',
 

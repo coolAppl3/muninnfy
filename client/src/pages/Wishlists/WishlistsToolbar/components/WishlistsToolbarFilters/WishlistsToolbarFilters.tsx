@@ -1,13 +1,14 @@
-import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer } from 'react';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 import Button from '../../../../../components/Button/Button';
 import useWishlists from '../../../hooks/useWishlists';
 import useCalendar from '../../../../../hooks/useCalendar';
 import PriceRangeFormGroup from '../../../../../components/PriceRangeFormGroup/PriceRangeFormGroup';
-import { WISHLIST_MAX_PRICE_TO_COMPLETE } from '../../../../../utils/constants/wishlistConstants';
+import { WISHLIST_MAX_TOTAL_ITEMS_PRICE } from '../../../../../utils/constants/wishlistConstants';
 import ToggleSwitch from '../../../../../components/ToggleSwitch/ToggleSwitch';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import WishlistsItemsCountRange from './components/WishlistsItemsCountRange';
+import wishlistsToolbarFiltersReducer, { initialWishlistsToolbarFiltersState } from './wishlistsToolbarFiltersReducer';
 
 type WishlistsToolbarFiltersProps = {
   isOpen: boolean;
@@ -18,23 +19,17 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
   const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
   const { startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
 
-  const [createdAfterTimestamp, setCreatedAfterTimestamp] = useState<number | null>(null);
-  const [createdBeforeTimestamp, setCreatedBeforeTimestamp] = useState<number | null>(null);
+  const [state, dispatch] = useReducer(wishlistsToolbarFiltersReducer, initialWishlistsToolbarFiltersState);
 
-  const [filterByItemsCount, setFilterByItemsCount] = useState<boolean>(false);
-  const [itemsCountFrom, setItemsCountFrom] = useState<number | null>(null);
-  const [itemsCountTo, setItemsCountTo] = useState<number | null>(null);
-  const [itemsCountRangeValid, setItemsCountRangeValid] = useState<boolean>(true);
-
-  const [filterByTotalItemsPrice, setFilterByTotalItemsPrice] = useState<boolean>(false);
-  const [totalItemsPriceFrom, setTotalIItemsFrom] = useState<number | null>(null);
-  const [totalItemsPriceTo, setTotalIItemsTo] = useState<number | null>(null);
-  const [totalItemsPriceRangeValid, setTotalItemsPriceRangeValid] = useState<boolean>(true);
-
-  const [filterByPriceToComplete, setFilterByPriceToComplete] = useState<boolean>(false);
-  const [priceToCompleteFrom, setPriceToCompleteFrom] = useState<number | null>(null);
-  const [priceToCompleteTo, setPriceToCompleteTo] = useState<number | null>(null);
-  const [priceToCompleteRangeValid, setPriceToCompleteRangeValid] = useState<boolean>(true);
+  const {
+    filterByItemsCount,
+    filterByPriceToComplete,
+    filterByTotalItemsPrice,
+    itemsCountRangeValid,
+    totalItemsPriceRangeValid,
+    priceToCompleteRangeValid,
+    ...filters
+  } = state;
 
   const allRangesValid: boolean = itemsCountRangeValid && totalItemsPriceRangeValid && priceToCompleteRangeValid;
   const createdTimestampsKey: string = 'createdTimestamps';
@@ -42,8 +37,13 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
   const { displayPopupMessage } = usePopupMessage();
 
   useEffect(() => {
-    setCreatedAfterTimestamp(startTimestampsMap.get(createdTimestampsKey) || null);
-    setCreatedBeforeTimestamp(endTimestampsMap.get(createdTimestampsKey) || null);
+    dispatch({
+      type: 'SET_CREATED_TIMESTAMP',
+      payload: {
+        fromValue: startTimestampsMap.get(createdTimestampsKey) || null,
+        toValue: endTimestampsMap.get(createdTimestampsKey) || null,
+      },
+    });
   }, [startTimestampsMap, endTimestampsMap]);
 
   function changesDetected(): boolean {
@@ -51,19 +51,8 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
       return false;
     }
 
-    const stateRecord = {
-      createdAfterTimestamp,
-      createdBeforeTimestamp,
-      itemsCountFrom,
-      itemsCountTo,
-      totalItemsPriceFrom,
-      totalItemsPriceTo,
-      priceToCompleteFrom,
-      priceToCompleteTo,
-    };
-
-    for (const key of Object.keys(stateRecord) as (keyof typeof stateRecord)[]) {
-      if (stateRecord[key] !== wishlistsFilterConfig[key]) {
+    for (const key of Object.keys(filters) as (keyof typeof filters)[]) {
+      if (filters[key] !== wishlistsFilterConfig[key]) {
         return true;
       }
     }
@@ -79,33 +68,14 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
 
     setWishlistsFilterConfig((prev) => ({
       ...prev,
-
-      createdAfterTimestamp,
-      createdBeforeTimestamp,
-      itemsCountFrom,
-      itemsCountTo,
-      totalItemsPriceFrom,
-      totalItemsPriceTo,
-      priceToCompleteFrom,
-      priceToCompleteTo,
+      ...filters,
     }));
 
     displayPopupMessage('Filters applied.', 'success');
   }
 
   function resetFilters(): void {
-    setFilterByItemsCount(false);
-    setFilterByTotalItemsPrice(false);
-    setFilterByPriceToComplete(false);
-
-    setCreatedAfterTimestamp(null);
-    setCreatedBeforeTimestamp(null);
-    setItemsCountFrom(null);
-    setItemsCountTo(null);
-    setTotalIItemsFrom(null);
-    setTotalIItemsTo(null);
-    setPriceToCompleteFrom(null);
-    setPriceToCompleteTo(null);
+    dispatch({ type: 'RESET_FILTERS' });
 
     setStartTimestampsMap(new Map<string, number>());
     setEndTimestampsMap(new Map<string, number>());
@@ -147,27 +117,14 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
           <header className='flex justify-start items-center gap-1'>
             <ToggleSwitch
               isToggled={filterByItemsCount}
-              onClick={() => {
-                const newValue: boolean = !filterByItemsCount;
-                setFilterByItemsCount(newValue);
-
-                if (newValue) {
-                  return;
-                }
-
-                setItemsCountFrom(null);
-                setItemsCountTo(null);
-                setItemsCountRangeValid(true);
-              }}
+              onClick={() => dispatch({ type: 'SET_FILTER_BY_ITEMS_COUNT', payload: { newValue: !filterByItemsCount } })}
             />
             <p className='text-title text-sm leading-[1]'>Items</p>
           </header>
 
           {filterByItemsCount && (
             <WishlistsItemsCountRange
-              setCountFrom={setItemsCountFrom}
-              setCountTo={setItemsCountTo}
-              setCountRangeValid={setItemsCountRangeValid}
+              dispatch={dispatch}
               className='mb-1'
             />
           )}
@@ -177,28 +134,18 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
           <header className='flex justify-start items-center gap-1'>
             <ToggleSwitch
               isToggled={filterByTotalItemsPrice}
-              onClick={() => {
-                const newValue: boolean = !filterByTotalItemsPrice;
-                setFilterByTotalItemsPrice(newValue);
-
-                if (newValue) {
-                  return;
-                }
-
-                setTotalIItemsFrom(null);
-                setTotalIItemsTo(null);
-                setTotalItemsPriceRangeValid(true);
-              }}
+              onClick={() => dispatch({ type: 'SET_FILTER_BY_TOTAL_ITEMS_PRICE', payload: { newValue: !filterByTotalItemsPrice } })}
             />
             <p className='text-title text-sm leading-[1]'>Worth</p>
           </header>
 
           {filterByTotalItemsPrice && (
             <PriceRangeFormGroup
-              setPriceFrom={setTotalIItemsFrom}
-              setPriceTo={setTotalIItemsTo}
-              setPriceRangeValid={setTotalItemsPriceRangeValid}
-              maxPrice={WISHLIST_MAX_PRICE_TO_COMPLETE}
+              setRangeValue={(newRange: { fromValue: number | null; toValue: number | null }) =>
+                dispatch({ type: 'SET_TOTAL_ITEMS_PRICE', payload: { ...newRange } })
+              }
+              setRangeIsValid={(newValue: boolean) => dispatch({ type: 'SET_TOTAL_ITEMS_PRICE_RANGE_VALID', payload: { newValue } })}
+              maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
               className='mb-1'
             />
           )}
@@ -208,28 +155,18 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
           <header className='flex justify-start items-center gap-1'>
             <ToggleSwitch
               isToggled={filterByPriceToComplete}
-              onClick={() => {
-                const newValue: boolean = !filterByPriceToComplete;
-                setFilterByPriceToComplete(newValue);
-
-                if (newValue) {
-                  return;
-                }
-
-                setPriceToCompleteFrom(null);
-                setPriceToCompleteTo(null);
-                setPriceToCompleteRangeValid(true);
-              }}
+              onClick={() => dispatch({ type: 'SET_FILTER_BY_PRICE_TO_COMPLETE', payload: { newValue: !filterByPriceToComplete } })}
             />
             <p className='text-title text-sm leading-[1]'>To complete</p>
           </header>
 
           {filterByPriceToComplete && (
             <PriceRangeFormGroup
-              setPriceFrom={setPriceToCompleteFrom}
-              setPriceTo={setPriceToCompleteTo}
-              setPriceRangeValid={setPriceToCompleteRangeValid}
-              maxPrice={WISHLIST_MAX_PRICE_TO_COMPLETE}
+              setRangeValue={(newRange: { fromValue: number | null; toValue: number | null }) =>
+                dispatch({ type: 'SET_PRICE_TO_COMPLETE', payload: { ...newRange } })
+              }
+              setRangeIsValid={(newValue: boolean) => dispatch({ type: 'SET_PRICE_TO_COMPLETE_RANGE_VALID', payload: { newValue } })}
+              maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
             />
           )}
         </div>

@@ -1,10 +1,10 @@
-import { Dispatch, JSX, MouseEventHandler, SetStateAction } from 'react';
+import { JSX, MouseEventHandler } from 'react';
 import ToggleSwitch from '../../../../../../components/ToggleSwitch/ToggleSwitch';
 import CheckIcon from '../../../../../../assets/svg/CheckIcon.svg?react';
 
 type WishlistItemsFilterTogglerProps = {
   filterBy: boolean | null;
-  setFilterBy: Dispatch<SetStateAction<boolean | null>>;
+  setFilterBy: (newValue: boolean | null) => void;
   title: string;
   positiveFilterTitle: string;
   negativeFilterTitle: string;
@@ -22,7 +22,7 @@ export default function WishlistItemsFilterToggler({
       <header className='flex justify-start items-center gap-1'>
         <ToggleSwitch
           isToggled={filterBy !== null}
-          onClick={() => setFilterBy((prev) => (prev === null ? true : null))}
+          onClick={() => setFilterBy(filterBy === null ? true : null)}
         />
         <p className='text-title text-sm leading-[1]'>{title}</p>
       </header>

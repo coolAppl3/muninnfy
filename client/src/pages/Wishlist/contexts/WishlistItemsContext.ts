@@ -11,9 +11,9 @@ export type ItemsFilterConfigType = {
   priceFrom: number | null;
   priceTo: number | null;
 
-  isPurchased: boolean | null;
-  hasLink: boolean | null;
-  hasPrice: boolean | null;
+  filterByIsPurchased: boolean | null;
+  filterByPrice: boolean | null;
+  filterByLink: boolean | null;
 
   titleQuery: string;
 

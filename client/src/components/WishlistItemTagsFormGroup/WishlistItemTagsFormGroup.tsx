@@ -1,10 +1,10 @@
-import { ChangeEvent, Dispatch, JSX, KeyboardEvent, MouseEvent, SetStateAction, useRef, useState } from 'react';
+import { ChangeEvent, JSX, KeyboardEvent, MouseEvent, useRef, useState } from 'react';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../../utils/constants/wishlistItemConstants';
 import usePopupMessage from '../../hooks/usePopupMessage';
 
 type WishlistItemTagsFormGroupProps = {
   tagsSet: Set<string>;
-  setTagsSet: Dispatch<SetStateAction<Set<string>>>;
+  setTagsSet: (newSet: Set<string>) => void;
   label: string;
 };
 
@@ -37,7 +37,7 @@ export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }
     const value: string = e.currentTarget.value;
 
     if (e.key === 'Backspace' && value === '') {
-      setTagsSet((prev) => new Set<string>([...prev].slice(0, -1)));
+      setTagsSet(new Set<string>([...tagsSet].slice(0, -1)));
       return;
     }
 
@@ -47,7 +47,7 @@ export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }
         return;
       }
 
-      setTagsSet((prev) => new Set(prev).add(value.toLowerCase()));
+      setTagsSet(new Set(tagsSet).add(value.toLowerCase()));
       setValue('');
     }
   }
@@ -86,13 +86,10 @@ export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }
           }
 
           const tag: string = e.target.textContent;
+          const newSet = new Set<string>(tagsSet);
 
-          setTagsSet((prev) => {
-            const newSet = new Set<string>(prev);
-            newSet.delete(tag.toLowerCase());
-
-            return newSet;
-          });
+          newSet.delete(tag.toLowerCase());
+          setTagsSet(newSet);
         }}
       >
         {[...tagsSet].map((tag: string) => (
