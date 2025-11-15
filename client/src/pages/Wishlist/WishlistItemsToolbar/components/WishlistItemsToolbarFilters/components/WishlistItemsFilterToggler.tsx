@@ -22,7 +22,7 @@ export default function WishlistItemsFilterToggler({
       <header className='flex justify-start items-center gap-1'>
         <ToggleSwitch
           isToggled={filterBy !== null}
-          setIsToggled={() => setFilterBy((prev) => (prev === null ? true : null))}
+          onClick={() => setFilterBy((prev) => (prev === null ? true : null))}
         />
         <p className='text-title text-sm leading-[1]'>{title}</p>
       </header>

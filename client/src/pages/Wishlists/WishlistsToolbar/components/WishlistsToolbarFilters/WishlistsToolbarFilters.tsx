@@ -147,7 +147,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
           <header className='flex justify-start items-center gap-1'>
             <ToggleSwitch
               isToggled={filterByItemsCount}
-              setIsToggled={() => {
+              onClick={() => {
                 const newValue: boolean = !filterByItemsCount;
                 setFilterByItemsCount(newValue);
 
@@ -177,7 +177,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
           <header className='flex justify-start items-center gap-1'>
             <ToggleSwitch
               isToggled={filterByTotalItemsPrice}
-              setIsToggled={() => {
+              onClick={() => {
                 const newValue: boolean = !filterByTotalItemsPrice;
                 setFilterByTotalItemsPrice(newValue);
 
@@ -208,7 +208,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
           <header className='flex justify-start items-center gap-1'>
             <ToggleSwitch
               isToggled={filterByPriceToComplete}
-              setIsToggled={() => {
+              onClick={() => {
                 const newValue: boolean = !filterByPriceToComplete;
                 setFilterByPriceToComplete(newValue);
 
