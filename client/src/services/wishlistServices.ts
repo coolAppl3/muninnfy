@@ -33,6 +33,10 @@ export async function getWishlistDetailsService(
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
 }
 
+export async function crossWishlistSearchService(itemTitleQuery: string): Promise<AxiosResponse<string[]>> {
+  return axios.get(`${wishlistsApiUrl}/crossWishlistSearch/${itemTitleQuery}`);
+}
+
 export async function getAllWishlistsService(abortSignal: AbortSignal): Promise<AxiosResponse<ExtendedWishlistDetailsType[]>> {
   return axios.get(`${wishlistsApiUrl}/all`, { signal: abortSignal });
 }
