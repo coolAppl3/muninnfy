@@ -15,6 +15,7 @@ export type WishlistsFilterConfigType = {
   priceToCompleteTo: number | null;
 
   titleQuery: string;
+  crossWishlistQueryIdSet: Set<string>;
 };
 
 export type WishlistsSortingMode = 'newest_first' | 'oldest_first' | 'largest_first' | 'smallest_first' | 'lexicographical';

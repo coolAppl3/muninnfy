@@ -25,7 +25,12 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
         priceToCompleteFrom,
         priceToCompleteTo,
         titleQuery,
+        crossWishlistQueryIdSet,
       } = wishlistsFilterConfig;
+
+      if (!crossWishlistQueryIdSet.has(wishlist.wishlist_id)) {
+        return false;
+      }
 
       if (createdAfterTimestamp !== null && wishlist.created_on_timestamp < createdAfterTimestamp) {
         return false;
@@ -133,4 +138,5 @@ const defaultWishlistsFilterConfig: WishlistsFilterConfigType = {
   priceToCompleteTo: null,
 
   titleQuery: '',
+  crossWishlistQueryIdSet: new Set<string>(),
 };

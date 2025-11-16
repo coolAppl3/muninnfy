@@ -17,8 +17,13 @@ export function WishlistsToolbar(): JSX.Element {
   const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
 
   const filtersAppliedCount: number = Object.entries(wishlistsFilterConfig).reduce(
-    (acc: number, [key, value]: [string, number | string | boolean | Set<string> | null]) =>
-      value === null || key === 'titleQuery' ? acc : acc + 1,
+    (acc: number, [key, value]: [string, number | string | boolean | Set<string> | null]) => {
+      if (value === null || key === 'titleQuery' || key === 'crossWishlistQueryIdSet') {
+        return acc;
+      }
+
+      return acc + 1;
+    },
     0
   );
 
