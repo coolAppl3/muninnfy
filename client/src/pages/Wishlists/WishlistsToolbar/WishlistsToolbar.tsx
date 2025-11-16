@@ -9,10 +9,12 @@ import WishlistsToolbarSort from './components/WishlistsToolbarSort';
 import WishlistsToolbarOptions from './components/WishlistsToolbarOptions';
 import CalendarProvider from '../../../providers/CalendarProvider';
 import WishlistsToolbarFilters from './components/WishlistsToolbarFilters/WishlistsToolbarFilters';
+import WishlistsToolbarCrossSearch from './components/WishlistsToolbarCrossSearch';
 
 export function WishlistsToolbar(): JSX.Element {
   const [titleQueryValue, setTitleQueryValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
+  const [crossWishlistsSearchMenuOpen, setCrossWishlistsSearchMenuOpen] = useState(false);
 
   const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
 
@@ -56,7 +58,7 @@ export function WishlistsToolbar(): JSX.Element {
             </button>
 
             <WishlistsToolbarSort />
-            <WishlistsToolbarOptions />
+            <WishlistsToolbarOptions setCrossWishlistsSearchMenuOpen={setCrossWishlistsSearchMenuOpen} />
           </header>
 
           <CalendarProvider>
@@ -65,6 +67,11 @@ export function WishlistsToolbar(): JSX.Element {
               setIsOpen={setFiltersMenuOpen}
             />
           </CalendarProvider>
+
+          <WishlistsToolbarCrossSearch
+            isOpen={crossWishlistsSearchMenuOpen}
+            setIsOpen={setCrossWishlistsSearchMenuOpen}
+          />
         </div>
 
         <DefaultFormGroup

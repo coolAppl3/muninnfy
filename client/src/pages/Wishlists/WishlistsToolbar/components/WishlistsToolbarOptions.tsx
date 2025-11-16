@@ -1,4 +1,4 @@
-import { FocusEvent, JSX, useMemo, useState } from 'react';
+import { Dispatch, FocusEvent, JSX, SetStateAction, useMemo, useState } from 'react';
 import TripleDotMenuIcon from '../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useConfirmModal from '../../../../hooks/useConfirmModal';
@@ -7,7 +7,11 @@ import useWishlists from '../../hooks/useWishlists';
 import { ExtendedWishlistDetailsType } from '../../../../types/wishlistTypes';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
-export default function WishlistsToolbarOptions(): JSX.Element {
+type WishlistsToolbarOptionsProps = {
+  setCrossWishlistsSearchMenuOpen: Dispatch<SetStateAction<boolean>>;
+};
+
+export default function WishlistsToolbarOptions({ setCrossWishlistsSearchMenuOpen }: WishlistsToolbarOptionsProps): JSX.Element {
   const { wishlists, setWishlists } = useWishlists();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -59,8 +63,7 @@ export default function WishlistsToolbarOptions(): JSX.Element {
           className='context-menu-btn'
           onClick={() => {
             setIsOpen(false);
-
-            // TODO: implement cross-wishlist items search
+            setCrossWishlistsSearchMenuOpen((prev) => !prev);
           }}
         >
           Search across wishlists
