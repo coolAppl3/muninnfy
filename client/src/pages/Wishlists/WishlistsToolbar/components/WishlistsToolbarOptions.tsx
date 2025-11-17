@@ -7,11 +7,7 @@ import useWishlists from '../../hooks/useWishlists';
 import { ExtendedWishlistDetailsType } from '../../../../types/wishlistTypes';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
 
-type WishlistsToolbarOptionsProps = {
-  setCrossWishlistsSearchMenuOpen: Dispatch<SetStateAction<boolean>>;
-};
-
-export default function WishlistsToolbarOptions({ setCrossWishlistsSearchMenuOpen }: WishlistsToolbarOptionsProps): JSX.Element {
+export default function WishlistsToolbarOptions(): JSX.Element {
   const { wishlists, setWishlists } = useWishlists();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -60,18 +56,7 @@ export default function WishlistsToolbarOptions({ setCrossWishlistsSearchMenuOpe
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className='context-menu-btn'
-          onClick={() => {
-            setIsOpen(false);
-            setCrossWishlistsSearchMenuOpen((prev) => !prev);
-          }}
-        >
-          Search across wishlists
-        </button>
-
-        <button
-          type='button'
-          className={'context-menu-btn danger'}
+          className='context-menu-btn text-danger'
           onClick={() => {
             setIsOpen(false);
 

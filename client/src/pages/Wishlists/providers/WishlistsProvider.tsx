@@ -28,7 +28,7 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
         crossWishlistQueryIdSet,
       } = wishlistsFilterConfig;
 
-      if (!crossWishlistQueryIdSet.has(wishlist.wishlist_id)) {
+      if (crossWishlistQueryIdSet && !crossWishlistQueryIdSet.has(wishlist.wishlist_id)) {
         return false;
       }
 
@@ -138,5 +138,7 @@ const defaultWishlistsFilterConfig: WishlistsFilterConfigType = {
   priceToCompleteTo: null,
 
   titleQuery: '',
-  crossWishlistQueryIdSet: new Set<string>(),
+
+  itemTitleQuery: '',
+  crossWishlistQueryIdSet: null,
 };

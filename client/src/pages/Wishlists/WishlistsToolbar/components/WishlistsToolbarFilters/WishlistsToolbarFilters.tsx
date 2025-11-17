@@ -1,4 +1,4 @@
-import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer } from 'react';
+import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer, useRef } from 'react';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 import Button from '../../../../../components/Button/Button';
 import useWishlists from '../../../hooks/useWishlists';
@@ -9,6 +9,10 @@ import ToggleSwitch from '../../../../../components/ToggleSwitch/ToggleSwitch';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import WishlistsItemsCountRange from './components/WishlistsItemsCountRange';
 import wishlistsToolbarFiltersReducer, { initialWishlistsToolbarFiltersState } from './wishlistsToolbarFiltersReducer';
+import DefaultFormGroup from '../../../../../components/DefaultFormGroup/DefaultFormGroup';
+import { crossWishlistSearchService } from '../../../../../services/wishlistServices';
+import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
+import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
 
 type WishlistsToolbarFiltersProps = {
   isOpen: boolean;
@@ -16,18 +20,27 @@ type WishlistsToolbarFiltersProps = {
 };
 
 export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: WishlistsToolbarFiltersProps): JSX.Element {
+  const [state, dispatch] = useReducer(wishlistsToolbarFiltersReducer, initialWishlistsToolbarFiltersState);
+
   const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
   const { startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
 
-  const [state, dispatch] = useReducer(wishlistsToolbarFiltersReducer, initialWishlistsToolbarFiltersState);
+  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   const {
+    itemTitleQuery,
+    itemTitleQueryErrorMessage,
+
     filterByItemsCount,
     filterByPriceToComplete,
     filterByTotalItemsPrice,
+    filterByItemTitle,
+
     itemsCountRangeValid,
     totalItemsPriceRangeValid,
     priceToCompleteRangeValid,
+    itemTitleQueryValid,
     ...filters
   } = state;
 
@@ -47,8 +60,12 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
   }, [startTimestampsMap, endTimestampsMap]);
 
   function changesDetected(): boolean {
-    if (!allRangesValid) {
+    if (!allRangesValid || itemTitleQueryErrorMessage) {
       return false;
+    }
+
+    if (itemTitleQuery !== wishlistsFilterConfig.itemTitleQuery) {
+      return true;
     }
 
     for (const key of Object.keys(filters) as (keyof typeof filters)[]) {
@@ -60,8 +77,8 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
     return false;
   }
 
-  function applyFilters(): void {
-    if (!allRangesValid) {
+  async function applyFilters(): Promise<void> {
+    if (!allRangesValid || itemTitleQueryErrorMessage) {
       displayPopupMessage('Invalid filter configuration.', 'error');
       return;
     }
@@ -69,7 +86,12 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
     setWishlistsFilterConfig((prev) => ({
       ...prev,
       ...filters,
+      itemTitleQuery,
     }));
+
+    if (itemTitleQuery !== wishlistsFilterConfig.itemTitleQuery) {
+      await applyCrossWishlistSearch();
+    }
 
     displayPopupMessage('Filters applied.', 'success');
   }
@@ -91,9 +113,41 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
       totalItemsPriceTo: null,
       priceToCompleteFrom: null,
       priceToCompleteTo: null,
+
+      itemTitleQuery: '',
+      crossWishlistQueryIdSet: null,
     }));
 
     displayPopupMessage('Filters reset.', 'success');
+  }
+
+  async function applyCrossWishlistSearch(): Promise<void> {
+    displayLoadingOverlay();
+
+    if (itemTitleQuery === '') {
+      setWishlistsFilterConfig((prev) => ({ ...prev, crossWishlistQueryIdSet: null }));
+      removeLoadingOverlay();
+
+      return;
+    }
+
+    try {
+      const wishlistIdsArr: string[] = (await crossWishlistSearchService(itemTitleQuery)).data;
+      setWishlistsFilterConfig((prev) => ({ ...prev, crossWishlistQueryIdSet: new Set<string>(wishlistIdsArr) }));
+    } catch (err: unknown) {
+      console.log(err);
+      const { isHandled, status, errMessage } = handleAsyncError(err);
+
+      if (isHandled) {
+        return;
+      }
+
+      if (status === 400) {
+        dispatch({ type: 'SET_ITEM_TITLE_QUERY_ERROR_MESSAGE', payload: { newValue: errMessage } });
+      }
+    } finally {
+      removeLoadingOverlay();
+    }
   }
 
   return (
@@ -167,6 +221,27 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
               }
               setRangeIsValid={(newValue: boolean) => dispatch({ type: 'SET_PRICE_TO_COMPLETE_RANGE_VALID', payload: { newValue } })}
               maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
+            />
+          )}
+        </div>
+
+        <div className='grid gap-1'>
+          <header className='flex justify-start items-center gap-1'>
+            <ToggleSwitch
+              isToggled={filterByItemTitle}
+              onClick={() => dispatch({ type: 'SET_FILTER_BY_ITEM_TITLE', payload: { newValue: !filterByItemTitle } })}
+            />
+            <p className='text-title text-sm leading-[1]'>Specific item</p>
+          </header>
+
+          {filterByItemTitle && (
+            <DefaultFormGroup
+              id='cross-wishlists-search'
+              label='Wishlist item title'
+              autoComplete='off'
+              value={itemTitleQuery}
+              errorMessage={itemTitleQueryErrorMessage}
+              onChange={(e) => dispatch({ type: 'SET_ITEM_TITLE_QUERY', payload: { newValue: e.target.value } })}
             />
           )}
         </div>

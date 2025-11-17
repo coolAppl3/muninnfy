@@ -1,3 +1,5 @@
+import { validateWishlistItemTitle } from '../../../../../utils/validation/wishlistItemValidation';
+
 type WishlistsToolbarFiltersState = {
   createdAfterTimestamp: number | null;
   createdBeforeTimestamp: number | null;
@@ -11,13 +13,18 @@ type WishlistsToolbarFiltersState = {
   priceToCompleteFrom: number | null;
   priceToCompleteTo: number | null;
 
+  itemTitleQuery: string;
+  itemTitleQueryErrorMessage: string | null;
+
   filterByItemsCount: boolean;
   filterByTotalItemsPrice: boolean;
   filterByPriceToComplete: boolean;
+  filterByItemTitle: boolean;
 
   itemsCountRangeValid: boolean;
   totalItemsPriceRangeValid: boolean;
   priceToCompleteRangeValid: boolean;
+  itemTitleQueryValid: boolean;
 };
 
 export const initialWishlistsToolbarFiltersState: WishlistsToolbarFiltersState = {
@@ -33,13 +40,18 @@ export const initialWishlistsToolbarFiltersState: WishlistsToolbarFiltersState =
   priceToCompleteFrom: null,
   priceToCompleteTo: null,
 
+  itemTitleQuery: '',
+  itemTitleQueryErrorMessage: null,
+
   filterByItemsCount: false,
   filterByTotalItemsPrice: false,
   filterByPriceToComplete: false,
+  filterByItemTitle: false,
 
   itemsCountRangeValid: true,
   totalItemsPriceRangeValid: true,
   priceToCompleteRangeValid: true,
+  itemTitleQueryValid: true,
 };
 
 export type WishlistsToolbarFiltersReducerAction =
@@ -49,14 +61,17 @@ export type WishlistsToolbarFiltersReducerAction =
   | { type: 'SET_ITEMS_COUNT'; payload: { fromValue: number | null; toValue: number | null } }
   | { type: 'SET_TOTAL_ITEMS_PRICE'; payload: { fromValue: number | null; toValue: number | null } }
   | { type: 'SET_PRICE_TO_COMPLETE'; payload: { fromValue: number | null; toValue: number | null } }
+  | { type: 'SET_ITEM_TITLE_QUERY'; payload: { newValue: string } }
   //
   | { type: 'SET_FILTER_BY_ITEMS_COUNT'; payload: { newValue: boolean } }
   | { type: 'SET_FILTER_BY_TOTAL_ITEMS_PRICE'; payload: { newValue: boolean } }
   | { type: 'SET_FILTER_BY_PRICE_TO_COMPLETE'; payload: { newValue: boolean } }
+  | { type: 'SET_FILTER_BY_ITEM_TITLE'; payload: { newValue: boolean } }
   //
   | { type: 'SET_ITEMS_COUNT_RANGE_VALID'; payload: { newValue: boolean } }
   | { type: 'SET_TOTAL_ITEMS_PRICE_RANGE_VALID'; payload: { newValue: boolean } }
-  | { type: 'SET_PRICE_TO_COMPLETE_RANGE_VALID'; payload: { newValue: boolean } };
+  | { type: 'SET_PRICE_TO_COMPLETE_RANGE_VALID'; payload: { newValue: boolean } }
+  | { type: 'SET_ITEM_TITLE_QUERY_ERROR_MESSAGE'; payload: { newValue: string | null } };
 
 export default function wishlistsToolbarFiltersReducer(
   state: WishlistsToolbarFiltersState,
@@ -112,6 +127,16 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
+  if (type === 'SET_ITEM_TITLE_QUERY') {
+    const updatedState: WishlistsToolbarFiltersState = {
+      ...state,
+      itemTitleQuery: payload.newValue,
+      itemTitleQueryErrorMessage: payload.newValue === '' ? null : validateWishlistItemTitle(payload.newValue),
+    };
+
+    return updatedState;
+  }
+
   if (type === 'SET_FILTER_BY_ITEMS_COUNT') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
@@ -148,6 +173,17 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
+  if (type === 'SET_FILTER_BY_ITEM_TITLE') {
+    const updatedState: WishlistsToolbarFiltersState = {
+      ...state,
+      filterByItemTitle: payload.newValue,
+      itemTitleQuery: '',
+      itemTitleQueryErrorMessage: '',
+    };
+
+    return updatedState;
+  }
+
   if (type === 'SET_ITEMS_COUNT_RANGE_VALID') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
@@ -170,6 +206,15 @@ export default function wishlistsToolbarFiltersReducer(
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       priceToCompleteRangeValid: payload.newValue,
+    };
+
+    return updatedState;
+  }
+
+  if (type === 'SET_ITEM_TITLE_QUERY_ERROR_MESSAGE') {
+    const updatedState: WishlistsToolbarFiltersState = {
+      ...state,
+      itemTitleQueryErrorMessage: payload.newValue,
     };
 
     return updatedState;
