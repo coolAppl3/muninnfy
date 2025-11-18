@@ -22,7 +22,7 @@ export function WishlistsToolbar(): JSX.Element {
         return acc;
       }
 
-      if (key === 'crossWishlistQueryIdSet' && value == null) {
+      if (key === 'crossWishlistQueryIdSet' && value === null) {
         return acc;
       }
 
