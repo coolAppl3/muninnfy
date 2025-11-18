@@ -8,7 +8,7 @@ export function validateWishlistTitle(value: string): string | null {
   }
 
   if (/\s{2,}/.test(value)) {
-    return 'Title must not contain consecutive whitespaces';
+    return 'Title must not contain consecutive whitespaces.';
   }
 
   if (value.length > 50) {
