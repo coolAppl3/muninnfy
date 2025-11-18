@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import WishlistPrivacyLevelIcon from '../WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
 import RedirectIcon from '../../assets/svg/RedirectIcon.svg?react';
 import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
+import StatisticItem from '../StatisticItem/StatisticItem';
 
 type WishlistCardProps = {
   wishlist: ExtendedWishlistDetailsType;
@@ -21,20 +22,20 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
       <div className='h-line mt-1'></div>
 
       <div className='text-sm text-description grid grid-cols-3 mt-1 relative z-0'>
-        <div className='grid'>
-          <span className='font-medium text-title'>{items_count}</span>
-          <span className='text-xs font-medium'>Items</span>
-        </div>
+        <StatisticItem
+          title='Items'
+          value={`${items_count}`}
+        />
 
-        <div className='grid'>
-          <span className='font-medium text-title'>{getFormattedPrice(total_items_price)}</span>
-          <span className='text-xs font-medium'>Worth</span>
-        </div>
+        <StatisticItem
+          title='Worth'
+          value={getFormattedPrice(total_items_price)}
+        />
 
-        <div className='grid'>
-          <span className='font-medium text-title'>{getFormattedPrice(price_to_complete)}</span>
-          <span className='text-xs font-medium'>To complete</span>
-        </div>
+        <StatisticItem
+          title='To Complete'
+          value={getFormattedPrice(price_to_complete)}
+        />
       </div>
 
       <div className='text-description flex justify-between items-center mt-2'>
