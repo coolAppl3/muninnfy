@@ -1,4 +1,4 @@
-import { Dispatch, JSX, SetStateAction } from 'react';
+import { JSX } from 'react';
 
 type ToggleSwitchProps = {
   isToggled: boolean;

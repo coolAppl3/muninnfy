@@ -1,11 +1,10 @@
-import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer, useRef } from 'react';
+import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer } from 'react';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 import Button from '../../../../../components/Button/Button';
 import useWishlists from '../../../hooks/useWishlists';
 import useCalendar from '../../../../../hooks/useCalendar';
 import PriceRangeFormGroup from '../../../../../components/PriceRangeFormGroup/PriceRangeFormGroup';
 import { WISHLIST_MAX_TOTAL_ITEMS_PRICE } from '../../../../../utils/constants/wishlistConstants';
-import ToggleSwitch from '../../../../../components/ToggleSwitch/ToggleSwitch';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import WishlistsItemsCountRange from './components/WishlistsItemsCountRange';
 import wishlistsToolbarFiltersReducer, { initialWishlistsToolbarFiltersState } from './wishlistsToolbarFiltersReducer';
