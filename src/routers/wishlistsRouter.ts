@@ -13,6 +13,7 @@ import { getAuthSessionId } from '../auth/authUtils';
 import { MappedWishlistItem } from './wishlistItemsRouter';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
 import { WishlistItem } from '../db/helpers/wishlistItemsDbHelpers';
+import { isValidWishlistItemTitle } from '../util/validation/wishlistItemValidation';
 
 export const wishlistsRouter: Router = express.Router();
 
@@ -121,6 +122,66 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
       res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistsRouter.get('/crossWishlistSearch/:itemTitleQuery', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const itemTitleQuery: string | undefined = req.params.itemTitleQuery;
+
+  if (!itemTitleQuery || !isValidWishlistItemTitle(itemTitleQuery)) {
+    res.status(400).json({ message: 'Invalid search query.', reason: 'invalidQuery' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type WishlistDetails = {
+      wishlist_id: string;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        wishlist_id
+      FROM
+        wishlists
+      WHERE
+        account_id = ? AND
+        EXISTS (
+          SELECT
+            1
+          FROM
+            wishlist_items
+          WHERE
+            wishlist_id = wishlists.wishlist_id AND
+            title LIKE ?
+        )
+      LIMIT ?;`,
+      [accountId, `%${itemTitleQuery}%`, TOTAL_WISHLISTS_LIMIT]
+    );
+
+    const wishlistIdsArr: string[] = (wishlistRows as WishlistDetails[]).map(({ wishlist_id }: WishlistDetails) => wishlist_id);
+
+    res.json(wishlistIdsArr);
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
       return;
     }
 
@@ -514,6 +575,45 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
 
       return;
     }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    await dbPool.execute<ResultSetHeader>(
+      `DELETE FROM
+        wishlists
+      WHERE
+        account_id = ? AND
+        NOT EXISTS (
+          SELECT 1 FROM wishlist_items WHERE wishlist_items.wishlist_id = wishlists.wishlist_id
+        )
+      LIMIT ?;`,
+      [accountId, TOTAL_WISHLISTS_LIMIT]
+    );
 
     res.json({});
   } catch (err: unknown) {

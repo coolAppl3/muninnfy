@@ -5,15 +5,13 @@ import PersonIcon from '../../assets/svg/PersonIcon.svg?react';
 import EyeIcon from '../../assets/svg/EyeIcon.svg?react';
 
 export default function WishlistPrivacyLevelIcon({ privacyLevel }: { privacyLevel: number }): JSX.Element {
-  const className = 'w-2 h-2';
-
   if (privacyLevel === PRIVATE_WISHLIST_PRIVACY_LEVEL) {
     return (
       <span
         title='Private'
         aria-label='Private wishlist'
       >
-        <LockIcon className={className} />
+        <LockIcon className='w-[1.6rem] h-[1.6rem]' />
       </span>
     );
   }
@@ -24,7 +22,7 @@ export default function WishlistPrivacyLevelIcon({ privacyLevel }: { privacyLeve
         title='Followers'
         aria-label='Followers only wishlist'
       >
-        <PersonIcon className={className} />
+        <PersonIcon className='w-[1.6rem] h-[1.6rem]' />
       </span>
     );
   }
@@ -34,7 +32,7 @@ export default function WishlistPrivacyLevelIcon({ privacyLevel }: { privacyLeve
       title='Public'
       aria-label='Public wishlist'
     >
-      <EyeIcon className={className} />
+      <EyeIcon className='w-[1.6rem] h-[1.6rem]' />
     </span>
   );
 }

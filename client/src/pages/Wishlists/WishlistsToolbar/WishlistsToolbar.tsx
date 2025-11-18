@@ -1,32 +1,29 @@
 import { JSX, useMemo, useState } from 'react';
 import Container from '../../../components/Container/Container';
-import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
-import WishlistItemsToolbarOptions from './components/WishlistItemsToolbarOptions';
-import WishlistItemsToolbarSort from './components/WishlistItemsToolbarSort';
-import WishlistItemsToolbarView from './components/WishlistItemsToolbarView';
-import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilters/WishlistItemsToolbarFilters';
+import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import { debounce } from '../../../utils/debounce';
-import useWishlistItems from '../hooks/useWishlistItems';
+import useWishlists from '../hooks/useWishlists';
+import WishlistsToolbarView from './components/WishlistsToolbarView';
+import WishlistsToolbarSort from './components/WishlistsToolbarSort';
+import WishlistsToolbarOptions from './components/WishlistsToolbarOptions';
+import CalendarProvider from '../../../providers/CalendarProvider';
+import WishlistsToolbarFilters from './components/WishlistsToolbarFilters/WishlistsToolbarFilters';
 
-export default function WishlistItemsToolbar(): JSX.Element {
-  const [titleQuery, setTitleQuery] = useState<string>('');
+export function WishlistsToolbar(): JSX.Element {
+  const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
+
+  const [titleQueryValue, setTitleQueryValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
-  const { itemsFilterConfig, setItemsFilterConfig } = useWishlistItems();
-
-  const filtersAppliedCount: number = Object.entries(itemsFilterConfig).reduce(
+  const filtersAppliedCount: number = Object.entries(wishlistsFilterConfig).reduce(
     (acc: number, [key, value]: [string, number | string | boolean | Set<string> | null]) => {
-      if (value === null) {
+      if (value === null || key === 'titleQuery' || key === 'itemTitleQuery') {
         return acc;
       }
 
-      if (key === 'requireAllFilterTags' || key === 'titleQuery') {
+      if (key === 'crossWishlistQueryIdSet' && value == null) {
         return acc;
-      }
-
-      if (key === 'tagsSet' && typeof value === 'object') {
-        return value.size > 0 ? acc + 1 : acc;
       }
 
       return acc + 1;
@@ -37,12 +34,12 @@ export default function WishlistItemsToolbar(): JSX.Element {
   const debounceSetTitleQuery: (titleQuery: string) => void = useMemo(
     () =>
       debounce((titleQuery: string) => {
-        setItemsFilterConfig((prev) => ({
+        setWishlistsFilterConfig((prev) => ({
           ...prev,
           titleQuery,
         }));
       }, 200),
-    [setItemsFilterConfig]
+    [setWishlistsFilterConfig]
   );
 
   return (
@@ -50,7 +47,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
       <Container>
         <div>
           <header className='flex justify-start items-center gap-1 mb-1 text-title relative z-3'>
-            <WishlistItemsToolbarView />
+            <WishlistsToolbarView />
 
             <button
               type='button'
@@ -62,26 +59,28 @@ export default function WishlistItemsToolbar(): JSX.Element {
               <SlidersIcon className={`w-2 h-2 transition-colors ${filtersMenuOpen ? 'text-cta' : ''}`} />
             </button>
 
-            <WishlistItemsToolbarSort />
-            <WishlistItemsToolbarOptions />
+            <WishlistsToolbarSort />
+            <WishlistsToolbarOptions />
           </header>
 
-          <WishlistItemsToolbarFilters
-            isOpen={filtersMenuOpen}
-            setIsOpen={setFiltersMenuOpen}
-          />
+          <CalendarProvider>
+            <WishlistsToolbarFilters
+              isOpen={filtersMenuOpen}
+              setIsOpen={setFiltersMenuOpen}
+            />
+          </CalendarProvider>
         </div>
 
         <DefaultFormGroup
-          id='search-wishlist-items'
-          label='Search wishlist items'
+          id='search-wishlists'
+          label='Search wishlists'
           autoComplete='off'
-          value={titleQuery}
+          value={titleQueryValue}
           errorMessage={null}
           className='mb-1'
           onChange={(e) => {
             const newValue: string = e.target.value;
-            setTitleQuery(newValue);
+            setTitleQueryValue(newValue);
 
             debounceSetTitleQuery(newValue.toLowerCase());
           }}

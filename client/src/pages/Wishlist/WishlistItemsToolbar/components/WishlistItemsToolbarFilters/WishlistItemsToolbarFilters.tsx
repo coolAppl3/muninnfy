@@ -1,5 +1,4 @@
-import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useState } from 'react';
-import WishlistItemsToolbarFilterItem from './components/WishlistItemsToolbarFilterItem';
+import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer } from 'react';
 import Button from '../../../../../components/Button/Button';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 import WishlistItemTagsFormGroup from '../../../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
@@ -7,8 +6,11 @@ import useCalendar from '../../../../../hooks/useCalendar';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../../hooks/useWishlistItems';
 import useWishlistItemsSelectionStore from '../../../stores/wishlistItemsSelectionStore';
-import WishlistItemToolbarPriceRange from './components/WishlistItemToolbarPriceRange';
 import CheckboxFormGroup from '../../../../../components/CheckboxFormGroup/CheckboxFormGroup';
+import PriceRangeFormGroup from '../../../../../components/PriceRangeFormGroup/PriceRangeFormGroup';
+import { WISHLIST_ITEM_MAX_PRICE } from '../../../../../utils/constants/wishlistItemConstants';
+import WishlistItemsFilterToggler from './components/WishlistItemsFilterToggler';
+import wishlistItemsToolbarFiltersReducer, { initialWishlistItemsToolbarFiltersState } from './wishlistItemsToolbarFiltersReducer';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
@@ -20,60 +22,43 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   const { calendarKey, startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
   const unselectAllWishlistItems: () => void = useWishlistItemsSelectionStore((store) => store.unselectAllWishlistItems);
 
-  const addedTimestampsKey: string = 'addTimestamps';
+  const [state, dispatch] = useReducer(wishlistItemsToolbarFiltersReducer, initialWishlistItemsToolbarFiltersState);
+  const { tagsSet, priceRangeValid, ...filters } = state;
+
+  const addedTimestampsKey: string = 'addedTimestamps';
   const purchasedTimestampsKey: string = 'purchasedTimestamps';
-
-  const [addedAfterTimestamp, setAddedAfterTimestamp] = useState<number | null>(startTimestampsMap.get(addedTimestampsKey) || null);
-  const [addedBeforeTimestamp, setAddedBeforeTimestamp] = useState<number | null>(endTimestampsMap.get(addedTimestampsKey) || null);
-
-  const [purchasedAfterTimestamp, setPurchasedAfterTimestamp] = useState<number | null>(
-    startTimestampsMap.get(purchasedTimestampsKey) || null
-  );
-  const [purchasedBeforeTimestamp, setPurchasedBeforeTimestamp] = useState<number | null>(
-    endTimestampsMap.get(purchasedTimestampsKey) || null
-  );
-
-  const [priceFrom, setPriceFrom] = useState<number | null>(null);
-  const [priceTo, setPriceTo] = useState<number | null>(null);
-  const [priceRangeValid, setPriceRangeValid] = useState<boolean>(true);
-
-  const [isPurchased, setIsPurchased] = useState<boolean | null>(itemsFilterConfig.isPurchased);
-  const [hasLink, setHasLink] = useState<boolean | null>(itemsFilterConfig.hasLink);
-  const [hasPrice, setHasPrice] = useState<boolean | null>(itemsFilterConfig.hasPrice);
-
-  const [tagsSet, setTagsSet] = useState<Set<string>>(new Set(itemsFilterConfig.tagsSet));
-  const [requireAllFilterTags, setRequireAllFilterTags] = useState<boolean>(false);
 
   const { displayPopupMessage } = usePopupMessage();
 
   useEffect(() => {
     if (calendarKey === addedTimestampsKey) {
-      setAddedAfterTimestamp(startTimestampsMap.get(addedTimestampsKey) || null);
-      setAddedBeforeTimestamp(endTimestampsMap.get(addedTimestampsKey) || null);
+      dispatch({
+        type: 'SET_ADDED_TIMESTAMP',
+        payload: {
+          fromValue: startTimestampsMap.get(addedTimestampsKey) || null,
+          toValue: endTimestampsMap.get(addedTimestampsKey) || null,
+        },
+      });
 
       return;
     }
 
-    setPurchasedAfterTimestamp(startTimestampsMap.get(purchasedTimestampsKey) || null);
-    setPurchasedBeforeTimestamp(endTimestampsMap.get(purchasedTimestampsKey) || null);
+    dispatch({
+      type: 'SET_PURCHASED_TIMESTAMP',
+      payload: {
+        fromValue: startTimestampsMap.get(purchasedTimestampsKey) || null,
+        toValue: endTimestampsMap.get(purchasedTimestampsKey) || null,
+      },
+    });
   }, [calendarKey, startTimestampsMap, endTimestampsMap]);
 
   function changesDetected(): boolean {
-    const stateRecord = {
-      addedAfterTimestamp,
-      addedBeforeTimestamp,
-      purchasedAfterTimestamp,
-      purchasedBeforeTimestamp,
-      priceFrom,
-      priceTo,
-      isPurchased,
-      hasLink,
-      hasPrice,
-      requireAllFilterTags,
-    };
+    if (!priceRangeValid) {
+      return false;
+    }
 
-    for (const key of Object.keys(stateRecord) as (keyof typeof stateRecord)[]) {
-      if (stateRecord[key] !== itemsFilterConfig[key]) {
+    for (const key of Object.keys(filters) as (keyof typeof filters)[]) {
+      if (filters[key] !== itemsFilterConfig[key]) {
         return true;
       }
     }
@@ -100,41 +85,16 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     unselectAllWishlistItems();
     setItemsFilterConfig((prev) => ({
       ...prev,
-
-      addedAfterTimestamp,
-      addedBeforeTimestamp,
-      purchasedAfterTimestamp,
-      purchasedBeforeTimestamp,
-      priceFrom,
-      priceTo,
-
-      isPurchased,
-      hasLink,
-      hasPrice,
-
+      ...filters,
       tagsSet,
-      requireAllFilterTags,
     }));
 
     displayPopupMessage('Filters applied.', 'success');
   }
 
   function resetFilter(): void {
+    dispatch({ type: 'RESET_FILTERS' });
     unselectAllWishlistItems();
-
-    setAddedAfterTimestamp(null);
-    setAddedBeforeTimestamp(null);
-    setPurchasedAfterTimestamp(null);
-    setPurchasedBeforeTimestamp(null);
-    setPriceFrom(null);
-    setPriceTo(null);
-
-    setIsPurchased(null);
-    setHasLink(null);
-    setHasPrice(null);
-
-    setTagsSet(new Set());
-    setRequireAllFilterTags(false);
 
     setStartTimestampsMap(new Map<string, number>());
     setEndTimestampsMap(new Map<string, number>());
@@ -149,9 +109,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       priceFrom: null,
       priceTo: null,
 
-      isPurchased: null,
-      hasLink: null,
-      hasPrice: null,
+      filterByIsPurchased: null,
+      filterByLink: null,
+      filterByPrice: null,
 
       tagsSet: new Set(),
       requireAllFilterTags: false,
@@ -179,29 +139,29 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       <div>
         <WishlistItemTagsFormGroup
           tagsSet={tagsSet}
-          setTagsSet={setTagsSet}
-          label='Tags - click space to add'
+          setTagsSet={(newSet: Set<string>) => dispatch({ type: 'SET_TAGS_SET', payload: { newSet } })}
+          label='Tags'
         />
 
         <CheckboxFormGroup
           id='require-all-tags'
           label='Require all tags'
-          isChecked={requireAllFilterTags}
-          onClick={() => setRequireAllFilterTags((prev) => !prev)}
+          isChecked={state.requireAllFilterTags}
+          onClick={() => dispatch({ type: 'SET_REQUIRE_ALL_FILTER_TAGS', payload: { newValue: !state.requireAllFilterTags } })}
           className='mt-1'
         />
       </div>
 
       <div className='grid gap-1'>
-        <WishlistItemsToolbarFilterItem
-          filterBy={isPurchased}
-          setFilterBy={setIsPurchased}
+        <WishlistItemsFilterToggler
+          filterBy={state.filterByIsPurchased}
+          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'SET_FILTER_BY_IS_PURCHASED', payload: { newValue } })}
           title='Purchase status'
           positiveFilterTitle='Purchased'
           negativeFilterTitle='Unpurchased'
         />
 
-        {isPurchased && (
+        {state.filterByIsPurchased && (
           <TimeWindowContainer
             calendarKey={purchasedTimestampsKey}
             startLabel='Purchased after'
@@ -210,26 +170,28 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           />
         )}
 
-        <WishlistItemsToolbarFilterItem
-          filterBy={hasPrice}
-          setFilterBy={setHasPrice}
+        <WishlistItemsFilterToggler
+          filterBy={state.filterByPrice}
+          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'SET_FILTER_BY_PRICE', payload: { newValue } })}
           title='Price'
           positiveFilterTitle='Has a price'
           negativeFilterTitle={`Doesn't have a price`}
         />
 
-        {hasPrice && (
-          <WishlistItemToolbarPriceRange
-            setPriceFrom={setPriceFrom}
-            setPriceTo={setPriceTo}
-            setPriceRangeValid={setPriceRangeValid}
+        {state.filterByPrice && (
+          <PriceRangeFormGroup
+            setRangeValue={(mewRange: { fromValue: number | null; toValue: number | null }) =>
+              dispatch({ type: 'SET_ITEM_PRICE', payload: { ...mewRange } })
+            }
+            setRangeIsValid={(newValue: boolean) => dispatch({ type: 'SET_ITEM_PRICE_RANGE_VALID', payload: { newValue } })}
+            maxPrice={WISHLIST_ITEM_MAX_PRICE}
             className='mb-1'
           />
         )}
 
-        <WishlistItemsToolbarFilterItem
-          filterBy={hasLink}
-          setFilterBy={setHasLink}
+        <WishlistItemsFilterToggler
+          filterBy={state.filterByLink}
+          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'SET_FILTER_BY_LINK', payload: { newValue } })}
           title='Link'
           positiveFilterTitle='Contains a link'
           negativeFilterTitle={`Doesn't contain a link`}

@@ -79,9 +79,11 @@ export default function Wishlist(): JSX.Element {
         }
 
         console.log(err);
-        handleAsyncError(err);
+        const { isHandled, status } = handleAsyncError(err);
 
-        navigate(referrerLocation || '/account');
+        if (!isHandled || status !== 401) {
+          navigate(referrerLocation || '/account');
+        }
       }
     };
 

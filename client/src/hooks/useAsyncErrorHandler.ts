@@ -31,7 +31,6 @@ export default function useAsyncErrorHandler(): HandleAsyncErrorFunction {
 
       if (status === 401 && errReason === 'authSessionExpired') {
         setAuthStatus('unauthenticated');
-
         isHandled = true;
       }
 

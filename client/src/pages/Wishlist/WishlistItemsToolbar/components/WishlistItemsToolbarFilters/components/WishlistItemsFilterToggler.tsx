@@ -1,40 +1,40 @@
-import { Dispatch, JSX, MouseEventHandler, SetStateAction } from 'react';
+import { JSX, MouseEventHandler } from 'react';
 import ToggleSwitch from '../../../../../../components/ToggleSwitch/ToggleSwitch';
 import CheckIcon from '../../../../../../assets/svg/CheckIcon.svg?react';
 
-type WishlistItemsToolbarFilterItemProps = {
+type WishlistItemsFilterTogglerProps = {
   filterBy: boolean | null;
-  setFilterBy: Dispatch<SetStateAction<boolean | null>>;
+  setFilterBy: (newValue: boolean | null) => void;
   title: string;
   positiveFilterTitle: string;
   negativeFilterTitle: string;
 };
 
-export default function WishlistItemsToolbarFilterItem({
+export default function WishlistItemsFilterToggler({
   filterBy,
   setFilterBy,
   title,
   positiveFilterTitle,
   negativeFilterTitle,
-}: WishlistItemsToolbarFilterItemProps): JSX.Element {
+}: WishlistItemsFilterTogglerProps): JSX.Element {
   return (
     <div className='grid gap-1'>
       <header className='flex justify-start items-center gap-1'>
         <ToggleSwitch
           isToggled={filterBy !== null}
-          setIsToggled={() => setFilterBy((prev) => (prev === null ? true : null))}
+          onClick={() => setFilterBy(filterBy === null ? true : null)}
         />
         <p className='text-title text-sm leading-[1]'>{title}</p>
       </header>
 
       <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>
-        <FilterItemButton
+        <FilterTogglerBtn
           onClick={() => setFilterBy(true)}
           title={positiveFilterTitle}
           isChecked={filterBy === true}
         />
 
-        <FilterItemButton
+        <FilterTogglerBtn
           onClick={() => setFilterBy(false)}
           title={negativeFilterTitle}
           isChecked={filterBy === false}
@@ -44,7 +44,13 @@ export default function WishlistItemsToolbarFilterItem({
   );
 }
 
-function FilterItemButton({ onClick, title, isChecked }: { onClick: MouseEventHandler; title: string; isChecked: boolean }): JSX.Element {
+type FilterTogglerBtnProps = {
+  onClick: MouseEventHandler;
+  title: string;
+  isChecked: boolean;
+};
+
+function FilterTogglerBtn({ onClick, title, isChecked }: FilterTogglerBtnProps): JSX.Element {
   return (
     <button
       type='button'

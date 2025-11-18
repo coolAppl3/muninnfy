@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.1.5] (2024-11-18)
+
+### Features
+
+- Implemented most of the `Wishlists` page.
+- Added `WishlistsContext`, `WishlistsProvider`, and `useWishlists()` custom hook.
+- Added the following components:
+  - `WishlistsContainer`.
+  - `WishlistsToolbarView`.
+  - `WishlistsToolbarSort`.
+  - `WishlistToolbarOptions`.
+  - `PriceRangeFormGroup`.
+  - `WishlistsToolbarFilters`.
+  - `WishlistsItemsCountRange`.
+  - `WishlistsFilterToggler`.
+- Added the following endpoints:
+  - DELETE `wishlists/empty`.
+  - GET `wishlists/crossWishlistSearch/:itemTitleQuery`.
+- Added the following services:
+  - `deleteEmptyWishlistsService()`.
+  - `crossWishlistSearchService()`.
+- Added `sharedValidation` module.
+- Added the following constants:
+  - `WISHLIST_ITEMS_LIMIT`.
+  - `WISHLIST_MAX_PRICE_TO_COMPLETE`.
+
+
+### Improvements
+
+- Memoized `WishlistCard`.
+- Slightly tightened usage of `handleAsyncError()`.
+
+
+### Bug Fixes
+
+- Fixed changing an item's price from 0 to none not registering as a change in `WishlistItemForm`, preventing the user form removing the price attribute from an item while editing it
+
+
+### Code Refactoring
+
+- Locale is not explicitly set to `en` `sortWishlistItems()` in `WishlistItemsProvider`.
+- Fixed `itemMatchesFilterConfig()` in `WishlistItemsProvider` not checking explicitly for null values in a few conditions.
+- Added missing `initialWishlists` in the component's props.
+- Simplified `WishlistCard` props.
+- Fixed `RedirectIcon` having a higher `z-index` than the link in `WishlistCard`.
+- Fixed aborted requests setting the auth status to `unauthenticated`, leading to flickers and unexpected behavior.
+  - This issue mostly occurred in the development environment, but had the potential to impact production.
+- Fixed grammar mistakes in `Features`.
+- Fixed UI alignment issues in `WishlistHeaderContent`. 
+- Fixed phrasing issues in `validateWishlistItemPrice()`.
+
+
 ## [0.1.4] (2024-11-08)
 
 ### Features

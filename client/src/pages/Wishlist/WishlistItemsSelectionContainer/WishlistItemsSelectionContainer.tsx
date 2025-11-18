@@ -88,7 +88,6 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
       if (status === 404 || (status === 400 && errReason === 'invalidWishlistId')) {
         navigate(referrerLocation || '/account');
-        return;
       }
     } finally {
       removeLoadingOverlay();
@@ -137,7 +136,6 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
       if (status === 404 || (status === 400 && errReason === 'invalidWishlistId')) {
         navigate(referrerLocation || '/account');
-        return;
       }
     } finally {
       removeLoadingOverlay();

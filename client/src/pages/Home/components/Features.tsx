@@ -16,7 +16,7 @@ export default function Features(): JSX.Element {
         <div className='features-container grid gap-2 sm:grid-cols-2 lg:grid-cols-3'>
           <FeatureCard
             title='Multiple Wishlists'
-            description='Create a collection separate wishlists for every occasion or interest — all in one place.'
+            description='Create independent wishlists for every occasion or interest — all in one place.'
             Icon={MultipleWishlistsIcon}
           />
 

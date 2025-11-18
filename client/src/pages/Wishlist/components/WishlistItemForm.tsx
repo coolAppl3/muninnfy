@@ -6,7 +6,6 @@ import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGr
 import {
   validateWishlistItemDescription,
   validateWishlistItemLink,
-  validateWishlistItemPrice,
   validateWishlistItemTitle,
 } from '../../../utils/validation/wishlistItemValidation';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
@@ -20,6 +19,8 @@ import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import useWishlistItems from '../hooks/useWishlistItems';
 import useWishlistItemsExpansionStore from '../stores/wishlistItemsExpansionStore';
 import { useShallow } from 'zustand/react/shallow';
+import { validatePrice } from '../../../utils/validation/sharedValidation';
+import { WISHLIST_ITEM_MAX_PRICE } from '../../../utils/constants/wishlistItemConstants';
 
 type WishlistItemFromProps = {
   formMode: 'NEW_ITEM' | 'EDIT_ITEM';
@@ -226,7 +227,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const newLinkErrorMessage: string | null = validateWishlistItemLink(linkValue);
     setLinkErrorMessage(newLinkErrorMessage);
 
-    const newPriceErrorMessage: string | null = validateWishlistItemPrice(priceValue);
+    const newPriceErrorMessage: string | null = validatePrice(priceValue, WISHLIST_ITEM_MAX_PRICE);
     setPriceErrorMessage(newPriceErrorMessage);
 
     for (const errorMessage of [newTitleErrorMessage, newDescriptionErrorMessage, newLinkErrorMessage, priceErrorMessage]) {
@@ -267,7 +268,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       return true;
     }
 
-    if (+priceValue !== wishlistItem.price) {
+    if ((priceValue === '' && wishlistItem.price !== null) || +priceValue !== wishlistItem.price) {
       return true;
     }
 
@@ -351,7 +352,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
           const newValue: string = e.target.value;
 
           setPriceValue(newValue);
-          setPriceErrorMessage(validateWishlistItemPrice(newValue));
+          setPriceErrorMessage(validatePrice(newValue, WISHLIST_ITEM_MAX_PRICE));
         }}
       />
 
@@ -372,7 +373,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       <WishlistItemTagsFormGroup
         tagsSet={tagsSet}
         setTagsSet={setTagsSet}
-        label='Tags - click space to add'
+        label='Tags'
       />
 
       <TextareaFormGroup

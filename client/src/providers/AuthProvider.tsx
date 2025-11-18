@@ -1,6 +1,7 @@
 import { JSX, ReactNode, useEffect, useMemo, useState } from 'react';
 import AuthContext, { AuthContextType, AuthStatus } from '../contexts/AuthContext';
 import { checkForAuthSessionService } from '../services/authServices';
+import { CanceledError } from 'axios';
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -17,6 +18,10 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
         const isValidAuthSession: boolean = (await checkForAuthSessionService(abortController.signal)).data.isValidAuthSession;
         setAuthStatus(isValidAuthSession ? 'authenticated' : 'unauthenticated');
       } catch (err: unknown) {
+        if (err instanceof CanceledError) {
+          return;
+        }
+
         setAuthStatus('unauthenticated');
       }
     };

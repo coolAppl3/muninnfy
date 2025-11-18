@@ -1,18 +1,18 @@
-import { Dispatch, JSX, SetStateAction } from 'react';
+import { JSX } from 'react';
 
 type ToggleSwitchProps = {
   isToggled: boolean;
-  setIsToggled: Dispatch<SetStateAction<boolean>>;
+  onClick: () => void;
   className?: string;
 };
 
-export default function ToggleSwitch({ isToggled, setIsToggled, className }: ToggleSwitchProps): JSX.Element {
+export default function ToggleSwitch({ isToggled, onClick, className }: ToggleSwitchProps): JSX.Element {
   return (
     <button
       type='button'
       title={isToggled ? 'Disable' : 'Enable'}
       aria-label={isToggled ? 'Disable' : 'Enable'}
-      onClick={() => setIsToggled((prev) => !prev)}
+      onClick={onClick}
       className={`flex justify-start items-center h-[1.4rem] w-[3.8rem] rounded-pill cursor-pointer hover:brightness-75 transition-all ${
         isToggled ? 'bg-cta/30 brightness-100' : 'bg-dark brightness-50'
       } ${className || ''}`}

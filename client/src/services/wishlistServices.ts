@@ -33,6 +33,10 @@ export async function getWishlistDetailsService(
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
 }
 
+export async function crossWishlistSearchService(itemTitleQuery: string): Promise<AxiosResponse<string[]>> {
+  return axios.get(`${wishlistsApiUrl}/crossWishlistSearch/${itemTitleQuery}`);
+}
+
 export async function getAllWishlistsService(abortSignal: AbortSignal): Promise<AxiosResponse<ExtendedWishlistDetailsType[]>> {
   return axios.get(`${wishlistsApiUrl}/all`, { signal: abortSignal });
 }
@@ -53,6 +57,10 @@ type ChangeWishlistPrivacyLevelServicePayload = {
 
 export async function changeWishlistPrivacyLevelService(body: ChangeWishlistPrivacyLevelServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);
+}
+
+export async function deleteEmptyWishlistsService(): Promise<AxiosResponse> {
+  return axios.delete(`${wishlistsApiUrl}/empty`);
 }
 
 export async function deleteWishlistService(wishlistId: string): Promise<AxiosResponse> {
