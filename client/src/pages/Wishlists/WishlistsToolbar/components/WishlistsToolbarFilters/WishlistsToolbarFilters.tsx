@@ -13,6 +13,7 @@ import DefaultFormGroup from '../../../../../components/DefaultFormGroup/Default
 import { crossWishlistSearchService } from '../../../../../services/wishlistServices';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
+import WishlistsFilterToggler from './components/WishlistsFilterToggler';
 
 type WishlistsToolbarFiltersProps = {
   isOpen: boolean;
@@ -167,33 +168,23 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
       />
 
       <div className='grid gap-1'>
-        <div className='grid gap-1'>
-          <header className='flex justify-start items-center gap-1'>
-            <ToggleSwitch
-              isToggled={filterByItemsCount}
-              onClick={() => dispatch({ type: 'SET_FILTER_BY_ITEMS_COUNT', payload: { newValue: !filterByItemsCount } })}
-            />
-            <p className='text-title text-sm leading-[1]'>Items</p>
-          </header>
-
-          {filterByItemsCount && (
+        <WishlistsFilterToggler
+          title='Items'
+          isToggled={filterByItemsCount}
+          onClick={() => dispatch({ type: 'SET_FILTER_BY_ITEMS_COUNT', payload: { newValue: !filterByItemsCount } })}
+          children={
             <WishlistsItemsCountRange
               dispatch={dispatch}
               className='mb-1'
             />
-          )}
-        </div>
+          }
+        />
 
-        <div className='grid gap-1'>
-          <header className='flex justify-start items-center gap-1'>
-            <ToggleSwitch
-              isToggled={filterByTotalItemsPrice}
-              onClick={() => dispatch({ type: 'SET_FILTER_BY_TOTAL_ITEMS_PRICE', payload: { newValue: !filterByTotalItemsPrice } })}
-            />
-            <p className='text-title text-sm leading-[1]'>Worth</p>
-          </header>
-
-          {filterByTotalItemsPrice && (
+        <WishlistsFilterToggler
+          title='Worth'
+          isToggled={filterByTotalItemsPrice}
+          onClick={() => dispatch({ type: 'SET_FILTER_BY_TOTAL_ITEMS_PRICE', payload: { newValue: !filterByTotalItemsPrice } })}
+          children={
             <PriceRangeFormGroup
               setRangeValue={(newRange: { fromValue: number | null; toValue: number | null }) =>
                 dispatch({ type: 'SET_TOTAL_ITEMS_PRICE', payload: { ...newRange } })
@@ -202,19 +193,14 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
               maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
               className='mb-1'
             />
-          )}
-        </div>
+          }
+        />
 
-        <div className='grid gap-1'>
-          <header className='flex justify-start items-center gap-1'>
-            <ToggleSwitch
-              isToggled={filterByPriceToComplete}
-              onClick={() => dispatch({ type: 'SET_FILTER_BY_PRICE_TO_COMPLETE', payload: { newValue: !filterByPriceToComplete } })}
-            />
-            <p className='text-title text-sm leading-[1]'>To complete</p>
-          </header>
-
-          {filterByPriceToComplete && (
+        <WishlistsFilterToggler
+          title='To complete'
+          isToggled={filterByPriceToComplete}
+          onClick={() => dispatch({ type: 'SET_FILTER_BY_PRICE_TO_COMPLETE', payload: { newValue: !filterByPriceToComplete } })}
+          children={
             <PriceRangeFormGroup
               setRangeValue={(newRange: { fromValue: number | null; toValue: number | null }) =>
                 dispatch({ type: 'SET_PRICE_TO_COMPLETE', payload: { ...newRange } })
@@ -222,19 +208,14 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
               setRangeIsValid={(newValue: boolean) => dispatch({ type: 'SET_PRICE_TO_COMPLETE_RANGE_VALID', payload: { newValue } })}
               maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
             />
-          )}
-        </div>
+          }
+        />
 
-        <div className='grid gap-1'>
-          <header className='flex justify-start items-center gap-1'>
-            <ToggleSwitch
-              isToggled={filterByItemTitle}
-              onClick={() => dispatch({ type: 'SET_FILTER_BY_ITEM_TITLE', payload: { newValue: !filterByItemTitle } })}
-            />
-            <p className='text-title text-sm leading-[1]'>Specific item</p>
-          </header>
-
-          {filterByItemTitle && (
+        <WishlistsFilterToggler
+          title='Specific item'
+          isToggled={filterByItemTitle}
+          onClick={() => dispatch({ type: 'SET_FILTER_BY_ITEM_TITLE', payload: { newValue: !filterByItemTitle } })}
+          children={
             <DefaultFormGroup
               id='cross-wishlists-search'
               label='Wishlist item title'
@@ -243,8 +224,8 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
               errorMessage={itemTitleQueryErrorMessage}
               onChange={(e) => dispatch({ type: 'SET_ITEM_TITLE_QUERY', payload: { newValue: e.target.value } })}
             />
-          )}
-        </div>
+          }
+        />
       </div>
 
       <div className='btn-container flex flex-col sm:flex-row justify-start items-start gap-1'>
