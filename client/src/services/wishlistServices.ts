@@ -37,7 +37,21 @@ export async function crossWishlistSearchService(itemTitleQuery: string): Promis
   return axios.get(`${wishlistsApiUrl}/crossWishlistSearch/${itemTitleQuery}`);
 }
 
-export async function getAllWishlistsService(abortSignal: AbortSignal): Promise<AxiosResponse<ExtendedWishlistDetailsType[]>> {
+export type CombinedWishlistsStatistics = {
+  totalWishlistsCount: number;
+  totalItemsCount: number;
+  totalPurchasedItemsCount: number;
+  totalWishlistsWorth: number;
+  totalWishlistsSpent: number;
+  totalWishlistsToComplete: number;
+};
+
+type GetAllWishlistsServiceData = {
+  wishlists: ExtendedWishlistDetailsType[];
+  combinedWishlistsStatistics: CombinedWishlistsStatistics;
+};
+
+export async function getAllWishlistsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAllWishlistsServiceData>> {
   return axios.get(`${wishlistsApiUrl}/all`, { signal: abortSignal });
 }
 
