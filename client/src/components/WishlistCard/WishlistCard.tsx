@@ -17,11 +17,11 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
 
   return (
     <div className='relative p-2 bg-secondary rounded-sm shadow-simple-tiny border-transparent transition-all duration-200 hover:scale-102 hover:brightness-110 hover:cursor-pointer will-change-transform group'>
-      <h3 className='text-title font-medium mb-1 leading-[1] wrap-anywhere'>{title}</h3>
+      <h3 className='text-title font-medium leading-[1] wrap-anywhere'>{title}</h3>
 
-      <div className='h-line mt-1'></div>
+      <div className='h-line my-1'></div>
 
-      <div className='text-sm text-description grid grid-cols-3 mt-1 relative z-0'>
+      <div className='text-sm text-description grid grid-cols-3 mb-2 relative z-0'>
         <StatisticItem
           title='Items'
           value={`${items_count}`}
@@ -38,7 +38,7 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
         />
       </div>
 
-      <div className='text-description flex justify-between items-center mt-2'>
+      <div className='text-description flex justify-between items-center'>
         <p className='text-sm font-medium'>{getFullDateString(created_on_timestamp)}</p>
         <WishlistPrivacyLevelIcon privacyLevel={privacy_level} />
       </div>
