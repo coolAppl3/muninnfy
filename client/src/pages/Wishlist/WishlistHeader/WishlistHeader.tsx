@@ -27,9 +27,9 @@ export default function WishlistHeader(): JSX.Element {
           <div>
             <WishlistHeaderContent />
 
-            <div className='h-line mt-1'></div>
+            <div className='h-line mb-1 mt-[4px]'></div>
 
-            <div className='text-sm text-description grid grid-cols-3 mt-1 relative z-0'>
+            <div className='text-sm text-description grid grid-cols-3 mb-2 relative z-0'>
               <StatisticItem
                 title='Items'
                 value={`${wishlistItems.length}`}
@@ -51,7 +51,7 @@ export default function WishlistHeader(): JSX.Element {
               />
             </div>
 
-            <div className='text-description flex justify-between items-center mt-2'>
+            <div className='text-description flex justify-between items-center'>
               <p className='text-sm font-medium'>{getFullDateString(wishlistDetails.created_on_timestamp)}</p>
               <WishlistPrivacyLevelIcon privacyLevel={wishlistDetails.privacy_level} />
             </div>
