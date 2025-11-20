@@ -6,6 +6,7 @@ import { deleteEmptyWishlistsService } from '../../../../services/wishlistServic
 import useWishlists from '../../hooks/useWishlists';
 import { ExtendedWishlistDetailsType } from '../../../../types/wishlistTypes';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
+import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 
 export default function WishlistsToolbarOptions(): JSX.Element {
   const { wishlists, setWishlists } = useWishlists();
@@ -14,6 +15,7 @@ export default function WishlistsToolbarOptions(): JSX.Element {
   const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
   const { displayPopupMessage } = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
+  const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   const emptyWishlistsCount: number = useMemo(
     () => wishlists.reduce((acc: number, cur: ExtendedWishlistDetailsType) => (cur.items_count > 0 ? acc : acc + 1), 0),
@@ -21,6 +23,8 @@ export default function WishlistsToolbarOptions(): JSX.Element {
   );
 
   async function deleteEmptyWishlists(): Promise<void> {
+    displayLoadingOverlay();
+
     try {
       await deleteEmptyWishlistsService();
       setWishlists((prev) => prev.filter((wishlist: ExtendedWishlistDetailsType) => wishlist.items_count > 0));
@@ -29,6 +33,8 @@ export default function WishlistsToolbarOptions(): JSX.Element {
     } catch (err: unknown) {
       console.log(err);
       handleAsyncError(err);
+    } finally {
+      removeLoadingOverlay();
     }
   }
 
