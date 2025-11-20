@@ -57,7 +57,7 @@ export default function WishlistsHeader({ combinedWishlistsStatistics }: Wishlis
             />
 
             <StatisticItem
-              title='Spent'
+              title='To complete'
               value={getFormattedPrice(Math.round(totalWishlistsToComplete))}
             />
           </div>
