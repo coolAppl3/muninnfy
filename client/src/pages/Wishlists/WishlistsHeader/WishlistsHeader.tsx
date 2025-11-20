@@ -4,12 +4,15 @@ import Container from '../../../components/Container/Container';
 import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import { CombinedWishlistsStatistics } from '../../../services/wishlistServices';
 import Button from '../../../components/Button/Button';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 type WishlistsHeaderProps = {
   combinedWishlistsStatistics: CombinedWishlistsStatistics;
 };
 
 export default function WishlistsHeader({ combinedWishlistsStatistics }: WishlistsHeaderProps): JSX.Element {
+  const navigate: NavigateFunction = useNavigate();
+
   const {
     totalWishlistsCount,
     totalItemsCount,
@@ -59,7 +62,12 @@ export default function WishlistsHeader({ combinedWishlistsStatistics }: Wishlis
             />
           </div>
 
-          <Button className='bg-cta border-cta text-dark w-full sm:w-fit'>New wishlist</Button>
+          <Button
+            className='bg-cta border-cta text-dark w-full sm:w-fit'
+            onClick={() => navigate('/wishlist/new')}
+          >
+            New wishlist
+          </Button>
         </div>
       </Container>
     </header>
