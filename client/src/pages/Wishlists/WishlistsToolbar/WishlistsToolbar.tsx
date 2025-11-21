@@ -11,25 +11,10 @@ import CalendarProvider from '../../../providers/CalendarProvider';
 import WishlistsToolbarFilters from './components/WishlistsToolbarFilters/WishlistsToolbarFilters';
 
 export function WishlistsToolbar(): JSX.Element {
-  const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
+  const { setWishlistsFilterConfig } = useWishlists();
 
   const [titleQueryValue, setTitleQueryValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
-
-  const filtersAppliedCount: number = Object.entries(wishlistsFilterConfig).reduce(
-    (acc: number, [key, value]: [string, number | string | boolean | Set<string> | null]) => {
-      if (value === null || key === 'titleQuery' || key === 'itemTitleQuery') {
-        return acc;
-      }
-
-      if (key === 'crossWishlistQueryIdSet' && value === null) {
-        return acc;
-      }
-
-      return acc + 1;
-    },
-    0
-  );
 
   const debounceSetTitleQuery: (titleQuery: string) => void = useMemo(
     () =>
@@ -77,7 +62,6 @@ export function WishlistsToolbar(): JSX.Element {
           autoComplete='off'
           value={titleQueryValue}
           errorMessage={null}
-          className='mb-1'
           onChange={(e) => {
             const newValue: string = e.target.value;
             setTitleQueryValue(newValue);
@@ -85,12 +69,6 @@ export function WishlistsToolbar(): JSX.Element {
             debounceSetTitleQuery(newValue.toLowerCase());
           }}
         />
-
-        {filtersAppliedCount > 0 && (
-          <span className='text-cta font-medium text-sm flex gap-1'>
-            {filtersAppliedCount === 1 ? '1 filter' : `${filtersAppliedCount} filters`} applied
-          </span>
-        )}
       </Container>
     </div>
   );
