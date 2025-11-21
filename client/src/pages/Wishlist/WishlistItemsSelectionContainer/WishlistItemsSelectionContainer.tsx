@@ -179,21 +179,23 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
             <p>
               Cost to purchase:{' '}
               <span className='text-title font-medium'>
-                {wishlistItems
-                  .reduce((acc: number, curr: WishlistItemType) => {
-                    const itemSelected: boolean = selectedItemsSet.has(curr.item_id);
+                {localCurrencyFormatter
+                  .format(
+                    wishlistItems.reduce((acc: number, curr: WishlistItemType) => {
+                      const itemSelected: boolean = selectedItemsSet.has(curr.item_id);
 
-                    if (!itemSelected || !curr.price) {
-                      return acc;
-                    }
+                      if (!itemSelected || !curr.price) {
+                        return acc;
+                      }
 
-                    if (curr.purchased_on_timestamp) {
-                      return acc;
-                    }
+                      if (curr.purchased_on_timestamp) {
+                        return acc;
+                      }
 
-                    return acc + curr.price;
-                  }, 0)
-                  .toFixed(2)}
+                      return acc + curr.price;
+                    }, 0)
+                  )
+                  .slice(1)}
               </span>
             </p>
           </div>
@@ -303,3 +305,9 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
     </div>
   );
 }
+
+const localCurrencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD', // to be sliced out
+  maximumFractionDigits: 2,
+});
