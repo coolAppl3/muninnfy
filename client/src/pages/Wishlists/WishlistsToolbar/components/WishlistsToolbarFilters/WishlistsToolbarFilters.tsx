@@ -1,4 +1,4 @@
-import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer } from 'react';
+import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer, useState } from 'react';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 import Button from '../../../../../components/Button/Button';
 import useWishlists from '../../../hooks/useWishlists';
@@ -21,6 +21,7 @@ type WishlistsToolbarFiltersProps = {
 
 export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: WishlistsToolbarFiltersProps): JSX.Element {
   const [state, dispatch] = useReducer(wishlistsToolbarFiltersReducer, initialWishlistsToolbarFiltersState);
+  const [isFetchingSearchQuery, setIsFetchingSearchingQuery] = useState<boolean>(false);
 
   const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
   const { startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
@@ -90,6 +91,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
     }));
 
     if (itemTitleQuery !== wishlistsFilterConfig.itemTitleQuery) {
+      setIsFetchingSearchingQuery(true);
       await applyCrossWishlistSearch();
     }
 
@@ -122,6 +124,10 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
   }
 
   async function applyCrossWishlistSearch(): Promise<void> {
+    if (isFetchingSearchQuery) {
+      return;
+    }
+
     displayLoadingOverlay();
 
     if (itemTitleQuery === '') {
@@ -146,6 +152,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         dispatch({ type: 'SET_ITEM_TITLE_QUERY_ERROR_MESSAGE', payload: { newValue: errMessage } });
       }
     } finally {
+      setIsFetchingSearchingQuery(false);
       removeLoadingOverlay();
     }
   }
