@@ -13,26 +13,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
   const [titleQuery, setTitleQuery] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
-  const { itemsFilterConfig, setItemsFilterConfig } = useWishlistItems();
-
-  const filtersAppliedCount: number = Object.entries(itemsFilterConfig).reduce(
-    (acc: number, [key, value]: [string, number | string | boolean | Set<string> | null]) => {
-      if (value === null) {
-        return acc;
-      }
-
-      if (key === 'requireAllFilterTags' || key === 'titleQuery') {
-        return acc;
-      }
-
-      if (key === 'tagsSet' && typeof value === 'object') {
-        return value.size > 0 ? acc + 1 : acc;
-      }
-
-      return acc + 1;
-    },
-    0
-  );
+  const { setItemsFilterConfig } = useWishlistItems();
 
   const debounceSetTitleQuery: (titleQuery: string) => void = useMemo(
     () =>
@@ -78,7 +59,6 @@ export default function WishlistItemsToolbar(): JSX.Element {
           autoComplete='off'
           value={titleQuery}
           errorMessage={null}
-          className='mb-1'
           onChange={(e) => {
             const newValue: string = e.target.value;
             setTitleQuery(newValue);
@@ -86,12 +66,6 @@ export default function WishlistItemsToolbar(): JSX.Element {
             debounceSetTitleQuery(newValue.toLowerCase());
           }}
         />
-
-        {filtersAppliedCount > 0 && (
-          <span className='text-cta font-medium text-sm flex gap-1'>
-            {filtersAppliedCount === 1 ? '1 filter' : `${filtersAppliedCount} filters`} applied
-          </span>
-        )}
       </Container>
     </div>
   );

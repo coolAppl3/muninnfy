@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from 'express';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
-import { FieldPacket, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
@@ -210,17 +210,25 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       title: string;
       created_on_timestamp: number;
       items_count: number;
+      purchased_items_count: number;
       total_items_price: number;
       price_to_complete: number;
     };
 
-    const [wishlists] = (await dbPool.execute<RowDataPacket[]>(
+    const [wishlists] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         wishlists.wishlist_id,
         wishlists.privacy_level,
         wishlists.title,
         wishlists.created_on_timestamp,
         COUNT(wishlist_items.item_id) AS items_count,
+        COALESCE(SUM(
+          CASE
+            WHEN wishlist_items.purchased_on_timestamp IS NULL
+            THEN 0
+            ELSE 1
+          END
+        ), 0)AS purchased_items_count,
         COALESCE(SUM(wishlist_items.price), 0) AS total_items_price,
         COALESCE(SUM(
           CASE
@@ -241,9 +249,33 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
         created_on_timestamp DESC
       LIMIT ?;`,
       [accountId, TOTAL_WISHLISTS_LIMIT]
-    )) as [Wishlist[], FieldPacket[]];
+    );
 
-    res.json(wishlists);
+    const combinedWishlistsStatistics: {
+      totalWishlistsCount: number;
+      totalItemsCount: number;
+      totalPurchasedItemsCount: number;
+      totalWishlistsWorth: number;
+      totalWishlistsSpent: number;
+      totalWishlistsToComplete: number;
+    } = {
+      totalWishlistsCount: wishlists.length,
+      totalItemsCount: 0,
+      totalPurchasedItemsCount: 0,
+      totalWishlistsWorth: 0,
+      totalWishlistsSpent: 0,
+      totalWishlistsToComplete: 0,
+    };
+
+    for (const wishlist of wishlists as Wishlist[]) {
+      combinedWishlistsStatistics.totalItemsCount += wishlist.items_count;
+      combinedWishlistsStatistics.totalPurchasedItemsCount += wishlist.purchased_items_count;
+      combinedWishlistsStatistics.totalWishlistsWorth += wishlist.total_items_price;
+      combinedWishlistsStatistics.totalWishlistsSpent += wishlist.total_items_price - wishlist.price_to_complete;
+      combinedWishlistsStatistics.totalWishlistsToComplete += wishlist.price_to_complete;
+    }
+
+    res.json({ combinedWishlistsStatistics, wishlists: wishlists as Wishlist[] });
   } catch (err: unknown) {
     console.log(err);
 

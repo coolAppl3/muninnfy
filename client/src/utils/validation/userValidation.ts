@@ -94,7 +94,7 @@ export function validateDisplayName(value: string): string | null {
   }
 
   if (/\s{2,}/.test(value)) {
-    return 'Display name must not contain consecutive whitespaces';
+    return 'Display name must not contain consecutive whitespaces.';
   }
 
   if (value.length > 25) {

@@ -9,6 +9,7 @@ import useWishlist from '../hooks/useWishlist';
 import useWishlistItems from '../hooks/useWishlistItems';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import WishlistPrivacyLevelIcon from '../../../components/WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
+import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 
 export default function WishlistHeader(): JSX.Element {
   const { wishlistDetails } = useWishlist();
@@ -26,35 +27,31 @@ export default function WishlistHeader(): JSX.Element {
           <div>
             <WishlistHeaderContent />
 
-            <div className='h-line mt-1'></div>
+            <div className='h-line mb-1 mt-[4px]'></div>
 
-            <div className='text-sm text-description grid grid-cols-3 mt-1 relative z-0'>
-              <div className='grid'>
-                <span className='font-medium text-title'>{wishlistItems.length}</span>
-                <span className='text-xs font-medium'>Items</span>
-              </div>
+            <div className='text-sm text-description grid grid-cols-3 mb-2 relative z-0'>
+              <StatisticItem
+                title='Items'
+                value={`${wishlistItems.length}`}
+              />
 
-              <div className='grid'>
-                <span className='font-medium text-title'>
-                  {getFormattedPrice(wishlistItems.reduce((acc: number, curr: WishlistItemType) => acc + (curr.price || 0), 0))}
-                </span>
-                <span className='text-xs font-medium'>Worth</span>
-              </div>
+              <StatisticItem
+                title='Worth'
+                value={getFormattedPrice(wishlistItems.reduce((acc: number, curr: WishlistItemType) => acc + (curr.price || 0), 0))}
+              />
 
-              <div className='grid'>
-                <span className='font-medium text-title'>
-                  {getFormattedPrice(
-                    wishlistItems.reduce(
-                      (acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)),
-                      0
-                    )
-                  )}
-                </span>
-                <span className='text-xs font-medium'>To complete</span>
-              </div>
+              <StatisticItem
+                title='To complete'
+                value={getFormattedPrice(
+                  wishlistItems.reduce(
+                    (acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)),
+                    0
+                  )
+                )}
+              />
             </div>
 
-            <div className='text-description flex justify-between items-center mt-2'>
+            <div className='text-description flex justify-between items-center'>
               <p className='text-sm font-medium'>{getFullDateString(wishlistDetails.created_on_timestamp)}</p>
               <WishlistPrivacyLevelIcon privacyLevel={wishlistDetails.privacy_level} />
             </div>

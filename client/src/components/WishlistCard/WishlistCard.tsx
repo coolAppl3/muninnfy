@@ -3,8 +3,9 @@ import { getFormattedPrice } from '../../utils/wishlistUtils';
 import { getFullDateString } from '../../utils/globalUtils';
 import { Link } from 'react-router-dom';
 import WishlistPrivacyLevelIcon from '../WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
-import RedirectIcon from '../../assets/svg/RedirectIcon.svg?react';
 import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
+import StatisticItem from '../StatisticItem/StatisticItem';
+import ArrowIcon from '../../assets/svg/ArrowIcon.svg?react';
 
 type WishlistCardProps = {
   wishlist: ExtendedWishlistDetailsType;
@@ -15,39 +16,49 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
   const { wishlist_id, title, privacy_level, created_on_timestamp, items_count, total_items_price, price_to_complete } = wishlist;
 
   return (
-    <div className='relative p-2 bg-secondary rounded-sm shadow-simple-tiny border-transparent transition-all duration-200 hover:scale-102 hover:brightness-110 hover:cursor-pointer will-change-transform group'>
-      <h3 className='text-title font-medium mb-1 leading-[1] wrap-anywhere'>{title}</h3>
+    <div className='relative p-2 bg-secondary rounded-sm shadow-simple-tiny'>
+      <h3 className='text-title font-medium leading-[1] wrap-anywhere'>{title}</h3>
 
-      <div className='h-line mt-1'></div>
+      <div className='h-line my-1'></div>
 
-      <div className='text-sm text-description grid grid-cols-3 mt-1 relative z-0'>
-        <div className='grid'>
-          <span className='font-medium text-title'>{items_count}</span>
-          <span className='text-xs font-medium'>Items</span>
-        </div>
+      <div className='text-sm text-description grid grid-cols-3 mb-2 relative z-0'>
+        <StatisticItem
+          title='Items'
+          value={`${items_count}`}
+        />
 
-        <div className='grid'>
-          <span className='font-medium text-title'>{getFormattedPrice(total_items_price)}</span>
-          <span className='text-xs font-medium'>Worth</span>
-        </div>
+        <StatisticItem
+          title='Worth'
+          value={getFormattedPrice(total_items_price)}
+        />
 
-        <div className='grid'>
-          <span className='font-medium text-title'>{getFormattedPrice(price_to_complete)}</span>
-          <span className='text-xs font-medium'>To complete</span>
-        </div>
+        <StatisticItem
+          title='To Complete'
+          value={getFormattedPrice(price_to_complete)}
+        />
       </div>
 
-      <div className='text-description flex justify-between items-center mt-2'>
-        <p className='text-sm font-medium'>{getFullDateString(created_on_timestamp)}</p>
+      <div className='text-description flex justify-between items-center'>
+        <p className='text-sm font-medium mr-auto'>{getFullDateString(created_on_timestamp)}</p>
+
         <WishlistPrivacyLevelIcon privacyLevel={privacy_level} />
+        <Link
+          to={`/wishlist/${wishlist_id}`}
+          className='ml-1 bg-dark text-title px-[2.4rem] h-[2.8rem] rounded-pill hidden xs:flex justify-center items-center transition-colors hover:text-cta'
+          title='View'
+          aria-label='View wishlist'
+        >
+          <ArrowIcon className='w-2 h-2' />
+        </Link>
       </div>
 
       <Link
         to={`/wishlist/${wishlist_id}`}
-        className='absolute top-0 left-0 h-full w-full'
-      />
-
-      <RedirectIcon className='w-[1.6rem] h-[1.6rem] text-description absolute top-1 right-1 transition-colors group-hover:text-cta z-0' />
+        className='ml-1 bg-dark text-title ml-auto mt-1 h-[2.8rem] rounded xs:hidden flex justify-center items-center '
+      >
+        <span className='mr-1 text-sm font-medium'>View</span>
+        <ArrowIcon className='w-2 h-2' />
+      </Link>
     </div>
   );
 }
