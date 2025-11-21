@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.2.0] (2024-11-21)
+
+### Features
+
+- `Wishlists` page implementation completed.
+- Added `StatisticItem` component, and implemented it in `WishlistCard` and `WishlistHeader`.
+- Added `WishlistsHeader` page component.
+  - GET `wishlists/all` has been adjusted to return `combinedWishlistsStatistics` object.
+  - `StatisticItem` was implemented here as well.
+- Added `ArrowIcon` SVG.
+- Improve UI design of `WishlistCard`.
+- Added an indicator, for both `WishlistsContainer` and `WishlistItems`, showing how many wishlists or items passed the applied filters.
+  - The indicator for applied filters, previously in `WishlistsToolbar` and `WishlistItemsToolbar` respectively, have been moved in this change.
+
+
+### Improvements
+
+- Added a loading overlay while a request to delete empty wishlists is being handled.
+
+
+### Bug Fixes
+
+- Fixed "Cost to purchase" value for selected wishlist items in `bulkSetWishlistItemIsPurchased` not being formatted to with thousands separators.
+- Fixed a few typos.
+
+
 ## [0.1.5] (2024-11-18)
 
 ### Features
