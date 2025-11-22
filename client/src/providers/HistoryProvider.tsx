@@ -14,6 +14,13 @@ export default function HistoryProvider({ children }: HistoryProviderProps): JSX
   const locationRef = useRef<string>(pathname);
 
   useEffect(() => {
+    if (pathname === '/wishlist/new') {
+      if (!referrerLocation) {
+        setReferrerLocation('/account');
+      }
+      return;
+    }
+
     const location: string = pathname + search;
 
     if (location === locationRef.current) {

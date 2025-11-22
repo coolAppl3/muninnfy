@@ -18,6 +18,8 @@ import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useA
 export default function NewWishlist(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  console.log(window.history.state.idx);
+
   const [privacyLevelValue, setPrivacyLevelValue] = useState<number>(FOLLOWERS_WISHLIST_PRIVACY_LEVEL);
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export default function NewWishlist(): JSX.Element {
       const wishlistId: string = (await createWishlistAsAccountService({ title, privacyLevel })).data.wishlistId;
 
       displayPopupMessage('Wishlist created.', 'success');
-      navigate(`/wishlist/${wishlistId}`);
+      navigate(`/wishlist/${wishlistId}`, { replace: true });
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
