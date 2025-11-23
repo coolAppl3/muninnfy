@@ -266,6 +266,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
     };
 
     for (const wishlist of wishlists as Wishlist[]) {
+      combinedWishlistsStatistics.totalItemsCount += wishlist.items_count;
       combinedWishlistsStatistics.totalPurchasedItemsCount += wishlist.purchased_items_count;
       combinedWishlistsStatistics.totalWishlistsWorth += wishlist.total_items_price;
       combinedWishlistsStatistics.totalWishlistsSpent += wishlist.total_items_price - wishlist.price_to_complete;
