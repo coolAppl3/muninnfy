@@ -6,7 +6,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
-import { TOTAL_WISHLISTS_LIMIT, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
+import { TOTAL_WISHLISTS_LIMIT, WISHLIST_INTERACTION_CREATE, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
@@ -100,9 +100,11 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         account_id,
         privacy_level,
         title,
-        created_on_timestamp
-      ) VALUES (${generatePlaceHolders(5)});`,
-      [wishlistId, accountId, privacyLevel, title, currentTimestamp]
+        created_on_timestamp,
+        latest_interaction_timestamp,
+        interactivity_index
+      ) VALUES (${generatePlaceHolders(7)});`,
+      [wishlistId, accountId, privacyLevel, title, currentTimestamp, currentTimestamp, WISHLIST_INTERACTION_CREATE]
     );
 
     res.status(201).json({ wishlistId });
