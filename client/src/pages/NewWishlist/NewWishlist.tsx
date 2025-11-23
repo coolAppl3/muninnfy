@@ -18,8 +18,6 @@ import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useA
 export default function NewWishlist(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  console.log(window.history.state.idx);
-
   const [privacyLevelValue, setPrivacyLevelValue] = useState<number>(FOLLOWERS_WISHLIST_PRIVACY_LEVEL);
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
