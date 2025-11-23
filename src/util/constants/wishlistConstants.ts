@@ -4,3 +4,10 @@ export const PUBLIC_WISHLIST_PRIVACY_LEVEL: number = 2;
 
 export const TOTAL_WISHLISTS_LIMIT: number = 100;
 export const WISHLIST_ITEMS_LIMIT: number = 100;
+
+export const WISHLIST_INTERACTION_MAX_VALUE: number = 200;
+export const WISHLIST_INTERACTION_CREATE: number = 10;
+export const WISHLIST_INTERACTION_ADD_ITEM: number = 6;
+export const WISHLIST_INTERACTION_GENERAL: number = 2;
+export const WISHLIST_INTERACTION_BULK_SMALL: number = 4;
+export const WISHLIST_INTERACTION_BULK_LARGE: number = 6;
