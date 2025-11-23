@@ -38,7 +38,6 @@ export async function crossWishlistSearchService(itemTitleQuery: string): Promis
 }
 
 export type CombinedWishlistsStatistics = {
-  totalWishlistsCount: number;
   totalItemsCount: number;
   totalPurchasedItemsCount: number;
   totalWishlistsWorth: number;

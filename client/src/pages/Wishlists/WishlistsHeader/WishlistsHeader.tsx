@@ -5,22 +5,18 @@ import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import { CombinedWishlistsStatistics } from '../../../services/wishlistServices';
 import Button from '../../../components/Button/Button';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useWishlists from '../hooks/useWishlists';
 
 type WishlistsHeaderProps = {
   combinedWishlistsStatistics: CombinedWishlistsStatistics;
 };
 
 export default function WishlistsHeader({ combinedWishlistsStatistics }: WishlistsHeaderProps): JSX.Element {
+  const { wishlists } = useWishlists();
   const navigate: NavigateFunction = useNavigate();
 
-  const {
-    totalWishlistsCount,
-    totalItemsCount,
-    totalPurchasedItemsCount,
-    totalWishlistsWorth,
-    totalWishlistsSpent,
-    totalWishlistsToComplete,
-  } = combinedWishlistsStatistics;
+  const { totalItemsCount, totalPurchasedItemsCount, totalWishlistsWorth, totalWishlistsSpent, totalWishlistsToComplete } =
+    combinedWishlistsStatistics;
 
   return (
     <header>
@@ -33,7 +29,7 @@ export default function WishlistsHeader({ combinedWishlistsStatistics }: Wishlis
           <div className='text-sm text-description grid grid-cols-3 gap-y-1 mb-2'>
             <StatisticItem
               title='Wishlists'
-              value={`${totalWishlistsCount}`}
+              value={`${wishlists.length}`}
             />
 
             <StatisticItem
