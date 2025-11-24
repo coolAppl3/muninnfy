@@ -13,11 +13,19 @@ import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
-import { WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
+import {
+  WISHLIST_INTERACTION_ADD_ITEM,
+  WISHLIST_INTERACTION_BULK_BORDER,
+  WISHLIST_INTERACTION_BULK_LARGE,
+  WISHLIST_INTERACTION_BULK_SMALL,
+  WISHLIST_INTERACTION_GENERAL,
+  WISHLIST_ITEMS_LIMIT,
+} from '../util/constants/wishlistConstants';
 import { sanitizeWishlistItemTags } from '../util/validation/wishlistItemTagValidation';
 import { deleteWishlistItemTags, insertWishlistItemTags } from '../db/helpers/wishlistItemTagsDbHelpers';
 import { getWishlistItemByTitle } from '../db/helpers/wishlistItemsDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
+import { incrementWishlistInteractivityIndex } from '../db/helpers/wishlistsDbHelpers';
 
 export const wishlistItemsRouter: Router = express.Router();
 
@@ -176,6 +184,8 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
     await connection.commit();
     res.status(201).json(mappedWishlistItem);
+
+    await incrementWishlistInteractivityIndex(wishlistId, WISHLIST_INTERACTION_ADD_ITEM, dbPool, req);
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -392,6 +402,8 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     await connection.commit();
     res.json(mappedWishlistItem);
+
+    await incrementWishlistInteractivityIndex(wishlistId, WISHLIST_INTERACTION_GENERAL, dbPool, req);
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -503,6 +515,8 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
     }
 
     res.json({});
+
+    await incrementWishlistInteractivityIndex(wishlistId, WISHLIST_INTERACTION_GENERAL, dbPool, req);
   } catch (err: unknown) {
     console.log(err);
 
@@ -594,6 +608,13 @@ wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
     );
 
     res.json({ deletedItemsCount: resultSetHeader.affectedRows });
+
+    await incrementWishlistInteractivityIndex(
+      wishlistId,
+      itemsIdArr.length > WISHLIST_INTERACTION_BULK_BORDER ? WISHLIST_INTERACTION_BULK_LARGE : WISHLIST_INTERACTION_BULK_SMALL,
+      dbPool,
+      req
+    );
   } catch (err: unknown) {
     console.log(err);
 
@@ -705,6 +726,8 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
     }
 
     res.json({ newPurchasedOnTimestamp });
+
+    await incrementWishlistInteractivityIndex(wishlistId, WISHLIST_INTERACTION_GENERAL, dbPool, req);
   } catch (err: unknown) {
     console.log(err);
 
@@ -806,6 +829,13 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
     );
 
     res.json({ newPurchasedOnTimestamp, updatedItemsCount: resultSetHeader.affectedRows });
+
+    await incrementWishlistInteractivityIndex(
+      wishlistId,
+      itemsIdArr.length > WISHLIST_INTERACTION_BULK_BORDER ? WISHLIST_INTERACTION_BULK_LARGE : WISHLIST_INTERACTION_BULK_SMALL,
+      dbPool,
+      req
+    );
   } catch (err: unknown) {
     console.log(err);
 
