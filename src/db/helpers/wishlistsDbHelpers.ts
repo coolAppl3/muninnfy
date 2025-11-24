@@ -3,7 +3,7 @@ import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
 import { WISHLIST_INTERACTION_THROTTLE_WINDOW } from '../../util/constants/wishlistConstants';
 
-export async function incrementInteractivityIndex(
+export async function incrementWishlistInteractivityIndex(
   wishlistId: string,
   increment: number,
   executor: Pool | PoolConnection,
