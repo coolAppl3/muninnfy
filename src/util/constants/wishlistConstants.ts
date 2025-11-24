@@ -13,4 +13,5 @@ export const WISHLIST_INTERACTION_ADD_ITEM: number = 6;
 export const WISHLIST_INTERACTION_GENERAL: number = 2;
 export const WISHLIST_INTERACTION_BULK_SMALL: number = 4;
 export const WISHLIST_INTERACTION_BULK_LARGE: number = 6;
+export const WISHLIST_INTERACTION_BULK_BORDER: number = 20; // beyond this value counts as a large bulk interaction
 export const WISHLIST_INTERACTION_THROTTLE_WINDOW: number = minuteMilliseconds * 10;
