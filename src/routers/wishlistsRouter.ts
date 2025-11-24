@@ -212,6 +212,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       privacy_level: string;
       title: string;
       created_on_timestamp: number;
+      is_favorite: boolean;
       items_count: number;
       purchased_items_count: number;
       total_items_price: number;
@@ -224,6 +225,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
         wishlists.privacy_level,
         wishlists.title,
         wishlists.created_on_timestamp,
+        wishlists.is_favorite,
         COUNT(wishlist_items.item_id) AS items_count,
         COALESCE(SUM(
           CASE
