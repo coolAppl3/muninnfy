@@ -4,7 +4,7 @@ import { getFullDateString } from '../../../utils/globalUtils';
 import { getFormattedPrice } from '../../../utils/wishlistUtils';
 import useWishlistHeader from './context/useWishlistHeader';
 import WishlistHeaderEditingContainer from './components/WishlistHeaderEditingContainer';
-import WishlistHeaderContent from './components/WishlistHeaderContent';
+import WishlistHeaderContent from './WishlistHeaderContent/WishlistHeaderContent';
 import useWishlist from '../hooks/useWishlist';
 import useWishlistItems from '../hooks/useWishlistItems';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
