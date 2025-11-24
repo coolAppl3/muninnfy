@@ -631,6 +631,7 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
     return;
   }
 
+  console.log(req.body);
   type RequestData = {
     wishlistId: string;
     newIsFavorite: boolean;
@@ -638,7 +639,7 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'setFavorite'];
+  const expectedKeys: string[] = ['wishlistId', 'newIsFavorite'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
@@ -697,7 +698,7 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
         is_favorite = ?
       WHERE
         wishlist_id = ?;`,
-      { setIsFavorite: newIsFavorite }
+      [newIsFavorite, wishlistId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
