@@ -157,7 +157,7 @@ async function createWishlistsTable(): Promise<void> {
         created_on_timestamp BIGINT UNSIGNED NOT NULL,
         latest_interaction_timestamp BIGINT UNSIGNED NOT NULL,
         interactivity_index TINYINT UNSIGNED NOT NULL,
-        is_favorite BOOLEAN NOT NULL,
+        is_favorited BOOLEAN NOT NULL,
         CHECK (interactivity_index <= 200),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         UNIQUE(account_id, title)

@@ -42,7 +42,7 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
       <div className='text-description flex justify-between items-center'>
         <p className='text-sm font-medium mr-auto'>{getFullDateString(created_on_timestamp)}</p>
 
-        {wishlist.is_favorite && (
+        {wishlist.is_favorited && (
           <span
             title='Favorited'
             aria-label='Favorited'

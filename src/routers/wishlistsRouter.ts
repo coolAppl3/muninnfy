@@ -103,7 +103,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         created_on_timestamp,
         latest_interaction_timestamp,
         interactivity_index,
-        is_favorite
+        is_favorited
       ) VALUES (${generatePlaceHolders(7)});`,
       [wishlistId, accountId, privacyLevel, title, currentTimestamp, currentTimestamp, WISHLIST_INTERACTION_CREATE, false]
     );
@@ -212,7 +212,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       privacy_level: string;
       title: string;
       created_on_timestamp: number;
-      is_favorite: boolean;
+      is_favorited: boolean;
       items_count: number;
       purchased_items_count: number;
       total_items_price: number;
@@ -225,7 +225,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
         wishlists.privacy_level,
         wishlists.title,
         wishlists.created_on_timestamp,
-        wishlists.is_favorite,
+        wishlists.is_favorited,
         COUNT(wishlist_items.item_id) AS items_count,
         COALESCE(SUM(
           CASE
@@ -316,7 +316,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
-      is_favorite: boolean;
+      is_favorited: boolean;
     };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
@@ -324,7 +324,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
         privacy_level,
         title,
         created_on_timestamp,
-        is_favorite
+        is_favorited
       FROM
         wishlists
       WHERE
@@ -636,25 +636,25 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
   console.log(req.body);
   type RequestData = {
     wishlistId: string;
-    newIsFavorite: boolean;
+    newIsFavorited: boolean;
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'newIsFavorite'];
+  const expectedKeys: string[] = ['wishlistId', 'newIsFavorited'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { wishlistId, newIsFavorite } = requestData;
+  const { wishlistId, newIsFavorited } = requestData;
 
   if (!isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
 
-  if (typeof newIsFavorite !== 'boolean') {
+  if (typeof newIsFavorited !== 'boolean') {
     res.status(400).json({ message: 'Invalid favorite value.', reason: 'invalidFavoriteValue' });
     return;
   }
@@ -667,12 +667,12 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
 
   try {
     type WishlistDetails = {
-      is_favorite: boolean;
+      is_favorited: boolean;
     };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        is_favorite
+        is_favorited
       FROM
         wishlists
       WHERE
@@ -688,7 +688,7 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
       return;
     }
 
-    if (wishlistDetails.is_favorite === newIsFavorite) {
+    if (wishlistDetails.is_favorited === newIsFavorited) {
       res.json({});
       return;
     }
@@ -697,15 +697,15 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
       `UPDATE
         wishlists
       SET
-        is_favorite = ?
+        is_favorited = ?
       WHERE
         wishlist_id = ?;`,
-      [newIsFavorite, wishlistId]
+      [newIsFavorited, wishlistId]
     );
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
-      await logUnexpectedError(req, null, 'Failed to update is_favorite.');
+      await logUnexpectedError(req, null, 'Failed to update is_favorited.');
 
       return;
     }

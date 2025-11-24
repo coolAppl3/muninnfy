@@ -27,16 +27,16 @@ export default function WishlistHeaderContentFavorite(): JSX.Element {
     displayLoadingOverlay();
     setIsSubmitting(true);
 
-    const newIsFavorite: boolean = !wishlistDetails.is_favorite;
+    const newIsFavorited: boolean = !wishlistDetails.is_favorited;
 
     try {
-      await setWishlistFavoriteService({ wishlistId, newIsFavorite });
+      await setWishlistFavoriteService({ wishlistId, newIsFavorited });
       setWishlistDetails((prev) => ({
         ...prev,
-        is_favorite: !wishlistDetails.is_favorite,
+        is_favorited: !wishlistDetails.is_favorited,
       }));
 
-      displayPopupMessage(newIsFavorite ? 'Added to favorites.' : 'Removed from favorites.', 'success');
+      displayPopupMessage(newIsFavorited ? 'Added to favorites.' : 'Removed from favorites.', 'success');
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errReason } = handleAsyncError(err);
@@ -62,7 +62,7 @@ export default function WishlistHeaderContentFavorite(): JSX.Element {
         isSubmitting ||
         displayConfirmModal({
           title: `Are you sure you want to ${
-            wishlistDetails.is_favorite ? 'remove this wishlist from favorites?' : 'add this wishlist to favorites?'
+            wishlistDetails.is_favorited ? 'remove this wishlist from favorites?' : 'add this wishlist to favorites?'
           }`,
           confirmBtnTitle: 'Confirm',
           cancelBtnTitle: 'Cancel',
@@ -75,7 +75,7 @@ export default function WishlistHeaderContentFavorite(): JSX.Element {
         })
       }
     >
-      {wishlistDetails.is_favorite ? 'Unfavorite' : 'Favorite'}
+      {wishlistDetails.is_favorited ? 'Unfavorite' : 'Favorite'}
     </button>
   );
 }

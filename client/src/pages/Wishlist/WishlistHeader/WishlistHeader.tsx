@@ -54,7 +54,7 @@ export default function WishlistHeader(): JSX.Element {
 
             <div className='text-description flex justify-between items-center'>
               <p className='text-sm font-medium'>{getFullDateString(wishlistDetails.created_on_timestamp)}</p>
-              {wishlistDetails.is_favorite && (
+              {wishlistDetails.is_favorited && (
                 <span
                   title='Favorited'
                   aria-label='Favorited'

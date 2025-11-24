@@ -2,7 +2,7 @@ export type WishlistDetailsType = {
   privacy_level: number;
   title: string;
   created_on_timestamp: number;
-  is_favorite: boolean;
+  is_favorited: boolean;
 };
 
 export type ExtendedWishlistDetailsType = {
@@ -10,7 +10,7 @@ export type ExtendedWishlistDetailsType = {
   privacy_level: number;
   title: string;
   created_on_timestamp: number;
-  is_favorite: boolean;
+  is_favorited: boolean;
   items_count: number;
   purchased_items_count: number;
   total_items_price: number;

@@ -74,7 +74,7 @@ export async function changeWishlistPrivacyLevelService(body: ChangeWishlistPriv
 
 type SetWishlistFavoriteServicePayload = {
   wishlistId: string;
-  newIsFavorite: boolean;
+  newIsFavorited: boolean;
 };
 
 export async function setWishlistFavoriteService(
