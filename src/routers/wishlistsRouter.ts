@@ -622,6 +622,102 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
   }
 });
 
+wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    wishlistId: string;
+    newIsFavorite: boolean;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['wishlistId', 'setFavorite'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { wishlistId, newIsFavorite } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (typeof newIsFavorite !== 'boolean') {
+    res.status(400).json({ message: 'Invalid favorite value.', reason: 'invalidFavoriteValue' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type WishlistDetails = {
+      is_favorite: boolean;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        is_favorite
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [wishlistId, accountId]
+    );
+
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
+
+    if (!wishlistDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    if (wishlistDetails.is_favorite === newIsFavorite) {
+      res.json({});
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        wishlists
+      SET
+        is_favorite = ?
+      WHERE
+        wishlist_id = ?;`,
+      { setIsFavorite: newIsFavorite }
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update is_favorite.');
+
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
