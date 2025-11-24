@@ -314,13 +314,15 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
+      is_favorite: boolean;
     };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         privacy_level,
         title,
-        created_on_timestamp
+        created_on_timestamp,
+        is_favorite
       FROM
         wishlists
       WHERE
