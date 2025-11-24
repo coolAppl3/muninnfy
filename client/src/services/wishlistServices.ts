@@ -72,6 +72,17 @@ export async function changeWishlistPrivacyLevelService(body: ChangeWishlistPriv
   return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);
 }
 
+type SetWishlistFavoriteServicePayload = {
+  wishlistId: string;
+  newIsFavorite: boolean;
+};
+
+export async function setWishlistFavoriteService(
+  body: SetWishlistFavoriteServicePayload
+): Promise<AxiosResponse<SetWishlistFavoriteServicePayload>> {
+  return axios.patch(`${wishlistsApiUrl}/change/favorite`, body);
+}
+
 export async function deleteEmptyWishlistsService(): Promise<AxiosResponse> {
   return axios.delete(`${wishlistsApiUrl}/empty`);
 }
