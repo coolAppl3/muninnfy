@@ -102,9 +102,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         title,
         created_on_timestamp,
         latest_interaction_timestamp,
-        interactivity_index
+        interactivity_index,
+        is_favorite
       ) VALUES (${generatePlaceHolders(7)});`,
-      [wishlistId, accountId, privacyLevel, title, currentTimestamp, currentTimestamp, WISHLIST_INTERACTION_CREATE]
+      [wishlistId, accountId, privacyLevel, title, currentTimestamp, currentTimestamp, WISHLIST_INTERACTION_CREATE, false]
     );
 
     res.status(201).json({ wishlistId });
