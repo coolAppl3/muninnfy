@@ -11,6 +11,8 @@ export type ExtendedWishlistDetailsType = {
   title: string;
   created_on_timestamp: number;
   is_favorited: boolean;
+  interactivity_index: number;
+  latest_interaction_timestamp: number;
   items_count: number;
   purchased_items_count: number;
   total_items_price: number;
