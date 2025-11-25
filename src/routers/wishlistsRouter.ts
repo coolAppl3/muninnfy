@@ -104,7 +104,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         latest_interaction_timestamp,
         interactivity_index,
         is_favorited
-      ) VALUES (${generatePlaceHolders(7)});`,
+      ) VALUES (${generatePlaceHolders(8)});`,
       [wishlistId, accountId, privacyLevel, title, currentTimestamp, currentTimestamp, WISHLIST_INTERACTION_CREATE, false]
     );
 
