@@ -24,6 +24,7 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
         totalItemsPriceTo,
         priceToCompleteFrom,
         priceToCompleteTo,
+        isFavorited,
         titleQuery,
         crossWishlistQueryIdSet,
       } = wishlistsFilterConfig;
@@ -61,6 +62,10 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       }
 
       if (priceToCompleteTo !== null && wishlist.price_to_complete > priceToCompleteTo) {
+        return false;
+      }
+
+      if (isFavorited !== null && wishlist.is_favorited !== isFavorited) {
         return false;
       }
 
@@ -137,6 +142,7 @@ const defaultWishlistsFilterConfig: WishlistsFilterConfigType = {
   priceToCompleteFrom: null,
   priceToCompleteTo: null,
 
+  isFavorited: null,
   titleQuery: '',
 
   itemTitleQuery: '',

@@ -14,6 +14,7 @@ export type WishlistsFilterConfigType = {
   priceToCompleteFrom: number | null;
   priceToCompleteTo: number | null;
 
+  isFavorited: boolean | null;
   titleQuery: string;
 
   itemTitleQuery: string;
