@@ -255,7 +255,8 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       GROUP BY
         wishlists.wishlist_id
       ORDER BY
-        created_on_timestamp DESC
+        interactivity_index DESC,
+        latest_interaction_timestamp DESC
       LIMIT ?;`,
       [accountId, TOTAL_WISHLISTS_LIMIT]
     );
