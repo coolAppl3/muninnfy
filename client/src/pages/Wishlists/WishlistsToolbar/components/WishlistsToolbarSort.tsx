@@ -42,6 +42,14 @@ export default function WishlistsToolbarSort(): JSX.Element {
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
+          className={`context-menu-btn ${wishlistsSortingMode === 'interactivity' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('interactivity')}
+        >
+          Interactivity
+        </button>
+
+        <button
+          type='button'
           className={`context-menu-btn ${wishlistsSortingMode === 'newest_first' ? 'text-cta' : ''}`}
           onClick={() => handleSortBtnClick('newest_first')}
         >

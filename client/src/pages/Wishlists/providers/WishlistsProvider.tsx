@@ -10,7 +10,7 @@ type WishlistsProviderProps = {
 export default function WishlistsProvider({ initialWishlists, children }: WishlistsProviderProps): JSX.Element {
   const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>(initialWishlists);
   const [wishlistsFilterConfig, setWishlistsFilterConfig] = useState<WishlistsFilterConfigType>(defaultWishlistsFilterConfig);
-  const [wishlistsSortingMode, setWishlistsSortingMode] = useState<WishlistsSortingMode>('newest_first');
+  const [wishlistsSortingMode, setWishlistsSortingMode] = useState<WishlistsSortingMode>('interactivity');
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
 
   const wishlistMatchesFilterConfig = useCallback(
@@ -102,7 +102,21 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
         return;
       }
 
-      setWishlists((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' })));
+      if (sortingMode === 'lexicographical') {
+        setWishlists((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' })));
+        return;
+      }
+
+      // sort by interactivity
+      setWishlists((prev) =>
+        prev.toSorted((a, b) => {
+          if (a.interactivity_index === b.interactivity_index) {
+            return b.latest_interaction_timestamp - a.latest_interaction_timestamp;
+          }
+
+          return b.interactivity_index - a.interactivity_index;
+        })
+      );
     },
     [wishlistsSortingMode]
   );
