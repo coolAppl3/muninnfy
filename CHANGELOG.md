@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.2.1] (2024-11-25)
+
+### Features
+
+- Added wishlist interactivity tracking.
+  - Added `latest_interaction_timestamp` and `interactivity_index` to `wishlists` table.
+  - Added `decayWishlistsInteractivityIndexCron()` cron job which runs every 6 hours.
+  - Added the following interactivity-related constants: `WISHLIST_INTERACTION_MAX_VALUE`, `WISHLIST_INTERACTION_CREATE`, `WISHLIST_INTERACTION_ADD_ITEM`, `WISHLIST_INTERACTION_GENERAL`, `WISHLIST_INTERACTION_BULK_SMALL`, `WISHLIST_INTERACTION_BULK_LARGE`, `WISHLIST_INTERACTION_BULK_BORDER`, `WISHLIST_INTERACTION_THROTTLE_WINDOW`, `WISHLIST_INTERACTIVITY_DECAY_AMOUNT`, `WISHLIST_INTERACTIVITY_DECAY_GRACE_PERIOD`.
+  - Added `incrementInteractivityIndex()` helper.
+  - Refactored a number of endpoints to implement this accordingly.
+  - Added the option to sort wishlists by interactivity, and made it the default sorting mode.
+- Added the option to favorite a wishlist.
+  - Added `is_favorited` column to `wishlists` table.
+  - Added PATCH `wishlists/change/favorite`.
+  - Added option to filter wishlists by whether or not they're favorited.
+  - Added `HeartIcon` SVG.
+  - Added an indicator when a wishlist is favorited.
+
+
+### Improvements
+
+- `NewWishlist` page will now be removed from the navigation history if a wishlist is successfully created, improving the user experience.
+
+
+### Code Refactoring
+
+- Removed `wishlistsItemsTagsRouter` and `wishlistItemTagsService`, which were unused.
+
+
+### Bug Fixes
+
+- Fixed the total wishlists counts being incorrectly passed around to components, causing them to no rerender, and for it to not be updated. 
+
+
 ## [0.2.0] (2024-11-21)
 
 ### Features
