@@ -4,6 +4,7 @@ import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useWishlistHeader from '../context/useWishlistHeader';
 import { copyToClipboard } from '../../../../utils/globalUtils';
 import useWishlist from '../../hooks/useWishlist';
+import WishlistHeaderContentFavorite from './components/WishlistHeaderContentFavorite';
 
 export default function WishlistHeaderContent(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();
@@ -40,10 +41,10 @@ export default function WishlistHeaderContent(): JSX.Element {
           className='context-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
-            setEditMode('TITLE');
+            setEditMode('PRIVACY_LEVEL');
           }}
         >
-          Change title
+          Change privacy level
         </button>
 
         <button
@@ -51,11 +52,13 @@ export default function WishlistHeaderContent(): JSX.Element {
           className='context-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
-            setEditMode('PRIVACY_LEVEL');
+            setEditMode('TITLE');
           }}
         >
-          Change privacy level
+          Change title
         </button>
+
+        <WishlistHeaderContentFavorite />
 
         <button
           type='button'
@@ -69,18 +72,18 @@ export default function WishlistHeaderContent(): JSX.Element {
               : displayPopupMessage('Failed to copy to clipboard.', 'error');
           }}
         >
-          Share wishlist
+          Share
         </button>
 
         <button
           type='button'
-          className='context-menu-btn danger'
+          className='context-menu-btn text-danger'
           onClick={() => {
             setMenuIsOpen(false);
             setEditMode('DELETE_WISHLIST');
           }}
         >
-          Delete wishlist
+          Delete
         </button>
       </div>
     </div>

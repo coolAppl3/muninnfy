@@ -4,12 +4,13 @@ import { getFullDateString } from '../../../utils/globalUtils';
 import { getFormattedPrice } from '../../../utils/wishlistUtils';
 import useWishlistHeader from './context/useWishlistHeader';
 import WishlistHeaderEditingContainer from './components/WishlistHeaderEditingContainer';
-import WishlistHeaderContent from './components/WishlistHeaderContent';
+import WishlistHeaderContent from './WishlistHeaderContent/WishlistHeaderContent';
 import useWishlist from '../hooks/useWishlist';
 import useWishlistItems from '../hooks/useWishlistItems';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import WishlistPrivacyLevelIcon from '../../../components/WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
 import StatisticItem from '../../../components/StatisticItem/StatisticItem';
+import HeartIcon from '../../../assets/svg/HeartIcon.svg?react';
 
 export default function WishlistHeader(): JSX.Element {
   const { wishlistDetails } = useWishlist();
@@ -53,6 +54,15 @@ export default function WishlistHeader(): JSX.Element {
 
             <div className='text-description flex justify-between items-center'>
               <p className='text-sm font-medium'>{getFullDateString(wishlistDetails.created_on_timestamp)}</p>
+              {wishlistDetails.is_favorited && (
+                <span
+                  title='Favorited'
+                  aria-label='Favorited'
+                  className='ml-auto mr-[4px] z-0'
+                >
+                  <HeartIcon className='w-[1.6rem] h-[1.6rem] text-cta' />
+                </span>
+              )}
               <WishlistPrivacyLevelIcon privacyLevel={wishlistDetails.privacy_level} />
             </div>
           </div>

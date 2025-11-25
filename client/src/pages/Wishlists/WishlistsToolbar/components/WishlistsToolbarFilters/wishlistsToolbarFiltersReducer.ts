@@ -13,6 +13,8 @@ type WishlistsToolbarFiltersState = {
   priceToCompleteFrom: number | null;
   priceToCompleteTo: number | null;
 
+  isFavorited: boolean | null;
+
   itemTitleQuery: string;
   itemTitleQueryErrorMessage: string | null;
 
@@ -40,6 +42,8 @@ export const initialWishlistsToolbarFiltersState: WishlistsToolbarFiltersState =
   priceToCompleteFrom: null,
   priceToCompleteTo: null,
 
+  isFavorited: null,
+
   itemTitleQuery: '',
   itemTitleQueryErrorMessage: null,
 
@@ -62,6 +66,7 @@ export type WishlistsToolbarFiltersReducerAction =
   | { type: 'SET_TOTAL_ITEMS_PRICE'; payload: { fromValue: number | null; toValue: number | null } }
   | { type: 'SET_PRICE_TO_COMPLETE'; payload: { fromValue: number | null; toValue: number | null } }
   | { type: 'SET_ITEM_TITLE_QUERY'; payload: { newValue: string } }
+  | { type: 'SET_IS_FAVORITED'; payload: { newValue: boolean | null } }
   //
   | { type: 'SET_FILTER_BY_ITEMS_COUNT'; payload: { newValue: boolean } }
   | { type: 'SET_FILTER_BY_TOTAL_ITEMS_PRICE'; payload: { newValue: boolean } }
@@ -132,6 +137,15 @@ export default function wishlistsToolbarFiltersReducer(
       ...state,
       itemTitleQuery: payload.newValue,
       itemTitleQueryErrorMessage: payload.newValue === '' ? null : validateWishlistItemTitle(payload.newValue),
+    };
+
+    return updatedState;
+  }
+
+  if (type === 'SET_IS_FAVORITED') {
+    const updatedState: WishlistsToolbarFiltersState = {
+      ...state,
+      isFavorited: payload.newValue,
     };
 
     return updatedState;

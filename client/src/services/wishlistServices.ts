@@ -38,7 +38,6 @@ export async function crossWishlistSearchService(itemTitleQuery: string): Promis
 }
 
 export type CombinedWishlistsStatistics = {
-  totalWishlistsCount: number;
   totalItemsCount: number;
   totalPurchasedItemsCount: number;
   totalWishlistsWorth: number;
@@ -71,6 +70,17 @@ type ChangeWishlistPrivacyLevelServicePayload = {
 
 export async function changeWishlistPrivacyLevelService(body: ChangeWishlistPrivacyLevelServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);
+}
+
+type SetWishlistFavoriteServicePayload = {
+  wishlistId: string;
+  newIsFavorited: boolean;
+};
+
+export async function setWishlistFavoriteService(
+  body: SetWishlistFavoriteServicePayload
+): Promise<AxiosResponse<SetWishlistFavoriteServicePayload>> {
+  return axios.patch(`${wishlistsApiUrl}/change/favorite`, body);
 }
 
 export async function deleteEmptyWishlistsService(): Promise<AxiosResponse> {

@@ -14,13 +14,20 @@ export type WishlistsFilterConfigType = {
   priceToCompleteFrom: number | null;
   priceToCompleteTo: number | null;
 
+  isFavorited: boolean | null;
   titleQuery: string;
 
   itemTitleQuery: string;
   crossWishlistQueryIdSet: Set<string> | null;
 };
 
-export type WishlistsSortingMode = 'newest_first' | 'oldest_first' | 'largest_first' | 'smallest_first' | 'lexicographical';
+export type WishlistsSortingMode =
+  | 'interactivity'
+  | 'newest_first'
+  | 'oldest_first'
+  | 'largest_first'
+  | 'smallest_first'
+  | 'lexicographical';
 
 export type WishlistsContextType = {
   wishlists: ExtendedWishlistDetailsType[];

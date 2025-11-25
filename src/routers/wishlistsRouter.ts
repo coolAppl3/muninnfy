@@ -6,7 +6,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
-import { TOTAL_WISHLISTS_LIMIT, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
+import { TOTAL_WISHLISTS_LIMIT, WISHLIST_INTERACTION_CREATE, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
@@ -100,9 +100,12 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         account_id,
         privacy_level,
         title,
-        created_on_timestamp
-      ) VALUES (${generatePlaceHolders(5)});`,
-      [wishlistId, accountId, privacyLevel, title, currentTimestamp]
+        created_on_timestamp,
+        latest_interaction_timestamp,
+        interactivity_index,
+        is_favorited
+      ) VALUES (${generatePlaceHolders(8)});`,
+      [wishlistId, accountId, privacyLevel, title, currentTimestamp, currentTimestamp, WISHLIST_INTERACTION_CREATE, false]
     );
 
     res.status(201).json({ wishlistId });
@@ -209,6 +212,9 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       privacy_level: string;
       title: string;
       created_on_timestamp: number;
+      is_favorited: boolean;
+      interactivity_index: number;
+      latest_interaction_timestamp: number;
       items_count: number;
       purchased_items_count: number;
       total_items_price: number;
@@ -221,6 +227,9 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
         wishlists.privacy_level,
         wishlists.title,
         wishlists.created_on_timestamp,
+        wishlists.is_favorited,
+        wishlists.interactivity_index,
+        wishlists.latest_interaction_timestamp,
         COUNT(wishlist_items.item_id) AS items_count,
         COALESCE(SUM(
           CASE
@@ -246,20 +255,19 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       GROUP BY
         wishlists.wishlist_id
       ORDER BY
-        created_on_timestamp DESC
+        interactivity_index DESC,
+        latest_interaction_timestamp DESC
       LIMIT ?;`,
       [accountId, TOTAL_WISHLISTS_LIMIT]
     );
 
     const combinedWishlistsStatistics: {
-      totalWishlistsCount: number;
       totalItemsCount: number;
       totalPurchasedItemsCount: number;
       totalWishlistsWorth: number;
       totalWishlistsSpent: number;
       totalWishlistsToComplete: number;
     } = {
-      totalWishlistsCount: wishlists.length,
       totalItemsCount: 0,
       totalPurchasedItemsCount: 0,
       totalWishlistsWorth: 0,
@@ -313,13 +321,15 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
+      is_favorited: boolean;
     };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         privacy_level,
         title,
-        created_on_timestamp
+        created_on_timestamp,
+        is_favorited
       FROM
         wishlists
       WHERE
@@ -604,6 +614,103 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
       await logUnexpectedError(req, null, 'Failed to update privacy_level.');
+
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  console.log(req.body);
+  type RequestData = {
+    wishlistId: string;
+    newIsFavorited: boolean;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['wishlistId', 'newIsFavorited'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { wishlistId, newIsFavorited } = requestData;
+
+  if (!isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  if (typeof newIsFavorited !== 'boolean') {
+    res.status(400).json({ message: 'Invalid favorite value.', reason: 'invalidFavoriteValue' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type WishlistDetails = {
+      is_favorited: boolean;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        is_favorited
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ? AND
+        account_id = ?;`,
+      [wishlistId, accountId]
+    );
+
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
+
+    if (!wishlistDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    if (wishlistDetails.is_favorited === newIsFavorited) {
+      res.json({});
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        wishlists
+      SET
+        is_favorited = ?
+      WHERE
+        wishlist_id = ?;`,
+      [newIsFavorited, wishlistId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update is_favorited.');
 
       return;
     }

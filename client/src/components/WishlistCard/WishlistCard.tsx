@@ -6,6 +6,7 @@ import WishlistPrivacyLevelIcon from '../WishlistPrivacyLevelIcon/WishlistPrivac
 import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
 import StatisticItem from '../StatisticItem/StatisticItem';
 import ArrowIcon from '../../assets/svg/ArrowIcon.svg?react';
+import HeartIcon from '../../assets/svg/HeartIcon.svg?react';
 
 type WishlistCardProps = {
   wishlist: ExtendedWishlistDetailsType;
@@ -41,7 +42,18 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
       <div className='text-description flex justify-between items-center'>
         <p className='text-sm font-medium mr-auto'>{getFullDateString(created_on_timestamp)}</p>
 
+        {wishlist.is_favorited && (
+          <span
+            title='Favorited'
+            aria-label='Favorited'
+            className='ml-auto mr-[4px]'
+          >
+            <HeartIcon className='w-[1.6rem] h-[1.6rem] text-cta' />
+          </span>
+        )}
+
         <WishlistPrivacyLevelIcon privacyLevel={privacy_level} />
+
         <Link
           to={`/wishlist/${wishlist_id}`}
           className='ml-1 bg-dark text-title px-[2.4rem] h-[2.8rem] rounded-pill hidden xs:flex justify-center items-center transition-colors hover:text-cta'

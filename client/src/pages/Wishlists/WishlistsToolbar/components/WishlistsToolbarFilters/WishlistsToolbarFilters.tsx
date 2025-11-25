@@ -13,6 +13,7 @@ import { crossWishlistSearchService } from '../../../../../services/wishlistServ
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
 import WishlistsFilterToggler from './components/WishlistsFilterToggler';
+import FilterTogglerCheckboxBtn from '../../../../../components/FilterTogglerCheckboxBtn/FilterTogglerCheckboxBtn';
 
 type WishlistsToolbarFiltersProps = {
   isOpen: boolean;
@@ -174,6 +175,27 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
       />
 
       <div className='grid gap-1'>
+        <WishlistsFilterToggler
+          title='Favorited'
+          isToggled={filters.isFavorited !== null}
+          onClick={() => dispatch({ type: 'SET_IS_FAVORITED', payload: { newValue: filters.isFavorited ? null : true } })}
+          children={
+            <div className={`gap-[1.4rem] pl-1 ${filters.isFavorited === null ? 'hidden' : 'grid'}`}>
+              <FilterTogglerCheckboxBtn
+                onClick={() => dispatch({ type: 'SET_IS_FAVORITED', payload: { newValue: true } })}
+                title='Favorited'
+                isChecked={filters.isFavorited === true}
+              />
+
+              <FilterTogglerCheckboxBtn
+                onClick={() => dispatch({ type: 'SET_IS_FAVORITED', payload: { newValue: false } })}
+                title='Not favorited'
+                isChecked={filters.isFavorited === false}
+              />
+            </div>
+          }
+        />
+
         <WishlistsFilterToggler
           title='Items'
           isToggled={filterByItemsCount}

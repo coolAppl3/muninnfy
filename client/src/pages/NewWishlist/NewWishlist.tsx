@@ -35,7 +35,7 @@ export default function NewWishlist(): JSX.Element {
       const wishlistId: string = (await createWishlistAsAccountService({ title, privacyLevel })).data.wishlistId;
 
       displayPopupMessage('Wishlist created.', 'success');
-      navigate(`/wishlist/${wishlistId}`);
+      navigate(`/wishlist/${wishlistId}`, { replace: true });
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errMessage, errReason } = handleAsyncError(err);

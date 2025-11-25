@@ -5,6 +5,7 @@ import { clearErrorLogsCron } from '../logs/errorLoggerCronJobs';
 import { deleteStaleAccountVerificationRequestsCron, deleteUnverifiedAccountsCron } from './accountCronJobs';
 import { minuteMilliseconds } from '../util/constants/globalConstants';
 import { deleteExpiredAuthSessionsCron } from '../auth/authSessions';
+import { decayWishlistsInteractivityIndexCron } from './wishlistCronJobs';
 
 export function initCronJobs(): void {
   // every 30 seconds
@@ -22,6 +23,13 @@ export function initCronJobs(): void {
     await removeStaleRateTrackerRowsCron(currentTimestamp);
     await deleteUnverifiedAccountsCron(currentTimestamp);
     await deleteStaleAccountVerificationRequestsCron(currentTimestamp);
+  });
+
+  // every 6 hours
+  cron.schedule('0 */6 * * *', async () => {
+    const currentTimestamp: number = Date.now();
+
+    await decayWishlistsInteractivityIndexCron(currentTimestamp);
   });
 
   // every day
