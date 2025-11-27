@@ -1,9 +1,12 @@
 import { JSX } from 'react';
 import AccountSidebarButton from './components/AccountSidebarButton';
+import useAccountLocation from '../hooks/useAccountLocation';
 
 export default function AccountSidebar(): JSX.Element {
+  const { accountLocation, setAccountLocation } = useAccountLocation();
+
   return (
-    <nav className='bg-secondary rounded-sm grid col-span-3 text-description overflow-hidden font-medium text-sm'>
+    <nav className='bg-secondary rounded-sm hidden md:grid md:col-span-3 text-description overflow-hidden font-medium text-sm'>
       <h3
         className='p-2 text-base text-title font-normal break-words'
         style={{ wordBreak: 'break-word' }}
@@ -14,24 +17,24 @@ export default function AccountSidebar(): JSX.Element {
       <div className='h-line'></div>
 
       <AccountSidebarButton
-        isSelected={true}
-        onClick={() => {}}
+        isSelected={accountLocation === 'overview'}
+        onClick={() => setAccountLocation('overview')}
       >
         Overview
       </AccountSidebarButton>
 
       <AccountSidebarButton
-        isSelected={false}
-        onClick={() => {}}
+        isSelected={accountLocation === 'social'}
+        onClick={() => setAccountLocation('social')}
       >
-        My details
+        Social
       </AccountSidebarButton>
 
       <AccountSidebarButton
-        isSelected={false}
-        onClick={() => {}}
+        isSelected={accountLocation === 'details'}
+        onClick={() => setAccountLocation('details')}
       >
-        Social
+        My details
       </AccountSidebarButton>
     </nav>
   );
