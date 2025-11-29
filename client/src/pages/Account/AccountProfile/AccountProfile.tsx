@@ -1,5 +1,5 @@
 import { JSX } from 'react';
 
-export function AccountDetails(): JSX.Element {
+export function AccountProfile(): JSX.Element {
   return <></>;
 }

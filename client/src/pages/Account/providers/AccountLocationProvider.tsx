@@ -6,7 +6,7 @@ type AccountLocationProviderProps = {
 };
 
 export default function AccountLocationProvider({ children }: AccountLocationProviderProps): JSX.Element {
-  const [accountLocation, setAccountLocation] = useState<AccountLocation>('overview');
+  const [accountLocation, setAccountLocation] = useState<AccountLocation>('profile');
 
   const contextValue: AccountLocationContextType = useMemo(() => ({ accountLocation, setAccountLocation }), [accountLocation]);
   return <AccountLocationContext value={contextValue}>{children}</AccountLocationContext>;

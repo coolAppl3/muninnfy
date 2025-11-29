@@ -11,8 +11,6 @@ export default function AccountNavMenu(): JSX.Element {
     <div
       className='fixed bottom-0 z-10'
       onBlur={(e: FocusEvent) => {
-        console.log(e.relatedTarget);
-
         if (e.relatedTarget?.classList.contains('nav-menu-btn')) {
           return;
         }
@@ -36,14 +34,14 @@ export default function AccountNavMenu(): JSX.Element {
         <button
           type='button'
           className={`nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-light-gray ${
-            accountLocation === 'overview' ? 'text-cta' : ''
+            accountLocation === 'profile' ? 'text-cta' : ''
           }`}
           onClick={() => {
-            setAccountLocation('overview');
+            setAccountLocation('profile');
             setIsOpen(false);
           }}
         >
-          Overview
+          Profile
         </button>
 
         <button
@@ -61,15 +59,28 @@ export default function AccountNavMenu(): JSX.Element {
 
         <button
           type='button'
-          className={`nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-secondary ${
-            accountLocation === 'details' ? 'text-cta' : ''
+          className={`nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-light-gray ${
+            accountLocation === 'notifications' ? 'text-cta' : ''
           }`}
           onClick={() => {
-            setAccountLocation('details');
+            setAccountLocation('notifications');
             setIsOpen(false);
           }}
         >
-          My details
+          Notifications
+        </button>
+
+        <button
+          type='button'
+          className={`nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-secondary ${
+            accountLocation === 'wishlists' ? 'text-cta' : ''
+          }`}
+          onClick={() => {
+            setAccountLocation('wishlists');
+            setIsOpen(false);
+          }}
+        >
+          Wishlists
         </button>
       </nav>
     </div>

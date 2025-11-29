@@ -6,21 +6,12 @@ export default function AccountSidebar(): JSX.Element {
   const { accountLocation, setAccountLocation } = useAccountLocation();
 
   return (
-    <nav className='bg-secondary rounded-sm hidden md:grid md:col-span-3 text-description overflow-hidden font-medium text-sm'>
-      <h3
-        className='p-2 text-base text-title font-normal break-words'
-        style={{ wordBreak: 'break-word' }}
-      >
-        Hi, John Doe
-      </h3>
-
-      <div className='h-line'></div>
-
+    <nav className='bg-secondary rounded-sm hidden md:grid md:col-span-3 text-description overflow-hidden font-medium text-sm shadow-simple-tiny'>
       <AccountSidebarButton
-        isSelected={accountLocation === 'overview'}
-        onClick={() => setAccountLocation('overview')}
+        isSelected={accountLocation === 'profile'}
+        onClick={() => setAccountLocation('profile')}
       >
-        Overview
+        Profile
       </AccountSidebarButton>
 
       <AccountSidebarButton
@@ -31,10 +22,17 @@ export default function AccountSidebar(): JSX.Element {
       </AccountSidebarButton>
 
       <AccountSidebarButton
-        isSelected={accountLocation === 'details'}
-        onClick={() => setAccountLocation('details')}
+        isSelected={accountLocation === 'notifications'}
+        onClick={() => setAccountLocation('notifications')}
       >
-        My details
+        Notifications
+      </AccountSidebarButton>
+
+      <AccountSidebarButton
+        isSelected={accountLocation === 'wishlists'}
+        onClick={() => setAccountLocation('wishlists')}
+      >
+        Wishlists
       </AccountSidebarButton>
     </nav>
   );
