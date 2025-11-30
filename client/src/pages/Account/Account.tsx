@@ -13,7 +13,7 @@ export default function Account(): JSX.Element {
 
       <AccountLocationProvider>
         <main className='py-4'>
-          <Container className='grid grid-cols-12 gap-1'>
+          <Container className='grid grid-cols-12 items-start gap-1'>
             <AccountSidebar />
             <AccountNavMenu />
             <AccountContent />

@@ -6,7 +6,7 @@ export default function AccountSidebar(): JSX.Element {
   const { accountLocation, setAccountLocation } = useAccountLocation();
 
   return (
-    <nav className='bg-secondary rounded-sm hidden md:grid md:col-span-3 text-description overflow-hidden font-medium text-sm shadow-simple-tiny'>
+    <nav className='sticky top-7 bg-secondary rounded-sm hidden md:grid md:col-span-3 text-description overflow-hidden font-medium text-sm shadow-simple-tiny'>
       <AccountSidebarButton
         isSelected={accountLocation === 'profile'}
         onClick={() => setAccountLocation('profile')}
