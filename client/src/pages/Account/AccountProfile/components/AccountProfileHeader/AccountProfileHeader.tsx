@@ -24,7 +24,7 @@ export default function AccountProfileHeader(): JSX.Element {
         title={`${isOpen ? 'Hide' : 'View'} profile menu`}
         aria-label={`${isOpen ? 'Hide' : 'View'} profile menu`}
       >
-        <TripleDotIcon className='w-[1.6rem] h-[1.6rem]' />
+        <TripleDotIcon className={`w-[1.6rem] h-[1.6rem] transition-colors ${isOpen ? 'text-cta' : ''}`} />
       </button>
 
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
@@ -33,6 +33,7 @@ export default function AccountProfileHeader(): JSX.Element {
           className='context-menu-btn'
           onClick={() => {
             setIsOpen(false);
+            // TODO: continue implementation
           }}
         >
           Change display name
@@ -43,6 +44,7 @@ export default function AccountProfileHeader(): JSX.Element {
           className='context-menu-btn'
           onClick={() => {
             setIsOpen(false);
+            // TODO: continue implementation
           }}
         >
           Change email address
