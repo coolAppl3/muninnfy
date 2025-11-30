@@ -4,6 +4,7 @@ import AccountNotifications from '../AccountNotifications/AccountNotifications';
 import { AccountProfile } from '../AccountProfile/AccountProfile';
 import AccountSocial from '../AccountSocial/AccountSocial';
 import { AccountLocation } from '../contexts/AccountLocationContext';
+import AccountWishlists from '../AccountWishlists/AccountWishlists';
 
 export default function AccountContent(): JSX.Element {
   const { accountLocation } = useAccountLocation();
@@ -15,5 +16,5 @@ const ContentRecord: Record<AccountLocation, JSX.Element> = {
   profile: <AccountProfile />,
   social: <AccountSocial />,
   notifications: <AccountNotifications />,
-  wishlists: <AccountProfile />,
+  wishlists: <AccountWishlists />,
 };
