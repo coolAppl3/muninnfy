@@ -64,6 +64,6 @@ type GetAccountDetailsServiceData = {
   accountDetails: AccountDetailsType;
 };
 
-export function getAccountDetailsService(): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
-  return axios.get(accountsApiUrl);
+export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
+  return axios.get(accountsApiUrl, { signal: abortSignal });
 }
