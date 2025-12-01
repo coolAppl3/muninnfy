@@ -8,7 +8,7 @@ type AccountDetailsProviderProps = {
 };
 
 export default function AccountDetailsProvider({ initialAccountDetails, children }: AccountDetailsProviderProps): JSX.Element {
-  const [accountDetails, setAccountDetails] = useState<AccountDetailsType | null>(initialAccountDetails);
+  const [accountDetails, setAccountDetails] = useState<AccountDetailsType>(initialAccountDetails);
 
   const contextValue: AccountDetailsContextType = useMemo(
     () => ({
