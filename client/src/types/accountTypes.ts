@@ -1,4 +1,4 @@
-export type AccountDetails = {
+export type AccountDetailsType = {
   public_account_id: string;
   email: string;
   username: string;

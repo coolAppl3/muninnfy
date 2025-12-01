@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { AccountDetails } from '../types/accountTypes';
+import { AccountDetailsType } from '../types/accountTypes';
 
 axios.defaults.withCredentials = true;
 const accountsApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/accounts` : `https://muninnfy/api/accounts`;
@@ -61,7 +61,7 @@ export function signInService(body: SignInPayload): Promise<AxiosResponse> {
 }
 
 type GetAccountDetailsServiceData = {
-  accountDetails: AccountDetails;
+  accountDetails: AccountDetailsType;
 };
 
 export function getAccountDetailsService(): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
