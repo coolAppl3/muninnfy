@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { AccountDetails } from '../types/accountTypes';
 
 axios.defaults.withCredentials = true;
 const accountsApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/accounts` : `https://muninnfy/api/accounts`;
@@ -57,4 +58,12 @@ type SignInPayload = {
 
 export function signInService(body: SignInPayload): Promise<AxiosResponse> {
   return axios.post(`${accountsApiUrl}/signIn`, body);
+}
+
+type GetAccountDetailsServiceData = {
+  accountDetails: AccountDetails;
+};
+
+export function getAccountDetailsService(): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
+  return axios.get(accountsApiUrl);
 }
