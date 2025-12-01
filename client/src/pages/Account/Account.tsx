@@ -50,7 +50,7 @@ export default function Account(): JSX.Element {
     getAccountDetails();
 
     return () => abortController.abort();
-  }, []);
+  }, [setAuthStatus, handleAsyncError]);
 
   return (
     <>
