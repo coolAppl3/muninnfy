@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import AccountProfileHeader from './components/AccountProfileHeader/AccountProfileHeader';
-import ToggleSwitch from '../../../components/ToggleSwitch/ToggleSwitch';
+import AccountProfilePrivacy from './components/AccountProfilePrivacy/AccountProfilePrivacy';
 
 export function AccountProfile(): JSX.Element {
   return (
@@ -32,25 +32,7 @@ export function AccountProfile(): JSX.Element {
       </div>
 
       <div className='h-line mt-2 mb-1'></div>
-      <h3 className='text-md text-title font-normal mb-1'>Privacy</h3>
-
-      <div className='grid gap-y-[4px]'>
-        <div className='flex justify-between items-center p-1 bg-dark rounded'>
-          <p className='text-description text-sm font-medium'>Private account</p>
-          <ToggleSwitch
-            isToggled={true}
-            onClick={() => {}}
-          />
-        </div>
-
-        <div className='flex justify-between items-center p-1 bg-dark rounded'>
-          <p className='text-description text-sm font-medium'>Approve followers</p>
-          <ToggleSwitch
-            isToggled={true}
-            onClick={() => {}}
-          />
-        </div>
-      </div>
+      <AccountProfilePrivacy />
     </>
   );
 }
