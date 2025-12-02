@@ -68,11 +68,11 @@ export function getAccountDetailsService(abortSignal: AbortSignal): Promise<Axio
   return axios.get(accountsApiUrl, { signal: abortSignal });
 }
 
-type UpdateAccountPrivacyServiceData = {
+type UpdateAccountPrivacyServicePayload = {
   isPrivate: boolean;
   approveFollowRequests: boolean;
 };
 
-export function updateAccountPrivacyService(body: UpdateAccountPrivacyServiceData): Promise<AxiosResponse> {
+export function updateAccountPrivacyService(body: UpdateAccountPrivacyServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/details/privacy`, body);
 }
