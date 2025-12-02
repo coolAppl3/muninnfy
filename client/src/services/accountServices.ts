@@ -67,3 +67,12 @@ type GetAccountDetailsServiceData = {
 export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
   return axios.get(accountsApiUrl, { signal: abortSignal });
 }
+
+type UpdateAccountPrivacyServiceData = {
+  isPrivate: boolean;
+  approveFollowRequests: boolean;
+};
+
+export function updateAccountPrivacyService(body: UpdateAccountPrivacyServiceData): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/privacy`, body);
+}
