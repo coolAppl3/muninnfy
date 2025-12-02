@@ -86,14 +86,16 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     type TakenStatus = {
       email_taken: boolean;
+      email_temporarily_taken: boolean;
       username_taken: boolean;
     };
 
     const [takenStatusRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         EXISTS (SELECT 1 FROM accounts WHERE email = ?) AS email_taken,
+        EXISTS (SELECT 1 FROM email_update WHERE new_email = ?) AS email_temporarily_taken,
         EXISTS (SELECT 1 FROM accounts WHERE username = ?) AS username_taken;`,
-      [email, username]
+      [email, email, username]
     );
 
     const takenStatus = takenStatusRows[0] as TakenStatus | undefined;
@@ -106,7 +108,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       return;
     }
 
-    if (takenStatus.email_taken) {
+    if (takenStatus.email_taken || takenStatus.email_temporarily_taken) {
       await connection.rollback();
       res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
 
