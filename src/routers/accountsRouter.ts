@@ -702,3 +702,73 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
     await logUnexpectedError(req, err);
   }
 });
+
+accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    isPrivate: boolean;
+    approveFollowRequests: boolean;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['isPrivate', 'approveFollowRequests'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { isPrivate, approveFollowRequests } = requestData;
+
+  if (typeof isPrivate !== 'boolean' || typeof approveFollowRequests !== 'boolean') {
+    res.status(400).json({ message: 'Invalid privacy configuration.', reason: 'invalidConfiguration' });
+    return;
+  }
+
+  if (isPrivate && !approveFollowRequests) {
+    res.status(400).json({ message: 'Invalid privacy configuration.', reason: 'invalidConfiguration' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        account_preferences
+      SET
+        is_private = ?,
+        approve_follow_requests = ?
+      WHERE
+        account_id = ?;`,
+      [isPrivate, approveFollowRequests, accountId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      await logUnexpectedError(req, null, 'Failed to update is_private and approve_follow_requests.');
+      res.status(500).json({ message: 'Internal server error.' });
+
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
