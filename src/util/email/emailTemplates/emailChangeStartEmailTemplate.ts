@@ -13,7 +13,6 @@ export default function emailChangeStartEmailTemplate({ displayName, confirmatio
           name="viewport"
           content="width=device-width, initial-scale=1.0"
         />
-        <title>Email</title>
       </head>
       
       <body>
