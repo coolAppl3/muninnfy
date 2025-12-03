@@ -1,7 +1,7 @@
 import { minuteMilliseconds } from '../../constants/globalConstants';
 import { ACCOUNT_VERIFICATION_WINDOW } from '../../constants/accountConstants';
 
-type AccountVerificationEmailTemplate = {
+export type AccountVerificationEmailTemplate = {
   displayName: string;
   publicAccountId: string;
   verificationToken: string;

@@ -1,5 +1,5 @@
 import { emailTransporter } from './initTransporter';
-import accountVerificationEmailTemplate from './emailTemplates/accountVerificationEmailTemplate';
+import accountVerificationEmailTemplate, { AccountVerificationEmailTemplate } from './emailTemplates/accountVerificationEmailTemplate';
 
 type SendEmailService = {
   receiver: string;
@@ -20,14 +20,7 @@ async function sendEmailService({ receiver, subject, html }: SendEmailService): 
   }
 }
 
-type SendAccountVerificationEmailServicePayload = {
-  receiver: string;
-  displayName: string;
-  publicAccountId: string;
-  verificationToken: string;
-};
-
-export async function sendAccountVerificationEmailService(payload: SendAccountVerificationEmailServicePayload): Promise<void> {
+export async function sendAccountVerificationEmailService(payload: { receiver: string } & AccountVerificationEmailTemplate): Promise<void> {
   const { receiver, ...rest } = payload;
 
   await sendEmailService({

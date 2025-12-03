@@ -1,4 +1,4 @@
-type EmailUpdateStartEmailTemplate = {
+export type EmailUpdateStartEmailTemplate = {
   displayName: string;
   confirmationCode: string;
 };
