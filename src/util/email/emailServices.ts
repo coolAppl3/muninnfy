@@ -8,7 +8,7 @@ type SendAccountVerificationEmailConfig = {
   verificationToken: string;
 };
 
-export async function sendAccountVerificationEmail(config: SendAccountVerificationEmailConfig): Promise<void> {
+export async function sendAccountVerificationEmailService(config: SendAccountVerificationEmailConfig): Promise<void> {
   try {
     await emailTransporter.sendMail({
       from: `Muninnfy <${process.env.TRANSPORTER_USER}>`,

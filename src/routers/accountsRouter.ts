@@ -13,7 +13,7 @@ import {
   ACCOUNT_FAILED_UPDATE_LIMIT,
   ACCOUNT_VERIFICATION_WINDOW,
 } from '../util/constants/accountConstants';
-import { sendAccountVerificationEmail } from '../util/email/emailServices';
+import { sendAccountVerificationEmailService } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
@@ -169,7 +169,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     await connection.commit();
     res.status(201).json({ publicAccountId });
 
-    await sendAccountVerificationEmail({
+    await sendAccountVerificationEmailService({
       receiver: email,
       displayName: displayName,
       publicAccountId,
@@ -372,7 +372,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool, req);
     res.json({});
 
-    await sendAccountVerificationEmail({
+    await sendAccountVerificationEmailService({
       receiver: accountDetails.email,
       displayName: accountDetails.display_name,
       publicAccountId: accountDetails.public_account_id,
