@@ -38,9 +38,9 @@ export default function accountVerificationEmailTemplate({
             >.
           </p>
 
-          <p>Your account will be automatically deleted if it's not verified within ${
+          <p>Your account will be automatically deleted if it's not verified within ${Math.floor(
             ACCOUNT_VERIFICATION_WINDOW / minuteMilliseconds
-          } minutes of being created.</p>
+          )} minutes of being created.</p>
           <p>If this request wasn't made by you, feel free to ignore it.</p>
 
           <p">Warmest regards,</p>
