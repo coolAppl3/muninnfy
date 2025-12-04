@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
-import bcrypt from 'bcrypt';
 import { ACCOUNT_FAILED_SIGN_IN_LIMIT } from '../../util/constants/accountConstants';
 import { removeRequestCookie } from '../../util/cookieUtils';
 import { purgeAuthSessions } from '../../auth/authSessions';
