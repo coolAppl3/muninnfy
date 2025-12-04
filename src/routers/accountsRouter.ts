@@ -1,28 +1,31 @@
 import express, { Router, Request, Response } from 'express';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidDisplayName, isValidEmail, isValidNewPassword, isValidPassword, isValidUsername } from '../util/validation/userValidation';
-import { getRequestCookie } from '../util/cookieUtils';
+import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
+import { generateCryptoUuid, generateConfirmationCode, isValidUuid } from '../util/tokenGenerator';
 import {
+  ACCOUNT_EMAIL_UPDATE_WINDOW,
   ACCOUNT_EMAILS_SENT_LIMIT,
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
   ACCOUNT_FAILED_UPDATE_LIMIT,
   ACCOUNT_VERIFICATION_WINDOW,
 } from '../util/constants/accountConstants';
-import { sendAccountVerificationEmail } from '../util/email/emailServices';
+import { sendAccountVerificationEmailService, sendEmailChangeStartEmailService } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
   deleteAccountById,
+  handleIncorrectPassword,
+  incrementEmailChangeEmailsSent,
   incrementFailedVerificationAttempts,
   incrementVerificationEmailsSent,
   resetFailedSignInAttempts,
 } from '../db/helpers/accountDbHelpers';
-import { createAuthSession } from '../auth/authSessions';
+import { createAuthSession, purgeAuthSessions } from '../auth/authSessions';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 
@@ -86,14 +89,16 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     type TakenStatus = {
       email_taken: boolean;
+      email_temporarily_taken: boolean;
       username_taken: boolean;
     };
 
     const [takenStatusRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         EXISTS (SELECT 1 FROM accounts WHERE email = ?) AS email_taken,
+        EXISTS (SELECT 1 FROM email_update WHERE new_email = ?) AS email_temporarily_taken,
         EXISTS (SELECT 1 FROM accounts WHERE username = ?) AS username_taken;`,
-      [email, username]
+      [email, email, username]
     );
 
     const takenStatus = takenStatusRows[0] as TakenStatus | undefined;
@@ -106,7 +111,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       return;
     }
 
-    if (takenStatus.email_taken) {
+    if (takenStatus.email_taken || takenStatus.email_temporarily_taken) {
       await connection.rollback();
       res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
 
@@ -167,7 +172,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     await connection.commit();
     res.status(201).json({ publicAccountId });
 
-    await sendAccountVerificationEmail({
+    await sendAccountVerificationEmailService({
       receiver: email,
       displayName: displayName,
       publicAccountId,
@@ -370,7 +375,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool, req);
     res.json({});
 
-    await sendAccountVerificationEmail({
+    await sendAccountVerificationEmailService({
       receiver: accountDetails.email,
       displayName: accountDetails.display_name,
       publicAccountId: accountDetails.public_account_id,
@@ -603,16 +608,9 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       return;
     }
 
-    const isCorrectPassword: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
-    if (!isCorrectPassword) {
-      const incremented: boolean = await incrementFailedVerificationAttempts(accountDetails.account_id, dbPool, req);
-      const hasBeenLocked: boolean = accountDetails.failed_sign_in_attempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
-
-      res.status(401).json({
-        message: `Incorrect password.${hasBeenLocked ? ' Account locked.' : ''}`,
-        reason: hasBeenLocked ? 'incorrectPassword_locked' : 'incorrectPassword',
-      });
-
+    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    if (!passwordIsCorrect) {
+      await handleIncorrectPassword(accountDetails.account_id, accountDetails.failed_sign_in_attempts, dbPool, req, res);
       return;
     }
 
@@ -660,23 +658,27 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
       email: string;
       username: string;
       display_name: string;
-      created_on_timestamp: string;
-      wishlist_count: number;
+      created_on_timestamp: number;
+      is_private: boolean;
+      approve_follow_requests: boolean;
     };
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        public_account_id,
-        email,
-        username,
-        display_name,
-        created_on_timestamp,
-        (SELECT COUNT(*) FROM wishlists WHERE account_id = :accountId) AS wishlists_count
+        accounts.public_account_id,
+        accounts.email,
+        accounts.username,
+        accounts.display_name,
+        accounts.created_on_timestamp,
+        account_preferences.is_private,
+        account_preferences.approve_follow_requests
       FROM
         accounts
+      LEFT JOIN
+        account_preferences USING(account_id)
       WHERE
-        account_id = :accountId;`,
-      { accountId }
+        accounts.account_id = ?;`,
+      [accountId]
     );
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
@@ -686,32 +688,438 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
       return;
     }
 
-    type Wishlist = {
-      wishlist_id: string;
-      privacy_level: string;
-      title: string;
-      created_on_timestamp: number;
-      items_count: number;
+    res.json({ accountDetails });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    isPrivate: boolean;
+    approveFollowRequests: boolean;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['isPrivate', 'approveFollowRequests'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { isPrivate, approveFollowRequests } = requestData;
+
+  if (typeof isPrivate !== 'boolean' || typeof approveFollowRequests !== 'boolean') {
+    res.status(400).json({ message: 'Invalid privacy configuration.', reason: 'invalidConfiguration' });
+    return;
+  }
+
+  if (isPrivate && !approveFollowRequests) {
+    res.status(400).json({ message: 'Invalid privacy configuration.', reason: 'invalidConfiguration' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        account_preferences
+      SET
+        is_private = ?,
+        approve_follow_requests = ?
+      WHERE
+        account_id = ?;`,
+      [isPrivate, approveFollowRequests, accountId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      await logUnexpectedError(req, null, 'Failed to update is_private and approve_follow_requests.');
+      res.status(500).json({ message: 'Internal server error.' });
+
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+accountsRouter.patch('/details/displayName', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    newDisplayName: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['newDisplayName'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { newDisplayName } = requestData;
+
+  if (!isValidDisplayName(newDisplayName)) {
+    res.status(400).json({ message: 'Invalid display name.', reason: 'invalidDisplayName' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      display_name: string;
     };
 
-    const [wishlists] = await dbPool.execute<RowDataPacket[]>(
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        wishlists.wishlist_id,
-        wishlists.privacy_level,
-        wishlists.title,
-        wishlists.created_on_timestamp,
-        (SELECT COUNT(*) FROM wishlist_items WHERE wishlist_id = wishlists.wishlist_id) AS items_count
+        display_name
       FROM
-        wishlists
+        accounts
       WHERE
-        account_id = ?
-      ORDER BY
-        items_count DESC
-      LIMIT 3;`,
+        account_id = ?;`,
       [accountId]
     );
 
-    res.json({ accountDetails, wishlists: wishlists as Wishlist[] });
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (accountDetails.display_name === newDisplayName) {
+      res.status(409).json({ message: 'Account already has this display name.', reason: 'duplicateDisplayName' });
+      return;
+    }
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        accounts
+      SET
+        display_name = ?
+      WHERE
+        account_id = ?;`,
+      [newDisplayName, accountId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update display_name.');
+
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+accountsRouter.post('/details/email/start', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    newEmail: string;
+    password: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['newEmail', 'password'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { newEmail, password } = requestData;
+
+  if (!isValidEmail(newEmail)) {
+    res.status(400).json({ message: 'Invalid email address.', reason: 'invalidUsername' });
+    return;
+  }
+
+  if (!isValidPassword(password)) {
+    res.status(400).json({ message: 'Invalid password.', reason: 'invalidPassword' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  let connection;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      email: string;
+      hashed_password: string;
+      display_name: string;
+      failed_sign_in_attempts: number;
+      update_id: number;
+      new_email: string;
+      expiry_timestamp: number;
+      email_taken: boolean;
+      email_temporarily_taken: boolean;
+    };
+
+    const [accountRows] = await connection.execute<ResultSetHeader[]>(
+      `SELECT
+        accounts.email,
+        accounts.hashed_password,
+        accounts.display_name,
+        accounts.failed_sign_in_attempts,
+        email_update.update_id,
+        email_update.new_email,
+        email_update.expiry_timestamp,
+        EXISTS (SELECT 1 FROM accounts WHERE email = :newEmail) AS email_taken,
+        EXISTS (SELECT 1 FROM email_update WHERE new_email = :newEmail) AS email_temporarily_taken
+      FROM
+        accounts
+      LEFT JOIN
+        email_update USING(account_id)
+      WHERE
+        accounts.account_id = :accountId;`,
+      { newEmail, accountId }
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
+    if (isLocked) {
+      await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
+      await purgeAuthSessions(accountId);
+
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+      return;
+    }
+
+    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    if (!passwordIsCorrect) {
+      await connection.rollback();
+      await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+
+      return;
+    }
+
+    if (accountDetails.update_id) {
+      await connection.rollback();
+      res.status(409).json({
+        message: 'Ongoing email update request found.',
+        reason: 'ongoingRequest',
+        resData: {
+          emailUpdateId: accountDetails.update_id,
+          newEmail: accountDetails.new_email,
+          expiryTimestamp: accountDetails.expiry_timestamp,
+        },
+      });
+
+      return;
+    }
+
+    if (newEmail === accountDetails.email) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Email already linked to this account.', reason: 'duplicateEmail' });
+
+      return;
+    }
+
+    if (accountDetails.email_taken || accountDetails.email_temporarily_taken) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
+
+      return;
+    }
+
+    const confirmationCode: string = generateConfirmationCode();
+    const expiryTimestamp: number = Date.now() + ACCOUNT_EMAIL_UPDATE_WINDOW;
+
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+      `INSERT INTO email_update (
+        account_id,
+        new_email,
+        confirmation_code,
+        expiry_timestamp,
+        update_emails_sent,
+        failed_update_attempts
+      ) VALUES (${generatePlaceHolders(6)});`,
+      [accountId, newEmail, confirmationCode, expiryTimestamp, 1, 0]
+    );
+
+    await connection.commit();
+    res.json({ emailUpdateId: resultSetHeader.insertId, expiryTimestamp });
+
+    await resetFailedSignInAttempts(accountId, dbPool, req);
+    await sendEmailChangeStartEmailService({
+      receiver: newEmail,
+      confirmationCode,
+      displayName: accountDetails.display_name,
+    });
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
+
+accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      display_name: string;
+      failed_sign_in_attempts: number;
+      update_id: number;
+      new_email: string;
+      confirmation_code: string;
+      expiry_timestamp: number;
+      update_emails_sent: number;
+      failed_update_attempts: number;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.display_name,
+        email_update.update_id,
+        email_update.new_email,
+        email_update.confirmation_code,
+        email_update.expiry_timestamp,
+        email_update.update_emails_sent,
+        email_update.failed_update_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        email_update USING(account_id)
+      WHERE
+        accounts.account_id = ?;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
+    if (isLocked) {
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+      return;
+    }
+
+    if (!accountDetails.update_id) {
+      res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
+      return;
+    }
+
+    const requestSuspended: boolean = accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT;
+    if (requestSuspended) {
+      res.status(403).json({
+        message: 'Email change request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    const emailsSentLimitReached: boolean = accountDetails.update_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT;
+    if (emailsSentLimitReached) {
+      res.status(403).json({ message: `Sent change emails limit reached.`, reason: 'emailsSentLimitReached' });
+      return;
+    }
+
+    await incrementEmailChangeEmailsSent(accountDetails.update_id, dbPool, req);
+    res.json({});
+
+    const { new_email, display_name, confirmation_code } = accountDetails;
+    await sendEmailChangeStartEmailService({
+      receiver: new_email,
+      displayName: display_name,
+      confirmationCode: confirmation_code,
+    });
   } catch (err: unknown) {
     console.log(err);
 

@@ -1,5 +1,68 @@
 # Changelog
 
+## [0.2.2] (2024-12-04)
+
+### Features
+
+- Implement general structure, navigation, and some of the profile section in `Account`.
+- Added the following components under the `Account` page:
+  - `AccountContent`.
+  - `AccountNavMenu`.
+  - `AccountSidebar`.
+    - `AccountSidebarButton`.
+  - `AccountProfile`.
+    - `AccountProfileHeader`.
+    - `AccountProfilePrivacy`.
+  - `AccountSocial`.
+  - `AccountNotification`.
+  - `AccountWishlists`.
+- Added `AccountLocationContext`, `AccountLocationProvider` and `useAccountLocation` custom hook.
+- Added `AccountDetailsContext`, `AccountDetailsProvider` and `useAccountDetails` custom hook.
+- Added the following endpoints:
+  - PATCH `details/privacy`.
+  - PATCH `details/displayName`.
+  - POST `details/email/start`.
+  - PATCH `details/email/resendEmail`.
+- Added the following services under `accountServices`:
+  - `getAccountDetailsService()`.
+  - `updateAccountPrivacyService()`.
+  - `updateAccountDisplayNameService()`.
+- Added `HamMenuIcon` SVG.
+- Added `emailUpdateStartEmailTemplate`.
+- Added `handleIncorrectPassword()` and implemented it accordingly.
+- Added the following helpers under `accountDbHelpers`:
+  - `incrementEmailChangeEmailsSent()`.
+  - `incrementedFailedEmailChangeAttempts()`.
+
+
+### Changes
+
+- Reworked GET `accounts` to align with recent changes
+  - Endpoint will be reworked further as more features are implemented.
+
+
+### Improvements
+
+- Added `sendEmailService()` locally in `emailServices`, refactoring the logic in the process to improve readability and reduce repeatability.
+- Improve typing for `emailServices`, `accountVerificationEmailTemplate`, and `emailChangeStartEmailTemplate`.
+- Improve parameter naming in `authSessions`.
+
+
+### Bug Fixes
+
+- Fixed POST `accounts/signUp` not checking if the email is used in the `email_update` table.
+- Fixed time remaining not being floored in `accountVerificationEmailTemplate`.
+- Fix `Readonly` being incorrectly used in `incrementVerificationEmailsSent()`.
+
+
+### Code Refactoring
+
+- Renamed `sendAccountVerificationEmail()` to `sendAccountVerificationEmailService()`.
+- Renamed `emailUpdateStartEmailTemplate` to `emailChangeStartEmailTemplate`.
+- Removed unused `<title>` tags in the HTML `<head>` in `accountVerificationEmailTemplate` and `emailChangeStartEmailTemplate`.
+- Renamed `generateVerificationCode()` and `isValidVerificationCode()` to `generateConfirmationCode()` and `isValidConfirmationCode()` respectively.
+
+
 ## [0.2.1] (2024-11-25)
 
 ### Features

@@ -127,7 +127,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
               <>
                 <div className='h-line'></div>
                 <p
-                  className='whitespace-break-spaces word'
+                  className='whitespace-break-spaces'
                   style={{ wordBreak: 'break-word' }}
                 >
                   {wishlistItem.description}

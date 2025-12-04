@@ -11,7 +11,7 @@ export function isValidUuid(uuid: string): boolean {
   return regex.test(uuid);
 }
 
-export function generateVerificationCode(): string {
+export function generateConfirmationCode(): string {
   // number 0, as well as uppercase and lowercase O, not included
   const allowedCodeCharacters: string = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
   let verificationCode: string = '';
@@ -23,7 +23,7 @@ export function generateVerificationCode(): string {
   return verificationCode;
 }
 
-export function isValidVerificationCode(verificationCode: any): boolean {
+export function isValidConfirmationCode(verificationCode: any): boolean {
   if (typeof verificationCode !== 'string') {
     return false;
   }

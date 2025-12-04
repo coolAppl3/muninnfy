@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { AccountDetailsType } from '../types/accountTypes';
 
 axios.defaults.withCredentials = true;
 const accountsApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/accounts` : `https://muninnfy/api/accounts`;
@@ -57,4 +58,29 @@ type SignInPayload = {
 
 export function signInService(body: SignInPayload): Promise<AxiosResponse> {
   return axios.post(`${accountsApiUrl}/signIn`, body);
+}
+
+type GetAccountDetailsServiceData = {
+  accountDetails: AccountDetailsType;
+};
+
+export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
+  return axios.get(accountsApiUrl, { signal: abortSignal });
+}
+
+type UpdateAccountPrivacyServicePayload = {
+  isPrivate: boolean;
+  approveFollowRequests: boolean;
+};
+
+export function updateAccountPrivacyService(body: UpdateAccountPrivacyServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/privacy`, body);
+}
+
+type UpdateAccountDisplayNameServicePayload = {
+  newDisplayName: string;
+};
+
+export function updateAccountDisplayNameService(body: UpdateAccountDisplayNameServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/displayName`, body);
 }

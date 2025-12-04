@@ -123,21 +123,21 @@ export async function createAuthSession(
   }
 }
 
-export async function destroyAuthSession(sessionId: string): Promise<void> {
+export async function destroyAuthSession(authSessionId: string): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
         auth_sessions
       WHERE
         session_id = ?;`,
-      [sessionId]
+      [authSessionId]
     );
   } catch (err: unknown) {
     console.log(err);
   }
 }
 
-export async function purgeAuthSessions(userId: number): Promise<void> {
+export async function purgeAuthSessions(accountId: number): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
@@ -145,7 +145,7 @@ export async function purgeAuthSessions(userId: number): Promise<void> {
       WHERE
         account_id = ?
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
-      [userId]
+      [accountId]
     );
   } catch (err: unknown) {
     console.log(err);

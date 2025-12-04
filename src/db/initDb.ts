@@ -7,6 +7,7 @@ export async function initDb(): Promise<void> {
   await createAccountRecoveryTable();
   await createAccountDeletionTable();
   await createEmailUpdateTable();
+
   await createAuthSessionsTable();
 
   await createWishlistsTable();

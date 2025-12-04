@@ -1,26 +1,42 @@
 import { emailTransporter } from './initTransporter';
-import accountVerificationEmailTemplate from './emailTemplates/accountVerificationEmailTemplate';
+import accountVerificationEmailTemplate, { AccountVerificationEmailTemplate } from './emailTemplates/accountVerificationEmailTemplate';
+import emailChangeStartEmailTemplate, { EmailUpdateStartEmailTemplate } from './emailTemplates/emailChangeStartEmailTemplate';
 
-type SendAccountVerificationEmailConfig = {
+type SendEmailService = {
   receiver: string;
-  displayName: string;
-  publicAccountId: string;
-  verificationToken: string;
+  subject: string;
+  html: string;
 };
 
-export async function sendAccountVerificationEmail(config: SendAccountVerificationEmailConfig): Promise<void> {
+async function sendEmailService({ receiver, subject, html }: SendEmailService): Promise<void> {
   try {
     await emailTransporter.sendMail({
       from: `Muninnfy <${process.env.TRANSPORTER_USER}>`,
-      to: config.receiver,
-      subject: 'Muninnfy - Account Verification',
-      html: accountVerificationEmailTemplate({
-        displayName: config.displayName,
-        publicAccountId: config.publicAccountId,
-        verificationToken: config.verificationToken,
-      }),
+      to: receiver,
+      subject,
+      html,
     });
   } catch (err: unknown) {
     console.log(err);
   }
+}
+
+export async function sendAccountVerificationEmailService(payload: { receiver: string } & AccountVerificationEmailTemplate): Promise<void> {
+  const { receiver, ...rest } = payload;
+
+  await sendEmailService({
+    receiver,
+    subject: 'Muninnfy - Account Verification',
+    html: accountVerificationEmailTemplate({ ...rest }),
+  });
+}
+
+export async function sendEmailChangeStartEmailService(payload: { receiver: string } & EmailUpdateStartEmailTemplate): Promise<void> {
+  const { receiver, ...rest } = payload;
+
+  await sendEmailService({
+    receiver,
+    subject: 'Muninnfy - Email Update',
+    html: emailChangeStartEmailTemplate({ ...rest }),
+  });
 }
