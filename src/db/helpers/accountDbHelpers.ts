@@ -1,6 +1,10 @@
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
+import bcrypt from 'bcrypt';
+import { ACCOUNT_FAILED_SIGN_IN_LIMIT } from '../../util/constants/accountConstants';
+import { removeRequestCookie } from '../../util/cookieUtils';
+import { purgeAuthSessions } from '../../auth/authSessions';
 
 export async function deleteAccountById(accountId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
   try {
@@ -111,4 +115,25 @@ export async function resetFailedSignInAttempts(accountId: number, executor: Poo
 
     return false;
   }
+}
+
+export async function handleIncorrectPassword(
+  accountId: number,
+  failedSignInAttempts: number,
+  executor: Pool | PoolConnection,
+  req: Request,
+  res: Response
+): Promise<void> {
+  const incremented: boolean = await incrementFailedSignInAttempts(accountId, executor, req);
+  const hasBeenLocked: boolean = failedSignInAttempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
+
+  if (hasBeenLocked) {
+    removeRequestCookie(res, 'authSessionId');
+    await purgeAuthSessions(accountId);
+  }
+
+  res.status(401).json({
+    message: `Incorrect password.${hasBeenLocked ? ' Account locked.' : ''}`,
+    reason: hasBeenLocked ? 'incorrectPassword_locked' : 'incorrectPassword',
+  });
 }
