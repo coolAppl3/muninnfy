@@ -25,7 +25,7 @@ export async function deleteAccountById(accountId: number, executor: Pool | Pool
 }
 
 export async function incrementVerificationEmailsSent(
-  verificationId: Readonly<number>,
+  verificationId: number,
   executor: Pool | PoolConnection,
   req: Request
 ): Promise<boolean> {
