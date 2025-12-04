@@ -6,7 +6,7 @@ import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { generateCryptoUuid, generateVerificationCode, isValidUuid } from '../util/tokenGenerator';
+import { generateCryptoUuid, generateConfirmationCode, isValidUuid } from '../util/tokenGenerator';
 import {
   ACCOUNT_EMAIL_UPDATE_WINDOW,
   ACCOUNT_EMAILS_SENT_LIMIT,
@@ -994,7 +994,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
-    const confirmationCode: string = generateVerificationCode();
+    const confirmationCode: string = generateConfirmationCode();
     const expiryTimestamp: number = Date.now() + ACCOUNT_EMAIL_UPDATE_WINDOW;
 
     const [resultSetHeader] = await connection.execute<ResultSetHeader>(
