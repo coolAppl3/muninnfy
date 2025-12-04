@@ -18,6 +18,7 @@ import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
   deleteAccountById,
+  handleIncorrectPassword,
   incrementFailedVerificationAttempts,
   incrementVerificationEmailsSent,
   resetFailedSignInAttempts,
@@ -605,16 +606,9 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       return;
     }
 
-    const isCorrectPassword: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
-    if (!isCorrectPassword) {
-      const incremented: boolean = await incrementFailedVerificationAttempts(accountDetails.account_id, dbPool, req);
-      const hasBeenLocked: boolean = accountDetails.failed_sign_in_attempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
-
-      res.status(401).json({
-        message: `Incorrect password.${hasBeenLocked ? ' Account locked.' : ''}`,
-        reason: hasBeenLocked ? 'incorrectPassword_locked' : 'incorrectPassword',
-      });
-
+    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    if (!passwordIsCorrect) {
+      await handleIncorrectPassword(accountDetails.account_id, accountDetails.failed_sign_in_attempts, dbPool, req, res);
       return;
     }
 
