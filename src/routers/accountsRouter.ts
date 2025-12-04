@@ -1,19 +1,20 @@
 import express, { Router, Request, Response } from 'express';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import { isValidDisplayName, isValidEmail, isValidNewPassword, isValidPassword, isValidUsername } from '../util/validation/userValidation';
-import { getRequestCookie } from '../util/cookieUtils';
+import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
+import { generateCryptoUuid, generateVerificationCode, isValidUuid } from '../util/tokenGenerator';
 import {
+  ACCOUNT_EMAIL_UPDATE_WINDOW,
   ACCOUNT_EMAILS_SENT_LIMIT,
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
   ACCOUNT_FAILED_UPDATE_LIMIT,
   ACCOUNT_VERIFICATION_WINDOW,
 } from '../util/constants/accountConstants';
-import { sendAccountVerificationEmailService } from '../util/email/emailServices';
+import { sendAccountVerificationEmailService, sendEmailChangeStartEmailService } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
@@ -23,7 +24,7 @@ import {
   incrementVerificationEmailsSent,
   resetFailedSignInAttempts,
 } from '../db/helpers/accountDbHelpers';
-import { createAuthSession } from '../auth/authSessions';
+import { createAuthSession, purgeAuthSessions } from '../auth/authSessions';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 
@@ -855,5 +856,178 @@ accountsRouter.patch('/details/displayName', async (req: Request, res: Response)
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  }
+});
+
+accountsRouter.post('/details/email/start', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    newEmail: string;
+    password: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['newEmail', 'password'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { newEmail, password } = requestData;
+
+  if (!isValidEmail(newEmail)) {
+    res.status(400).json({ message: 'Invalid email address.', reason: 'invalidUsername' });
+    return;
+  }
+
+  if (!isValidPassword(password)) {
+    res.status(400).json({ message: 'Invalid password.', reason: 'invalidPassword' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  let connection;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      email: string;
+      hashed_password: string;
+      display_name: string;
+      failed_sign_in_attempts: number;
+      update_id: number;
+      new_email: string;
+      expiry_timestamp: number;
+      email_taken: boolean;
+      email_temporarily_taken: boolean;
+    };
+
+    const [accountRows] = await connection.execute<ResultSetHeader[]>(
+      `SELECT
+        accounts.email,
+        accounts.hashed_password,
+        accounts.display_name,
+        accounts.failed_sign_in_attempts,
+        email_update.update_id,
+        email_update.new_email,
+        email_update.expiry_timestamp,
+        EXISTS (SELECT 1 FROM accounts WHERE email = :newEmail) AS email_taken,
+        EXISTS (SELECT 1 FROM email_update WHERE new_email = :newEmail) AS email_temporarily_taken
+      FROM
+        accounts
+      LEFT JOIN
+        email_update USING(account_id)
+      WHERE
+        accounts.account_id = :accountId;`,
+      { newEmail, accountId }
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
+    if (isLocked) {
+      await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
+      await purgeAuthSessions(accountId);
+
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+      return;
+    }
+
+    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    if (!passwordIsCorrect) {
+      await connection.rollback();
+      await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+
+      return;
+    }
+
+    if (accountDetails.update_id) {
+      await connection.rollback();
+      res.status(409).json({
+        message: 'Ongoing email update request found.',
+        reason: 'ongoingRequest',
+        resData: {
+          emailUpdateId: accountDetails.update_id,
+          newEmail: accountDetails.new_email,
+          expiryTimestamp: accountDetails.expiry_timestamp,
+        },
+      });
+
+      return;
+    }
+
+    if (newEmail === accountDetails.email) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Email already linked to this account.', reason: 'duplicateEmail' });
+
+      return;
+    }
+
+    if (accountDetails.email_taken || accountDetails.email_temporarily_taken) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
+
+      return;
+    }
+
+    const confirmationCode: string = generateVerificationCode();
+    const expiryTimestamp: number = Date.now() + ACCOUNT_EMAIL_UPDATE_WINDOW;
+
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+      `INSERT INTO email_update (
+        account_id,
+        new_email,
+        confirmation_code,
+        expiry_timestamp,
+        update_emails_sent,
+        failed_update_attempts
+      ) VALUES (${generatePlaceHolders(6)});`,
+      [accountId, newEmail, confirmationCode, expiryTimestamp, 1, 0]
+    );
+
+    await connection.commit();
+    res.json({ emailUpdateId: resultSetHeader.insertId, expiryTimestamp });
+
+    await resetFailedSignInAttempts(accountId, dbPool, req);
+    await sendEmailChangeStartEmailService({
+      receiver: newEmail,
+      confirmationCode,
+      displayName: accountDetails.display_name,
+    });
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
