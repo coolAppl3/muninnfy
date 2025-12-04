@@ -99,6 +99,31 @@ export async function incrementEmailChangeEmailsSent(
   }
 }
 
+export async function incrementedFailedEmailChangeAttempts(
+  verificationId: number,
+  executor: Pool | PoolConnection,
+  req: Request
+): Promise<boolean> {
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        email_update
+      SET
+        failed_update_attempts = failed_update_attempts + 1
+      WHERE
+        update_id = ?;`,
+      [verificationId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, err, 'failed to increment failed_update_attempts');
+
+    return false;
+  }
+}
+
 export async function incrementFailedSignInAttempts(accountId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
   try {
     const [resultSetHeader] = await executor.execute<ResultSetHeader>(
