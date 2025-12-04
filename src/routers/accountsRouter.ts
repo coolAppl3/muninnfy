@@ -20,6 +20,7 @@ import { logUnexpectedError } from '../logs/errorLogger';
 import {
   deleteAccountById,
   handleIncorrectPassword,
+  incrementEmailChangeEmailsSent,
   incrementFailedVerificationAttempts,
   incrementVerificationEmailsSent,
   resetFailedSignInAttempts,
@@ -1029,5 +1030,104 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     await logUnexpectedError(req, err);
   } finally {
     connection?.release();
+  }
+});
+
+accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      display_name: string;
+      failed_sign_in_attempts: number;
+      update_id: number;
+      new_email: string;
+      confirmation_code: string;
+      expiry_timestamp: number;
+      update_emails_sent: number;
+      failed_update_attempts: number;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.display_name,
+        email_update.update_id,
+        email_update.new_email,
+        email_update.confirmation_code,
+        email_update.expiry_timestamp,
+        email_update.update_emails_sent,
+        email_update.failed_update_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        email_update USING(account_id)
+      WHERE
+        accounts.account_id = ?;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
+    if (isLocked) {
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+      return;
+    }
+
+    if (!accountDetails.update_id) {
+      res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
+      return;
+    }
+
+    const requestSuspended: boolean = accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT;
+    if (requestSuspended) {
+      res.status(403).json({
+        message: 'Email change request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    const emailsSentLimitReached: boolean = accountDetails.update_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT;
+    if (emailsSentLimitReached) {
+      res.status(403).json({ message: `Sent change emails limit reached.`, reason: 'emailsSentLimitReached' });
+      return;
+    }
+
+    await incrementEmailChangeEmailsSent(accountDetails.update_id, dbPool, req);
+    res.json({});
+
+    const { new_email, display_name, confirmation_code } = accountDetails;
+    await sendEmailChangeStartEmailService({
+      receiver: new_email,
+      displayName: display_name,
+      confirmationCode: confirmation_code,
+    });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
