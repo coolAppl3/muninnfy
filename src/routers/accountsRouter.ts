@@ -14,7 +14,7 @@ import {
   ACCOUNT_FAILED_UPDATE_LIMIT,
   ACCOUNT_VERIFICATION_WINDOW,
 } from '../util/constants/accountConstants';
-import { sendAccountVerificationEmailService, sendEmailChangeStartEmailService } from '../util/email/emailServices';
+import { sendAccountVerificationEmailService, sendEmailUpdateStartEmailService } from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
@@ -1012,7 +1012,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     res.json({ emailUpdateId: resultSetHeader.insertId, expiryTimestamp });
 
     await resetFailedSignInAttempts(accountId, dbPool, req);
-    await sendEmailChangeStartEmailService({
+    await sendEmailUpdateStartEmailService({
       receiver: newEmail,
       confirmationCode,
       displayName: accountDetails.display_name,
@@ -1114,7 +1114,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     res.json({});
 
     const { new_email, display_name, confirmation_code } = accountDetails;
-    await sendEmailChangeStartEmailService({
+    await sendEmailUpdateStartEmailService({
       receiver: new_email,
       displayName: display_name,
       confirmationCode: confirmation_code,
