@@ -47,7 +47,7 @@ export default function ResendAccountVerificationEmail({ publicAccountId }: Rese
 
       setTitle(errMessage);
 
-      if (status === 400 || (status === 403 && errReason === 'emailLimitReached')) {
+      if (status === 400 || (status === 403 && errReason === 'emailsSentLimitReached')) {
         setBtnTitle('Go to homepage');
         setBtnNavigateLocation('/home');
 

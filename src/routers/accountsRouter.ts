@@ -367,7 +367,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     if (accountDetails.verification_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
-      res.status(403).json({ message: `Sent verification emails limit reached.`, reason: 'emailLimitReached' });
+      res.status(403).json({ message: `Sent verification emails limit reached.`, reason: 'emailsSentLimitReached' });
       return;
     }
 
