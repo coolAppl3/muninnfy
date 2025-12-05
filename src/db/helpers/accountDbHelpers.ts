@@ -18,7 +18,7 @@ export async function deleteAccountById(accountId: number, executor: Pool | Pool
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to delete account');
+    await logUnexpectedError(req, err, 'Failed to delete account.');
 
     return false;
   }
@@ -43,7 +43,7 @@ export async function incrementVerificationEmailsSent(
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment verification_emails_sent');
+    await logUnexpectedError(req, err, 'Failed to increment verification_emails_sent.');
 
     return false;
   }
@@ -68,7 +68,7 @@ export async function incrementFailedVerificationAttempts(
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment failed_verification_attempts');
+    await logUnexpectedError(req, err, 'Failed to increment failed_verification_attempts.');
 
     return false;
   }
@@ -93,7 +93,7 @@ export async function incrementEmailChangeEmailsSent(
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment update_emails_sent');
+    await logUnexpectedError(req, err, 'Failed to increment update_emails_sent.');
 
     return false;
   }
@@ -118,7 +118,7 @@ export async function incrementedFailedEmailChangeAttempts(
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment failed_update_attempts');
+    await logUnexpectedError(req, err, 'Failed to increment failed_update_attempts.');
 
     return false;
   }
@@ -139,7 +139,7 @@ export async function incrementFailedSignInAttempts(accountId: number, executor:
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment failed_sign_in_attempts');
+    await logUnexpectedError(req, err, 'Failed to increment failed_sign_in_attempts.');
 
     return false;
   }
@@ -160,7 +160,7 @@ export async function resetFailedSignInAttempts(accountId: number, executor: Poo
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to reset failed_sign_in_attempts');
+    await logUnexpectedError(req, err, 'Failed to reset failed_sign_in_attempts.');
 
     return false;
   }

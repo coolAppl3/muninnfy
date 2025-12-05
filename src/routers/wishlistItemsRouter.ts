@@ -350,7 +350,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       await connection.rollback();
       res.status(500).json({ message: 'Internal server error.' });
 
-      await logUnexpectedError(req, null, 'failed to update wishlist item');
+      await logUnexpectedError(req, null, 'Failed to update wishlist item.');
       return;
     }
 

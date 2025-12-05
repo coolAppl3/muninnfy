@@ -61,7 +61,7 @@ export async function getWishlistItemByTitle(
     return mappedWishlistItem;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to fetch wishlist item data');
+    await logUnexpectedError(req, err, 'Failed to fetch wishlist item data.');
 
     return null;
   }
