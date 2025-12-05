@@ -945,8 +945,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
-    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
-    if (isLocked) {
+    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
       await connection.rollback();
 
       removeRequestCookie(res, 'authSessionId');
@@ -1093,8 +1092,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
       return;
     }
 
-    const requestSuspended: boolean = accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT;
-    if (requestSuspended) {
+    if (accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
       res.status(403).json({
         message: 'Email change request suspended.',
         reason: 'requestSuspended',
@@ -1104,8 +1102,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
       return;
     }
 
-    const emailsSentLimitReached: boolean = accountDetails.update_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT;
-    if (emailsSentLimitReached) {
+    if (accountDetails.update_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       res.status(403).json({ message: `Sent change emails limit reached.`, reason: 'emailsSentLimitReached' });
       return;
     }
