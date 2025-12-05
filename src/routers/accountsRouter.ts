@@ -1024,6 +1024,18 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
+    if (!isSqlError(err)) {
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
+
+      return;
+    }
+
+    if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'new_email'`)) {
+      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
+      return;
+    }
+
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
   } finally {
