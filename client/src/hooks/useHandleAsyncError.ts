@@ -7,7 +7,7 @@ import usePopupMessage from './usePopupMessage';
 type HandleAsyncErrorData = AsyncErrorData & { isHandled: boolean };
 export type HandleAsyncErrorFunction = (err: unknown) => HandleAsyncErrorData;
 
-export default function useAsyncErrorHandler(): HandleAsyncErrorFunction {
+export default function useHandleAsyncError(): HandleAsyncErrorFunction {
   const { setAuthStatus } = useAuth();
   const { displayPopupMessage } = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();

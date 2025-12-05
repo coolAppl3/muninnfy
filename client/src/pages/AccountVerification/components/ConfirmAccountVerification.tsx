@@ -1,6 +1,6 @@
 import { JSX, useCallback, useEffect, useState } from 'react';
 import useAuth from '../../../hooks/useAuth';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import Button from '../../../components/Button/Button';
@@ -20,7 +20,7 @@ export default function ConfirmAccountVerification({ publicAccountId, verificati
   const [btnNavigateLocation, setBtnNavigateLocation] = useState<string | null>(null);
 
   const { setAuthStatus } = useAuth();
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
 

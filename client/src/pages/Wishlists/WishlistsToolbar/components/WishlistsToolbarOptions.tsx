@@ -5,14 +5,14 @@ import useConfirmModal from '../../../../hooks/useConfirmModal';
 import { deleteEmptyWishlistsService } from '../../../../services/wishlistServices';
 import useWishlists from '../../hooks/useWishlists';
 import { ExtendedWishlistDetailsType } from '../../../../types/wishlistTypes';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../hooks/useHandleAsyncError';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 
 export default function WishlistsToolbarOptions(): JSX.Element {
   const { wishlists, setWishlists } = useWishlists();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayPopupMessage } = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();

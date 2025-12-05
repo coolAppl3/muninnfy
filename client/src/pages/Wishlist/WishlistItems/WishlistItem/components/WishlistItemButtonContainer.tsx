@@ -1,5 +1,5 @@
 import { Dispatch, FocusEvent, JSX, memo, SetStateAction, useState } from 'react';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import useHistory from '../../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
@@ -21,7 +21,7 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [updatingPurchaseStatus, setUpdatingPurchaseStatus] = useState<boolean>(false);
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();

@@ -13,7 +13,7 @@ import { validateWishlistTitle } from '../../utils/validation/wishlistValidation
 import usePopupMessage from '../../hooks/usePopupMessage';
 import { createWishlistAsAccountService } from '../../services/wishlistServices';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 
 export default function NewWishlist(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -22,7 +22,7 @@ export default function NewWishlist(): JSX.Element {
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();

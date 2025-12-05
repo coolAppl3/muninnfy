@@ -12,7 +12,7 @@ import usePopupMessage from '../../hooks/usePopupMessage';
 import { signInService } from '../../services/accountServices';
 import useConfirmModal from '../../hooks/useConfirmModal';
 import useAuth from '../../hooks/useAuth';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 
 export default function SignIn(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -25,7 +25,7 @@ export default function SignIn(): JSX.Element {
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | null>(null);
 
   const { setAuthStatus } = useAuth();
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();

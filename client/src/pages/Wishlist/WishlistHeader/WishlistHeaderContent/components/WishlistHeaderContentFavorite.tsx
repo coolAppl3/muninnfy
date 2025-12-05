@@ -4,7 +4,7 @@ import { setWishlistFavoriteService } from '../../../../../services/wishlistServ
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import useConfirmModal from '../../../../../hooks/useConfirmModal';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../../../hooks/useHistory';
 
@@ -15,7 +15,7 @@ export default function WishlistHeaderContentFavorite(): JSX.Element {
   const { displayPopupMessage } = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { referrerLocation } = useHistory();
 

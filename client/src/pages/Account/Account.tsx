@@ -9,7 +9,7 @@ import { AccountDetailsType } from '../../types/accountTypes';
 import AccountDetailsProvider from './providers/AccountDetailsProvider';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import { getAccountDetailsService } from '../../services/accountServices';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import { CanceledError } from 'axios';
 import useAuth from '../../hooks/useAuth';
 
@@ -17,7 +17,7 @@ export default function Account(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [initialAccountDetails, setInitialAccountDetails] = useState<AccountDetailsType | null>(null);
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { setAuthStatus } = useAuth();
 
   useEffect(() => {

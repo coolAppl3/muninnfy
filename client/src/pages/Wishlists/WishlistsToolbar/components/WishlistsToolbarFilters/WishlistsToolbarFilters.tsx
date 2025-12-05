@@ -11,7 +11,7 @@ import wishlistsToolbarFiltersReducer, { initialWishlistsToolbarFiltersState } f
 import DefaultFormGroup from '../../../../../components/DefaultFormGroup/DefaultFormGroup';
 import { crossWishlistSearchService } from '../../../../../services/wishlistServices';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import WishlistsFilterToggler from './components/WishlistsFilterToggler';
 import FilterTogglerCheckboxBtn from '../../../../../components/FilterTogglerCheckboxBtn/FilterTogglerCheckboxBtn';
 
@@ -27,7 +27,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
   const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
   const { startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   const {

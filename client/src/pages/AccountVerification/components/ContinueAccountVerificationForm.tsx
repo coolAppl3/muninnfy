@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
 import useAuth from '../../../hooks/useAuth';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
@@ -15,7 +15,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { setAuthStatus } = useAuth();
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
