@@ -61,7 +61,7 @@ export async function incrementFailedVerificationAttempts(
       SET
         failed_verification_attempts = failed_verification_attempts + 1
       WHERE
-        verification_id = ?`,
+        verification_id = ?;`,
       [verificationId]
     );
 
