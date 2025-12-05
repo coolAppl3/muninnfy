@@ -751,8 +751,8 @@ accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => 
     );
 
     if (resultSetHeader.affectedRows === 0) {
-      await logUnexpectedError(req, null, 'Failed to update is_private and approve_follow_requests.');
       res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update is_private and approve_follow_requests.');
 
       return;
     }
