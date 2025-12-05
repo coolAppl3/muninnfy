@@ -29,3 +29,17 @@ export async function deleteStaleAccountVerificationRequestsCron(currentTimestam
     console.log(err);
   }
 }
+
+export async function deleteStaleEmailUpdateRequestsCron(currentTimestamp: number): Promise<void> {
+  try {
+    await dbPool.execute(
+      `DELETE FROM
+        email_update
+      WHERE
+        expiry_timestamp <= ?;`,
+      [currentTimestamp]
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}

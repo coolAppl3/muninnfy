@@ -1,8 +1,11 @@
 import cron from 'node-cron';
-
 import { removeLightRateAbusersCron, removeStaleRateTrackerRowsCron, replenishRateRequestsCron } from './rateLimiterCronJobs';
 import { clearErrorLogsCron } from '../logs/errorLoggerCronJobs';
-import { deleteStaleAccountVerificationRequestsCron, deleteUnverifiedAccountsCron } from './accountCronJobs';
+import {
+  deleteStaleAccountVerificationRequestsCron,
+  deleteStaleEmailUpdateRequestsCron,
+  deleteUnverifiedAccountsCron,
+} from './accountCronJobs';
 import { minuteMilliseconds } from '../util/constants/globalConstants';
 import { deleteExpiredAuthSessionsCron } from '../auth/authSessions';
 import { decayWishlistsInteractivityIndexCron } from './wishlistCronJobs';
@@ -23,6 +26,7 @@ export function initCronJobs(): void {
     await removeStaleRateTrackerRowsCron(currentTimestamp);
     await deleteUnverifiedAccountsCron(currentTimestamp);
     await deleteStaleAccountVerificationRequestsCron(currentTimestamp);
+    await deleteStaleEmailUpdateRequestsCron(currentTimestamp);
   });
 
   // every 6 hours
