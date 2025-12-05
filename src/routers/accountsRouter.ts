@@ -84,7 +84,6 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type TakenStatus = {
@@ -95,9 +94,9 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     const [takenStatusRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        EXISTS (SELECT 1 FROM accounts WHERE email = ?) AS email_taken,
-        EXISTS (SELECT 1 FROM email_update WHERE new_email = ?) AS email_temporarily_taken,
-        EXISTS (SELECT 1 FROM accounts WHERE username = ?) AS username_taken;`,
+        EXISTS (SELECT 1 FROM accounts WHERE email = ? FOR UPDATE) AS email_taken,
+        EXISTS (SELECT 1 FROM email_update WHERE new_email = ? FOR UPDATE) AS email_temporarily_taken,
+        EXISTS (SELECT 1 FROM accounts WHERE username = ? FOR UPDATE) AS username_taken;`,
       [email, email, username]
     );
 
@@ -429,7 +428,6 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {
@@ -452,7 +450,8 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       LEFT JOIN
         account_verification USING(account_id)
       WHERE
-        accounts.public_account_id = ?;`,
+        accounts.public_account_id = ?
+      FOR UPDATE;`,
       [publicAccountId]
     );
 
@@ -902,7 +901,6 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {
@@ -926,14 +924,15 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
         email_update.update_id,
         email_update.new_email,
         email_update.expiry_timestamp,
-        EXISTS (SELECT 1 FROM accounts WHERE email = :newEmail) AS email_taken,
-        EXISTS (SELECT 1 FROM email_update WHERE new_email = :newEmail) AS email_temporarily_taken
+        EXISTS (SELECT 1 FROM accounts WHERE email = :newEmail FOR UPDATE) AS email_taken,
+        EXISTS (SELECT 1 FROM email_update WHERE new_email = :newEmail FOR UPDATE) AS email_temporarily_taken
       FROM
         accounts
       LEFT JOIN
         email_update USING(account_id)
       WHERE
-        accounts.account_id = :accountId;`,
+        accounts.account_id = :accountId
+      FOR UPDATE;`,
       { newEmail, accountId }
     );
 
