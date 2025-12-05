@@ -908,9 +908,12 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       hashed_password: string;
       display_name: string;
       failed_sign_in_attempts: number;
+
       update_id: number;
       new_email: string;
       expiry_timestamp: number;
+      failed_update_attempts: number;
+
       email_taken: boolean;
       email_temporarily_taken: boolean;
     };
@@ -921,9 +924,12 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
         accounts.hashed_password,
         accounts.display_name,
         accounts.failed_sign_in_attempts,
+
         email_update.update_id,
         email_update.new_email,
         email_update.expiry_timestamp,
+        email_update.failed_update_attempts,
+
         EXISTS (SELECT 1 FROM accounts WHERE email = :newEmail FOR UPDATE) AS email_taken,
         EXISTS (SELECT 1 FROM email_update WHERE new_email = :newEmail FOR UPDATE) AS email_temporarily_taken
       FROM
@@ -933,7 +939,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       WHERE
         accounts.account_id = :accountId
       FOR UPDATE;`,
-      { newEmail, accountId }
+      { accountId, newEmail }
     );
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
@@ -965,13 +971,15 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
 
     if (accountDetails.update_id) {
       await connection.rollback();
+
       res.status(409).json({
-        message: 'Ongoing email update request found.',
+        message: 'Ongoing email change request found.',
         reason: 'ongoingRequest',
         resData: {
           emailUpdateId: accountDetails.update_id,
           newEmail: accountDetails.new_email,
           expiryTimestamp: accountDetails.expiry_timestamp,
+          isSuspended: accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT,
         },
       });
 
@@ -981,13 +989,6 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     if (newEmail === accountDetails.email) {
       await connection.rollback();
       res.status(409).json({ message: 'Email already linked to this account.', reason: 'duplicateEmail' });
-
-      return;
-    }
-
-    if (accountDetails.email_taken || accountDetails.email_temporarily_taken) {
-      await connection.rollback();
-      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
 
       return;
     }
@@ -1071,6 +1072,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         accounts.display_name,
+
         email_update.update_id,
         email_update.new_email,
         email_update.confirmation_code,
