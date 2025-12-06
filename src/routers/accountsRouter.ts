@@ -12,9 +12,14 @@ import {
   ACCOUNT_EMAILS_SENT_LIMIT,
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
   ACCOUNT_FAILED_UPDATE_LIMIT,
+  ACCOUNT_RECOVERY_WINDOW,
   ACCOUNT_VERIFICATION_WINDOW,
 } from '../util/constants/accountConstants';
-import { sendAccountVerificationEmailService, sendEmailUpdateStartEmailService } from '../util/email/emailServices';
+import {
+  sendAccountRecoveryEmailService,
+  sendAccountVerificationEmailService,
+  sendEmailUpdateStartEmailService,
+} from '../util/email/emailServices';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
@@ -1467,5 +1472,123 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     await logUnexpectedError(req, err);
   } finally {
     connection?.release();
+  }
+});
+
+accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    return;
+  }
+
+  type RequestData = {
+    email: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['email'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { email } = requestData;
+
+  if (!isValidEmail(email)) {
+    res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      account_id: number;
+      public_account_id: string;
+      display_name: string;
+      is_verified: boolean;
+      recovery_id: number;
+      recovery_token: string;
+      expiry_timestamp: number;
+      failed_recovery_attempts: number;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.account_id,
+        accounts.public_account_id,
+        accounts.display_name,
+        accounts.is_verified,
+
+        account_recovery.recovery_id,
+        account_recovery.recovery_token,
+        account_recovery.expiry_timestamp,
+        account_recovery.failed_recovery_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        account_recovery USING(account_id)
+      WHERE
+        accounts.email = ?;`,
+      [email]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails || !accountDetails.is_verified) {
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (!accountDetails.recovery_id) {
+      const recoveryToken: string = generateCryptoUuid();
+      const expiryTimestamp: number = Date.now() + ACCOUNT_RECOVERY_WINDOW;
+
+      await dbPool.execute<ResultSetHeader>(
+        `INSERT INTO account_recovery (
+          account_id,
+          recovery_token,
+          expiry_timestamp,
+          recovery_emails_sent,
+          failed_recovery_attempts
+        ) VALUES (${generatePlaceHolders(5)});`,
+        [accountDetails.account_id, recoveryToken, expiryTimestamp, 1, 0]
+      );
+
+      await sendAccountRecoveryEmailService({
+        receiver: email,
+        displayName: accountDetails.display_name,
+        publicAccountId: accountDetails.public_account_id,
+        recoveryToken,
+      });
+
+      res.json({ publicAccountId: accountDetails.public_account_id });
+      return;
+    }
+
+    if (accountDetails.failed_recovery_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      res.status(403).json({
+        message: 'Recovery request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    res.status(409).json({
+      message: 'Ongoing recovery request found.',
+      reason: 'ongoingRequestFound',
+      resData: { publicAccountId: accountDetails.public_account_id },
+    });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
