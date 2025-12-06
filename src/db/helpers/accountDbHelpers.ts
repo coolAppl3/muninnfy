@@ -8,7 +8,6 @@ import {
 } from '../../util/constants/accountConstants';
 import { removeRequestCookie } from '../../util/cookieUtils';
 import { purgeAuthSessions } from '../../auth/authSessions';
-import { dayMilliseconds } from '../../util/constants/globalConstants';
 
 export async function deleteAccountById(accountId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
   try {
