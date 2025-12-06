@@ -874,6 +874,127 @@ accountsRouter.patch('/details/displayName', async (req: Request, res: Response)
   }
 });
 
+accountsRouter.patch('/details/password', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    password: string;
+    newPassword: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['password', 'newPassword'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { password, newPassword } = requestData;
+
+  if (!isValidPassword(password)) {
+    res.status(400).json({ message: 'Invalid current password.', reason: 'invalidCurrentPassword' });
+    return;
+  }
+
+  if (!isValidNewPassword(newPassword)) {
+    res.status(400).json({ message: 'Invalid new password.', reason: 'invalidNewPassword' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      username: string;
+      hashed_password: string;
+      failed_sign_in_attempts: number;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        username,
+        hashed_password,
+        failed_sign_in_attempts
+      FROM
+        accounts
+      WHERE
+        account_id = ?;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+      return;
+    }
+
+    if (newPassword === accountDetails.username) {
+      res.status(409).json({ message: `Username and password can't match.`, reason: 'newPasswordMatchesUsername' });
+      return;
+    }
+
+    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    if (!passwordIsCorrect) {
+      await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+      return;
+    }
+
+    if (newPassword === password) {
+      res.status(409).json({ message: `New password can't match current password.`, reason: 'newPasswordMatchesUsername' });
+      return;
+    }
+
+    const newHashedPassword: string = await bcrypt.hash(newPassword, 10);
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `UPDATE
+        accounts
+      SET
+        hashed_password = ?,
+        failed_sign_in_attempts = ?
+      WHERE
+        account_id = ?;`,
+      [newHashedPassword, 0, accountId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update hashed_password.');
+
+      return;
+    }
+
+    await purgeAuthSessions(accountId, authSessionId);
+    res.json({});
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 accountsRouter.post('/details/email/start', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
