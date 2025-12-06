@@ -9,6 +9,8 @@ export default function accountRecoveryEmailTemplate({
   publicAccountId,
   recoveryToken,
 }: AccountRecoveryEmailTemplate): string {
+  const origin: string = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://muninnfy.com';
+
   return `
       <!DOCTYPE html>
       <html lang="en">
