@@ -74,7 +74,7 @@ export async function incrementFailedVerificationAttempts(
   }
 }
 
-export async function incrementEmailChangeEmailsSent(
+export async function incrementEmailUpdateEmailsSent(
   emailUpdateId: number,
   executor: Pool | PoolConnection,
   req: Request
@@ -99,7 +99,7 @@ export async function incrementEmailChangeEmailsSent(
   }
 }
 
-export async function incrementedFailedEmailChangeAttempts(
+export async function incrementedFailedEmailUpdateAttempts(
   emailUpdateId: number,
   executor: Pool | PoolConnection,
   req: Request
