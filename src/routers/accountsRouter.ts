@@ -627,6 +627,14 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     }
 
     res.json({});
+
+    await dbPool.execute(
+      `DELETE FROM
+        account_recovery
+      WHERE
+        account_id = ?;`,
+      [accountDetails.account_id]
+    );
   } catch (err: unknown) {
     console.log(err);
 
