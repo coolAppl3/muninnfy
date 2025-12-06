@@ -1,6 +1,7 @@
 import { emailTransporter } from './initTransporter';
 import accountVerificationEmailTemplate, { AccountVerificationEmailTemplate } from './emailTemplates/accountVerificationEmailTemplate';
 import emailUpdateStartEmailTemplate, { EmailUpdateStartEmailTemplate } from './emailTemplates/emailChangeStartEmailTemplate';
+import accountRecoveryEmailTemplate, { AccountRecoveryEmailTemplate } from './emailTemplates/accountRecoveryEmailTemplate';
 
 type SendEmailService = {
   receiver: string;
@@ -38,5 +39,15 @@ export async function sendEmailUpdateStartEmailService(payload: { receiver: stri
     receiver,
     subject: 'Muninnfy - Email Update',
     html: emailUpdateStartEmailTemplate({ ...rest }),
+  });
+}
+
+export async function sendAccountRecoveryEmailService(payload: { receiver: string } & AccountRecoveryEmailTemplate): Promise<void> {
+  const { receiver, ...rest } = payload;
+
+  await sendEmailService({
+    receiver,
+    subject: 'Muninnfy - Account Recovery',
+    html: accountRecoveryEmailTemplate({ ...rest }),
   });
 }
