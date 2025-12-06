@@ -214,3 +214,24 @@ export async function handleIncorrectPassword(
     reason: hasBeenLocked ? 'incorrectPassword_locked' : 'incorrectPassword',
   });
 }
+
+export async function incrementRecoveryEmailsSent(recoveryId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        account_recovery
+      SET
+        recovery_emails_sent = recovery_emails_sent + 1
+      WHERE
+        recovery_id = ?;`,
+      [recoveryId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, null, 'Failed to increment recovery_emails_sent.');
+
+    return false;
+  }
+}
