@@ -138,13 +138,13 @@ export async function destroyAuthSession(authSessionId: string): Promise<void> {
   }
 }
 
-export async function purgeAuthSessions(accountId: number): Promise<void> {
+export async function purgeAuthSessions(accountId: number, authSessionIdToExclude?: string): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
         auth_sessions
       WHERE
-        account_id = ?
+        account_id = ? ${authSessionIdToExclude ? `AND session_id != ${authSessionIdToExclude}` : ''}
       LIMIT ${AUTH_SESSIONS_LIMIT};`,
       [accountId]
     );
