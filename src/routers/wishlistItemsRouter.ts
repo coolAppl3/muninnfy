@@ -307,6 +307,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       `SELECT
         added_on_timestamp,
         purchased_on_timestamp,
+        
         (SELECT COUNT(*) FROM wishlist_item_tags WHERE item_id = :itemId) AS tags_count,
         EXISTS (SELECT 1 FROM wishlists WHERE wishlist_id = :wishlistId AND account_id = :accountId) AS is_wishlist_owner
       FROM

@@ -249,6 +249,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
         accounts.account_id,
         accounts.public_account_id,
         accounts.is_verified,
+        
         (SELECT 1 FROM account_verification WHERE account_id = accounts.account_id) AS verification_request_exists
       FROM
         accounts
@@ -335,6 +336,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
         accounts.email,
         accounts.display_name,
         accounts.is_verified,
+        
         account_verification.verification_id,
         account_verification.verification_token,
         account_verification.verification_emails_sent,
@@ -443,6 +445,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       `SELECT
         accounts.account_id,
         accounts.is_verified,
+
         account_verification.verification_id,
         account_verification.verification_token,
         account_verification.failed_verification_attempts
@@ -678,6 +681,7 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
         accounts.username,
         accounts.display_name,
         accounts.created_on_timestamp,
+
         account_preferences.is_private,
         account_preferences.approve_follow_requests
       FROM

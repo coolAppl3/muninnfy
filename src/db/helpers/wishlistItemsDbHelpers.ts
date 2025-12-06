@@ -31,6 +31,7 @@ export async function getWishlistItemByTitle(
         wishlist_items.link,
         wishlist_items.price,
         wishlist_items.purchased_on_timestamp,
+        
         wishlist_item_tags.tag_id,
         wishlist_item_tags.tag_name
       FROM
