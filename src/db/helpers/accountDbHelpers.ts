@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
 import {
-  ACCOUNT_EMAIL_UPDATE_SUSPENSION_DURATION,
+  ACCOUNT_UPDATE_SUSPENSION_DURATION,
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
   ACCOUNT_FAILED_UPDATE_LIMIT,
 } from '../../util/constants/accountConstants';
@@ -129,7 +129,7 @@ export async function incrementedFailedEmailUpdateAttempts(
 }
 
 export async function suspendEmailUpdateRequest(emailUpdateId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
-  const newExpiryTimestamp: number = Date.now() + ACCOUNT_EMAIL_UPDATE_SUSPENSION_DURATION;
+  const newExpiryTimestamp: number = Date.now() + ACCOUNT_UPDATE_SUSPENSION_DURATION;
 
   try {
     const [resultSetHeader] = await executor.execute<ResultSetHeader>(
