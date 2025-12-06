@@ -23,7 +23,7 @@ export default function emailUpdateStartEmailTemplate({ displayName, confirmatio
 
           <p>If you didn't make this request, please sign in and change your password to ensure any unauthorized access is removed.</p>
 
-          <p">Warmest regards,</p>
+          <p>Warmest regards,</p>
           <p>Muninnfy</p>
         </div>
       </body>

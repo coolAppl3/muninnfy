@@ -42,7 +42,7 @@ export default function accountVerificationEmailTemplate({
           )} minutes of being created.</p>
           <p>If this request wasn't made by you, feel free to ignore it.</p>
 
-          <p">Warmest regards,</p>
+          <p>Warmest regards,</p>
           <p>Muninnfy</p>
         </div>
       </body>
