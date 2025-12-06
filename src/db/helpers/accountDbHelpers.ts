@@ -100,7 +100,7 @@ export async function incrementEmailChangeEmailsSent(
 }
 
 export async function incrementedFailedEmailChangeAttempts(
-  verificationId: number,
+  emailUpdateId: number,
   executor: Pool | PoolConnection,
   req: Request
 ): Promise<boolean> {
@@ -112,7 +112,7 @@ export async function incrementedFailedEmailChangeAttempts(
         failed_update_attempts = failed_update_attempts + 1
       WHERE
         update_id = ?;`,
-      [verificationId]
+      [emailUpdateId]
     );
 
     return resultSetHeader.affectedRows > 0;
