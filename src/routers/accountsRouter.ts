@@ -1057,7 +1057,12 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     return;
   }
 
+  let connection;
+
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type AccountDetails = {
       display_name: string;
       failed_sign_in_attempts: number;
@@ -1069,7 +1074,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
       failed_update_attempts: number;
     };
 
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         accounts.display_name,
 
@@ -1084,29 +1089,38 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
       LEFT JOIN
         email_update USING(account_id)
       WHERE
-        accounts.account_id = ?;`,
+        accounts.account_id = ?
+      FOR UPDATE;`,
       [accountId]
     );
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
+      await connection.rollback();
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
       return;
     }
 
     const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
     if (isLocked) {
+      await connection.rollback();
       res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+
       return;
     }
 
     if (!accountDetails.update_id) {
+      await connection.rollback();
       res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
+
       return;
     }
 
     if (accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      await connection.rollback();
+
       res.status(403).json({
         message: 'Email change request suspended.',
         reason: 'requestSuspended',
@@ -1117,11 +1131,15 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     }
 
     if (accountDetails.update_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+      await connection.rollback();
       res.status(403).json({ message: `Sent change emails limit reached.`, reason: 'emailsSentLimitReached' });
+
       return;
     }
 
-    await incrementEmailChangeEmailsSent(accountDetails.update_id, dbPool, req);
+    await incrementEmailChangeEmailsSent(accountDetails.update_id, connection, req);
+
+    await connection.commit();
     res.json({});
 
     const { new_email, display_name, confirmation_code } = accountDetails;
@@ -1132,6 +1150,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     });
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       return;
@@ -1139,5 +1158,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
