@@ -1,9 +1,14 @@
 import { Request, Response } from 'express';
 import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
-import { ACCOUNT_FAILED_SIGN_IN_LIMIT } from '../../util/constants/accountConstants';
+import {
+  ACCOUNT_EMAIL_UPDATE_SUSPENSION_DURATION,
+  ACCOUNT_FAILED_SIGN_IN_LIMIT,
+  ACCOUNT_FAILED_UPDATE_LIMIT,
+} from '../../util/constants/accountConstants';
 import { removeRequestCookie } from '../../util/cookieUtils';
 import { purgeAuthSessions } from '../../auth/authSessions';
+import { dayMilliseconds } from '../../util/constants/globalConstants';
 
 export async function deleteAccountById(accountId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
   try {
@@ -119,6 +124,30 @@ export async function incrementedFailedEmailUpdateAttempts(
   } catch (err: unknown) {
     console.log(err);
     await logUnexpectedError(req, err, 'Failed to increment failed_update_attempts.');
+
+    return false;
+  }
+}
+
+export async function suspendEmailUpdateRequest(emailUpdateId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+  const newExpiryTimestamp: number = Date.now() + ACCOUNT_EMAIL_UPDATE_SUSPENSION_DURATION;
+
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        email_update
+      SET
+        failed_update_attempts = ?,
+        expiry_timestamp = ?
+      WHERE
+        update_id = ?;`,
+      [ACCOUNT_FAILED_UPDATE_LIMIT, newExpiryTimestamp, emailUpdateId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, err, 'Failed to suspend email_update request.');
 
     return false;
   }
