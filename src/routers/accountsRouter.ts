@@ -28,6 +28,7 @@ import {
   incrementedFailedEmailUpdateAttempts,
   incrementEmailUpdateEmailsSent,
   incrementFailedVerificationAttempts,
+  incrementRecoveryEmailsSent,
   incrementVerificationEmailsSent,
   resetFailedSignInAttempts,
   suspendEmailUpdateRequest,
@@ -1578,6 +1579,113 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
       message: 'Ongoing recovery request found.',
       reason: 'ongoingRequestFound',
       resData: { publicAccountId: accountDetails.public_account_id },
+    });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    return;
+  }
+
+  type RequestData = {
+    publicAccountId: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['publicAccountId'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { publicAccountId } = requestData;
+
+  if (!isValidUuid(publicAccountId)) {
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      email: string;
+      display_name: string;
+      is_verified: boolean;
+      recovery_id: number;
+      recovery_token: string;
+      expiry_timestamp: number;
+      recovery_emails_sent: number;
+      failed_recovery_attempts: number;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.email,
+        accounts.display_name,
+        accounts.is_verified,
+
+        account_recovery.recovery_id,
+        account_recovery.recovery_token,
+        account_recovery.expiry_timestamp,
+        account_recovery.recovery_emails_sent,
+        account_recovery.failed_recovery_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        account_recovery USING(account_id)
+      WHERE
+        accounts.public_account_id = ?;`,
+      [publicAccountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails || !accountDetails.is_verified) {
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (!accountDetails.recovery_id) {
+      res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
+      return;
+    }
+
+    if (accountDetails.failed_recovery_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      res.status(403).json({
+        message: 'Recovery request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    if (accountDetails.recovery_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+      res.status(403).json({ message: 'Sent recovery emails limit reached.', reason: 'emailsSentLimitReached' });
+      return;
+    }
+
+    await incrementRecoveryEmailsSent(accountDetails.recovery_id, dbPool, req);
+
+    res.json({});
+
+    await sendAccountRecoveryEmailService({
+      receiver: accountDetails.email,
+      displayName: accountDetails.display_name,
+      publicAccountId,
+      recoveryToken: accountDetails.recovery_token,
     });
   } catch (err: unknown) {
     console.log(err);
