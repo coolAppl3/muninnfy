@@ -1508,7 +1508,6 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
       display_name: string;
       is_verified: boolean;
       recovery_id: number;
-      recovery_token: string;
       expiry_timestamp: number;
       failed_recovery_attempts: number;
     };
@@ -1521,7 +1520,6 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
         accounts.is_verified,
 
         account_recovery.recovery_id,
-        account_recovery.recovery_token,
         account_recovery.expiry_timestamp,
         account_recovery.failed_recovery_attempts
       FROM
