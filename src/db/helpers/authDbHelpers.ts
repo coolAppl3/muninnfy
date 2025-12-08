@@ -1,9 +1,10 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2/promise';
 import { dbPool } from '../db';
 import { removeRequestCookie } from '../../util/cookieUtils';
+import { logUnexpectedError } from '../../logs/errorLogger';
 
-export async function getAccountIdByAuthSessionId(authSessionId: string, res: Response): Promise<number | null> {
+export async function getAccountIdByAuthSessionId(authSessionId: string, req: Request, res: Response): Promise<number | null> {
   const currentTimestamp: number = Date.now();
 
   try {
@@ -44,10 +45,12 @@ export async function getAccountIdByAuthSessionId(authSessionId: string, res: Re
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return null;
     }
 
     res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err, 'Failed to get account_id.');
     return null;
   }
 }

@@ -191,6 +191,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -285,6 +286,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -407,6 +409,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -547,6 +550,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -682,6 +686,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -699,7 +704,7 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -747,6 +752,7 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -787,7 +793,7 @@ accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => 
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -817,6 +823,7 @@ accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => 
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -851,7 +858,7 @@ accountsRouter.patch('/details/displayName', async (req: Request, res: Response)
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -906,6 +913,7 @@ accountsRouter.patch('/details/displayName', async (req: Request, res: Response)
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -946,7 +954,7 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -1046,6 +1054,7 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1088,7 +1097,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -1223,6 +1232,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1252,7 +1262,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -1354,6 +1364,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1390,7 +1401,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -1527,6 +1538,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1659,6 +1671,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1784,6 +1797,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
