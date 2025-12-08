@@ -1,5 +1,54 @@
 # Changelog
 
+## [0.2.3] (2024-12-08)
+
+### Features
+
+- Added the following endpoints:
+  - PATCH `accounts/recovery/resendEmail`.
+  - POST `accounts/recovery/start`.
+  - PATCH `accounts/details/password`.
+  - PATCH `accounts/details/email/confirm`.
+- Added the following helpers:
+  - `incrementRecoveryEmailsSent()`.
+  - `suspendEmailUpdateRequest()`
+- Added `deleteStaleEmailUpdateRequestsCron()`.
+- Added `ACCOUNT_EMAIL_UPDATE_SUSPENSION_DURATION` to `accountConstants`.
+- Successful sign in attempts now remove any ongoing account recovery requests.
+- Added `accountRecoveryEmailTemplate` with `accountRecoveryEmailTemplate()`.
+- Added `sendAccountRecoveryEmailService()`.
+- Added optional `authSessionIdToExclude` parameter to `purgeAuthSessions()`.
+
+
+### Changes
+
+- Reduced `ACCOUNT_EMAIL_UPDATE_WINDOW` to an hour down from a day.
+
+
+### Improvements
+
+- Improved database transaction logic throughout the app, fixing a few issues in the process.
+
+
+### Bug Fixes
+
+- fixed grammar inconsistency with `logUnexpectedError()` in a few locations.
+- fixed `logUnexpectedError()` being called before sending a response.
+- fixed POST `accounts/details/email/start` not handling duplicate new_email in the catch block.
+- fixed POST `accounts/details/email/start` not accounting for suspended requests.
+- fixed incorrect parameter name in `incrementedFailedEmailChangeAttempts()`.
+- fixed rename `incrementEmailChangeEmailsSent()` and `incrementedFailedEmailChangeAttempts()` to `incrementEmailUpdateEmailsSent()` and `incrementedFailedEmailUpdateAttempts()` respectively.
+- fixed `@types/cookie-parser` not being listed as a dev dependency.
+
+
+### Code Refactoring
+
+Renamed `useAsyncErrorHandler` to `useHandleAsyncError`.
+Rephrased `emailsLimitReached` to `emailsSentLimitReached` in a few endpoints.
+Improved readability of some SQL queries by adding line breaks.
+Consolidated suspension constants into one in `accountConstants`.
+
+
 ## [0.2.2] (2024-12-04)
 
 ### Features
