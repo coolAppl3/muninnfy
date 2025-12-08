@@ -1627,15 +1627,15 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
         [accountDetails.account_id, recoveryToken, expiryTimestamp, 1, 0]
       );
 
+      await connection.commit();
+      res.json({ publicAccountId: accountDetails.public_account_id });
+
       await sendAccountRecoveryEmailService({
         receiver: email,
         displayName: accountDetails.display_name,
         publicAccountId: accountDetails.public_account_id,
         recoveryToken,
       });
-
-      await connection.commit();
-      res.json({ publicAccountId: accountDetails.public_account_id });
 
       return;
     }
