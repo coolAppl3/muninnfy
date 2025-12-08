@@ -10,7 +10,7 @@ import {
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
@@ -100,7 +100,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     type WishlistDetails = {
@@ -290,7 +290,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     return;
   }
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     connection = await dbPool.getConnection();

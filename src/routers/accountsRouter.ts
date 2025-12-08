@@ -324,7 +324,12 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     return;
   }
 
+  let connection: PoolConnection | null = null;
+
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type AccountDetails = {
       account_id: number;
       public_account_id: string;
@@ -337,7 +342,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       failed_verification_attempts: number;
     };
 
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         accounts.account_id,
         accounts.public_account_id,
@@ -354,23 +359,30 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       LEFT JOIN
         account_verification USING(account_id)
       WHERE
-        accounts.public_account_id = ?;`,
+        accounts.public_account_id = ?
+      FOR UPDATE;`,
       [publicAccountId]
     );
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
+      await connection.rollback();
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
       return;
     }
 
     if (accountDetails.is_verified) {
+      await connection.rollback();
       res.status(409).json({ message: 'Account is already verified.', reason: 'alreadyVerified' });
+
       return;
     }
 
     if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      await connection.rollback();
+
       await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
@@ -378,11 +390,15 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     }
 
     if (accountDetails.verification_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+      await connection.rollback();
       res.status(403).json({ message: `Sent verification emails limit reached.`, reason: 'emailsSentLimitReached' });
+
       return;
     }
 
-    await incrementVerificationEmailsSent(accountDetails.verification_id, dbPool, req);
+    await incrementVerificationEmailsSent(accountDetails.verification_id, connection, req);
+
+    await connection.commit();
     res.json({});
 
     await sendAccountVerificationEmailService({
@@ -393,6 +409,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     });
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       return;
@@ -400,6 +417,8 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
 
@@ -580,7 +599,12 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     return;
   }
 
+  let connection: PoolConnection | null = null;
+
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type AccountDetails = {
       account_id: number;
       hashed_password: string;
@@ -588,7 +612,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       failed_sign_in_attempts: number;
     };
 
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         account_id,
         hashed_password,
@@ -597,31 +621,40 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       FROM
         accounts
       WHERE
-        email = ?;`,
+        email = ?
+      FOR UPDATE;`,
       [email]
     );
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
+      await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
       return;
     }
 
     if (!accountDetails.is_verified) {
+      await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
       return;
     }
 
     const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
     if (isLocked) {
+      await connection.rollback();
       res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+
       return;
     }
 
     const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
     if (!passwordIsCorrect) {
+      await connection.rollback();
       await handleIncorrectPassword(accountDetails.account_id, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+
       return;
     }
 
@@ -631,12 +664,15 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
 
     const authSessionCreated: boolean = await createAuthSession(res, accountDetails.account_id, keepSignedIn);
     if (!authSessionCreated) {
+      await connection.rollback();
+
       res.status(500).json({ message: 'Internal server error.' });
       await logUnexpectedError(req, null, 'Failed to create authSession.');
 
       return;
     }
 
+    await connection.commit();
     res.json({});
 
     await dbPool.execute(
@@ -648,6 +684,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     );
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       return;
@@ -655,6 +692,8 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
 
@@ -918,14 +957,19 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
     return;
   }
 
+  let connection: PoolConnection | null = null;
+
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type AccountDetails = {
       username: string;
       hashed_password: string;
       failed_sign_in_attempts: number;
     };
 
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         username,
         hashed_password,
@@ -933,41 +977,52 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
       FROM
         accounts
       WHERE
-        account_id = ?;`,
+        account_id = ?
+      FOR UPDATE;`,
       [accountId]
     );
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
+      await connection.rollback();
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
       return;
     }
 
     if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
+      await connection.rollback();
       res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+
       return;
     }
 
     if (newPassword === accountDetails.username) {
+      await connection.rollback();
       res.status(409).json({ message: `Username and password can't match.`, reason: 'newPasswordMatchesUsername' });
+
       return;
     }
 
     const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
     if (!passwordIsCorrect) {
+      await connection.rollback();
       await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+
       return;
     }
 
     if (newPassword === password) {
+      await connection.rollback();
       res.status(409).json({ message: `New password can't match current password.`, reason: 'newPasswordMatchesUsername' });
+
       return;
     }
 
     const newHashedPassword: string = await bcrypt.hash(newPassword, 10);
 
-    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `UPDATE
         accounts
       SET
@@ -979,6 +1034,8 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
     );
 
     if (resultSetHeader.affectedRows === 0) {
+      await connection.rollback();
+
       res.status(500).json({ message: 'Internal server error.' });
       await logUnexpectedError(req, null, 'Failed to update hashed_password.');
 
@@ -986,11 +1043,12 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
     }
 
     await purgeAuthSessions(accountId, authSessionId);
-    res.json({});
 
+    await connection.commit();
     res.json({});
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       return;
@@ -998,6 +1056,8 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
 
@@ -1039,10 +1099,11 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     return;
   }
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     connection = await dbPool.getConnection();
+    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {
@@ -1153,7 +1214,10 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     await connection.commit();
     res.json({ emailUpdateId: resultSetHeader.insertId, expiryTimestamp });
 
-    await resetFailedSignInAttempts(accountId, dbPool, req);
+    if (accountDetails.failed_sign_in_attempts > 0) {
+      await resetFailedSignInAttempts(accountId, dbPool, req);
+    }
+
     await sendEmailUpdateStartEmailService({
       receiver: newEmail,
       confirmationCode,
@@ -1199,7 +1263,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     return;
   }
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     connection = await dbPool.getConnection();
@@ -1337,7 +1401,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     return;
   }
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     connection = await dbPool.getConnection();
@@ -1502,7 +1566,13 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
     return;
   }
 
+  let connection: PoolConnection | null = null;
+
   try {
+    connection = await dbPool.getConnection();
+    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
+    await connection.beginTransaction();
+
     type AccountDetails = {
       account_id: number;
       public_account_id: string;
@@ -1513,7 +1583,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
       failed_recovery_attempts: number;
     };
 
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         accounts.account_id,
         accounts.public_account_id,
@@ -1528,14 +1598,17 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
       LEFT JOIN
         account_recovery USING(account_id)
       WHERE
-        accounts.email = ?;`,
+        accounts.email = ?
+      FOR UPDATE;`,
       [email]
     );
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails || !accountDetails.is_verified) {
+      await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
       return;
     }
 
@@ -1543,7 +1616,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
       const recoveryToken: string = generateCryptoUuid();
       const expiryTimestamp: number = Date.now() + ACCOUNT_RECOVERY_WINDOW;
 
-      await dbPool.execute<ResultSetHeader>(
+      await connection.execute<ResultSetHeader>(
         `INSERT INTO account_recovery (
           account_id,
           recovery_token,
@@ -1561,9 +1634,13 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
         recoveryToken,
       });
 
+      await connection.commit();
       res.json({ publicAccountId: accountDetails.public_account_id });
+
       return;
     }
+
+    await connection.rollback();
 
     if (accountDetails.failed_recovery_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
       res.status(403).json({
@@ -1582,6 +1659,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
     });
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       return;
@@ -1589,6 +1667,8 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
 
@@ -1618,7 +1698,12 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
     return;
   }
 
+  let connection: PoolConnection | null = null;
+
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type AccountDetails = {
       email: string;
       display_name: string;
@@ -1630,7 +1715,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
       failed_recovery_attempts: number;
     };
 
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         accounts.email,
         accounts.display_name,
@@ -1646,23 +1731,30 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
       LEFT JOIN
         account_recovery USING(account_id)
       WHERE
-        accounts.public_account_id = ?;`,
+        accounts.public_account_id = ?
+      FOR UPDATE;`,
       [publicAccountId]
     );
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails || !accountDetails.is_verified) {
+      await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
       return;
     }
 
     if (!accountDetails.recovery_id) {
+      await connection.rollback();
       res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
+
       return;
     }
 
     if (accountDetails.failed_recovery_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      await connection.rollback();
+
       res.status(403).json({
         message: 'Recovery request suspended.',
         reason: 'requestSuspended',
@@ -1673,12 +1765,15 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
     }
 
     if (accountDetails.recovery_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+      await connection.rollback();
       res.status(403).json({ message: 'Sent recovery emails limit reached.', reason: 'emailsSentLimitReached' });
+
       return;
     }
 
     await incrementRecoveryEmailsSent(accountDetails.recovery_id, dbPool, req);
 
+    await connection.commit();
     res.json({});
 
     await sendAccountRecoveryEmailService({
@@ -1689,6 +1784,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
     });
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       return;
@@ -1696,5 +1792,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
