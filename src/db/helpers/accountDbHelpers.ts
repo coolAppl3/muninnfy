@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
+import { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
 import {
   ACCOUNT_UPDATE_SUSPENSION_DURATION,
@@ -231,6 +231,27 @@ export async function incrementRecoveryEmailsSent(recoveryId: number, executor: 
   } catch (err: unknown) {
     console.log(err);
     await logUnexpectedError(req, null, 'Failed to increment recovery_emails_sent.');
+
+    return false;
+  }
+}
+
+export async function incrementFailedRecoveryAttempts(recoveryId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        account_recovery
+      SET
+        failed_recovery_attempts = failed_recovery_attempts + 1
+      WHERE
+        recovery_id = ?;`,
+      [recoveryId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, err, 'Failed to increment failed_recovery_attempts.');
 
     return false;
   }
