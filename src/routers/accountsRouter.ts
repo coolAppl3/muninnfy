@@ -268,12 +268,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
-    if (!accountDetails) {
-      res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
-      return;
-    }
-
-    if (accountDetails.is_verified) {
+    if (!accountDetails || accountDetails.is_verified) {
       res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
       return;
     }
