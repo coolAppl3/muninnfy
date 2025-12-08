@@ -235,3 +235,27 @@ export async function incrementRecoveryEmailsSent(recoveryId: number, executor: 
     return false;
   }
 }
+
+export async function suspendRecoveryRequest(recoveryId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+  const newExpiryTimestamp: number = Date.now() + ACCOUNT_UPDATE_SUSPENSION_DURATION;
+
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        account_recovery
+      SET
+        failed_recovery_attempts = ?,
+        expiry_timestamp = ?
+      WHERE
+        recovery_id = ?;`,
+      [ACCOUNT_FAILED_UPDATE_LIMIT, newExpiryTimestamp, recoveryId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, err, 'Failed to suspend account_recovery request.');
+
+    return false;
+  }
+}
