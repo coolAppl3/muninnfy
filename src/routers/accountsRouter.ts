@@ -653,10 +653,6 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       return;
     }
 
-    if (accountDetails.failed_sign_in_attempts > 0) {
-      await resetFailedSignInAttempts(accountDetails.account_id, dbPool, req);
-    }
-
     const authSessionCreated: boolean = await createAuthSession(res, accountDetails.account_id, keepSignedIn);
     if (!authSessionCreated) {
       await connection.rollback();
@@ -669,6 +665,10 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
 
     await connection.commit();
     res.json({});
+
+    if (accountDetails.failed_sign_in_attempts > 0) {
+      await resetFailedSignInAttempts(accountDetails.account_id, dbPool, req);
+    }
 
     await dbPool.execute(
       `DELETE FROM
@@ -1477,6 +1477,8 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
       const requestSuspended: boolean = await suspendEmailUpdateRequest(accountDetails.update_id, dbPool, req);
       if (!requestSuspended) {
         res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, null, 'Failed to suspend email update request.');
+
         return;
       }
 
