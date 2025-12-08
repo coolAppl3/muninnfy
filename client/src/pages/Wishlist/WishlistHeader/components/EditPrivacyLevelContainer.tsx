@@ -13,14 +13,14 @@ import {
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../../../utils/constants/wishlistConstants';
 import useWishlist from '../../hooks/useWishlist';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../hooks/useHandleAsyncError';
 import Button from '../../../../components/Button/Button';
 
 export default function EditPrivacyLevelContainer(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen } = useWishlistHeader();
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();

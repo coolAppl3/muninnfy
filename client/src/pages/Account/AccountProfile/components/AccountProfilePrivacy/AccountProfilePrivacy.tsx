@@ -4,7 +4,7 @@ import Button from '../../../../../components/Button/Button';
 import useAccountDetails from '../../../hooks/useAccountDetails';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import { updateAccountPrivacyService } from '../../../../../services/accountServices';
 
 export default function AccountProfilePrivacy(): JSX.Element {
@@ -17,7 +17,7 @@ export default function AccountProfilePrivacy(): JSX.Element {
 
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
   const changesDetected: boolean = isPrivate !== is_private || approveFollowRequests !== approve_follow_requests;
 

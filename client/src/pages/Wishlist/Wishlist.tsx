@@ -12,7 +12,7 @@ import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import WishlistProvider from './providers/WishlistProvider';
 import WishlistItems from './WishlistItems/WishlistItems';
 import NewWishlistItemFormContainer from './NewWishlistItemFormContainer/NewWishlistItemFormContainer';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import { WishlistDetailsType } from '../../types/wishlistTypes';
 import { WishlistItemType } from '../../types/wishlistItemTypes';
 import WishlistItemsToolbar from './WishlistItemsToolbar/WishlistItemsToolbar';
@@ -30,7 +30,7 @@ export default function Wishlist(): JSX.Element {
     initialWishlistItemsTitleSet: Set<string>;
   } | null>(null);
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
   const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();

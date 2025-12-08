@@ -31,6 +31,7 @@ export async function getWishlistItemByTitle(
         wishlist_items.link,
         wishlist_items.price,
         wishlist_items.purchased_on_timestamp,
+        
         wishlist_item_tags.tag_id,
         wishlist_item_tags.tag_name
       FROM
@@ -61,7 +62,7 @@ export async function getWishlistItemByTitle(
     return mappedWishlistItem;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to fetch wishlist item data');
+    await logUnexpectedError(req, err, 'Failed to fetch wishlist item data.');
 
     return null;
   }

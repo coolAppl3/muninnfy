@@ -14,7 +14,7 @@ import useWishlist from '../hooks/useWishlist';
 import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import useWishlistItems from '../hooks/useWishlistItems';
 import useWishlistItemsExpansionStore from '../stores/wishlistItemsExpansionStore';
@@ -58,7 +58,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     new Set<string>(wishlistItem?.tags.map(({ name }: { id: number; name: string }) => name) || [])
   );
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();

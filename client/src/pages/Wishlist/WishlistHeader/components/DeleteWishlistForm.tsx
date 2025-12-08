@@ -8,7 +8,7 @@ import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import DefaultFormGroup from '../../../../components/DefaultFormGroup/DefaultFormGroup';
 import Button from '../../../../components/Button/Button';
 import useWishlist from '../../hooks/useWishlist';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../hooks/useHandleAsyncError';
 
 export default function DeleteWishlistForm(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();
@@ -16,7 +16,7 @@ export default function DeleteWishlistForm(): JSX.Element {
 
   const [confirmationTitleValue, setConfirmationTitleValue] = useState<string>('');
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();

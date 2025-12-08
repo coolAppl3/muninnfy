@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
-import { ACCOUNT_FAILED_SIGN_IN_LIMIT } from '../../util/constants/accountConstants';
+import {
+  ACCOUNT_UPDATE_SUSPENSION_DURATION,
+  ACCOUNT_FAILED_SIGN_IN_LIMIT,
+  ACCOUNT_FAILED_UPDATE_LIMIT,
+} from '../../util/constants/accountConstants';
 import { removeRequestCookie } from '../../util/cookieUtils';
 import { purgeAuthSessions } from '../../auth/authSessions';
 
@@ -18,7 +22,7 @@ export async function deleteAccountById(accountId: number, executor: Pool | Pool
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to delete account');
+    await logUnexpectedError(req, err, 'Failed to delete account.');
 
     return false;
   }
@@ -43,7 +47,7 @@ export async function incrementVerificationEmailsSent(
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment verification_emails_sent');
+    await logUnexpectedError(req, err, 'Failed to increment verification_emails_sent.');
 
     return false;
   }
@@ -61,20 +65,20 @@ export async function incrementFailedVerificationAttempts(
       SET
         failed_verification_attempts = failed_verification_attempts + 1
       WHERE
-        verification_id = ?`,
+        verification_id = ?;`,
       [verificationId]
     );
 
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment failed_verification_attempts');
+    await logUnexpectedError(req, err, 'Failed to increment failed_verification_attempts.');
 
     return false;
   }
 }
 
-export async function incrementEmailChangeEmailsSent(
+export async function incrementEmailUpdateEmailsSent(
   emailUpdateId: number,
   executor: Pool | PoolConnection,
   req: Request
@@ -93,14 +97,14 @@ export async function incrementEmailChangeEmailsSent(
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment update_emails_sent');
+    await logUnexpectedError(req, err, 'Failed to increment update_emails_sent.');
 
     return false;
   }
 }
 
-export async function incrementedFailedEmailChangeAttempts(
-  verificationId: number,
+export async function incrementedFailedEmailUpdateAttempts(
+  emailUpdateId: number,
   executor: Pool | PoolConnection,
   req: Request
 ): Promise<boolean> {
@@ -112,13 +116,37 @@ export async function incrementedFailedEmailChangeAttempts(
         failed_update_attempts = failed_update_attempts + 1
       WHERE
         update_id = ?;`,
-      [verificationId]
+      [emailUpdateId]
     );
 
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment failed_update_attempts');
+    await logUnexpectedError(req, err, 'Failed to increment failed_update_attempts.');
+
+    return false;
+  }
+}
+
+export async function suspendEmailUpdateRequest(emailUpdateId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+  const newExpiryTimestamp: number = Date.now() + ACCOUNT_UPDATE_SUSPENSION_DURATION;
+
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        email_update
+      SET
+        failed_update_attempts = ?,
+        expiry_timestamp = ?
+      WHERE
+        update_id = ?;`,
+      [ACCOUNT_FAILED_UPDATE_LIMIT, newExpiryTimestamp, emailUpdateId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, err, 'Failed to suspend email_update request.');
 
     return false;
   }
@@ -139,7 +167,7 @@ export async function incrementFailedSignInAttempts(accountId: number, executor:
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to increment failed_sign_in_attempts');
+    await logUnexpectedError(req, err, 'Failed to increment failed_sign_in_attempts.');
 
     return false;
   }
@@ -160,7 +188,7 @@ export async function resetFailedSignInAttempts(accountId: number, executor: Poo
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to reset failed_sign_in_attempts');
+    await logUnexpectedError(req, err, 'Failed to reset failed_sign_in_attempts.');
 
     return false;
   }
@@ -185,4 +213,25 @@ export async function handleIncorrectPassword(
     message: `Incorrect password.${hasBeenLocked ? ' Account locked.' : ''}`,
     reason: hasBeenLocked ? 'incorrectPassword_locked' : 'incorrectPassword',
   });
+}
+
+export async function incrementRecoveryEmailsSent(recoveryId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+  try {
+    const [resultSetHeader] = await executor.execute<ResultSetHeader>(
+      `UPDATE
+        account_recovery
+      SET
+        recovery_emails_sent = recovery_emails_sent + 1
+      WHERE
+        recovery_id = ?;`,
+      [recoveryId]
+    );
+
+    return resultSetHeader.affectedRows > 0;
+  } catch (err: unknown) {
+    console.log(err);
+    await logUnexpectedError(req, null, 'Failed to increment recovery_emails_sent.');
+
+    return false;
+  }
 }

@@ -9,7 +9,7 @@ import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import { bulkDeleteWishlistItemsService, bulkSetWishlistItemIsPurchasedService } from '../../../services/wishlistItemServices';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useInfoModal from '../../../hooks/useInfoModal';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../hooks/useHistory';
 import useWishlistItems from '../hooks/useWishlistItems';
@@ -34,7 +34,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();

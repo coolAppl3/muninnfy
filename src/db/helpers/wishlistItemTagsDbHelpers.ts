@@ -19,7 +19,7 @@ export async function insertWishlistItemTags(
     return true;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to insert tags');
+    await logUnexpectedError(req, err, 'Failed to insert tags.');
 
     return false;
   }
@@ -38,7 +38,7 @@ export async function deleteWishlistItemTags(itemId: number, executor: Pool | Po
     return true;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'failed to delete tags');
+    await logUnexpectedError(req, err, 'Failed to delete tags.');
 
     return false;
   }

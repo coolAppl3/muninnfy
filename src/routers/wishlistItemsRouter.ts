@@ -10,7 +10,7 @@ import {
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
@@ -100,7 +100,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     type WishlistDetails = {
@@ -290,7 +290,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     return;
   }
 
-  let connection;
+  let connection: PoolConnection | null = null;
 
   try {
     connection = await dbPool.getConnection();
@@ -307,6 +307,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       `SELECT
         added_on_timestamp,
         purchased_on_timestamp,
+        
         (SELECT COUNT(*) FROM wishlist_item_tags WHERE item_id = :itemId) AS tags_count,
         EXISTS (SELECT 1 FROM wishlists WHERE wishlist_id = :wishlistId AND account_id = :accountId) AS is_wishlist_owner
       FROM
@@ -350,7 +351,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
       await connection.rollback();
       res.status(500).json({ message: 'Internal server error.' });
 
-      await logUnexpectedError(req, null, 'failed to update wishlist item');
+      await logUnexpectedError(req, null, 'Failed to update wishlist item.');
       return;
     }
 

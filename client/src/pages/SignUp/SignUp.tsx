@@ -10,7 +10,7 @@ import usePopupMessage from '../../hooks/usePopupMessage';
 import PasswordFormGroup from '../../components/PasswordFormGroup/PasswordFormGroup';
 import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup';
 import useAuth from '../../hooks/useAuth';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -18,7 +18,7 @@ export default function SignUp(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const { setAuthStatus } = useAuth();
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
 

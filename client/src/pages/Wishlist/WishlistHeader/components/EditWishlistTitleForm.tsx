@@ -9,7 +9,7 @@ import DefaultFormGroup from '../../../../components/DefaultFormGroup/DefaultFor
 import { validateWishlistTitle } from '../../../../utils/validation/wishlistValidation';
 import Button from '../../../../components/Button/Button';
 import useWishlist from '../../hooks/useWishlist';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../hooks/useHandleAsyncError';
 
 export default function EditWishlistTitleForm(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
@@ -18,7 +18,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();

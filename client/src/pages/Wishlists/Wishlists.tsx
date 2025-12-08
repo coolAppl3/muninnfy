@@ -3,7 +3,7 @@ import Head from '../../components/Head/Head';
 import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
 import { CombinedWishlistsStatistics, getAllWishlistsService } from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
-import useAsyncErrorHandler, { HandleAsyncErrorFunction } from '../../hooks/useAsyncErrorHandler';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import WishlistsProvider from './providers/WishlistsProvider';
 import WishlistsContainer from './WishlistsContainer/WishlistsContainer';
@@ -17,7 +17,7 @@ export default function Wishlists(): JSX.Element {
   const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>([]);
   const [combinedWishlistsStatistics, setCombinedWishlistsStatistics] = useState<CombinedWishlistsStatistics | null>(null);
 
-  const handleAsyncError: HandleAsyncErrorFunction = useAsyncErrorHandler();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { referrerLocation } = useHistory();
 
