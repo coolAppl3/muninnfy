@@ -2,7 +2,7 @@ import { Request } from 'express';
 import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 
-export async function logUnexpectedError(req: Request, err: unknown, description: string | null = null): Promise<void> {
+export async function logUnexpectedError(req: Request | null, err: unknown, description: string | null = null): Promise<void> {
   const currentTimestamp: number = Date.now();
   const { message, trace } = getErrorData(err);
 
@@ -16,7 +16,7 @@ export async function logUnexpectedError(req: Request, err: unknown, description
         stack_trace,
         description
       ) VALUES (${generatePlaceHolders(6)});`,
-      [req.method, req.originalUrl, currentTimestamp, message, trace, description]
+      [req && req.method, req && req.originalUrl, currentTimestamp, message, trace, description]
     );
   } catch (err: unknown) {
     console.log(err);
