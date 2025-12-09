@@ -93,7 +93,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
+    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type TakenStatus = {
@@ -1108,7 +1108,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
+    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {
@@ -1580,7 +1580,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
+    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {

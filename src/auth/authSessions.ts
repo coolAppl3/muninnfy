@@ -28,7 +28,7 @@ export async function createAuthSession(
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
+    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type SessionDetails = {
