@@ -1808,3 +1808,176 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
     connection?.release();
   }
 });
+
+accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    return;
+  }
+
+  type RequestData = {
+    publicAccountId: string;
+    recoveryToken: string;
+    newPassword: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['publicAccountId', 'recoveryToken', 'newPassword'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { publicAccountId, recoveryToken, newPassword } = requestData;
+
+  if (!isValidUuid(publicAccountId)) {
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    return;
+  }
+
+  if (!isValidUuid(recoveryToken)) {
+    res.status(400).json({ message: 'Invalid recovery token.', reason: 'invalidRecoveryToken' });
+    return;
+  }
+
+  if (!isValidNewPassword(newPassword)) {
+    res.status(400).json({ message: 'Invalid new password.', reason: 'invalidNewPassword' });
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      account_id: number;
+      username: string;
+      is_verified: boolean;
+      failed_sign_in_attempts: number;
+      recovery_id: number;
+      recovery_token: string;
+      expiry_timestamp: number;
+      failed_recovery_attempts: number;
+    };
+
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.account_id,
+        accounts.username,
+        accounts.is_verified,
+        accounts.failed_sign_in_attempts,
+
+        account_recovery.recovery_id,
+        account_recovery.recovery_token,
+        account_recovery.expiry_timestamp,
+        account_recovery.failed_recovery_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        account_recovery USING(account_id)
+      WHERE
+        accounts.public_account_id = ?
+      FOR UPDATE;`,
+      [publicAccountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails || !accountDetails.is_verified) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    if (!accountDetails.account_id) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
+
+      return;
+    }
+
+    if (accountDetails.failed_recovery_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+      await connection.rollback();
+
+      res.status(403).json({
+        message: 'Recovery request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    if (accountDetails.recovery_token !== recoveryToken) {
+      await connection.rollback();
+
+      const suspendRequest: boolean = accountDetails.failed_recovery_attempts + 1 >= ACCOUNT_FAILED_UPDATE_LIMIT;
+      if (!suspendRequest) {
+        res.status(401).json({ message: 'Incorrect recovery token.', reason: 'incorrectToken' });
+        return;
+      }
+
+      const requestSuspended: boolean = await suspendRecoveryRequest(accountDetails.recovery_id, dbPool, req);
+      if (!requestSuspended) {
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, null, 'Failed to suspend account recovery request.');
+
+        return;
+      }
+
+      res.status(401).json({ message: 'Incorrect recovery token. Request suspended.', reason: 'incorrectToken_suspended' });
+      return;
+    }
+
+    if (accountDetails.username === newPassword) {
+      await connection.rollback();
+      res.status(409).json({ message: `Username and new password can't match.`, reason: 'newPasswordMatchesUsername' });
+
+      return;
+    }
+
+    const newHashedPassword: string = await bcrypt.hash(newPassword, 10);
+
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+      `UPDATE
+        accounts
+      SET
+        hashed_password = ?
+      WHERE
+        account_id = ?;`,
+      [newHashedPassword, accountDetails.account_id]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      await connection.rollback();
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to update hashed_password.');
+
+      return;
+    }
+
+    connection.commit();
+    res.json({});
+
+    await purgeAuthSessions(accountDetails.account_id);
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
