@@ -32,6 +32,7 @@ import {
   incrementVerificationEmailsSent,
   resetFailedSignInAttempts,
   suspendEmailUpdateRequest,
+  suspendRecoveryRequest,
 } from '../db/helpers/accountDbHelpers';
 import { createAuthSession, purgeAuthSessions } from '../auth/authSessions';
 import { getAuthSessionId } from '../auth/authUtils';
@@ -1781,7 +1782,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
       return;
     }
 
-    await incrementRecoveryEmailsSent(accountDetails.recovery_id, dbPool, req);
+    await incrementRecoveryEmailsSent(accountDetails.recovery_id, connection, req);
 
     await connection.commit();
     res.json({});
