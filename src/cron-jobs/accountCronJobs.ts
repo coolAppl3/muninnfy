@@ -43,3 +43,17 @@ export async function deleteStaleEmailUpdateRequestsCron(currentTimestamp: numbe
     console.log(err);
   }
 }
+
+export async function deleteStaleAccountRecoveryRequestsCron(currentTimestamp: number): Promise<void> {
+  try {
+    await dbPool.execute(
+      `DELETE FROM
+        account_recovery
+      WHERE
+        expiry_timestamp <= ?;`,
+      [currentTimestamp]
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
