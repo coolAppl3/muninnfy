@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
 import {
   ACCOUNT_UPDATE_SUSPENSION_DURATION,
@@ -146,7 +146,7 @@ export async function suspendEmailUpdateRequest(emailUpdateId: number, executor:
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'Failed to suspend email_update request.');
+    await logUnexpectedError(req, err, 'Failed to suspend email update request.');
 
     return false;
   }
@@ -275,7 +275,7 @@ export async function suspendRecoveryRequest(recoveryId: number, executor: Pool 
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, 'Failed to suspend account_recovery request.');
+    await logUnexpectedError(req, err, 'Failed to suspend account recovery request.');
 
     return false;
   }
