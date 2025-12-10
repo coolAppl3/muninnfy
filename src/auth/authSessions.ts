@@ -84,10 +84,11 @@ export async function createAuthSession(
       SET
         session_id = ?,
         created_on_timestamp = ?,
-        expiry_timestamp = ?
+        expiry_timestamp = ?,
+        extensions_count = ?
       WHERE
         session_id = ?;`,
-      [newAuthSessionId, currentTimestamp, expiryTimestamp, oldestAuthSession.session_id]
+      [newAuthSessionId, currentTimestamp, expiryTimestamp, 0, oldestAuthSession.session_id]
     );
 
     if (resultSetHeader.affectedRows === 0) {
