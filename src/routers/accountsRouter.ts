@@ -93,7 +93,6 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type TakenStatus = {
@@ -104,10 +103,10 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     const [takenStatusRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        EXISTS (SELECT 1 FROM accounts WHERE email = ? FOR UPDATE) AS email_taken,
-        EXISTS (SELECT 1 FROM email_update WHERE new_email = ? FOR UPDATE) AS email_temporarily_taken,
-        EXISTS (SELECT 1 FROM accounts WHERE username = ? FOR UPDATE) AS username_taken;`,
-      [email, email, username]
+        EXISTS (SELECT 1 FROM accounts WHERE email = :email FOR UPDATE) AS email_taken,
+        EXISTS (SELECT 1 FROM email_update WHERE new_email = :email FOR UPDATE) AS email_temporarily_taken,
+        EXISTS (SELECT 1 FROM accounts WHERE username = :username FOR UPDATE) AS username_taken;`,
+      { email, username }
     );
 
     const takenStatus = takenStatusRows[0] as TakenStatus | undefined;
@@ -1046,10 +1045,10 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
       return;
     }
 
-    await purgeAuthSessions(accountId, authSessionId);
-
     await connection.commit();
     res.json({});
+
+    await purgeAuthSessions(accountId, authSessionId);
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -1108,7 +1107,6 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {
@@ -1580,7 +1578,6 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {
