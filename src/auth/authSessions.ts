@@ -10,6 +10,7 @@ import { generateCryptoUuid } from '../util/tokenGenerator';
 
 export async function createAuthSession(
   res: Response,
+  connection: PoolConnection,
   accountId: number,
   keepSignedIn: boolean,
   attemptCount: number = 1
@@ -24,13 +25,7 @@ export async function createAuthSession(
   const maxAge: number | undefined = keepSignedIn ? dayMilliseconds * 7 : undefined;
   const expiryTimestamp: number = currentTimestamp + (maxAge ? maxAge : hourMilliseconds * 6);
 
-  let connection: PoolConnection | null = null;
-
   try {
-    connection = await dbPool.getConnection();
-    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
-    await connection.beginTransaction();
-
     type SessionDetails = {
       session_id: string;
       created_on_timestamp: number;
@@ -63,8 +58,6 @@ export async function createAuthSession(
         [newAuthSessionId, accountId, currentTimestamp, expiryTimestamp, keepSignedIn, 0]
       );
 
-      await connection.commit();
-
       setResponseCookie(res, 'authSessionId', newAuthSessionId, maxAge, true);
       return true;
     }
@@ -82,7 +75,6 @@ export async function createAuthSession(
     }, null);
 
     if (!oldestAuthSession) {
-      await connection.rollback();
       return false;
     }
 
@@ -99,29 +91,23 @@ export async function createAuthSession(
     );
 
     if (resultSetHeader.affectedRows === 0) {
-      await connection.rollback();
       return false;
     }
-
-    await connection.commit();
 
     setResponseCookie(res, 'authSessionId', newAuthSessionId, maxAge, true);
     return true;
   } catch (err: unknown) {
     console.log(err);
-    await connection?.rollback();
 
     if (!isSqlError(err)) {
       return false;
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'PRIMARY'`)) {
-      return await createAuthSession(res, accountId, keepSignedIn, ++attemptCount);
+      return await createAuthSession(res, connection, accountId, keepSignedIn, ++attemptCount);
     }
 
     return false;
-  } finally {
-    connection?.release();
   }
 }
 

@@ -658,7 +658,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       return;
     }
 
-    const authSessionCreated: boolean = await createAuthSession(res, accountDetails.account_id, keepSignedIn);
+    const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, keepSignedIn);
     if (!authSessionCreated) {
       await connection.rollback();
 
