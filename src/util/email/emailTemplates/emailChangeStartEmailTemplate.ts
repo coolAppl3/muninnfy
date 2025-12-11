@@ -19,7 +19,7 @@ export default function emailUpdateStartEmailTemplate({ displayName, confirmatio
         <div style="background-color: #181b13; padding: 20px; color: #cbcbcd; font-family: sans-serif; font-weight: 500">
           <p>Hey ${displayName},</p>
 
-          <p>We received a request to change the email address on your account. To confirm this action, please use the following verification code: ${confirmationCode}.</p>
+          <p>We received a request to change the email address on your account. To confirm this action, please use the following confirmation code: ${confirmationCode}.</p>
 
           <p>If you didn't make this request, please sign in and change your password to ensure any unauthorized access is removed.</p>
 
