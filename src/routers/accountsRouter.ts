@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { generateCryptoUuid, generateConfirmationCode, isValidUuid, isValidConfirmationCode } from '../util/tokenGenerator';
 import {
+  ACCOUNT_DELETION_WINDOW,
   ACCOUNT_EMAIL_UPDATE_WINDOW,
   ACCOUNT_EMAILS_SENT_LIMIT,
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
@@ -16,6 +17,7 @@ import {
   ACCOUNT_VERIFICATION_WINDOW,
 } from '../util/constants/accountConstants';
 import {
+  sendAccountDeletionEmailService,
   sendAccountRecoveryEmailService,
   sendAccountVerificationEmailService,
   sendEmailUpdateStartEmailService,
@@ -1963,6 +1965,156 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
     res.json({});
 
     await purgeAuthSessions(accountDetails.account_id);
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
+
+accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    password: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['password'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { password } = requestData;
+
+  if (!isValidPassword(password)) {
+    res.status(400).json({ message: 'Invalid password.', reason: 'invalidPassword' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      public_account_id: string;
+      email: string;
+      hashed_password: string;
+      display_name: string;
+      is_verified: boolean;
+      failed_sign_in_attempts: number;
+      deletion_id: number;
+      expiry_timestamp: number;
+      failed_deletion_attempts: number;
+    };
+
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.public_account_id,
+        accounts.email,
+        accounts.hashed_password,
+        accounts.display_name,
+        accounts.is_verified,
+        accounts.failed_sign_in_attempts,
+        
+        account_deletion.deletion_id,
+        account_deletion.expiry_timestamp,
+        account_deletion.failed_deletion_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        account_deletion USING(account_id)
+      WHERE
+        accounts.account_id = ?
+      FOR UPDATE;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails || !accountDetails.is_verified) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
+      await connection.rollback();
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+
+      return;
+    }
+
+    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    if (!passwordIsCorrect) {
+      await connection.rollback();
+      await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+
+      return;
+    }
+
+    if (accountDetails.deletion_id) {
+      await connection.rollback();
+
+      res.status(409).json({
+        message: 'Ongoing deletion request found.',
+        reason: 'ongoingRequest',
+        resData: {
+          deletionId: accountDetails.deletion_id,
+          expiryTimestamp: accountDetails.expiry_timestamp,
+          isSuspended: accountDetails.failed_deletion_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT,
+        },
+      });
+
+      return;
+    }
+
+    const expiryTimestamp: number = Date.now() + ACCOUNT_DELETION_WINDOW;
+    const confirmationCode: string = generateConfirmationCode();
+
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+      `INSERT INTO account_deletion (
+        account_id,
+        confirmation_code,
+        expiry_timestamp,
+        deletion_emails_sent,
+        failed_deletion_attempts
+      ) VALUES(${generatePlaceHolders(5)});`,
+      [accountId, confirmationCode, expiryTimestamp, 1, 0]
+    );
+
+    await connection.commit();
+    res.json({ deletionId: resultSetHeader.insertId, expiryTimestamp });
+
+    await sendAccountDeletionEmailService({
+      receiver: accountDetails.email,
+      displayName: accountDetails.display_name,
+      confirmationCode,
+    });
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
