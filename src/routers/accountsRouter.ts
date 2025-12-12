@@ -2238,3 +2238,121 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
     connection?.release();
   }
 });
+
+accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const confirmationCode: string | undefined = req.params.confirmationCode;
+
+  if (!confirmationCode || !isValidConfirmationCode(confirmationCode)) {
+    res.status(400).json({ message: 'Invalid confirmation code.', reason: 'invalidConfirmationCode' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      failed_sign_in_attempts: number;
+      request_id: number;
+      confirmation_code: string;
+      failed_attempts: number;
+      expiry_timestamp: number;
+    };
+
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.failed_sign_in_attempts,
+        
+        account_deletion.request_id,
+        account_deletion.confirmation_code,
+        account_deletion.failed_attempts,
+        account_deletion.expiry_timestamp
+      FROM
+        accounts
+      LEFT JOIN
+        account_deletion USING(account_id)
+      WHERE
+        accounts.account_id = ?
+      FOR UPDATE;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
+      await connection.rollback();
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+
+      return;
+    }
+
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+      await connection.rollback();
+
+      res.status(403).json({
+        message: 'Deletion request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    if (accountDetails.confirmation_code !== confirmationCode) {
+      await connection.rollback();
+
+      const suspendRequest: boolean = accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
+      if (!suspendRequest) {
+        await incrementFailedAccountRequestAttempts('account_deletion', accountDetails.request_id, dbPool, req);
+        res.status(401).json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
+
+        return;
+      }
+
+      const requestSuspended: boolean = await suspendAccountRequest('account_deletion', accountDetails.request_id, dbPool, req);
+      if (!requestSuspended) {
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, null, 'Failed to suspend account deletion request.');
+
+        return;
+      }
+
+      res.status(401).json({ message: 'Incorrect confirmation code. Request suspended.', reason: 'incorrectCode_suspended' });
+      return;
+    }
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
