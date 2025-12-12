@@ -1485,8 +1485,6 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
       const requestSuspended: boolean = await suspendAccountRequest('email_update', accountDetails.request_id, dbPool, req);
       if (!requestSuspended) {
         res.status(500).json({ message: 'Internal server error.' });
-        await logUnexpectedError(req, null, 'Failed to suspend email update request.');
-
         return;
       }
 
@@ -1922,8 +1920,6 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       const requestSuspended: boolean = await suspendAccountRequest('account_recovery', accountDetails.request_id, dbPool, req);
       if (!requestSuspended) {
         res.status(500).json({ message: 'Internal server error.' });
-        await logUnexpectedError(req, null, 'Failed to suspend account recovery request.');
-
         return;
       }
 
@@ -2333,8 +2329,6 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
       const requestSuspended: boolean = await suspendAccountRequest('account_deletion', accountDetails.request_id, dbPool, req);
       if (!requestSuspended) {
         res.status(500).json({ message: 'Internal server error.' });
-        await logUnexpectedError(req, null, 'Failed to suspend account deletion request.');
-
         return;
       }
 
