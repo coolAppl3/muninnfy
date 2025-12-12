@@ -2020,7 +2020,6 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
     await connection.beginTransaction();
 
     type AccountDetails = {
-      public_account_id: string;
       email: string;
       hashed_password: string;
       display_name: string;
@@ -2033,7 +2032,6 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        accounts.public_account_id,
         accounts.email,
         accounts.hashed_password,
         accounts.display_name,
