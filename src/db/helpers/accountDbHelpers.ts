@@ -55,7 +55,7 @@ export async function incrementFailedAccountRequestAttempts(
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, `Failed to increment emails_sent for ${tableName}.`);
+    await logUnexpectedError(req, err, `Failed to increment failed_attempts for ${tableName}.`);
 
     return false;
   }
@@ -84,7 +84,7 @@ export async function suspendAccountRequest(
     return resultSetHeader.affectedRows > 0;
   } catch (err: unknown) {
     console.log(err);
-    await logUnexpectedError(req, err, `Failed to increment emails_sent for ${tableName}.`);
+    await logUnexpectedError(req, err, `Failed to suspend ${tableName} request.`);
 
     return false;
   }
