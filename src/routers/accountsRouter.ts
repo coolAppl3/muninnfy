@@ -2126,3 +2126,115 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
     connection?.release();
   }
 });
+
+accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      email: string;
+      display_name: string;
+      failed_sign_in_attempts: number;
+      request_id: number;
+      confirmation_code: string;
+      emails_sent: number;
+      failed_attempts: number;
+      expiry_timestamp: number;
+    };
+
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.email,
+        accounts.display_name,
+        accounts.failed_sign_in_attempts,
+        
+        account_deletion.request_id,
+        account_deletion.confirmation_code,
+        account_deletion.emails_sent,
+        account_deletion.failed_attempts,
+        account_deletion.expiry_timestamp
+      FROM
+        accounts
+      LEFT JOIN
+        account_deletion USING(account_id)
+      WHERE
+        accounts.account_id = ?
+      FOR UPDATE;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
+      await connection.rollback();
+      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
+
+      return;
+    }
+
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+      await connection.rollback();
+
+      res.status(403).json({
+        message: 'Deletion request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+      await connection.rollback();
+      res.status(403).json({ message: 'Sent deletion emails limit reached.', reason: 'emailsSentLimitReached' });
+
+      return;
+    }
+
+    await incrementAccountRequestEmailsSent('account_deletion', accountDetails.request_id, connection, req);
+
+    await connection.commit();
+    res.json({});
+
+    await sendAccountDeletionEmailService({
+      receiver: accountDetails.email,
+      displayName: accountDetails.display_name,
+      confirmationCode: accountDetails.confirmation_code,
+    });
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
