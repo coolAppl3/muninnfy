@@ -60,11 +60,11 @@ async function createAccountVerificationTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS account_verification (
-        verification_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL UNIQUE,
         verification_token CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-        verification_emails_sent TINYINT UNSIGNED NOT NULL CHECK(verification_emails_sent <= 3),
-        failed_verification_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_verification_attempts <= 3),
+        emails_sent TINYINT UNSIGNED NOT NULL CHECK(emails_sent <= 3),
+        failed_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_attempts <= 3),
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
@@ -78,12 +78,12 @@ async function createAccountRecoveryTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS account_recovery (
-        recovery_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL UNIQUE,
         recovery_token CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+        emails_sent TINYINT UNSIGNED NOT NULL CHECK(emails_sent <= 3),
+        failed_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_attempts <= 3),
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
-        recovery_emails_sent TINYINT UNSIGNED NOT NULL CHECK(recovery_emails_sent <= 3),
-        failed_recovery_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_recovery_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
@@ -96,12 +96,12 @@ async function createAccountDeletionTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS account_deletion (
-        deletion_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL UNIQUE,
         confirmation_code VARCHAR(10) NOT NULL COLLATE utf8mb4_bin,
+        emails_sent TINYINT UNSIGNED NOT NULL CHECK(emails_sent <= 3),
+        failed_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_attempts <= 3),
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
-        deletion_emails_sent TINYINT UNSIGNED NOT NULL CHECK(deletion_emails_sent <= 3),
-        failed_deletion_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_deletion_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
@@ -114,13 +114,13 @@ async function createEmailUpdateTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS email_update (
-        update_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL UNIQUE,
         new_email VARCHAR(254) NOT NULL UNIQUE,
         confirmation_code VARCHAR(10) NOT NULL COLLATE utf8mb4_bin,
+        emails_sent TINYINT UNSIGNED NOT NULL CHECK(emails_sent <= 3),
+        failed_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_attempts <= 3),
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
-        update_emails_sent TINYINT UNSIGNED NOT NULL CHECK(update_emails_sent <= 3),
-        failed_update_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_update_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`
     );
