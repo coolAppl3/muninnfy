@@ -5,6 +5,7 @@ import {
   ACCOUNT_UPDATE_SUSPENSION_DURATION,
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
   ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+  ACCOUNT_EMAILS_SENT_LIMIT,
 } from '../../util/constants/accountConstants';
 import { removeRequestCookie } from '../../util/cookieUtils';
 import { purgeAuthSessions } from '../../auth/authSessions';
@@ -20,10 +21,10 @@ export async function incrementAccountRequestEmailsSent(
       `UPDATE
         ${tableName}
       SET
-        emails_sent = emails_sent + 1
+        emails_sent = LEAST(?, emails_sent + 1)
       WHERE
         request_id = ?;`,
-      [requestId]
+      [ACCOUNT_EMAILS_SENT_LIMIT, requestId]
     );
 
     return resultSetHeader.affectedRows > 0;
@@ -46,10 +47,10 @@ export async function incrementFailedAccountRequestAttempts(
       `UPDATE
         ${tableName}
       SET
-        failed_attempts = failed_attempts + 1
+        failed_attempts = LEAST(?, failed_attempts + 1)
       WHERE
         request_id = ?;`,
-      [requestId]
+      [ACCOUNT_FAILED_ATTEMPTS_LIMIT, requestId]
     );
 
     return resultSetHeader.affectedRows > 0;
@@ -117,10 +118,10 @@ async function incrementFailedSignInAttempts(accountId: number, executor: Pool |
       `UPDATE
         accounts
       SET
-        failed_sign_in_attempts = failed_sign_in_attempts + 1
+        failed_sign_in_attempts = LEAST(?, failed_sign_in_attempts + 1)
       WHERE
         account_id = ?;`,
-      [accountId]
+      [ACCOUNT_FAILED_SIGN_IN_LIMIT, accountId]
     );
 
     return resultSetHeader.affectedRows > 0;
