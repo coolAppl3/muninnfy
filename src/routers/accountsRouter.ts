@@ -2335,6 +2335,28 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
       res.status(401).json({ message: 'Incorrect confirmation code. Request suspended.', reason: 'incorrectCode_suspended' });
       return;
     }
+
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+      `DELETE FROM
+        accounts
+      WHERE
+        account_id = ?;`,
+      [accountId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      await connection.rollback();
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to delete account.');
+
+      return;
+    }
+
+    removeRequestCookie(res, 'authSessionId');
+
+    await connection.commit();
+    res.json({});
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
