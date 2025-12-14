@@ -1896,10 +1896,11 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       `UPDATE
         accounts
       SET
-        hashed_password = ?
+        hashed_password = ?,
+        failed_sign_in_attempts = ?
       WHERE
         account_id = ?;`,
-      [newHashedPassword, accountDetails.account_id]
+      [newHashedPassword, 0, accountDetails.account_id]
     );
 
     if (resultSetHeader.affectedRows === 0) {
