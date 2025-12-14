@@ -2,6 +2,7 @@ import { emailTransporter } from './initTransporter';
 import accountVerificationEmailTemplate, { AccountVerificationEmailTemplate } from './emailTemplates/accountVerificationEmailTemplate';
 import emailUpdateStartEmailTemplate, { EmailUpdateStartEmailTemplate } from './emailTemplates/emailChangeStartEmailTemplate';
 import accountRecoveryEmailTemplate, { AccountRecoveryEmailTemplate } from './emailTemplates/accountRecoveryEmailTemplate';
+import accountDeletionEmailTemplate, { AccountDeletionEmailTemplate } from './emailTemplates/accountDeletionEmailTemplate';
 
 type SendEmailService = {
   receiver: string;
@@ -49,5 +50,15 @@ export async function sendAccountRecoveryEmailService(payload: { receiver: strin
     receiver,
     subject: 'Muninnfy - Account Recovery',
     html: accountRecoveryEmailTemplate({ ...rest }),
+  });
+}
+
+export async function sendAccountDeletionEmailService(payload: { receiver: string } & AccountDeletionEmailTemplate): Promise<void> {
+  const { receiver, ...rest } = payload;
+
+  await sendEmailService({
+    receiver,
+    subject: 'Muninnfy - Account Deletion',
+    html: accountDeletionEmailTemplate({ ...rest }),
   });
 }

@@ -1,3 +1,11 @@
+import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_ATTEMPTS_LIMIT, ACCOUNT_FAILED_SIGN_IN_LIMIT } from '../util/constants/accountConstants';
+import { AUTH_EXTENSIONS_LIMIT } from '../util/constants/authConstants';
+import {
+  FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+  PRIVATE_WISHLIST_PRIVACY_LEVEL,
+  PUBLIC_WISHLIST_PRIVACY_LEVEL,
+  WISHLIST_INTERACTIVITY_MAX_VALUE,
+} from '../util/constants/wishlistConstants';
 import { dbPool } from './db';
 
 export async function initDb(): Promise<void> {
@@ -33,8 +41,9 @@ async function createAccountsTable(): Promise<void> {
         display_name VARCHAR(40) NOT NULL,
         created_on_timestamp BIGINT UNSIGNED NOT NULL,
         is_verified BOOLEAN NOT NULL,
-        failed_sign_in_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_sign_in_attempts <= 5)
-      );`
+        failed_sign_in_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_sign_in_attempts <= ?)
+      );`,
+      [ACCOUNT_FAILED_SIGN_IN_LIMIT]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -60,14 +69,15 @@ async function createAccountVerificationTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS account_verification (
-        verification_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL UNIQUE,
         verification_token CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-        verification_emails_sent TINYINT UNSIGNED NOT NULL CHECK(verification_emails_sent <= 3),
-        failed_verification_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_verification_attempts <= 3),
+        emails_sent TINYINT UNSIGNED NOT NULL CHECK(emails_sent <= ?),
+        failed_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_attempts <= ?),
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
+      );`,
+      [ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_ATTEMPTS_LIMIT]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -78,14 +88,15 @@ async function createAccountRecoveryTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS account_recovery (
-        recovery_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL UNIQUE,
         recovery_token CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+        emails_sent TINYINT UNSIGNED NOT NULL CHECK(emails_sent <= ?),
+        failed_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_attempts <= ?),
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
-        recovery_emails_sent TINYINT UNSIGNED NOT NULL CHECK(recovery_emails_sent <= 3),
-        failed_recovery_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_recovery_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
+      );`,
+      [ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_ATTEMPTS_LIMIT]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -96,14 +107,15 @@ async function createAccountDeletionTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS account_deletion (
-        deletion_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL UNIQUE,
         confirmation_code VARCHAR(10) NOT NULL COLLATE utf8mb4_bin,
+        emails_sent TINYINT UNSIGNED NOT NULL CHECK(emails_sent <= ?),
+        failed_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_attempts <= ?),
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
-        deletion_emails_sent TINYINT UNSIGNED NOT NULL CHECK(deletion_emails_sent <= 3),
-        failed_deletion_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_deletion_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
+      );`,
+      [ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_ATTEMPTS_LIMIT]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -114,15 +126,16 @@ async function createEmailUpdateTable(): Promise<void> {
   try {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS email_update (
-        update_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL UNIQUE,
         new_email VARCHAR(254) NOT NULL UNIQUE,
         confirmation_code VARCHAR(10) NOT NULL COLLATE utf8mb4_bin,
+        emails_sent TINYINT UNSIGNED NOT NULL CHECK(emails_sent <= ?),
+        failed_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_attempts <= ?),
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
-        update_emails_sent TINYINT UNSIGNED NOT NULL CHECK(update_emails_sent <= 3),
-        failed_update_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_update_attempts <= 3),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
+      );`,
+      [ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_ATTEMPTS_LIMIT]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -138,9 +151,10 @@ async function createAuthSessionsTable(): Promise<void> {
         created_on_timestamp BIGINT UNSIGNED NOT NULL,
         expiry_timestamp BIGINT UNSIGNED NOT NULL,
         keep_signed_in BOOLEAN NOT NULL,
-        extensions_count TINYINT UNSIGNED NOT NULL CHECK(extensions_count <= 3),
+        extensions_count TINYINT UNSIGNED NOT NULL CHECK(extensions_count <= ?),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
+      );`,
+      [AUTH_EXTENSIONS_LIMIT]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -153,16 +167,17 @@ async function createWishlistsTable(): Promise<void> {
       `CREATE TABLE IF NOT EXISTS wishlists (
         wishlist_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY,
         account_id INT UNSIGNED NOT NULL,
-        privacy_level TINYINT UNSIGNED NOT NULL CHECK (privacy_level IN (0, 1, 2)),
+        privacy_level TINYINT UNSIGNED NOT NULL CHECK (privacy_level IN (?, ?, ?)),
         title VARCHAR(100) NOT NULL,
         created_on_timestamp BIGINT UNSIGNED NOT NULL,
         latest_interaction_timestamp BIGINT UNSIGNED NOT NULL,
         interactivity_index TINYINT UNSIGNED NOT NULL,
         is_favorited BOOLEAN NOT NULL,
-        CHECK (interactivity_index <= 200),
+        CHECK(interactivity_index <= ?),
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         UNIQUE(account_id, title)
-      );`
+      );`,
+      [PRIVATE_WISHLIST_PRIVACY_LEVEL, FOLLOWERS_WISHLIST_PRIVACY_LEVEL, PUBLIC_WISHLIST_PRIVACY_LEVEL, WISHLIST_INTERACTIVITY_MAX_VALUE]
     );
   } catch (err: unknown) {
     console.log(err);

@@ -49,7 +49,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -113,6 +113,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -147,7 +148,7 @@ wishlistsRouter.get('/crossWishlistSearch/:itemTitleQuery', async (req: Request,
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -185,6 +186,7 @@ wishlistsRouter.get('/crossWishlistSearch/:itemTitleQuery', async (req: Request,
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -200,7 +202,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -289,6 +291,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -311,7 +314,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -405,6 +408,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -445,7 +449,7 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -517,6 +521,7 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -569,7 +574,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -625,6 +630,7 @@ wishlistsRouter.patch('/change/privacyLevel', async (req: Request, res: Response
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -666,7 +672,7 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -722,6 +728,7 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -737,7 +744,7 @@ wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -761,6 +768,7 @@ wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -788,7 +796,7 @@ wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -831,6 +839,7 @@ wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 

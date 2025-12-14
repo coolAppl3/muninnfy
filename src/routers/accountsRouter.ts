@@ -8,14 +8,16 @@ import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { generateCryptoUuid, generateConfirmationCode, isValidUuid, isValidConfirmationCode } from '../util/tokenGenerator';
 import {
+  ACCOUNT_DELETION_WINDOW,
   ACCOUNT_EMAIL_UPDATE_WINDOW,
   ACCOUNT_EMAILS_SENT_LIMIT,
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
-  ACCOUNT_FAILED_UPDATE_LIMIT,
+  ACCOUNT_FAILED_ATTEMPTS_LIMIT,
   ACCOUNT_RECOVERY_WINDOW,
   ACCOUNT_VERIFICATION_WINDOW,
 } from '../util/constants/accountConstants';
 import {
+  sendAccountDeletionEmailService,
   sendAccountRecoveryEmailService,
   sendAccountVerificationEmailService,
   sendEmailUpdateStartEmailService,
@@ -25,13 +27,10 @@ import { logUnexpectedError } from '../logs/errorLogger';
 import {
   deleteAccountById,
   handleIncorrectPassword,
-  incrementedFailedEmailUpdateAttempts,
-  incrementEmailUpdateEmailsSent,
-  incrementFailedVerificationAttempts,
-  incrementRecoveryEmailsSent,
-  incrementVerificationEmailsSent,
+  incrementAccountRequestEmailsSent,
+  incrementFailedAccountRequestAttempts,
   resetFailedSignInAttempts,
-  suspendEmailUpdateRequest,
+  suspendAccountRequest,
 } from '../db/helpers/accountDbHelpers';
 import { createAuthSession, purgeAuthSessions } from '../auth/authSessions';
 import { getAuthSessionId } from '../auth/authUtils';
@@ -92,7 +91,6 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type TakenStatus = {
@@ -103,10 +101,10 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     const [takenStatusRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        EXISTS (SELECT 1 FROM accounts WHERE email = ? FOR UPDATE) AS email_taken,
-        EXISTS (SELECT 1 FROM email_update WHERE new_email = ? FOR UPDATE) AS email_temporarily_taken,
-        EXISTS (SELECT 1 FROM accounts WHERE username = ? FOR UPDATE) AS username_taken;`,
-      [email, email, username]
+        EXISTS (SELECT 1 FROM accounts WHERE email = :email FOR UPDATE) AS email_taken,
+        EXISTS (SELECT 1 FROM email_update WHERE new_email = :email FOR UPDATE) AS email_temporarily_taken,
+        EXISTS (SELECT 1 FROM accounts WHERE username = :username FOR UPDATE) AS username_taken;`,
+      { email, username }
     );
 
     const takenStatus = takenStatusRows[0] as TakenStatus | undefined;
@@ -170,8 +168,8 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       `INSERT INTO account_verification (
         account_id,
         verification_token,
-        verification_emails_sent,
-        failed_verification_attempts,
+        emails_sent,
+        failed_attempts,
         expiry_timestamp
       ) VALUES (${generatePlaceHolders(5)});`,
       [accountId, verificationToken, 1, 0, verificationExpiryTimestamp]
@@ -191,6 +189,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -285,6 +284,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -331,10 +331,10 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       email: string;
       display_name: string;
       is_verified: boolean;
-      verification_id: number;
+      verification_request_id: number;
       verification_token: string;
-      verification_emails_sent: number;
-      failed_verification_attempts: number;
+      emails_sent: number;
+      failed_attempts: number;
     };
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
@@ -345,10 +345,10 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
         accounts.display_name,
         accounts.is_verified,
         
-        account_verification.verification_id,
+        account_verification.request_id AS verification_request_id,
         account_verification.verification_token,
-        account_verification.verification_emails_sent,
-        account_verification.failed_verification_attempts
+        account_verification.emails_sent,
+        account_verification.failed_attempts
       FROM
         accounts
       LEFT JOIN
@@ -375,7 +375,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       return;
     }
 
-    if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+    if (!accountDetails.verification_request_id || accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await connection.rollback();
 
       await deleteAccountById(accountDetails.account_id, dbPool, req);
@@ -384,14 +384,14 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       return;
     }
 
-    if (accountDetails.verification_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+    if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
       res.status(403).json({ message: `Sent verification emails limit reached.`, reason: 'emailsSentLimitReached' });
 
       return;
     }
 
-    await incrementVerificationEmailsSent(accountDetails.verification_id, connection, req);
+    await incrementAccountRequestEmailsSent('account_verification', accountDetails.verification_request_id, connection, req);
 
     await connection.commit();
     res.json({});
@@ -407,6 +407,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -458,9 +459,9 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
     type AccountDetails = {
       account_id: number;
       is_verified: boolean;
-      verification_id: number;
+      verification_request_id: number;
       verification_token: string;
-      failed_verification_attempts: number;
+      failed_attempts: number;
     };
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
@@ -468,9 +469,9 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
         accounts.account_id,
         accounts.is_verified,
 
-        account_verification.verification_id,
+        account_verification.request_id AS verification_request_id,
         account_verification.verification_token,
-        account_verification.failed_verification_attempts
+        account_verification.failed_attempts
       FROM
         accounts
       LEFT JOIN
@@ -497,7 +498,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
       return;
     }
 
-    if (!accountDetails.verification_id || accountDetails.failed_verification_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+    if (!accountDetails.verification_request_id || accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await connection.rollback();
 
       await deleteAccountById(accountDetails.account_id, dbPool, req);
@@ -533,20 +534,21 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
 
     await connection.rollback();
 
-    if (accountDetails.failed_verification_attempts + 1 >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+    if (accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await deleteAccountById(accountDetails.account_id, dbPool, req);
       res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken_deleted' });
 
       return;
     }
 
-    await incrementFailedVerificationAttempts(accountDetails.verification_id, dbPool, req);
+    await incrementFailedAccountRequestAttempts('account_verification', accountDetails.verification_request_id, dbPool, req);
     res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken' });
   } catch (err: unknown) {
     console.log(err);
     connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -623,22 +625,14 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
-    if (!accountDetails) {
+    if (!accountDetails || !accountDetails.is_verified) {
       await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
 
-    if (!accountDetails.is_verified) {
-      await connection.rollback();
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
-
-      return;
-    }
-
-    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
-    if (isLocked) {
+    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
       await connection.rollback();
       res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
 
@@ -653,7 +647,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       return;
     }
 
-    const authSessionCreated: boolean = await createAuthSession(res, accountDetails.account_id, keepSignedIn);
+    const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, keepSignedIn);
     if (!authSessionCreated) {
       await connection.rollback();
 
@@ -682,6 +676,7 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -699,7 +694,7 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -747,6 +742,7 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -787,7 +783,7 @@ accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => 
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -817,6 +813,7 @@ accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => 
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -851,7 +848,7 @@ accountsRouter.patch('/details/displayName', async (req: Request, res: Response)
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -906,6 +903,7 @@ accountsRouter.patch('/details/displayName', async (req: Request, res: Response)
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -946,7 +944,7 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -982,13 +980,6 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
     if (!accountDetails) {
       await connection.rollback();
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-
-      return;
-    }
-
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
 
       return;
     }
@@ -1037,15 +1028,20 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
       return;
     }
 
-    await purgeAuthSessions(accountId, authSessionId);
-
     await connection.commit();
     res.json({});
+
+    await purgeAuthSessions(accountId, authSessionId);
+
+    if (accountDetails.failed_sign_in_attempts > 0) {
+      await resetFailedSignInAttempts(accountId, dbPool, req);
+    }
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1088,7 +1084,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -1098,7 +1094,6 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {
@@ -1107,10 +1102,10 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       display_name: string;
       failed_sign_in_attempts: number;
 
-      update_id: number;
+      request_id: number;
       new_email: string;
       expiry_timestamp: number;
-      failed_update_attempts: number;
+      failed_attempts: number;
 
       email_taken: boolean;
       email_temporarily_taken: boolean;
@@ -1123,10 +1118,10 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
         accounts.display_name,
         accounts.failed_sign_in_attempts,
 
-        email_update.update_id,
+        email_update.request_id,
         email_update.new_email,
         email_update.expiry_timestamp,
-        email_update.failed_update_attempts,
+        email_update.failed_attempts,
 
         EXISTS (SELECT 1 FROM accounts WHERE email = :newEmail FOR UPDATE) AS email_taken,
         EXISTS (SELECT 1 FROM email_update WHERE new_email = :newEmail FOR UPDATE) AS email_temporarily_taken
@@ -1149,16 +1144,6 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-
-      removeRequestCookie(res, 'authSessionId');
-      await purgeAuthSessions(accountId);
-
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
-      return;
-    }
-
     const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
     if (!passwordIsCorrect) {
       await connection.rollback();
@@ -1167,17 +1152,17 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
-    if (accountDetails.update_id) {
+    if (accountDetails.request_id) {
       await connection.rollback();
 
       res.status(409).json({
         message: 'Ongoing email change request found.',
         reason: 'ongoingRequest',
         resData: {
-          emailUpdateId: accountDetails.update_id,
+          emailUpdateId: accountDetails.request_id,
           newEmail: accountDetails.new_email,
           expiryTimestamp: accountDetails.expiry_timestamp,
-          isSuspended: accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT,
+          isSuspended: accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT,
         },
       });
 
@@ -1200,8 +1185,8 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
         new_email,
         confirmation_code,
         expiry_timestamp,
-        update_emails_sent,
-        failed_update_attempts
+        emails_sent,
+        failed_attempts
       ) VALUES (${generatePlaceHolders(6)});`,
       [accountId, newEmail, confirmationCode, expiryTimestamp, 1, 0]
     );
@@ -1223,6 +1208,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1252,7 +1238,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -1266,25 +1252,24 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
 
     type AccountDetails = {
       display_name: string;
-      failed_sign_in_attempts: number;
-      update_id: number;
+      request_id: number;
       new_email: string;
       confirmation_code: string;
       expiry_timestamp: number;
-      update_emails_sent: number;
-      failed_update_attempts: number;
+      emails_sent: number;
+      failed_attempts: number;
     };
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         accounts.display_name,
 
-        email_update.update_id,
+        email_update.request_id,
         email_update.new_email,
         email_update.confirmation_code,
         email_update.expiry_timestamp,
-        email_update.update_emails_sent,
-        email_update.failed_update_attempts
+        email_update.emails_sent,
+        email_update.failed_attempts
       FROM
         accounts
       LEFT JOIN
@@ -1304,22 +1289,14 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
       return;
     }
 
-    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
-    if (isLocked) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
-
-      return;
-    }
-
-    if (!accountDetails.update_id) {
+    if (!accountDetails.request_id) {
       await connection.rollback();
       res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
 
       return;
     }
 
-    if (accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await connection.rollback();
 
       res.status(403).json({
@@ -1331,29 +1308,29 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
       return;
     }
 
-    if (accountDetails.update_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+    if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
       res.status(403).json({ message: `Sent change emails limit reached.`, reason: 'emailsSentLimitReached' });
 
       return;
     }
 
-    await incrementEmailUpdateEmailsSent(accountDetails.update_id, connection, req);
+    await incrementAccountRequestEmailsSent('email_update', accountDetails.request_id, connection, req);
 
     await connection.commit();
     res.json({});
 
-    const { new_email, display_name, confirmation_code } = accountDetails;
     await sendEmailUpdateStartEmailService({
-      receiver: new_email,
-      displayName: display_name,
-      confirmationCode: confirmation_code,
+      receiver: accountDetails.new_email,
+      displayName: accountDetails.display_name,
+      confirmationCode: accountDetails.confirmation_code,
     });
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1390,7 +1367,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, res);
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
   if (!accountId) {
     return;
@@ -1403,28 +1380,24 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     await connection.beginTransaction();
 
     type AccountDetails = {
-      failed_sign_in_attempts: number;
-      update_id: number;
+      request_id: number;
       new_email: string;
       confirmation_code: string;
+      failed_attempts: number;
       expiry_timestamp: number;
-      failed_update_attempts: number;
     };
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        accounts.failed_sign_in_attempts,
-        email_update.update_id,
-        email_update.new_email,
-        email_update.confirmation_code,
-        email_update.expiry_timestamp,
-        email_update.failed_Update_attempts
+        request_id,
+        new_email,
+        confirmation_code,
+        expiry_timestamp,
+        failed_attempts
       FROM
-        accounts
-      LEFT JOIN
-        email_update USING(account_id)
+        email_update
       WHERE
-        accounts.account_id = ?;`,
+        account_id = ?;`,
       [accountId]
     );
 
@@ -1437,21 +1410,14 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
       return;
     }
 
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked', reason: 'accountLocked' });
-
-      return;
-    }
-
-    if (!accountDetails.update_id) {
+    if (!accountDetails.request_id) {
       await connection.rollback();
       res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
 
       return;
     }
 
-    if (accountDetails.failed_update_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await connection.rollback();
 
       res.status(403).json({
@@ -1466,19 +1432,17 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     if (accountDetails.confirmation_code !== confirmationCode) {
       await connection.rollback();
 
-      const suspendRequest: boolean = accountDetails.failed_update_attempts + 1 >= ACCOUNT_FAILED_UPDATE_LIMIT;
+      const suspendRequest: boolean = accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
       if (!suspendRequest) {
-        await incrementedFailedEmailUpdateAttempts(accountDetails.update_id, dbPool, req);
+        await incrementFailedAccountRequestAttempts('email_update', accountDetails.request_id, dbPool, req);
         res.status(401).json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
 
         return;
       }
 
-      const requestSuspended: boolean = await suspendEmailUpdateRequest(accountDetails.update_id, dbPool, req);
+      const requestSuspended: boolean = await suspendAccountRequest('email_update', accountDetails.request_id, dbPool, req);
       if (!requestSuspended) {
         res.status(500).json({ message: 'Internal server error.' });
-        await logUnexpectedError(req, null, 'Failed to suspend email update request.');
-
         return;
       }
 
@@ -1500,8 +1464,8 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
       `DELETE FROM
         email_update
       WHERE
-        update_id = ?;`,
-      [accountDetails.update_id]
+        request_id = ?;`,
+      [accountDetails.request_id]
     );
 
     const emailUpdated: boolean = firstResultSetheader.affectedRows > 0;
@@ -1527,6 +1491,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1567,7 +1532,6 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 
   try {
     connection = await dbPool.getConnection();
-    await connection.execute(`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`);
     await connection.beginTransaction();
 
     type AccountDetails = {
@@ -1575,9 +1539,9 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
       public_account_id: string;
       display_name: string;
       is_verified: boolean;
-      recovery_id: number;
+      request_id: number;
       expiry_timestamp: number;
-      failed_recovery_attempts: number;
+      failed_attempts: number;
     };
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
@@ -1587,9 +1551,9 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
         accounts.display_name,
         accounts.is_verified,
 
-        account_recovery.recovery_id,
+        account_recovery.request_id,
         account_recovery.expiry_timestamp,
-        account_recovery.failed_recovery_attempts
+        account_recovery.failed_attempts
       FROM
         accounts
       LEFT JOIN
@@ -1609,7 +1573,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
       return;
     }
 
-    if (!accountDetails.recovery_id) {
+    if (!accountDetails.request_id) {
       const recoveryToken: string = generateCryptoUuid();
       const expiryTimestamp: number = Date.now() + ACCOUNT_RECOVERY_WINDOW;
 
@@ -1618,8 +1582,8 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
           account_id,
           recovery_token,
           expiry_timestamp,
-          recovery_emails_sent,
-          failed_recovery_attempts
+          emails_sent,
+          failed_attempts
         ) VALUES (${generatePlaceHolders(5)});`,
         [accountDetails.account_id, recoveryToken, expiryTimestamp, 1, 0]
       );
@@ -1639,7 +1603,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 
     await connection.rollback();
 
-    if (accountDetails.failed_recovery_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       res.status(403).json({
         message: 'Recovery request suspended.',
         reason: 'requestSuspended',
@@ -1659,6 +1623,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -1705,11 +1670,11 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
       email: string;
       display_name: string;
       is_verified: boolean;
-      recovery_id: number;
+      request_id: number;
       recovery_token: string;
       expiry_timestamp: number;
-      recovery_emails_sent: number;
-      failed_recovery_attempts: number;
+      emails_sent: number;
+      failed_attempts: number;
     };
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
@@ -1718,11 +1683,11 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
         accounts.display_name,
         accounts.is_verified,
 
-        account_recovery.recovery_id,
+        account_recovery.request_id,
         account_recovery.recovery_token,
         account_recovery.expiry_timestamp,
-        account_recovery.recovery_emails_sent,
-        account_recovery.failed_recovery_attempts
+        account_recovery.emails_sent,
+        account_recovery.failed_attempts
       FROM
         accounts
       LEFT JOIN
@@ -1742,14 +1707,14 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
       return;
     }
 
-    if (!accountDetails.recovery_id) {
+    if (!accountDetails.request_id) {
       await connection.rollback();
       res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
 
       return;
     }
 
-    if (accountDetails.failed_recovery_attempts >= ACCOUNT_FAILED_UPDATE_LIMIT) {
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await connection.rollback();
 
       res.status(403).json({
@@ -1761,14 +1726,14 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
       return;
     }
 
-    if (accountDetails.recovery_emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+    if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
       res.status(403).json({ message: 'Sent recovery emails limit reached.', reason: 'emailsSentLimitReached' });
 
       return;
     }
 
-    await incrementRecoveryEmailsSent(accountDetails.recovery_id, dbPool, req);
+    await incrementAccountRequestEmailsSent('account_recovery', accountDetails.request_id, connection, req);
 
     await connection.commit();
     res.json({});
@@ -1784,6 +1749,568 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
     await connection?.rollback();
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
+
+accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) => {
+  const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
+  if (isSignedIn) {
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    return;
+  }
+
+  type RequestData = {
+    publicAccountId: string;
+    recoveryToken: string;
+    newPassword: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['publicAccountId', 'recoveryToken', 'newPassword'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { publicAccountId, recoveryToken, newPassword } = requestData;
+
+  if (!isValidUuid(publicAccountId)) {
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    return;
+  }
+
+  if (!isValidUuid(recoveryToken)) {
+    res.status(400).json({ message: 'Invalid recovery token.', reason: 'invalidRecoveryToken' });
+    return;
+  }
+
+  if (!isValidNewPassword(newPassword)) {
+    res.status(400).json({ message: 'Invalid new password.', reason: 'invalidNewPassword' });
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      account_id: number;
+      username: string;
+      is_verified: boolean;
+      request_id: number;
+      recovery_token: string;
+      expiry_timestamp: number;
+      failed_attempts: number;
+    };
+
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.account_id,
+        accounts.username,
+        accounts.is_verified,
+
+        account_recovery.request_id,
+        account_recovery.recovery_token,
+        account_recovery.expiry_timestamp,
+        account_recovery.failed_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        account_recovery USING(account_id)
+      WHERE
+        accounts.public_account_id = ?
+      FOR UPDATE;`,
+      [publicAccountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails || !accountDetails.is_verified) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    if (!accountDetails.account_id) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
+
+      return;
+    }
+
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+      await connection.rollback();
+
+      res.status(403).json({
+        message: 'Recovery request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    if (accountDetails.recovery_token !== recoveryToken) {
+      await connection.rollback();
+
+      const suspendRequest: boolean = accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
+      if (!suspendRequest) {
+        await incrementFailedAccountRequestAttempts('account_recovery', accountDetails.request_id, dbPool, req);
+        res.status(401).json({ message: 'Incorrect recovery token.', reason: 'incorrectToken' });
+
+        return;
+      }
+
+      const requestSuspended: boolean = await suspendAccountRequest('account_recovery', accountDetails.request_id, dbPool, req);
+      if (!requestSuspended) {
+        res.status(500).json({ message: 'Internal server error.' });
+        return;
+      }
+
+      res.status(401).json({ message: 'Incorrect recovery token. Request suspended.', reason: 'incorrectToken_suspended' });
+      return;
+    }
+
+    if (accountDetails.username === newPassword) {
+      await connection.rollback();
+      res.status(409).json({ message: `Username and new password can't match.`, reason: 'newPasswordMatchesUsername' });
+
+      return;
+    }
+
+    const newHashedPassword: string = await bcrypt.hash(newPassword, 10);
+
+    const [firstResultSetheader] = await connection.execute<ResultSetHeader>(
+      `UPDATE
+        accounts
+      SET
+        hashed_password = ?,
+        failed_sign_in_attempts = ?
+      WHERE
+        account_id = ?;`,
+      [newHashedPassword, 0, accountDetails.account_id]
+    );
+
+    const [secondResultSetHeader] = await connection.execute<ResultSetHeader>(
+      `DELETE FROM
+        account_recovery
+      WHERE
+        request_id = ?;`,
+      [accountDetails.request_id]
+    );
+
+    const accountRecovered: boolean = firstResultSetheader.affectedRows > 0;
+    const recoveryRequestDeleted: boolean = secondResultSetHeader.affectedRows > 0;
+
+    if (!accountRecovered || !recoveryRequestDeleted) {
+      await connection.rollback();
+      res.status(500).json({ message: 'Internal server error.' });
+
+      await logUnexpectedError(
+        req,
+        null,
+        `Failed to complete email update process. Account recovered: ${accountRecovered}. Request deleted: ${recoveryRequestDeleted}.`
+      );
+
+      return;
+    }
+
+    connection.commit();
+    res.json({});
+
+    await purgeAuthSessions(accountDetails.account_id);
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
+
+accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  type RequestData = {
+    password: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['password'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { password } = requestData;
+
+  if (!isValidPassword(password)) {
+    res.status(400).json({ message: 'Invalid password.', reason: 'invalidPassword' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      email: string;
+      hashed_password: string;
+      display_name: string;
+      is_verified: boolean;
+      failed_sign_in_attempts: number;
+      request_id: number;
+      expiry_timestamp: number;
+      failed_attempts: number;
+    };
+
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.email,
+        accounts.hashed_password,
+        accounts.display_name,
+        accounts.is_verified,
+        accounts.failed_sign_in_attempts,
+        
+        account_deletion.request_id,
+        account_deletion.expiry_timestamp,
+        account_deletion.failed_attempts
+      FROM
+        accounts
+      LEFT JOIN
+        account_deletion USING(account_id)
+      WHERE
+        accounts.account_id = ?
+      FOR UPDATE;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails || !accountDetails.is_verified) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    if (!passwordIsCorrect) {
+      await connection.rollback();
+      await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+
+      return;
+    }
+
+    if (accountDetails.request_id) {
+      await connection.rollback();
+
+      res.status(409).json({
+        message: 'Ongoing deletion request found.',
+        reason: 'ongoingRequest',
+        resData: {
+          deletionId: accountDetails.request_id,
+          expiryTimestamp: accountDetails.expiry_timestamp,
+          isSuspended: accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+        },
+      });
+
+      return;
+    }
+
+    const expiryTimestamp: number = Date.now() + ACCOUNT_DELETION_WINDOW;
+    const confirmationCode: string = generateConfirmationCode();
+
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+      `INSERT INTO account_deletion (
+        account_id,
+        confirmation_code,
+        expiry_timestamp,
+        emails_sent,
+        failed_attempts
+      ) VALUES(${generatePlaceHolders(5)});`,
+      [accountId, confirmationCode, expiryTimestamp, 1, 0]
+    );
+
+    await connection.commit();
+    res.json({ deletionId: resultSetHeader.insertId, expiryTimestamp });
+
+    await sendAccountDeletionEmailService({
+      receiver: accountDetails.email,
+      displayName: accountDetails.display_name,
+      confirmationCode,
+    });
+
+    if (accountDetails.failed_sign_in_attempts > 0) {
+      await resetFailedSignInAttempts(accountId, dbPool, req);
+    }
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
+
+accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      email: string;
+      display_name: string;
+      request_id: number;
+      confirmation_code: string;
+      emails_sent: number;
+      failed_attempts: number;
+      expiry_timestamp: number;
+    };
+
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.email,
+        accounts.display_name,
+        
+        account_deletion.request_id,
+        account_deletion.confirmation_code,
+        account_deletion.emails_sent,
+        account_deletion.failed_attempts,
+        account_deletion.expiry_timestamp
+      FROM
+        accounts
+      LEFT JOIN
+        account_deletion USING(account_id)
+      WHERE
+        accounts.account_id = ?
+      FOR UPDATE;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+      await connection.rollback();
+
+      res.status(403).json({
+        message: 'Deletion request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
+      await connection.rollback();
+      res.status(403).json({ message: 'Sent deletion emails limit reached.', reason: 'emailsSentLimitReached' });
+
+      return;
+    }
+
+    await incrementAccountRequestEmailsSent('account_deletion', accountDetails.request_id, connection, req);
+
+    await connection.commit();
+    res.json({});
+
+    await sendAccountDeletionEmailService({
+      receiver: accountDetails.email,
+      displayName: accountDetails.display_name,
+      confirmationCode: accountDetails.confirmation_code,
+    });
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
+  }
+});
+
+accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const confirmationCode: string | undefined = req.params.confirmationCode;
+
+  if (!confirmationCode || !isValidConfirmationCode(confirmationCode)) {
+    res.status(400).json({ message: 'Invalid confirmation code.', reason: 'invalidConfirmationCode' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  let connection: PoolConnection | null = null;
+
+  try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
+    type AccountDetails = {
+      request_id: number;
+      confirmation_code: string;
+      failed_attempts: number;
+      expiry_timestamp: number;
+    };
+
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
+      `SELECT
+        request_id,
+        confirmation_code,
+        failed_attempts,
+        expiry_timestamp
+      FROM
+        email_update
+      WHERE
+        account_id = ?
+      FOR UPDATE;`,
+      [accountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
+      return;
+    }
+
+    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+      await connection.rollback();
+
+      res.status(403).json({
+        message: 'Deletion request suspended.',
+        reason: 'requestSuspended',
+        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+      });
+
+      return;
+    }
+
+    if (accountDetails.confirmation_code !== confirmationCode) {
+      await connection.rollback();
+
+      const suspendRequest: boolean = accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
+      if (!suspendRequest) {
+        await incrementFailedAccountRequestAttempts('account_deletion', accountDetails.request_id, dbPool, req);
+        res.status(401).json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
+
+        return;
+      }
+
+      const requestSuspended: boolean = await suspendAccountRequest('account_deletion', accountDetails.request_id, dbPool, req);
+      if (!requestSuspended) {
+        res.status(500).json({ message: 'Internal server error.' });
+        return;
+      }
+
+      res.status(401).json({ message: 'Incorrect confirmation code. Request suspended.', reason: 'incorrectCode_suspended' });
+      return;
+    }
+
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+      `DELETE FROM
+        accounts
+      WHERE
+        account_id = ?;`,
+      [accountId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      await connection.rollback();
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, null, 'Failed to delete account.');
+
+      return;
+    }
+
+    removeRequestCookie(res, 'authSessionId');
+
+    await connection.commit();
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+    await connection?.rollback();
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 

@@ -92,6 +92,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -133,6 +134,7 @@ authRouter.delete('/session', async (req: Request, res: Response) => {
     console.log(err);
 
     if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 

@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.2.4] (2024-12-14)
+
+### Features
+
+- Added the following endpoints:
+  - PATCH `accounts/recovery/confirm`.
+  - POST `accounts/deletion/start`.
+  - PATCH `accounts/deletion/resendEmail`.
+  - DELETE `accounts/deletion/confirm/:confirmationCode`.
+- Added the following helpers:
+  - `incrementAccountRequestEmailsSent`.
+  - `incrementFailedAccountRequestAttempts`.
+  - `suspendAccountRequest`.
+- Added `deleteStaleAccountRecoveryRequestsCron()`.
+- Added `deleteStaleAccountDeletionRequestsCron()`.
+- Added `accountDeletionEmailTemplate`.
+- Added `sendAccountDeletionEmailService()`.
+
+
+### Changes
+
+- `logUnexpectedError()` can now accept `null` for the `req` parameter.
+
+
+### Improvements
+
+- Majorly reduced redundancy, and improved readability, for account-related change endpoints and logic, changing the row names in a few tables in the process.
+
+
+### Bug Fixes
+
+- Fixed error logging issues throughout the app.
+- Fixed a few issues with the use of the use of transactions throughout the app, improving the overall logic in the process.
+- Fixed `extensions_count` not being reset when the oldest auth session is repurposed in `createAuthSession()`.
+
+
+### Code Refactoring
+
+- Refactored removed redundant `failed_sign_in_attempts` checks in `accountsRouter`.
+- Refactored renamed `WISHLIST_INTERACTION_MAX_VALUE` to `WISHLIST_INTERACTIVITY_MAX_VALUE`.
+- Refactored removed redundant logging.
+- Other minor refactors related to the improvements in this patch.
+
+
 ## [0.2.3] (2024-12-08)
 
 ### Features
