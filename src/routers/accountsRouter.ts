@@ -1892,7 +1892,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
 
     const newHashedPassword: string = await bcrypt.hash(newPassword, 10);
 
-    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+    const [firstResultSetheader] = await connection.execute<ResultSetHeader>(
       `UPDATE
         accounts
       SET
@@ -1903,11 +1903,26 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       [newHashedPassword, 0, accountDetails.account_id]
     );
 
-    if (resultSetHeader.affectedRows === 0) {
-      await connection.rollback();
+    const [secondResultSetHeader] = await connection.execute<ResultSetHeader>(
+      `DELETE FROM
+        account_recovery
+      WHERE
+        request_id = ?;`,
+      [accountDetails.request_id]
+    );
 
+    const accountRecovered: boolean = firstResultSetheader.affectedRows > 0;
+    const recoveryRequestDeleted: boolean = secondResultSetHeader.affectedRows > 0;
+
+    if (!accountRecovered || !recoveryRequestDeleted) {
+      await connection.rollback();
       res.status(500).json({ message: 'Internal server error.' });
-      await logUnexpectedError(req, null, 'Failed to update hashed_password.');
+
+      await logUnexpectedError(
+        req,
+        null,
+        `Failed to complete email update process. Account recovered: ${accountRecovered}. Request deleted: ${recoveryRequestDeleted}.`
+      );
 
       return;
     }
