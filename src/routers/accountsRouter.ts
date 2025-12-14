@@ -625,22 +625,14 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
-    if (!accountDetails) {
+    if (!accountDetails || !accountDetails.is_verified) {
       await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
 
-    if (!accountDetails.is_verified) {
-      await connection.rollback();
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
-
-      return;
-    }
-
-    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
-    if (isLocked) {
+    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
       await connection.rollback();
       res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
 
@@ -992,13 +984,6 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
       return;
     }
 
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
-
-      return;
-    }
-
     if (newPassword === accountDetails.username) {
       await connection.rollback();
       res.status(409).json({ message: `Username and password can't match.`, reason: 'newPasswordMatchesUsername' });
@@ -1047,6 +1032,10 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
     res.json({});
 
     await purgeAuthSessions(accountId, authSessionId);
+
+    if (accountDetails.failed_sign_in_attempts > 0) {
+      await resetFailedSignInAttempts(accountId, dbPool, req);
+    }
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -1152,16 +1141,6 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       await connection.rollback();
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
-      return;
-    }
-
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-
-      removeRequestCookie(res, 'authSessionId');
-      await purgeAuthSessions(accountId);
-
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
       return;
     }
 
@@ -1273,7 +1252,6 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
 
     type AccountDetails = {
       display_name: string;
-      failed_sign_in_attempts: number;
       request_id: number;
       new_email: string;
       confirmation_code: string;
@@ -1311,14 +1289,6 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
       return;
     }
 
-    const isLocked: boolean = accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT;
-    if (isLocked) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
-
-      return;
-    }
-
     if (!accountDetails.request_id) {
       await connection.rollback();
       res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
@@ -1350,11 +1320,10 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
     await connection.commit();
     res.json({});
 
-    const { new_email, display_name, confirmation_code } = accountDetails;
     await sendEmailUpdateStartEmailService({
-      receiver: new_email,
-      displayName: display_name,
-      confirmationCode: confirmation_code,
+      receiver: accountDetails.new_email,
+      displayName: accountDetails.display_name,
+      confirmationCode: accountDetails.confirmation_code,
     });
   } catch (err: unknown) {
     console.log(err);
@@ -1411,7 +1380,6 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     await connection.beginTransaction();
 
     type AccountDetails = {
-      failed_sign_in_attempts: number;
       request_id: number;
       new_email: string;
       confirmation_code: string;
@@ -1421,18 +1389,15 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        accounts.failed_sign_in_attempts,
-        email_update.request_id,
-        email_update.new_email,
-        email_update.confirmation_code,
-        email_update.expiry_timestamp,
-        email_update.failed_attempts
+        request_id,
+        new_email,
+        confirmation_code,
+        expiry_timestamp,
+        failed_attempts
       FROM
-        accounts
-      LEFT JOIN
-        email_update USING(account_id)
+        email_update
       WHERE
-        accounts.account_id = ?;`,
+        account_id = ?;`,
       [accountId]
     );
 
@@ -1441,13 +1406,6 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     if (!accountDetails) {
       await connection.rollback();
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-
-      return;
-    }
-
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked', reason: 'accountLocked' });
 
       return;
     }
@@ -1850,7 +1808,6 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       account_id: number;
       username: string;
       is_verified: boolean;
-      failed_sign_in_attempts: number;
       request_id: number;
       recovery_token: string;
       expiry_timestamp: number;
@@ -1862,7 +1819,6 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
         accounts.account_id,
         accounts.username,
         accounts.is_verified,
-        accounts.failed_sign_in_attempts,
 
         account_recovery.request_id,
         account_recovery.recovery_token,
@@ -2054,13 +2010,6 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
       return;
     }
 
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
-
-      return;
-    }
-
     const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
     if (!passwordIsCorrect) {
       await connection.rollback();
@@ -2107,6 +2056,10 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
       displayName: accountDetails.display_name,
       confirmationCode,
     });
+
+    if (accountDetails.failed_sign_in_attempts > 0) {
+      await resetFailedSignInAttempts(accountId, dbPool, req);
+    }
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -2145,7 +2098,6 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
     type AccountDetails = {
       email: string;
       display_name: string;
-      failed_sign_in_attempts: number;
       request_id: number;
       confirmation_code: string;
       emails_sent: number;
@@ -2157,7 +2109,6 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
       `SELECT
         accounts.email,
         accounts.display_name,
-        accounts.failed_sign_in_attempts,
         
         account_deletion.request_id,
         account_deletion.confirmation_code,
@@ -2179,13 +2130,6 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
     if (!accountDetails) {
       await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
-
-      return;
-    }
-
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
 
       return;
     }
@@ -2262,7 +2206,6 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
     await connection.beginTransaction();
 
     type AccountDetails = {
-      failed_sign_in_attempts: number;
       request_id: number;
       confirmation_code: string;
       failed_attempts: number;
@@ -2271,18 +2214,14 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        accounts.failed_sign_in_attempts,
-        
-        account_deletion.request_id,
-        account_deletion.confirmation_code,
-        account_deletion.failed_attempts,
-        account_deletion.expiry_timestamp
+        request_id,
+        confirmation_code,
+        failed_attempts,
+        expiry_timestamp
       FROM
-        accounts
-      LEFT JOIN
-        account_deletion USING(account_id)
+        email_update
       WHERE
-        accounts.account_id = ?
+        account_id = ?
       FOR UPDATE;`,
       [accountId]
     );
@@ -2292,13 +2231,6 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
     if (!accountDetails) {
       await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
-
-      return;
-    }
-
-    if (accountDetails.failed_sign_in_attempts >= ACCOUNT_FAILED_SIGN_IN_LIMIT) {
-      await connection.rollback();
-      res.status(403).json({ message: 'Account is locked.', reason: 'accountLocked' });
 
       return;
     }
