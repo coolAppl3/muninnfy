@@ -32,7 +32,7 @@ export function AccountProfile(): JSX.Element {
         <StatisticItem
           title='Email address'
           value={email}
-          className='md:col-span-2'
+          className='md:col-span-2 break-all'
         />
       </div>
 
