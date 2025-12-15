@@ -24,7 +24,7 @@ export default function AccountProfilePrivacy(): JSX.Element {
   async function updateAccountPrivacy(): Promise<void> {
     try {
       await updateAccountPrivacyService({ isPrivate, approveFollowRequests });
-      setAccountDetails((prev) => ({ ...prev, is_private: isPrivate, approveFollowRequests: approve_follow_requests }));
+      setAccountDetails((prev) => ({ ...prev, is_private: isPrivate, approve_follow_requests: approveFollowRequests }));
 
       displayPopupMessage('Privacy preferences updated.', 'success');
     } catch (err: unknown) {
