@@ -4,9 +4,11 @@ import AccountProfileHeader from './components/AccountProfileHeader/AccountProfi
 import AccountProfilePrivacy from './components/AccountProfilePrivacy/AccountProfilePrivacy';
 import useAccountDetails from '../hooks/useAccountDetails';
 import { getFullDateString } from '../../../utils/globalUtils';
-import AccountProfileProvider from './context/AccountProfileProvider';
+import { AccountProfileSection } from './context/AccountProfileContext';
+import useAccountProfile from '../contexts/useAccountProfile';
 
 export function AccountProfile(): JSX.Element {
+  const { section } = useAccountProfile();
   const { accountDetails } = useAccountDetails();
   const { public_account_id, created_on_timestamp, display_name, username, email } = accountDetails;
 
@@ -37,8 +39,20 @@ export function AccountProfile(): JSX.Element {
         />
       </div>
 
-      <div className='h-line mt-2 mb-1'></div>
-      <AccountProfilePrivacy />
+      {section && (
+        <div>
+          <div className='h-line mt-2 mb-1'></div>
+          {contentRecord[section]}
+        </div>
+      )}
     </>
   );
 }
+
+const contentRecord: Record<AccountProfileSection, JSX.Element> = {
+  PRIVACY_SETTINGS: <AccountProfilePrivacy />,
+  CHANGE_DISPLAY_NAME: <></>, // TODO: implement
+  CHANGE_EMAIL: <></>, // TODO: implement
+  CHANGE_PASSWORD: <></>, // TODO: implement
+  DELETE_ACCOUNT: <></>, // TODO: implement
+};
