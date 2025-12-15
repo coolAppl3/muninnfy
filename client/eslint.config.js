@@ -41,6 +41,7 @@ export default defineConfig([
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       eqeqeq: 'error',
+      'react-hooks/exhaustive-deps': 'error',
     },
   },
 ]);
