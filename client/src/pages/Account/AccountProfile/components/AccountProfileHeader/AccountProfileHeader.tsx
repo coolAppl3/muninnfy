@@ -36,6 +36,17 @@ export default function AccountProfileHeader(): JSX.Element {
             // TODO: continue implementation
           }}
         >
+          Edit privacy settings
+        </button>
+
+        <button
+          type='button'
+          className='context-menu-btn'
+          onClick={() => {
+            setIsOpen(false);
+            // TODO: continue implementation
+          }}
+        >
           Change display name
         </button>
 
@@ -48,6 +59,28 @@ export default function AccountProfileHeader(): JSX.Element {
           }}
         >
           Change email address
+        </button>
+
+        <button
+          type='button'
+          className='context-menu-btn'
+          onClick={() => {
+            setIsOpen(false);
+            // TODO: continue implementation
+          }}
+        >
+          Change password
+        </button>
+
+        <button
+          type='button'
+          className='context-menu-btn danger'
+          onClick={() => {
+            setIsOpen(false);
+            // TODO: continue implementation
+          }}
+        >
+          Delete account
         </button>
       </div>
     </header>
