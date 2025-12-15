@@ -18,7 +18,7 @@ export function AccountProfile(): JSX.Element {
         <p className='leading-[1]'>Created on {getFullDateString(created_on_timestamp)}</p>
       </div>
 
-      <div className='grid md:grid-cols-2 gap-1 text-sm text-description'>
+      <div className='grid md:grid-cols-2 gap-1 text-sm text-description relative z-0'>
         <StatisticItem
           title='Display name'
           value={display_name}
