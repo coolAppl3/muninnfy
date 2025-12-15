@@ -4,13 +4,14 @@ import AccountProfileHeader from './components/AccountProfileHeader/AccountProfi
 import AccountProfilePrivacy from './components/AccountProfilePrivacy/AccountProfilePrivacy';
 import useAccountDetails from '../hooks/useAccountDetails';
 import { getFullDateString } from '../../../utils/globalUtils';
+import AccountProfileProvider from './context/AccountProfileProvider';
 
 export function AccountProfile(): JSX.Element {
   const { accountDetails } = useAccountDetails();
   const { public_account_id, created_on_timestamp, display_name, username, email } = accountDetails;
 
   return (
-    <>
+    <AccountProfileProvider>
       <AccountProfileHeader />
 
       <div className='text-description/50 text-xs mb-[1.2rem]'>
@@ -38,6 +39,6 @@ export function AccountProfile(): JSX.Element {
 
       <div className='h-line mt-2 mb-1'></div>
       <AccountProfilePrivacy />
-    </>
+    </AccountProfileProvider>
   );
 }
