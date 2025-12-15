@@ -6,14 +6,14 @@ type AccountProfileProviderProps = {
 };
 
 export default function AccountProfileProvider({ children }: AccountProfileProviderProps): JSX.Element {
-  const [section, setSection] = useState<AccountProfileSection | null>(null);
+  const [profileSection, setProfileSection] = useState<AccountProfileSection | null>(null);
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const contextValue: AccountProfileContextType = useMemo(
     () => ({
-      section,
-      setSection,
+      profileSection,
+      setProfileSection,
 
       menuIsOpen,
       setMenuIsOpen,
@@ -21,7 +21,7 @@ export default function AccountProfileProvider({ children }: AccountProfileProvi
       isSubmitting,
       setIsSubmitting,
     }),
-    [section, menuIsOpen, isSubmitting]
+    [profileSection, menuIsOpen, isSubmitting]
   );
 
   return <AccountProfileContext value={contextValue}>{children}</AccountProfileContext>;
