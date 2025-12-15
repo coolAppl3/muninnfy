@@ -1,8 +1,9 @@
-import { FocusEvent, JSX, useState } from 'react';
+import { FocusEvent, JSX } from 'react';
 import TripleDotIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
+import useAccountProfile from '../../../contexts/useAccountProfile';
 
 export default function AccountProfileHeader(): JSX.Element {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { menuIsOpen, setMenuIsOpen } = useAccountProfile();
 
   return (
     <header
@@ -12,7 +13,7 @@ export default function AccountProfileHeader(): JSX.Element {
           return;
         }
 
-        setIsOpen(false);
+        setMenuIsOpen(false);
       }}
     >
       <h3 className='text-md font-normal'>Personal information</h3>
@@ -20,19 +21,19 @@ export default function AccountProfileHeader(): JSX.Element {
       <button
         type='button'
         className='bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
-        onClick={() => setIsOpen((prev) => !prev)}
-        title={`${isOpen ? 'Hide' : 'View'} profile menu`}
-        aria-label={`${isOpen ? 'Hide' : 'View'} profile menu`}
+        onClick={() => setMenuIsOpen((prev) => !prev)}
+        title={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
+        aria-label={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
       >
-        <TripleDotIcon className={`w-[1.6rem] h-[1.6rem] transition-colors ${isOpen ? 'text-cta' : ''}`} />
+        <TripleDotIcon className={`w-[1.6rem] h-[1.6rem] transition-colors ${menuIsOpen ? 'text-cta' : ''}`} />
       </button>
 
-      <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
+      <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
           className='context-menu-btn'
           onClick={() => {
-            setIsOpen(false);
+            setMenuIsOpen(false);
             // TODO: continue implementation
           }}
         >
@@ -43,7 +44,7 @@ export default function AccountProfileHeader(): JSX.Element {
           type='button'
           className='context-menu-btn'
           onClick={() => {
-            setIsOpen(false);
+            setMenuIsOpen(false);
             // TODO: continue implementation
           }}
         >
@@ -54,7 +55,7 @@ export default function AccountProfileHeader(): JSX.Element {
           type='button'
           className='context-menu-btn'
           onClick={() => {
-            setIsOpen(false);
+            setMenuIsOpen(false);
             // TODO: continue implementation
           }}
         >
@@ -65,7 +66,7 @@ export default function AccountProfileHeader(): JSX.Element {
           type='button'
           className='context-menu-btn'
           onClick={() => {
-            setIsOpen(false);
+            setMenuIsOpen(false);
             // TODO: continue implementation
           }}
         >
@@ -76,7 +77,7 @@ export default function AccountProfileHeader(): JSX.Element {
           type='button'
           className='context-menu-btn danger'
           onClick={() => {
-            setIsOpen(false);
+            setMenuIsOpen(false);
             // TODO: continue implementation
           }}
         >
