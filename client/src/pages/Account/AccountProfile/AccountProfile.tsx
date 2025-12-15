@@ -8,7 +8,7 @@ import { AccountProfileSection } from './context/AccountProfileContext';
 import useAccountProfile from '../contexts/useAccountProfile';
 
 export function AccountProfile(): JSX.Element {
-  const { section } = useAccountProfile();
+  const { profileSection } = useAccountProfile();
   const { accountDetails } = useAccountDetails();
   const { public_account_id, created_on_timestamp, display_name, username, email } = accountDetails;
 
@@ -39,10 +39,10 @@ export function AccountProfile(): JSX.Element {
         />
       </div>
 
-      {section && (
+      {profileSection && (
         <div>
           <div className='h-line mt-2 mb-1'></div>
-          {contentRecord[section]}
+          {contentRecord[profileSection]}
         </div>
       )}
     </>

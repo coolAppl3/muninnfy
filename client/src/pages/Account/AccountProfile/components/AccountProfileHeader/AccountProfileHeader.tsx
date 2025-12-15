@@ -3,7 +3,7 @@ import TripleDotIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react
 import useAccountProfile from '../../../contexts/useAccountProfile';
 
 export default function AccountProfileHeader(): JSX.Element {
-  const { menuIsOpen, setMenuIsOpen, section, setSection } = useAccountProfile();
+  const { menuIsOpen, setMenuIsOpen, profileSection, setProfileSection } = useAccountProfile();
 
   return (
     <header
@@ -31,10 +31,10 @@ export default function AccountProfileHeader(): JSX.Element {
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className={`context-menu-btn ${section === 'PRIVACY_SETTINGS' ? 'text-cta' : ''}`}
+          className={`context-menu-btn ${profileSection === 'PRIVACY_SETTINGS' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setSection('PRIVACY_SETTINGS');
+            setProfileSection('PRIVACY_SETTINGS');
           }}
         >
           Privacy settings
@@ -42,10 +42,10 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${section === 'CHANGE_DISPLAY_NAME' ? 'text-cta' : ''}`}
+          className={`context-menu-btn ${profileSection === 'CHANGE_DISPLAY_NAME' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setSection('CHANGE_DISPLAY_NAME');
+            setProfileSection('CHANGE_DISPLAY_NAME');
           }}
         >
           Change display name
@@ -53,10 +53,10 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${section === 'CHANGE_EMAIL' ? 'text-cta' : ''}`}
+          className={`context-menu-btn ${profileSection === 'CHANGE_EMAIL' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setSection('CHANGE_EMAIL');
+            setProfileSection('CHANGE_EMAIL');
           }}
         >
           Change email address
@@ -64,10 +64,10 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${section === 'CHANGE_PASSWORD' ? 'text-cta' : ''}`}
+          className={`context-menu-btn ${profileSection === 'CHANGE_PASSWORD' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setSection('CHANGE_PASSWORD');
+            setProfileSection('CHANGE_PASSWORD');
           }}
         >
           Change password
@@ -78,7 +78,7 @@ export default function AccountProfileHeader(): JSX.Element {
           className='context-menu-btn danger'
           onClick={() => {
             setMenuIsOpen(false);
-            setSection('DELETE_ACCOUNT');
+            setProfileSection('DELETE_ACCOUNT');
           }}
         >
           Delete account
