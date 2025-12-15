@@ -9,7 +9,11 @@ import AccountWishlists from '../AccountWishlists/AccountWishlists';
 export default function AccountContent(): JSX.Element {
   const { accountLocation } = useAccountLocation();
 
-  return <div className='p-2 bg-secondary rounded-sm col-span-12 md:col-span-9 shadow-simple-tiny'>{ContentRecord[accountLocation]}</div>;
+  return (
+    <div className='p-2 bg-secondary rounded-sm col-span-12 md:col-span-9 shadow-simple-tiny min-h-full'>
+      {ContentRecord[accountLocation]}
+    </div>
+  );
 }
 
 const ContentRecord: Record<AccountLocation, JSX.Element> = {
