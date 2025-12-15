@@ -37,7 +37,7 @@ export default function AccountProfileHeader(): JSX.Element {
             setSection('PRIVACY_SETTINGS');
           }}
         >
-          Edit privacy settings
+          Privacy settings
         </button>
 
         <button

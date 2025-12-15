@@ -35,7 +35,7 @@ export default function AccountProfilePrivacy(): JSX.Element {
 
   return (
     <div className='grid gap-1'>
-      <h3 className='text-md text-title font-normal'>Privacy</h3>
+      <h3 className='text-md text-title font-normal'>Privacy settings</h3>
 
       <div className='grid gap-y-[4px] text-description text-sm font-medium'>
         <div className='flex justify-between items-center p-1 bg-dark rounded'>
