@@ -5,7 +5,7 @@ import { AccountProfile } from '../AccountProfile/AccountProfile';
 import AccountSocial from '../AccountSocial/AccountSocial';
 import { AccountLocation } from '../contexts/AccountLocationContext';
 import AccountWishlists from '../AccountWishlists/AccountWishlists';
-import AccountProfileProvider from '../AccountProfile/context/AccountProfileProvider';
+import AccountProfileProvider from '../providers/AccountProfileProvider';
 
 export default function AccountContent(): JSX.Element {
   const { accountLocation } = useAccountLocation();

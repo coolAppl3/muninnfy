@@ -1,6 +1,6 @@
 import { FocusEvent, JSX } from 'react';
 import TripleDotIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
-import useAccountProfile from '../../context/useAccountProfile';
+import useAccountProfile from '../../../hooks/useAccountProfile';
 
 export default function AccountProfileHeader(): JSX.Element {
   const { menuIsOpen, setMenuIsOpen, profileSection, setProfileSection } = useAccountProfile();

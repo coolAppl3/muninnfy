@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
-import AccountProfileContext, { AccountProfileContextType, AccountProfileSection } from './AccountProfileContext';
+import AccountProfileContext, { AccountProfileContextType, AccountProfileSection } from '../contexts/AccountProfileContext';
 
 type AccountProfileProviderProps = {
   children: ReactNode;

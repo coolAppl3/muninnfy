@@ -62,15 +62,16 @@ export default function Account(): JSX.Element {
 
       <AccountLocationProvider>
         {isLoaded && initialAccountDetails ? (
-          <AccountDetailsProvider initialAccountDetails={initialAccountDetails}>
-            <main className='py-4'>
-              <Container className='grid grid-cols-12 items-start gap-1'>
-                <AccountSidebar />
-                <AccountNavMenu />
+          <main className='py-4'>
+            <Container className='grid grid-cols-12 items-start gap-1'>
+              <AccountSidebar />
+              <AccountNavMenu />
+
+              <AccountDetailsProvider initialAccountDetails={initialAccountDetails}>
                 <AccountContent />
-              </Container>
-            </main>
-          </AccountDetailsProvider>
+              </AccountDetailsProvider>
+            </Container>
+          </main>
         ) : (
           <LoadingSkeleton />
         )}
