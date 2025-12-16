@@ -12,5 +12,5 @@ export type AccountDetailsContextType = {
   setOngoingAccountDeletionRequest: Dispatch<SetStateAction<OngoingAccountRequest | null>>;
 };
 
-const AccountContext = createContext<AccountDetailsContextType | null>(null);
-export default AccountContext;
+const AccountDetailsContext = createContext<AccountDetailsContextType | null>(null);
+export default AccountDetailsContext;
