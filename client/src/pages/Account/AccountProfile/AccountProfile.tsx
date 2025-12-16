@@ -21,30 +21,30 @@ export function AccountProfile(): JSX.Element {
         <p className='leading-[1]'>Created on {getFullDateString(created_on_timestamp)}</p>
       </div>
 
-      <div className='grid md:grid-cols-2 gap-1 text-sm text-description relative z-0'>
-        <StatisticItem
-          title='Display name'
-          value={display_name}
-        />
+      <div className={`grid transition-[grid] ${profileSection ? 'grid-rows-[auto_1fr]' : 'grid-rows-[auto_0fr]'}`}>
+        <div className='grid md:grid-cols-2 gap-1 text-sm text-description relative z-0 h-fit'>
+          <StatisticItem
+            title='Display name'
+            value={display_name}
+          />
 
-        <StatisticItem
-          title='Username'
-          value={username}
-        />
+          <StatisticItem
+            title='Username'
+            value={username}
+          />
 
-        <StatisticItem
-          title='Email address'
-          value={email}
-          className='md:col-span-2 break-all'
-        />
-      </div>
-
-      {profileSection && (
-        <div>
-          <div className='h-line mt-2 mb-1'></div>
-          {contentRecord[profileSection]}
+          <StatisticItem
+            title='Email address'
+            value={email}
+            className='md:col-span-2 break-all'
+          />
         </div>
-      )}
+
+        <div className='z-0 overflow-hidden'>
+          <div className='h-line mt-2 mb-[1rem]'></div>
+          {profileSection && contentRecord[profileSection]}
+        </div>
+      </div>
     </>
   );
 }
