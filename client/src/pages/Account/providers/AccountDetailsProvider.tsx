@@ -1,6 +1,6 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
 import AccountDetailsContext, { AccountDetailsContextType } from '../contexts/AccountDetailsContext';
-import { AccountDetailsType, OngoingAccountRequest } from '../../../types/accountTypes';
+import { AccountDetailsType } from '../../../types/accountTypes';
 
 type AccountDetailsProviderProps = {
   initialAccountDetails: AccountDetailsType;
@@ -9,21 +9,13 @@ type AccountDetailsProviderProps = {
 
 export default function AccountDetailsProvider({ initialAccountDetails, children }: AccountDetailsProviderProps): JSX.Element {
   const [accountDetails, setAccountDetails] = useState<AccountDetailsType>(initialAccountDetails);
-  const [ongoingEmailUpdateRequest, setOngoingEmailUpdateRequest] = useState<(OngoingAccountRequest & { new_email: string }) | null>(null);
-  const [ongoingAccountDeletionRequest, setOngoingAccountDeletionRequest] = useState<OngoingAccountRequest | null>(null);
 
   const contextValue: AccountDetailsContextType = useMemo(
     () => ({
       accountDetails,
       setAccountDetails,
-
-      ongoingEmailUpdateRequest,
-      setOngoingEmailUpdateRequest,
-
-      ongoingAccountDeletionRequest,
-      setOngoingAccountDeletionRequest,
     }),
-    [accountDetails, ongoingEmailUpdateRequest, ongoingAccountDeletionRequest]
+    [accountDetails]
   );
 
   return <AccountDetailsContext value={contextValue}>{children}</AccountDetailsContext>;
