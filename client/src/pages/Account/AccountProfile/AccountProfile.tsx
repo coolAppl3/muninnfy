@@ -5,7 +5,7 @@ import AccountProfilePrivacy from './components/AccountProfilePrivacy/AccountPro
 import useAccountDetails from '../hooks/useAccountDetails';
 import { getFullDateString } from '../../../utils/globalUtils';
 import { AccountProfileSection } from './context/AccountProfileContext';
-import useAccountProfile from '../contexts/useAccountProfile';
+import useAccountProfile from './context/useAccountProfile';
 
 export function AccountProfile(): JSX.Element {
   const { profileSection } = useAccountProfile();

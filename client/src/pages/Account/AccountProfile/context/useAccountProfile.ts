@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import AccountProfileContext, { AccountProfileContextType } from '../AccountProfile/context/AccountProfileContext';
+import AccountProfileContext, { AccountProfileContextType } from './AccountProfileContext';
 
 export default function useAccountProfile(): AccountProfileContextType {
   const context = useContext<AccountProfileContextType | null>(AccountProfileContext);

@@ -6,7 +6,7 @@ import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import { updateAccountPrivacyService } from '../../../../../services/accountServices';
-import useAccountProfile from '../../../contexts/useAccountProfile';
+import useAccountProfile from '../../context/useAccountProfile';
 
 export default function AccountProfilePrivacy(): JSX.Element {
   const { setProfileSection } = useAccountProfile();
