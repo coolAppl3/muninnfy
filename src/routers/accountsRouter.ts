@@ -711,7 +711,13 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
       approve_follow_requests: boolean;
     };
 
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+    type OngoingAccountRequest = {
+      request_id: number;
+      is_suspended: boolean;
+      expiry_timestamp: number;
+    };
+
+    const [accountRows] = await dbPool.query<RowDataPacket[][]>(
       `SELECT
         accounts.public_account_id,
         accounts.email,
@@ -726,18 +732,49 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
       LEFT JOIN
         account_preferences USING(account_id)
       WHERE
-        accounts.account_id = ?;`,
-      [accountId]
+        accounts.account_id = :accountId;
+      
+      SELECT
+        request_id,
+        new_email,
+        failed_attempts >= :failedAttemptsLimit AS is_suspended,
+        expiry_timestamp
+      FROM
+        email_update
+      WHERE
+        account_id = :accountId;
+      
+      SELECT
+        request_id,
+        failed_attempts >= :failedAttemptsLimit AS is_suspended,
+        expiry_timestamp
+      FROM
+        account_deletion
+      WHERE
+        account_id = :accountId;`,
+      { accountId, failedAttemptsLimit: ACCOUNT_FAILED_ATTEMPTS_LIMIT }
     );
 
-    const accountDetails = accountRows[0] as AccountDetails | undefined;
+    const accountDetails = (accountRows[0] ? accountRows[0][0] : undefined) as AccountDetails | undefined;
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
       return;
     }
 
-    res.json({ accountDetails });
+    const ongoingEmailUpdateRequest = (accountRows[1] ? accountRows[1][0] : null) as (OngoingAccountRequest & { new_email: string }) | null;
+    const ongoingAccountDeletionRequest = (accountRows[2] ? accountRows[2][0] : null) as
+      | (OngoingAccountRequest & { new_email: string })
+      | null;
+
+    ongoingEmailUpdateRequest && (ongoingEmailUpdateRequest.is_suspended = Boolean(ongoingEmailUpdateRequest.is_suspended));
+    ongoingAccountDeletionRequest && (ongoingAccountDeletionRequest.is_suspended = Boolean(ongoingAccountDeletionRequest.is_suspended));
+
+    res.json({
+      accountDetails,
+      ongoingEmailUpdateRequest,
+      ongoingAccountDeletionRequest,
+    });
   } catch (err: unknown) {
     console.log(err);
 
