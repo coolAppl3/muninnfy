@@ -6,8 +6,11 @@ import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import { updateAccountPrivacyService } from '../../../../../services/accountServices';
+import useAccountProfile from '../../../contexts/useAccountProfile';
 
 export default function AccountProfilePrivacy(): JSX.Element {
+  const { setProfileSection } = useAccountProfile();
+
   const { accountDetails, setAccountDetails } = useAccountDetails();
   const { is_private, approve_follow_requests } = accountDetails;
 
@@ -27,6 +30,7 @@ export default function AccountProfilePrivacy(): JSX.Element {
       setAccountDetails((prev) => ({ ...prev, is_private: isPrivate, approve_follow_requests: approveFollowRequests }));
 
       displayPopupMessage('Privacy preferences updated.', 'success');
+      setProfileSection(null);
     } catch (err: unknown) {
       console.log(err);
       handleAsyncError(err);
@@ -61,38 +65,39 @@ export default function AccountProfilePrivacy(): JSX.Element {
         </div>
       </div>
 
-      {changesDetected && (
-        <div className='flex flex-col sm:flex-row sm:justify-start items-center gap-1'>
-          <Button
-            className='bg-cta border-cta text-dark w-full sm:w-fit order-1 sm:order-2'
-            onClick={async () => {
-              if (isSubmitting || !changesDetected) {
-                return;
-              }
+      <div className='flex flex-col sm:flex-row sm:justify-start items-center gap-1'>
+        <Button
+          className='bg-cta border-cta text-dark w-full sm:w-fit order-1 sm:order-2'
+          disabled={!changesDetected}
+          onClick={async () => {
+            if (isSubmitting || !changesDetected) {
+              return;
+            }
 
-              displayLoadingOverlay();
-              setIsSubmitting(true);
+            displayLoadingOverlay();
+            setIsSubmitting(true);
 
-              await updateAccountPrivacy();
+            await updateAccountPrivacy();
 
-              setIsSubmitting(false);
-              removeLoadingOverlay();
-            }}
-          >
-            Save
-          </Button>
+            setIsSubmitting(false);
+            removeLoadingOverlay();
+          }}
+        >
+          Save
+        </Button>
 
-          <Button
-            className='bg-secondary border-title text-title w-full sm:w-fit order-2 sm:order-1'
-            onClick={() => {
-              setIsPrivate(is_private);
-              setApproveFollowRequests(approve_follow_requests);
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
-      )}
+        <Button
+          className='bg-secondary border-title text-title w-full sm:w-fit order-2 sm:order-1'
+          onClick={() => {
+            setIsPrivate(is_private);
+            setApproveFollowRequests(approve_follow_requests);
+
+            setProfileSection(null);
+          }}
+        >
+          Cancel
+        </Button>
+      </div>
     </div>
   );
 }
