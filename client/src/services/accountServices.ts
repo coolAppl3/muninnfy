@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { AccountDetailsType } from '../types/accountTypes';
+import { AccountDetailsType, OngoingAccountRequest } from '../types/accountTypes';
 
 axios.defaults.withCredentials = true;
 const accountsApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/accounts` : `https://muninnfy/api/accounts`;
@@ -62,6 +62,8 @@ export function signInService(body: SignInPayload): Promise<AxiosResponse> {
 
 type GetAccountDetailsServiceData = {
   accountDetails: AccountDetailsType;
+  ongoingEmailUpdateRequest: (OngoingAccountRequest & { new_email: string }) | null;
+  ongoingAccountDeletionRequest: OngoingAccountRequest | null;
 };
 
 export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {

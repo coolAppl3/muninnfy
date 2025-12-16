@@ -25,7 +25,11 @@ export default function Account(): JSX.Element {
 
     const getAccountDetails = async () => {
       try {
-        const accountDetails: AccountDetailsType = (await getAccountDetailsService(abortController.signal)).data.accountDetails;
+        const { accountDetails, ongoingEmailUpdateRequest, ongoingAccountDeletionRequest } = (
+          await getAccountDetailsService(abortController.signal)
+        ).data;
+
+        // TODO: pass down ongoingEmailUpdateRequest and ongoingAccountDeletionRequest
 
         setInitialAccountDetails(accountDetails);
         setIsLoaded(true);
