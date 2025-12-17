@@ -7,6 +7,7 @@ import { getFullDateString } from '../../../utils/globalUtils';
 import { AccountProfileSection } from '../contexts/AccountProfileContext';
 import useAccountProfile from '../hooks/useAccountProfile';
 import AccountOngoingRequests from './components/AccountOngoingRequests/AccountOngoingRequests';
+import AccountChangeDisplayName from './components/AccountChangeDisplayName/AccountChangeDisplayName';
 
 export function AccountProfile(): JSX.Element {
   const { profileSection } = useAccountProfile();
@@ -54,7 +55,7 @@ export function AccountProfile(): JSX.Element {
 
 const contentRecord: Record<AccountProfileSection, JSX.Element> = {
   PRIVACY_SETTINGS: <AccountProfilePrivacy />,
-  CHANGE_DISPLAY_NAME: <></>, // TODO: implement
+  CHANGE_DISPLAY_NAME: <AccountChangeDisplayName />,
   CHANGE_EMAIL: <></>, // TODO: implement
   CHANGE_PASSWORD: <></>, // TODO: implement
   DELETE_ACCOUNT: <></>, // TODO: implement
