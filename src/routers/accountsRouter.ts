@@ -758,7 +758,9 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
     const accountDetails = (accountRows[0] ? accountRows[0][0] : undefined) as AccountDetails | undefined;
 
     if (!accountDetails) {
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
       return;
     }
 
@@ -909,7 +911,9 @@ accountsRouter.patch('/details/displayName', async (req: Request, res: Response)
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails) {
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+
       return;
     }
 
@@ -1016,6 +1020,8 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
 
     if (!accountDetails) {
       await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
       return;
@@ -1176,6 +1182,8 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
 
     if (!accountDetails) {
       await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
       return;
@@ -1321,6 +1329,8 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
 
     if (!accountDetails) {
       await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
       return;
@@ -1442,6 +1452,8 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
 
     if (!accountDetails) {
       await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
       return;
@@ -2058,6 +2070,8 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
 
     if (!accountDetails || !accountDetails.is_verified) {
       await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
@@ -2182,6 +2196,8 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
 
     if (!accountDetails) {
       await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
@@ -2283,6 +2299,8 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
 
     if (!accountDetails) {
       await connection.rollback();
+
+      removeRequestCookie(res, 'authSessionId');
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
