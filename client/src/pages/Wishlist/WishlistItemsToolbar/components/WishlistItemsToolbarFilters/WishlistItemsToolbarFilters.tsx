@@ -202,7 +202,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
         <Button
           className='bg-cta border-cta w-full sm:w-fit order-1 sm:order-3'
           disabled={!changesDetected()}
-          isSubmitBtn={true}
+          isSubmitBtn
         >
           Apply filters
         </Button>

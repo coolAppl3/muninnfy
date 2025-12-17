@@ -79,7 +79,7 @@ export default function DeleteWishlistForm(): JSX.Element {
 
       <div className='flex flex-col justify-start items-center gap-1 sm:flex-row'>
         <Button
-          isSubmitBtn={true}
+          isSubmitBtn
           className='bg-danger border-danger order-1 sm:order-2 w-full sm:w-fit'
           disabled={editMode === 'DELETE_WISHLIST' ? confirmationTitleValue !== wishlistDetails.title : true}
         >

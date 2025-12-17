@@ -93,7 +93,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
         />
 
         <Button
-          isSubmitBtn={true}
+          isSubmitBtn
           className='bg-cta border-cta w-full mt-2'
         >
           Continue

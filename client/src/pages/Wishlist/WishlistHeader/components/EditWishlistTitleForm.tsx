@@ -119,7 +119,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
 
       <div className='flex flex-col justify-start items-center gap-1 sm:flex-row'>
         <Button
-          isSubmitBtn={true}
+          isSubmitBtn
           className='bg-cta border-cta order-1 sm:order-2 w-full sm:w-fit'
         >
           Submit

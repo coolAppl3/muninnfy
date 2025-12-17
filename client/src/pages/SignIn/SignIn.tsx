@@ -170,7 +170,7 @@ export default function SignIn(): JSX.Element {
 
               <Button
                 className='bg-cta border-cta w-full'
-                isSubmitBtn={true}
+                isSubmitBtn
               >
                 Submit
               </Button>
