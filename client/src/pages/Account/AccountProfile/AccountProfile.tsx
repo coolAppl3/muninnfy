@@ -6,6 +6,7 @@ import useAccountDetails from '../hooks/useAccountDetails';
 import { getFullDateString } from '../../../utils/globalUtils';
 import { AccountProfileSection } from '../contexts/AccountProfileContext';
 import useAccountProfile from '../hooks/useAccountProfile';
+import AccountOngoingRequests from './components/AccountOngoingRequests/AccountOngoingRequests';
 
 export function AccountProfile(): JSX.Element {
   const { profileSection } = useAccountProfile();
@@ -45,6 +46,8 @@ export function AccountProfile(): JSX.Element {
           {profileSection && contentRecord[profileSection]}
         </div>
       </div>
+
+      {profileSection ? null : <AccountOngoingRequests />}
     </>
   );
 }
