@@ -86,10 +86,10 @@ export default function EditWishlistTitleForm(): JSX.Element {
         const newTitleErrorMessage: string | null =
           validateWishlistTitle(titleValue) || (titleValue === wishlistDetails.title ? 'Wishlist already has this title.' : null);
 
-        setTitleErrorMessage(newTitleErrorMessage);
-
         if (newTitleErrorMessage) {
+          setTitleErrorMessage(newTitleErrorMessage);
           displayPopupMessage(newTitleErrorMessage, 'error');
+
           return;
         }
 
@@ -112,8 +112,8 @@ export default function EditWishlistTitleForm(): JSX.Element {
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
-          setTitleErrorMessage(validateWishlistTitle(newValue));
           setTitleValue(newValue);
+          setTitleErrorMessage(validateWishlistTitle(newValue));
         }}
       />
 
