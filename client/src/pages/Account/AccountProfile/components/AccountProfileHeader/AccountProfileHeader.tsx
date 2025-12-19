@@ -53,17 +53,6 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${profileSection === 'CHANGE_EMAIL' ? 'text-cta' : ''}`}
-          onClick={() => {
-            setMenuIsOpen(false);
-            setProfileSection('CHANGE_EMAIL');
-          }}
-        >
-          Change email address
-        </button>
-
-        <button
-          type='button'
           className={`context-menu-btn ${profileSection === 'CHANGE_PASSWORD' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
@@ -75,7 +64,18 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className='context-menu-btn danger'
+          className={`context-menu-btn border-t-1 border-t-description/50 ${profileSection === 'CHANGE_EMAIL' ? 'text-cta' : ''}`}
+          onClick={() => {
+            setMenuIsOpen(false);
+            setProfileSection('CHANGE_EMAIL');
+          }}
+        >
+          Change email address
+        </button>
+
+        <button
+          type='button'
+          className='context-menu-btn text-danger'
           onClick={() => {
             setMenuIsOpen(false);
             setProfileSection('DELETE_ACCOUNT');
