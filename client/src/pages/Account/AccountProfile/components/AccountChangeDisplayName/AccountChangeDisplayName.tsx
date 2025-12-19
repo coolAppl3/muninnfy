@@ -6,7 +6,7 @@ import useAccountDetails from '../../../hooks/useAccountDetails';
 import useAccountProfile from '../../../hooks/useAccountProfile';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import { updateAccountDisplayNameService } from '../../../../../services/accountServices';
+import { updateDisplayNameService } from '../../../../../services/accountServices';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import useAuth from '../../../../../hooks/useAuth';
 
@@ -26,7 +26,7 @@ export default function AccountChangeDisplayName(): JSX.Element {
     const newDisplayName: string = value;
 
     try {
-      await updateAccountDisplayNameService({ newDisplayName });
+      await updateDisplayNameService({ newDisplayName });
       setAccountDetails((prev) => ({ ...prev, display_name: newDisplayName }));
 
       displayPopupMessage('Display name changed.', 'success');

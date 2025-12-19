@@ -79,10 +79,10 @@ export function updateAccountPrivacyService(body: UpdateAccountPrivacyServicePay
   return axios.patch(`${accountsApiUrl}/details/privacy`, body);
 }
 
-type UpdateAccountDisplayNameServicePayload = {
+type UpdateDisplayNameServicePayload = {
   newDisplayName: string;
 };
 
-export function updateAccountDisplayNameService(body: UpdateAccountDisplayNameServicePayload): Promise<AxiosResponse> {
+export function updateDisplayNameService(body: UpdateDisplayNameServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/details/displayName`, body);
 }
