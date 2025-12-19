@@ -9,6 +9,7 @@ import useAccountProfile from '../hooks/useAccountProfile';
 import AccountOngoingRequests from './components/AccountOngoingRequests/AccountOngoingRequests';
 import AccountChangeDisplayName from './components/AccountChangeDisplayName/AccountChangeDisplayName';
 import AccountChangePassword from './components/AccountChangePassword/AccountChangePassword';
+import AccountChangeEmail from './components/AccountChangeEmail/AccountChangeEmail';
 
 export function AccountProfile(): JSX.Element {
   const { profileSection } = useAccountProfile();
@@ -57,7 +58,7 @@ export function AccountProfile(): JSX.Element {
 const contentRecord: Record<AccountProfileSection, JSX.Element> = {
   PRIVACY_SETTINGS: <AccountProfilePrivacy />,
   CHANGE_DISPLAY_NAME: <AccountChangeDisplayName />,
-  CHANGE_EMAIL: <></>, // TODO: implement
+  CHANGE_EMAIL: <AccountChangeEmail />,
   CHANGE_PASSWORD: <AccountChangePassword />,
   DELETE_ACCOUNT: <></>, // TODO: implement
 };
