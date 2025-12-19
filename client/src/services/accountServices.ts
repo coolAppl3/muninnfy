@@ -86,3 +86,12 @@ type UpdateDisplayNameServicePayload = {
 export function updateDisplayNameService(body: UpdateDisplayNameServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/details/displayName`, body);
 }
+
+type UpdatePasswordServicePayload = {
+  password: string;
+  newPassword: string;
+};
+
+export function updatePasswordService(body: UpdatePasswordServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/password`, body);
+}
