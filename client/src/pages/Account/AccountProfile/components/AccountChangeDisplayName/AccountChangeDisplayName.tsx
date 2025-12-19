@@ -88,9 +88,9 @@ export default function AccountChangeDisplayName(): JSX.Element {
           const newValue: string = e.target.value;
 
           setValue(newValue);
-          setErrorMessage(validateDisplayName(newValue));
-
-          newValue === accountDetails.display_name && setErrorMessage('Account already has this display name.');
+          setErrorMessage(
+            newValue === accountDetails.display_name ? 'Account already has this display name.' : validateDisplayName(newValue)
+          );
         }}
       />
 
