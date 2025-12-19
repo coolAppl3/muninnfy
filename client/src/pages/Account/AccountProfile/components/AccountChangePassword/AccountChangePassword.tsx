@@ -1,16 +1,17 @@
 import { ChangeEvent, FormEvent, JSX, useState } from 'react';
 import Button from '../../../../../components/Button/Button';
-import DefaultFormGroup from '../../../../../components/DefaultFormGroup/DefaultFormGroup';
-import { validateDisplayName, validateNewPassword, validatePassword } from '../../../../../utils/validation/userValidation';
+import { validateNewPassword, validatePassword } from '../../../../../utils/validation/userValidation';
 import useAccountProfile from '../../../hooks/useAccountProfile';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import { updateAccountDisplayNameService } from '../../../../../services/accountServices';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import useAuth from '../../../../../hooks/useAuth';
 import PasswordFormGroup from '../../../../../components/PasswordFormGroup/PasswordFormGroup';
+import { updatePasswordService } from '../../../../../services/accountServices';
+import useAccountDetails from '../../../hooks/useAccountDetails';
 
 export default function AccountChangePassword(): JSX.Element {
+  const { accountDetails } = useAccountDetails();
   const { setProfileSection, setIsSubmitting, isSubmitting } = useAccountProfile();
 
   const [currentPasswordValue, setCurrentPasswordValue] = useState<string>('');
@@ -28,20 +29,50 @@ export default function AccountChangePassword(): JSX.Element {
   const { displayPopupMessage } = usePopupMessage();
 
   async function updateDisplayName(): Promise<void> {
-    const currentPassword: string = currentPasswordValue;
+    const password: string = currentPasswordValue;
     const newPassword: string = newPasswordValue;
 
     try {
-      // TODO: continue implementation
+      await updatePasswordService({ password, newPassword });
+
+      displayPopupMessage('Password changed.', 'success');
+      setProfileSection(null);
     } catch (err: unknown) {
       console.log(err);
-      // TODO: continue implementation
+      const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
+
+      if (isHandled) {
+        return;
+      }
+
+      if (status === 400 && errReason) {
+        errReason === 'invalidCurrentPassword' ? setCurrentPasswordErrorMessage(errMessage) : setNewPasswordErrorMessage(errMessage);
+        return;
+      }
+
+      if (status === 401) {
+        setCurrentPasswordErrorMessage(errMessage);
+        errMessage === 'incorrectPassword_locked' && setAuthStatus('unauthenticated');
+
+        return;
+      }
+
+      if (status === 409) {
+        setNewPasswordErrorMessage(errMessage);
+        return;
+      }
+
+      if (status === 404) {
+        setAuthStatus('unauthenticated');
+      }
     }
   }
 
   function allFieldsValid(): boolean {
     const newCurrentPasswordErrorMessage: string | null = validatePassword(currentPasswordValue);
-    const newNewPasswordErrorMessage: string | null = validateNewPassword(newPasswordValue);
+
+    const newNewPasswordErrorMessage: string | null =
+      newPasswordValue === accountDetails.username ? `Username and password can't match.` : validateNewPassword(newPasswordValue);
     const newConfirmNewPasswordErrorMessage: string | null = confirmNewPasswordValue === newPasswordValue ? null : `Passwords don't match.`;
 
     setCurrentPasswordErrorMessage(newCurrentPasswordErrorMessage);
@@ -103,7 +134,9 @@ export default function AccountChangePassword(): JSX.Element {
           const newValue: string = e.target.value;
 
           setNewPasswordValue(newValue);
-          setNewPasswordErrorMessage(validateNewPassword(newValue));
+          setNewPasswordErrorMessage(
+            newValue === accountDetails.username ? `Username and password can't match.` : validateNewPassword(newValue)
+          );
         }}
       />
 
