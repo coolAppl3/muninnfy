@@ -1,10 +1,19 @@
 import { JSX } from 'react';
 import useAccountOngoingRequests from '../../../hooks/useAccountOngoingRequests';
-import useAccountDetails from '../../../hooks/useAccountDetails';
+import AccountChangeEmailStart from './components/AccountChangeEmailStart';
+import AccountChangeEmailSuspended from './components/AccountChangeEmailSuspended';
+import AccountChangeEmailConfirm from './components/AccountChangeEmailConfirm';
 
 export default function AccountChangeEmail(): JSX.Element {
-  const { accountDetails, setAccountDetails } = useAccountDetails();
-  const { ongoingEmailUpdateRequest, setOngoingEmailUpdateRequest } = useAccountOngoingRequests();
+  const { ongoingEmailUpdateRequest } = useAccountOngoingRequests();
 
-  return <></>;
+  if (!ongoingEmailUpdateRequest) {
+    return <AccountChangeEmailStart />;
+  }
+
+  if (ongoingEmailUpdateRequest.is_suspended) {
+    return <AccountChangeEmailSuspended />;
+  }
+
+  return <AccountChangeEmailConfirm />;
 }
