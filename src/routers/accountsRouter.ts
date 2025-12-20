@@ -1356,7 +1356,7 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
 
     if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
-      res.status(403).json({ message: `Sent change emails limit reached.`, reason: 'emailsSentLimitReached' });
+      res.status(403).json({ message: `Sent confirmation emails limit reached.`, reason: 'emailsSentLimitReached' });
 
       return;
     }
@@ -2215,7 +2215,7 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
 
     if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
-      res.status(403).json({ message: 'Sent deletion emails limit reached.', reason: 'emailsSentLimitReached' });
+      res.status(403).json({ message: 'Sent confirmation emails limit reached.', reason: 'emailsSentLimitReached' });
 
       return;
     }
