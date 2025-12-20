@@ -38,3 +38,24 @@ export function validatePrice(value: string, maxValue: number): string | null {
 
   return null;
 }
+
+export function validateHexCode(hexCode: string): string | null {
+  if (hexCode.length !== 8) {
+    return 'Code must be 8 characters long.';
+  }
+
+  if (hexCode.trim() !== hexCode) {
+    return 'Code must not contain leading or trailing whitespace.';
+  }
+
+  if (hexCode.includes(' ')) {
+    return 'Code must not contain any whitespace';
+  }
+
+  const regex: RegExp = /^[A-F0-9]{8}$/;
+  if (!regex.test(hexCode)) {
+    return 'Invalid code.';
+  }
+
+  return null;
+}
