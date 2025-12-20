@@ -1,9 +1,11 @@
 import { JSX } from 'react';
 import useAccountOngoingRequests from '../../../hooks/useAccountOngoingRequests';
 import ArrowIcon from '../../../../../assets/svg/ArrowIcon.svg?react';
+import useAccountProfile from '../../../hooks/useAccountProfile';
 
 export default function AccountOngoingRequests(): JSX.Element {
   const { ongoingEmailUpdateRequest, ongoingAccountDeletionRequest } = useAccountOngoingRequests();
+  const { setProfileSection } = useAccountProfile();
 
   if (!ongoingEmailUpdateRequest && !ongoingAccountDeletionRequest) {
     return <></>;
@@ -29,7 +31,7 @@ export default function AccountOngoingRequests(): JSX.Element {
                 aria-label='View request'
                 className='ml-1 bg-cta/10 text-title px-[2.4rem] h-[2.8rem] rounded-pill flex justify-center items-center transition-colors hover:bg-cta/5 hover:text-cta cursor-pointer'
                 onClick={() => {
-                  // TODO: continue implementation
+                  setProfileSection(index === 0 ? 'CHANGE_EMAIL' : 'DELETE_ACCOUNT');
                 }}
               >
                 <ArrowIcon className='w-[1.6rem] h-[1.6rem]' />
