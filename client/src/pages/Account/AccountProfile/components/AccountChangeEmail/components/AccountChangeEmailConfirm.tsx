@@ -196,7 +196,7 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
           value={value}
           errorMessage={errorMessage}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            const newValue: string = e.target.value.trim().toUpperCase();
+            const newValue: string = e.target.value.trim().toUpperCase().slice(0, 8);
 
             setValue(newValue);
             setErrorMessage(validateHexCode(newValue));
