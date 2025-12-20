@@ -19,3 +19,19 @@ export function isValidOngoingRequestData(errResData: unknown): errResData is On
 
   return true;
 }
+
+export function resDataContainsExpiryTimestamp(errResData: unknown): errResData is { expiryTimestamp: number } {
+  if (typeof errResData !== 'object' || errResData === null) {
+    return false;
+  }
+
+  if (
+    !('expiryTimestamp' in errResData) ||
+    typeof errResData.expiryTimestamp !== 'number' ||
+    !Number.isInteger(errResData.expiryTimestamp)
+  ) {
+    return false;
+  }
+
+  return true;
+}
