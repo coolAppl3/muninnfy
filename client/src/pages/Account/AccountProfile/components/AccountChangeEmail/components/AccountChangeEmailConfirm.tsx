@@ -9,11 +9,11 @@ import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../..
 import useAccountDetails from '../../../../hooks/useAccountDetails';
 import useAccountOngoingRequests from '../../../../hooks/useAccountOngoingRequests';
 import { validateHexCode } from '../../../../../../utils/validation/sharedValidation';
-import { resendEmailUpdateEmailService } from '../../../../../../services/accountServices';
+import { confirmEmailUpdateService, resendEmailUpdateEmailService } from '../../../../../../services/accountServices';
 import { resDataContainsExpiryTimestamp } from '../../../util/AccountProfileUtils';
 
 export default function AccountChangeEmailConfirm(): JSX.Element {
-  const { accountDetails } = useAccountDetails();
+  const { setAccountDetails } = useAccountDetails();
   const { ongoingEmailUpdateRequest, setOngoingEmailUpdateRequest } = useAccountOngoingRequests();
   const { setProfileSection, setIsSubmitting, isSubmitting } = useAccountProfile();
 
@@ -28,13 +28,66 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
   const { displayPopupMessage } = usePopupMessage();
 
   async function confirmEmailUpdate(): Promise<void> {
-    const confirmationCode: string = value.toUpperCase();
+    if (!ongoingEmailUpdateRequest) {
+      displayPopupMessage('Email change request not found or has expired.', 'error');
+      return;
+    }
+
+    if (ongoingEmailUpdateRequest?.is_suspended) {
+      displayPopupMessage('Email update request suspended.', 'error');
+      return;
+    }
+    const confirmationCode: string = value;
 
     try {
-      // TODO: continue implementation
+      await confirmEmailUpdateService({ confirmationCode });
+
+      setAccountDetails((prev) => ({ ...prev, email: ongoingEmailUpdateRequest.new_email }));
+      setOngoingEmailUpdateRequest(null);
+
+      setProfileSection(null);
+      displayPopupMessage('Email changed.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      // TODO: continue implementation
+      const { isHandled, status, errMessage, errReason, errResData } = handleAsyncError(err);
+
+      if (isHandled) {
+        return;
+      }
+
+      if (status === 400 && errReason === 'invalidCode') {
+        setErrorMessage(errMessage);
+        return;
+      }
+
+      if (status === 404) {
+        if (errReason === 'requestNotFound') {
+          setOngoingEmailUpdateRequest(null);
+          setProfileSection(null);
+
+          return;
+        }
+
+        setAuthStatus('unauthenticated');
+        return;
+      }
+
+      if (status === 401) {
+        setErrorMessage(errMessage);
+      }
+
+      if (errReason === 'incorrectCode') {
+        return;
+      }
+
+      if (!resDataContainsExpiryTimestamp(errResData)) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      if (errReason === 'requestSuspended' || errReason === 'incorrectCode_suspended') {
+        setOngoingEmailUpdateRequest((prev) => prev && { ...prev, expiry_timestamp: errResData.expiryTimestamp, is_suspended: true });
+      }
     }
   }
 
