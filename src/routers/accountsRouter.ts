@@ -1118,7 +1118,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
   const { newEmail, password } = requestData;
 
   if (!isValidEmail(newEmail)) {
-    res.status(400).json({ message: 'Invalid email address.', reason: 'invalidUsername' });
+    res.status(400).json({ message: 'Invalid email address.', reason: 'invalidEmail' });
     return;
   }
 
