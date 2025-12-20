@@ -108,3 +108,7 @@ type StartEmailUpdateServiceData = {
 export function startEmailUpdateService(body: StartEmailUpdateServicePayload): Promise<AxiosResponse<StartEmailUpdateServiceData>> {
   return axios.post(`${accountsApiUrl}/details/email/start`, body);
 }
+
+export function resendEmailUpdateEmailService(): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/email/resendEmail`);
+}
