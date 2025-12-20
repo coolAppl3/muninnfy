@@ -52,7 +52,7 @@ export default function AccountChangePassword(): JSX.Element {
 
       if (status === 401) {
         setCurrentPasswordErrorMessage(errMessage);
-        errMessage === 'incorrectPassword_locked' && setAuthStatus('unauthenticated');
+        errReason === 'incorrectPassword_locked' && setAuthStatus('unauthenticated');
 
         return;
       }
