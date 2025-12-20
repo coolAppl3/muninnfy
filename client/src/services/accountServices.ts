@@ -95,3 +95,16 @@ type UpdatePasswordServicePayload = {
 export function updatePasswordService(body: UpdatePasswordServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/details/password`, body);
 }
+
+type UpdateEmailServicePayload = {
+  newEmail: string;
+  password: string;
+};
+
+type UpdateEmailServiceData = {
+  expiryTimestamp: number;
+};
+
+export function updateEmailService(body: UpdateEmailServicePayload): Promise<AxiosResponse<UpdateEmailServiceData>> {
+  return axios.post(`${accountsApiUrl}/details/email/start`, body);
+}
