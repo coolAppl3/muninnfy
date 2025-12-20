@@ -10,6 +10,7 @@ import AccountOngoingRequests from './components/AccountOngoingRequests/AccountO
 import AccountChangeDisplayName from './components/AccountChangeDisplayName/AccountChangeDisplayName';
 import AccountChangePassword from './components/AccountChangePassword/AccountChangePassword';
 import AccountChangeEmail from './components/AccountChangeEmail/AccountChangeEmail';
+import AccountDeletion from './components/AccountDeletion/AccountDeletion';
 
 export function AccountProfile(): JSX.Element {
   const { profileSection } = useAccountProfile();
@@ -60,5 +61,5 @@ const contentRecord: Record<AccountProfileSection, JSX.Element> = {
   CHANGE_DISPLAY_NAME: <AccountChangeDisplayName />,
   CHANGE_EMAIL: <AccountChangeEmail />,
   CHANGE_PASSWORD: <AccountChangePassword />,
-  DELETE_ACCOUNT: <></>, // TODO: implement
+  DELETE_ACCOUNT: <AccountDeletion />,
 };
