@@ -1488,13 +1488,17 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
         return;
       }
 
-      const requestSuspended: boolean = await suspendAccountRequest('email_update', accountDetails.request_id, dbPool, req);
-      if (!requestSuspended) {
+      const expiryTimestamp: number | null = await suspendAccountRequest('email_update', accountDetails.request_id, dbPool, req);
+      if (!expiryTimestamp) {
         res.status(500).json({ message: 'Internal server error.' });
         return;
       }
 
-      res.status(401).json({ message: 'Incorrect confirmation code. Request suspended', reason: 'incorrectCode_suspended' });
+      res.status(401).json({
+        message: 'Incorrect confirmation code. Request suspended',
+        reason: 'incorrectCode_suspended',
+        resData: { newExpiryTimestamp: expiryTimestamp },
+      });
       return;
     }
 
@@ -1921,13 +1925,17 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
         return;
       }
 
-      const requestSuspended: boolean = await suspendAccountRequest('account_recovery', accountDetails.request_id, dbPool, req);
-      if (!requestSuspended) {
+      const expiryTimestamp: number | null = await suspendAccountRequest('account_recovery', accountDetails.request_id, dbPool, req);
+      if (!expiryTimestamp) {
         res.status(500).json({ message: 'Internal server error.' });
         return;
       }
 
-      res.status(401).json({ message: 'Incorrect recovery token. Request suspended.', reason: 'incorrectToken_suspended' });
+      res.status(401).json({
+        message: 'Incorrect recovery token. Request suspended.',
+        reason: 'incorrectToken_suspended',
+        resData: { expiryTimestamp },
+      });
       return;
     }
 
@@ -2327,13 +2335,17 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
         return;
       }
 
-      const requestSuspended: boolean = await suspendAccountRequest('account_deletion', accountDetails.request_id, dbPool, req);
-      if (!requestSuspended) {
+      const expiryTimestamp: number | null = await suspendAccountRequest('account_deletion', accountDetails.request_id, dbPool, req);
+      if (!expiryTimestamp) {
         res.status(500).json({ message: 'Internal server error.' });
         return;
       }
 
-      res.status(401).json({ message: 'Incorrect confirmation code. Request suspended.', reason: 'incorrectCode_suspended' });
+      res.status(401).json({
+        message: 'Incorrect confirmation code. Request suspended.',
+        reason: 'incorrectCode_suspended',
+        resData: { expiryTimestamp },
+      });
       return;
     }
 

@@ -67,7 +67,7 @@ export async function suspendAccountRequest(
   requestId: number,
   executor: Pool | PoolConnection,
   req: Request
-): Promise<boolean> {
+): Promise<number | null> {
   const newExpiryTimestamp: number = Date.now() + ACCOUNT_UPDATE_SUSPENSION_DURATION;
 
   try {
@@ -82,12 +82,16 @@ export async function suspendAccountRequest(
       [ACCOUNT_FAILED_ATTEMPTS_LIMIT, newExpiryTimestamp, requestId]
     );
 
-    return resultSetHeader.affectedRows > 0;
+    if (resultSetHeader.affectedRows === 0) {
+      return null;
+    }
+
+    return newExpiryTimestamp;
   } catch (err: unknown) {
     console.log(err);
     await logUnexpectedError(req, err, `Failed to suspend ${tableName} request.`);
 
-    return false;
+    return null;
   }
 }
 
