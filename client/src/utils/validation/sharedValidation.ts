@@ -44,17 +44,13 @@ export function validateHexCode(hexCode: string): string | null {
     return 'Code must be 8 characters long.';
   }
 
-  if (hexCode.trim() !== hexCode) {
-    return 'Code must not contain leading or trailing whitespace.';
-  }
-
   if (hexCode.includes(' ')) {
     return 'Code must not contain any whitespace';
   }
 
   const regex: RegExp = /^[A-F0-9]{8}$/;
   if (!regex.test(hexCode)) {
-    return 'Invalid code.';
+    return 'Only hexadecimal values are allowed.';
   }
 
   return null;
