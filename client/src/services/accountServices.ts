@@ -112,3 +112,11 @@ export function startEmailUpdateService(body: StartEmailUpdateServicePayload): P
 export function resendEmailUpdateEmailService(): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/details/email/resendEmail`);
 }
+
+type ConfirmEmailUpdateServicePayload = {
+  confirmationCode: string;
+};
+
+export function confirmEmailUpdateService(body: ConfirmEmailUpdateServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/email/confirm`, body);
+}
