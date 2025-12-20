@@ -9,7 +9,7 @@ import useAuth from '../../../../../../hooks/useAuth';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../hooks/useHandleAsyncError';
 import PasswordFormGroup from '../../../../../../components/PasswordFormGroup/PasswordFormGroup';
 import useAccountDetails from '../../../../hooks/useAccountDetails';
-import { updateEmailService } from '../../../../../../services/accountServices';
+import { startEmailUpdateService } from '../../../../../../services/accountServices';
 import useAccountOngoingRequests from '../../../../hooks/useAccountOngoingRequests';
 import { OngoingAccountRequest } from '../../../../../../types/accountTypes';
 import { isValidOngoingRequestData } from '../../../util/AccountProfileUtils';
@@ -30,12 +30,12 @@ export default function AccountChangeEmailStart(): JSX.Element {
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
 
-  async function updateEmail(): Promise<void> {
+  async function startEmailUpdate(): Promise<void> {
     const newEmail: string = emailValue;
     const password: string = passwordValue;
 
     try {
-      const expiryTimestamp: number = (await updateEmailService({ newEmail, password })).data.expiryTimestamp;
+      const expiryTimestamp: number = (await startEmailUpdateService({ newEmail, password })).data.expiryTimestamp;
       setOngoingEmailUpdateRequest({ new_email: newEmail, expiry_timestamp: expiryTimestamp, is_suspended: false });
 
       displayPopupMessage('Confirmation email sent.', 'success');
@@ -113,7 +113,7 @@ export default function AccountChangeEmailStart(): JSX.Element {
         setIsSubmitting(true);
         displayLoadingOverlay();
 
-        await updateEmail();
+        await startEmailUpdate();
 
         setIsSubmitting(false);
         removeLoadingOverlay();

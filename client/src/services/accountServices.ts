@@ -96,15 +96,15 @@ export function updatePasswordService(body: UpdatePasswordServicePayload): Promi
   return axios.patch(`${accountsApiUrl}/details/password`, body);
 }
 
-type UpdateEmailServicePayload = {
+type StartEmailUpdateServicePayload = {
   newEmail: string;
   password: string;
 };
 
-type UpdateEmailServiceData = {
+type StartEmailUpdateServiceData = {
   expiryTimestamp: number;
 };
 
-export function updateEmailService(body: UpdateEmailServicePayload): Promise<AxiosResponse<UpdateEmailServiceData>> {
+export function startEmailUpdateService(body: StartEmailUpdateServicePayload): Promise<AxiosResponse<StartEmailUpdateServiceData>> {
   return axios.post(`${accountsApiUrl}/details/email/start`, body);
 }
