@@ -1204,10 +1204,9 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
         message: 'Ongoing email change request found.',
         reason: 'ongoingRequest',
         resData: {
-          emailUpdateId: accountDetails.request_id,
-          newEmail: accountDetails.new_email,
-          expiryTimestamp: accountDetails.expiry_timestamp,
-          isSuspended: accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+          new_email: accountDetails.new_email,
+          expiry_timestamp: accountDetails.expiry_timestamp,
+          is_suspended: accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT,
         },
       });
 
@@ -1224,7 +1223,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     const confirmationCode: string = generateConfirmationCode();
     const expiryTimestamp: number = Date.now() + ACCOUNT_EMAIL_UPDATE_WINDOW;
 
-    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+    await connection.execute(
       `INSERT INTO email_update (
         account_id,
         new_email,
@@ -1237,7 +1236,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     );
 
     await connection.commit();
-    res.json({ emailUpdateId: resultSetHeader.insertId, expiryTimestamp });
+    res.json({ expiryTimestamp });
 
     if (accountDetails.failed_sign_in_attempts > 0) {
       await resetFailedSignInAttempts(accountId, dbPool, req);
@@ -2092,9 +2091,8 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
         message: 'Ongoing deletion request found.',
         reason: 'ongoingRequest',
         resData: {
-          deletionId: accountDetails.request_id,
-          expiryTimestamp: accountDetails.expiry_timestamp,
-          isSuspended: accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+          expiry_timestamp: accountDetails.expiry_timestamp,
+          is_suspended: accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT,
         },
       });
 
@@ -2104,7 +2102,7 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
     const expiryTimestamp: number = Date.now() + ACCOUNT_DELETION_WINDOW;
     const confirmationCode: string = generateConfirmationCode();
 
-    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+    await connection.execute(
       `INSERT INTO account_deletion (
         account_id,
         confirmation_code,
@@ -2116,7 +2114,7 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
     );
 
     await connection.commit();
-    res.json({ deletionId: resultSetHeader.insertId, expiryTimestamp });
+    res.json({ expiryTimestamp });
 
     await sendAccountDeletionEmailService({
       receiver: accountDetails.email,

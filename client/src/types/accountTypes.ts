@@ -9,7 +9,6 @@ export type AccountDetailsType = {
 };
 
 export type OngoingAccountRequest = {
-  request_id: number;
-  is_suspended: boolean;
   expiry_timestamp: number;
+  is_suspended: boolean;
 };
