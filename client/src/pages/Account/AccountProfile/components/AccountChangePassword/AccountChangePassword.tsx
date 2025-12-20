@@ -95,11 +95,7 @@ export default function AccountChangePassword(): JSX.Element {
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
-        if (isSubmitting) {
-          return;
-        }
-
-        if (!allFieldsValid()) {
+        if (isSubmitting || !allFieldsValid()) {
           return;
         }
 
