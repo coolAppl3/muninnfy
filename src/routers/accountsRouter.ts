@@ -1495,7 +1495,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
       }
 
       res.status(401).json({
-        message: 'Incorrect confirmation code. Request suspended',
+        message: 'Incorrect confirmation code.',
         reason: 'incorrectCode_suspended',
         resData: { expiryTimestamp },
       });
@@ -1932,7 +1932,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       }
 
       res.status(401).json({
-        message: 'Incorrect recovery token. Request suspended.',
+        message: 'Incorrect recovery token.',
         reason: 'incorrectToken_suspended',
         resData: { expiryTimestamp },
       });
@@ -2342,7 +2342,7 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
       }
 
       res.status(401).json({
-        message: 'Incorrect confirmation code. Request suspended.',
+        message: 'Incorrect confirmation code.',
         reason: 'incorrectCode_suspended',
         resData: { expiryTimestamp },
       });
