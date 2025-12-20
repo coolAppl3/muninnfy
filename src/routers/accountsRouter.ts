@@ -6,7 +6,7 @@ import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { generateCryptoUuid, generateConfirmationCode, isValidUuid, isValidConfirmationCode } from '../util/tokenGenerator';
+import { generateCryptoUuid, generateHexCode, isValidUuid, isValidHexCode } from '../util/tokenGenerator';
 import {
   ACCOUNT_DELETION_WINDOW,
   ACCOUNT_EMAIL_UPDATE_WINDOW,
@@ -1220,7 +1220,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
-    const confirmationCode: string = generateConfirmationCode();
+    const confirmationCode: string = generateHexCode();
     const expiryTimestamp: number = Date.now() + ACCOUNT_EMAIL_UPDATE_WINDOW;
 
     await connection.execute(
@@ -1408,7 +1408,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
 
   const { confirmationCode } = requestData;
 
-  if (!isValidConfirmationCode(confirmationCode)) {
+  if (!isValidHexCode(confirmationCode)) {
     res.status(400).json({ message: 'Invalid confirmation code.', reason: 'invalidCode' });
     return;
   }
@@ -2100,7 +2100,7 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
     }
 
     const expiryTimestamp: number = Date.now() + ACCOUNT_DELETION_WINDOW;
-    const confirmationCode: string = generateConfirmationCode();
+    const confirmationCode: string = generateHexCode();
 
     await connection.execute(
       `INSERT INTO account_deletion (
@@ -2255,7 +2255,7 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
 
   const confirmationCode: string | undefined = req.params.confirmationCode;
 
-  if (!confirmationCode || !isValidConfirmationCode(confirmationCode)) {
+  if (!confirmationCode || !isValidHexCode(confirmationCode)) {
     res.status(400).json({ message: 'Invalid confirmation code.', reason: 'invalidConfirmationCode' });
     return;
   }

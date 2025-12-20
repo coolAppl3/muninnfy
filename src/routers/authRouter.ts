@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from 'express';
 import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
-import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
+import { generateHexCode, generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { dbPool } from '../db/db';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { destroyAuthSession } from '../auth/authSessions';
@@ -12,6 +12,8 @@ export const authRouter: Router = express.Router();
 
 authRouter.get('/session', async (req: Request, res: Response) => {
   const authSessionId: string | null = getRequestCookie(req, 'authSessionId');
+
+  generateHexCode();
 
   if (!authSessionId) {
     res.json({ isValidAuthSession: false });
