@@ -5,17 +5,23 @@ import Container from '../../components/Container/Container';
 import AccountContent from './AccountContent/AccountContent';
 import AccountLocationProvider from './providers/AccountLocationProvider';
 import AccountNavMenu from './AccountNavMenu/AccountNavMenu';
-import { AccountDetailsType } from '../../types/accountTypes';
+import { AccountDetailsType, OngoingAccountRequest } from '../../types/accountTypes';
 import AccountDetailsProvider from './providers/AccountDetailsProvider';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import { getAccountDetailsService } from '../../services/accountServices';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import { CanceledError } from 'axios';
 import useAuth from '../../hooks/useAuth';
+import AccountOngoingRequestsProvider from './providers/AccountOngoingRequestsProvider';
 
 export default function Account(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [initialAccountDetails, setInitialAccountDetails] = useState<AccountDetailsType | null>(null);
+
+  const [initialOngoingEmailUpdateRequest, setInitialOngoingEmailUpdateRequest] = useState<
+    (OngoingAccountRequest & { new_email: string }) | null
+  >(null);
+  const [initialOngoingAccountDeletionRequest, setInitialOngoingAccountDeletionRequest] = useState<OngoingAccountRequest | null>(null);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { setAuthStatus } = useAuth();
@@ -25,9 +31,14 @@ export default function Account(): JSX.Element {
 
     const getAccountDetails = async () => {
       try {
-        const accountDetails: AccountDetailsType = (await getAccountDetailsService(abortController.signal)).data.accountDetails;
+        const { accountDetails, ongoingEmailUpdateRequest, ongoingAccountDeletionRequest } = (
+          await getAccountDetailsService(abortController.signal)
+        ).data;
 
         setInitialAccountDetails(accountDetails);
+        setInitialOngoingEmailUpdateRequest(ongoingEmailUpdateRequest);
+        setInitialOngoingAccountDeletionRequest(ongoingAccountDeletionRequest);
+
         setIsLoaded(true);
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
@@ -58,15 +69,21 @@ export default function Account(): JSX.Element {
 
       <AccountLocationProvider>
         {isLoaded && initialAccountDetails ? (
-          <AccountDetailsProvider initialAccountDetails={initialAccountDetails}>
-            <main className='py-4'>
-              <Container className='grid grid-cols-12 items-start gap-1'>
-                <AccountSidebar />
-                <AccountNavMenu />
-                <AccountContent />
-              </Container>
-            </main>
-          </AccountDetailsProvider>
+          <main className='py-4'>
+            <Container className='grid grid-cols-12 items-start gap-1'>
+              <AccountSidebar />
+              <AccountNavMenu />
+
+              <AccountDetailsProvider initialAccountDetails={initialAccountDetails}>
+                <AccountOngoingRequestsProvider
+                  initialOngoingEmailUpdateRequest={initialOngoingEmailUpdateRequest}
+                  initialOngoingAccountDeletionRequest={initialOngoingAccountDeletionRequest}
+                >
+                  <AccountContent />
+                </AccountOngoingRequestsProvider>
+              </AccountDetailsProvider>
+            </Container>
+          </main>
         ) : (
           <LoadingSkeleton />
         )}

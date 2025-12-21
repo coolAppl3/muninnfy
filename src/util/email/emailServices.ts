@@ -38,7 +38,7 @@ export async function sendEmailUpdateStartEmailService(payload: { receiver: stri
 
   await sendEmailService({
     receiver,
-    subject: 'Muninnfy - Email Update',
+    subject: 'Muninnfy - Email Change',
     html: emailUpdateStartEmailTemplate({ ...rest }),
   });
 }

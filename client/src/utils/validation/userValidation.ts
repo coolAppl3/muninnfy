@@ -45,7 +45,7 @@ export function validatePassword(value: string): string | null {
   // meant for sign in attempts - doesn't over-validate
 
   if (value === '') {
-    return 'A valid password is required.';
+    return 'Password required.';
   }
 
   if (/\s/.test(value)) {

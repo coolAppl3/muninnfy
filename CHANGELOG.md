@@ -1,5 +1,72 @@
 # Changelog
 
+## [0.2.5] (2024-12-21)
+
+### Features
+
+- Fully implemented the profile section in `Account`, which allows the user to:
+  - Change their account's privacy settings.
+  - Change their display name.
+  - Change their password.
+  - Change their email address.
+  - Delete their account.
+- Added `AccountOngoingRequestsContext`, `AccountOngoingRequestsProvider`, and `useAccountOngoingRequests()` custom hook.
+- Added `AccountProfileContext`, `AccountProfileProvider`, and `useAccountProfile()` custom hook.
+- Added the following components under `Account`:
+  - `AccountChangeDisplayName`.
+  - `AccountChangePassword`.
+  - `AccountOngoingRequests`.
+  - `AccountChangeEmail`.
+    - `AccountChangeEmailStart`.
+    - `AccountChangeEmailSuspended`.
+    - `AccountChangeEmailConfirm`.
+  - `AccountDeletion`.
+    - `AccountDeletionStart`.
+    - `AccountDeletionSuspended`.
+    - `AccountDeletionConfirm`.
+- Added `AccountProfileUtils` with `isValidOngoingRequestData()` and `resDataContainsExpiryTimestamp()`.
+
+
+### Changes
+
+- Reworked confirmation codes to now be cryptographically safe 8-digit hexadecimal codes.
+
+
+### Improvements
+
+- Visually aligned the logo phrase in the footer with the rest of the footer elements.
+- Improved privacy related phrasing.
+- Other minor improvements.
+
+
+### Bug Fixes
+
+- Fixed `setAccountDetails()` incorrectly updating the `approve_follow_requests` value.
+- Fixed `StatisticItem` components overlaying the header's context menu.
+- Fixed longer emails not breaking into a new line in the profile header.
+- Fixed `AccountDetailsContext` being named `AccountContext`.
+- Fixed 404 responses for accounts not being found not removing the `authSessionId` cookie.
+- Fixed incorrect error reason in POST `accounts/details/email/start`.
+- Fixed a number of logical flaws in PATCH `accounts/details/email/confirm` and DELETE `accounts//deletion/confirm/:confirmationCode`.
+
+
+### Code Refactoring
+
+- Renamed `section` and `setSection` to `profileSection` and `setProfileSection` respectively for `AccountProfileContext`.
+- Refactored GET `accounts` to include ongoing requests data.
+- Simplified instanced of `isSubmitBtn={true}` to `isSubmitBtn`.
+- Reordered the buttons in the profile header context menu to be more intuitive.
+- Refactored email subject for `sendEmailUpdateStartEmailService()`.
+- Reworked `suspendAccountRequest()` to return the new expiry timestamp, which will now be returned in the response.
+- Reduced unnecessarily long error message in some endpoints
+- Plenty of other minor refactors.
+
+
+### Build Changes
+
+- Improved `eslint.config.js`.
+
+
 ## [0.2.4] (2024-12-14)
 
 ### Features

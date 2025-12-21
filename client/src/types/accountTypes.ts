@@ -7,3 +7,8 @@ export type AccountDetailsType = {
   is_private: boolean;
   approve_follow_requests: boolean;
 };
+
+export type OngoingAccountRequest = {
+  expiry_timestamp: number;
+  is_suspended: boolean;
+};

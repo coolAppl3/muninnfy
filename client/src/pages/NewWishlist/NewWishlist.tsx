@@ -149,7 +149,7 @@ export default function NewWishlist(): JSX.Element {
               </div>
 
               <Button
-                isSubmitBtn={true}
+                isSubmitBtn
                 className='bg-cta border-cta'
               >
                 Create wishlist

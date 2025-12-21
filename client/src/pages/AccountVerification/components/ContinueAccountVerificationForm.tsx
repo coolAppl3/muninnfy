@@ -22,14 +22,6 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
 
   async function continueAccountVerification(): Promise<void> {
     const email: string = emailValue;
-    const newErrorMessage: string | null = validateEmail(email);
-
-    if (newErrorMessage) {
-      setErrorMessage(newErrorMessage);
-      displayPopupMessage(newErrorMessage, 'error');
-
-      return;
-    }
 
     try {
       const publicAccountId: string = (await continueAccountVerificationService({ email })).data.publicAccountId;
@@ -69,6 +61,14 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
             return;
           }
 
+          const newErrorMessage: string | null = validateEmail(emailValue);
+          if (newErrorMessage) {
+            setErrorMessage(newErrorMessage);
+            displayPopupMessage(newErrorMessage, 'error');
+
+            return;
+          }
+
           setIsSubmitting(true);
           displayLoadingOverlay();
 
@@ -93,7 +93,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
         />
 
         <Button
-          isSubmitBtn={true}
+          isSubmitBtn
           className='bg-cta border-cta w-full mt-2'
         >
           Continue

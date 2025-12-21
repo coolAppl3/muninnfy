@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { AccountDetailsType } from '../types/accountTypes';
+import { AccountDetailsType, OngoingAccountRequest } from '../types/accountTypes';
 
 axios.defaults.withCredentials = true;
 const accountsApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/accounts` : `https://muninnfy/api/accounts`;
@@ -62,6 +62,8 @@ export function signInService(body: SignInPayload): Promise<AxiosResponse> {
 
 type GetAccountDetailsServiceData = {
   accountDetails: AccountDetailsType;
+  ongoingEmailUpdateRequest: (OngoingAccountRequest & { new_email: string }) | null;
+  ongoingAccountDeletionRequest: OngoingAccountRequest | null;
 };
 
 export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
@@ -77,10 +79,66 @@ export function updateAccountPrivacyService(body: UpdateAccountPrivacyServicePay
   return axios.patch(`${accountsApiUrl}/details/privacy`, body);
 }
 
-type UpdateAccountDisplayNameServicePayload = {
+type UpdateDisplayNameServicePayload = {
   newDisplayName: string;
 };
 
-export function updateAccountDisplayNameService(body: UpdateAccountDisplayNameServicePayload): Promise<AxiosResponse> {
+export function updateDisplayNameService(body: UpdateDisplayNameServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/details/displayName`, body);
+}
+
+type UpdatePasswordServicePayload = {
+  password: string;
+  newPassword: string;
+};
+
+export function updatePasswordService(body: UpdatePasswordServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/password`, body);
+}
+
+type StartEmailUpdateServicePayload = {
+  newEmail: string;
+  password: string;
+};
+
+type StartEmailUpdateServiceData = {
+  expiryTimestamp: number;
+};
+
+export function startEmailUpdateService(body: StartEmailUpdateServicePayload): Promise<AxiosResponse<StartEmailUpdateServiceData>> {
+  return axios.post(`${accountsApiUrl}/details/email/start`, body);
+}
+
+export function resendEmailUpdateEmailService(): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/email/resendEmail`);
+}
+
+type ConfirmEmailUpdateServicePayload = {
+  confirmationCode: string;
+};
+
+export function confirmEmailUpdateService(body: ConfirmEmailUpdateServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/details/email/confirm`, body);
+}
+
+type StartAccountDeletionServicePayload = {
+  password: string;
+};
+
+type StartAccountDeletionServiceData = {
+  expiryTimestamp: number;
+};
+
+export function startAccountDeletionService(
+  body: StartAccountDeletionServicePayload
+): Promise<AxiosResponse<StartAccountDeletionServiceData>> {
+  return axios.post(`${accountsApiUrl}/deletion/start`, body);
+}
+
+export function resendAccountDeletionEmailService(): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/deletion/resendEmail`);
+}
+
+export function confirmAccountDeletionService(confirmationCode: string): Promise<AxiosResponse> {
+  return axios.delete(`${accountsApiUrl}/deletion/confirm/${confirmationCode}`);
 }

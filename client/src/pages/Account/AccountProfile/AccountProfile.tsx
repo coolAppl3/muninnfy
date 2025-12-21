@@ -4,8 +4,16 @@ import AccountProfileHeader from './components/AccountProfileHeader/AccountProfi
 import AccountProfilePrivacy from './components/AccountProfilePrivacy/AccountProfilePrivacy';
 import useAccountDetails from '../hooks/useAccountDetails';
 import { getFullDateString } from '../../../utils/globalUtils';
+import { AccountProfileSection } from '../contexts/AccountProfileContext';
+import useAccountProfile from '../hooks/useAccountProfile';
+import AccountOngoingRequests from './components/AccountOngoingRequests/AccountOngoingRequests';
+import AccountChangeDisplayName from './components/AccountChangeDisplayName/AccountChangeDisplayName';
+import AccountChangePassword from './components/AccountChangePassword/AccountChangePassword';
+import AccountChangeEmail from './components/AccountChangeEmail/AccountChangeEmail';
+import AccountDeletion from './components/AccountDeletion/AccountDeletion';
 
 export function AccountProfile(): JSX.Element {
+  const { profileSection } = useAccountProfile();
   const { accountDetails } = useAccountDetails();
   const { public_account_id, created_on_timestamp, display_name, username, email } = accountDetails;
 
@@ -18,26 +26,40 @@ export function AccountProfile(): JSX.Element {
         <p className='leading-[1]'>Created on {getFullDateString(created_on_timestamp)}</p>
       </div>
 
-      <div className='grid md:grid-cols-2 gap-1 text-sm text-description'>
-        <StatisticItem
-          title='Display name'
-          value={display_name}
-        />
+      <div className={`grid transition-[grid] ${profileSection ? 'grid-rows-[auto_1fr]' : 'grid-rows-[auto_0fr]'}`}>
+        <div className='grid md:grid-cols-2 gap-1 text-sm text-description relative z-0 h-fit'>
+          <StatisticItem
+            title='Display name'
+            value={display_name}
+          />
 
-        <StatisticItem
-          title='Username'
-          value={username}
-        />
+          <StatisticItem
+            title='Username'
+            value={username}
+          />
 
-        <StatisticItem
-          title='Email address'
-          value={email}
-          className='md:col-span-2'
-        />
+          <StatisticItem
+            title='Email address'
+            value={email}
+            className='md:col-span-2 break-all'
+          />
+        </div>
+
+        <div className='z-0 overflow-hidden'>
+          <div className='h-line mt-2 mb-[1rem]'></div>
+          {profileSection && contentRecord[profileSection]}
+        </div>
       </div>
 
-      <div className='h-line mt-2 mb-1'></div>
-      <AccountProfilePrivacy />
+      {profileSection ? null : <AccountOngoingRequests />}
     </>
   );
 }
+
+const contentRecord: Record<AccountProfileSection, JSX.Element> = {
+  PRIVACY_SETTINGS: <AccountProfilePrivacy />,
+  CHANGE_DISPLAY_NAME: <AccountChangeDisplayName />,
+  CHANGE_EMAIL: <AccountChangeEmail />,
+  CHANGE_PASSWORD: <AccountChangePassword />,
+  DELETE_ACCOUNT: <AccountDeletion />,
+};

@@ -17,6 +17,7 @@ export default defineConfig([
 
     plugins: {
       ...react.configs.flat.recommended,
+      react,
     },
 
     languageOptions: {
@@ -40,7 +41,9 @@ export default defineConfig([
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      "eqeqeq": 'error',
+      eqeqeq: 'error',
+      'react-hooks/exhaustive-deps': 'error',
+      'react/jsx-key': 'error',
     },
   },
 ]);

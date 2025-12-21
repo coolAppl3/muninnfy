@@ -5,15 +5,24 @@ import { AccountProfile } from '../AccountProfile/AccountProfile';
 import AccountSocial from '../AccountSocial/AccountSocial';
 import { AccountLocation } from '../contexts/AccountLocationContext';
 import AccountWishlists from '../AccountWishlists/AccountWishlists';
+import AccountProfileProvider from '../providers/AccountProfileProvider';
 
 export default function AccountContent(): JSX.Element {
   const { accountLocation } = useAccountLocation();
 
-  return <div className='p-2 bg-secondary rounded-sm col-span-12 md:col-span-9 shadow-simple-tiny'>{ContentRecord[accountLocation]}</div>;
+  return (
+    <div className='p-2 bg-secondary rounded-sm col-span-12 md:col-span-9 shadow-simple-tiny min-h-full'>
+      {contentRecord[accountLocation]}
+    </div>
+  );
 }
 
-const ContentRecord: Record<AccountLocation, JSX.Element> = {
-  profile: <AccountProfile />,
+const contentRecord: Record<AccountLocation, JSX.Element> = {
+  profile: (
+    <AccountProfileProvider>
+      <AccountProfile />
+    </AccountProfileProvider>
+  ),
   social: <AccountSocial />,
   notifications: <AccountNotifications />,
   wishlists: <AccountWishlists />,

@@ -66,10 +66,9 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
 
       <Link
         to={`/wishlist/${wishlist_id}`}
-        className='ml-1 bg-dark text-title ml-auto mt-1 h-[2.8rem] rounded xs:hidden flex justify-center items-center '
+        className='bg-dark text-title ml-auto mt-1 py-[1rem] rounded xs:hidden flex justify-center items-center text-sm font-medium'
       >
-        <span className='mr-1 text-sm font-medium'>View</span>
-        <ArrowIcon className='w-2 h-2' />
+        View
       </Link>
     </div>
   );

@@ -180,7 +180,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
           isToggled={filters.isFavorited !== null}
           onClick={() => dispatch({ type: 'SET_IS_FAVORITED', payload: { newValue: filters.isFavorited ? null : true } })}
           children={
-            <div className={`gap-[1.4rem] pl-1 ${filters.isFavorited === null ? 'hidden' : 'grid'}`}>
+            <div className={`gap-[1.4rem] pl-1 mb-1 ${filters.isFavorited === null ? 'hidden' : 'grid'}`}>
               <FilterTogglerCheckboxBtn
                 onClick={() => dispatch({ type: 'SET_IS_FAVORITED', payload: { newValue: true } })}
                 title='Favorited'
@@ -260,7 +260,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <Button
           className='bg-cta border-cta w-full sm:w-fit order-1 sm:order-3'
           disabled={!changesDetected()}
-          isSubmitBtn={true}
+          isSubmitBtn
         >
           Apply filters
         </Button>

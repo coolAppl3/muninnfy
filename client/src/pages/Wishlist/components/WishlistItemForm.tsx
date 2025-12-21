@@ -407,7 +407,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
         </Button>
 
         <Button
-          isSubmitBtn={true}
+          isSubmitBtn
           className={`bg-cta border-cta w-full order-1 ${
             formMode === 'EDIT_ITEM' ? 'sm:w-full md:w-fit sm:order-1 md:order-2' : 'sm:w-fit sm:order-2'
           }`}

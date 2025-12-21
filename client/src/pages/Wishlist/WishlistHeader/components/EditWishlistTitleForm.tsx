@@ -86,10 +86,10 @@ export default function EditWishlistTitleForm(): JSX.Element {
         const newTitleErrorMessage: string | null =
           validateWishlistTitle(titleValue) || (titleValue === wishlistDetails.title ? 'Wishlist already has this title.' : null);
 
-        setTitleErrorMessage(newTitleErrorMessage);
-
         if (newTitleErrorMessage) {
+          setTitleErrorMessage(newTitleErrorMessage);
           displayPopupMessage(newTitleErrorMessage, 'error');
+
           return;
         }
 
@@ -112,14 +112,14 @@ export default function EditWishlistTitleForm(): JSX.Element {
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
-          setTitleErrorMessage(validateWishlistTitle(newValue));
           setTitleValue(newValue);
+          setTitleErrorMessage(validateWishlistTitle(newValue));
         }}
       />
 
       <div className='flex flex-col justify-start items-center gap-1 sm:flex-row'>
         <Button
-          isSubmitBtn={true}
+          isSubmitBtn
           className='bg-cta border-cta order-1 sm:order-2 w-full sm:w-fit'
         >
           Submit

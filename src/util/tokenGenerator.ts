@@ -1,3 +1,5 @@
+import crypto from 'node:crypto';
+
 export function generateCryptoUuid(): string {
   return crypto.randomUUID();
 }
@@ -11,23 +13,15 @@ export function isValidUuid(uuid: string): boolean {
   return regex.test(uuid);
 }
 
-export function generateConfirmationCode(): string {
-  // number 0, as well as uppercase and lowercase O, not included
-  const allowedCodeCharacters: string = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
-  let verificationCode: string = '';
-
-  while (verificationCode.length < 6) {
-    verificationCode += allowedCodeCharacters[Math.floor(Math.random() * allowedCodeCharacters.length)];
-  }
-
-  return verificationCode;
+export function generateHexCode(): string {
+  return crypto.randomBytes(4).toString('hex').toUpperCase();
 }
 
-export function isValidConfirmationCode(verificationCode: any): boolean {
-  if (typeof verificationCode !== 'string') {
+export function isValidHexCode(hexCode: any): boolean {
+  if (typeof hexCode !== 'string') {
     return false;
   }
 
-  const regex: RegExp = /^[A-NP-Z1-9]{6}$/;
-  return regex.test(verificationCode);
+  const regex: RegExp = /^[A-F0-9]{8}$/;
+  return regex.test(hexCode);
 }

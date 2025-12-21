@@ -30,6 +30,18 @@ export function getShortenedDateString(timestamp: number): string {
   return `${monthName} ${date}${ordinalSuffix}, ${year}`;
 }
 
+export function getDateAndTimeString(timestamp: number): string {
+  const dateObject: Date = new Date(timestamp);
+
+  const date: number = dateObject.getDate();
+  const monthName: string = getMonthName(dateObject);
+  const ordinalSuffix: string = getDateOrdinalSuffix(date);
+
+  const time = new Intl.DateTimeFormat('en-GB', { timeStyle: 'short' }).format(dateObject);
+
+  return `${monthName} ${date}${ordinalSuffix}, ${time}`;
+}
+
 function getMonthName(date: Date): string {
   return new Intl.DateTimeFormat('en-GB', { month: 'long' }).format(date);
 }
