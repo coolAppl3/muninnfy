@@ -1425,7 +1425,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     connection = await dbPool.getConnection();
     await connection.beginTransaction();
 
-    type AccountDetails = {
+    type RequestDetails = {
       request_id: number;
       new_email: string;
       confirmation_code: string;
@@ -1433,7 +1433,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
       expiry_timestamp: number;
     };
 
-    const [accountRows] = await connection.execute<RowDataPacket[]>(
+    const [requestRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         request_id,
         new_email,
@@ -1447,48 +1447,39 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
       [accountId]
     );
 
-    const accountDetails = accountRows[0] as AccountDetails | undefined;
+    const requestDetails = requestRows[0] as RequestDetails | undefined;
 
-    if (!accountDetails) {
-      await connection.rollback();
-
-      removeRequestCookie(res, 'authSessionId');
-      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-
-      return;
-    }
-
-    if (!accountDetails.request_id) {
+    if (!requestDetails) {
       await connection.rollback();
       res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
 
       return;
     }
 
-    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+    if (requestDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await connection.rollback();
 
       res.status(403).json({
         message: 'Email change request suspended.',
         reason: 'requestSuspended',
-        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+        resData: { expiryTimestamp: requestDetails.expiry_timestamp },
       });
 
       return;
     }
 
-    if (accountDetails.confirmation_code !== confirmationCode) {
+    if (requestDetails.confirmation_code !== confirmationCode) {
       await connection.rollback();
 
-      const suspendRequest: boolean = accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
+      const suspendRequest: boolean = requestDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
       if (!suspendRequest) {
-        await incrementFailedAccountRequestAttempts('email_update', accountDetails.request_id, dbPool, req);
+        await incrementFailedAccountRequestAttempts('email_update', requestDetails.request_id, dbPool, req);
         res.status(401).json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
 
         return;
       }
 
-      const expiryTimestamp: number | null = await suspendAccountRequest('email_update', accountDetails.request_id, dbPool, req);
+      const expiryTimestamp: number | null = await suspendAccountRequest('email_update', requestDetails.request_id, dbPool, req);
       if (!expiryTimestamp) {
         res.status(500).json({ message: 'Internal server error.' });
         return;
@@ -1509,7 +1500,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
         email = ?
       WHERE
         account_id = ?;`,
-      [accountDetails.new_email, accountId]
+      [requestDetails.new_email, accountId]
     );
 
     const [secondResultSetHeader] = await connection.execute<ResultSetHeader>(
@@ -1517,7 +1508,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
         email_update
       WHERE
         request_id = ?;`,
-      [accountDetails.request_id]
+      [requestDetails.request_id]
     );
 
     const emailUpdated: boolean = firstResultSetheader.affectedRows > 0;
@@ -2264,7 +2255,7 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
   const confirmationCode: string | undefined = req.params.confirmationCode;
 
   if (!confirmationCode || !isValidHexCode(confirmationCode)) {
-    res.status(400).json({ message: 'Invalid confirmation code.', reason: 'invalidConfirmationCode' });
+    res.status(400).json({ message: 'Invalid confirmation code.', reason: 'invalidCode' });
     return;
   }
 
@@ -2280,62 +2271,60 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
     connection = await dbPool.getConnection();
     await connection.beginTransaction();
 
-    type AccountDetails = {
+    type RequestDetails = {
       request_id: number;
       confirmation_code: string;
       failed_attempts: number;
       expiry_timestamp: number;
     };
 
-    const [accountRows] = await connection.execute<RowDataPacket[]>(
+    const [requestRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         request_id,
         confirmation_code,
         failed_attempts,
         expiry_timestamp
       FROM
-        email_update
+        account_deletion
       WHERE
         account_id = ?
       FOR UPDATE;`,
       [accountId]
     );
 
-    const accountDetails = accountRows[0] as AccountDetails | undefined;
+    const requestDetails = requestRows[0] as RequestDetails | undefined;
 
-    if (!accountDetails) {
+    if (!requestDetails) {
       await connection.rollback();
-
-      removeRequestCookie(res, 'authSessionId');
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res.status(404).json({ message: 'Deletion request not found or has expired.', reason: 'requestNotFound' });
 
       return;
     }
 
-    if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+    if (requestDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await connection.rollback();
 
       res.status(403).json({
         message: 'Deletion request suspended.',
         reason: 'requestSuspended',
-        resData: { expiryTimestamp: accountDetails.expiry_timestamp },
+        resData: { expiryTimestamp: requestDetails.expiry_timestamp },
       });
 
       return;
     }
 
-    if (accountDetails.confirmation_code !== confirmationCode) {
+    if (requestDetails.confirmation_code !== confirmationCode) {
       await connection.rollback();
 
-      const suspendRequest: boolean = accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
+      const suspendRequest: boolean = requestDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
       if (!suspendRequest) {
-        await incrementFailedAccountRequestAttempts('account_deletion', accountDetails.request_id, dbPool, req);
+        await incrementFailedAccountRequestAttempts('account_deletion', requestDetails.request_id, dbPool, req);
         res.status(401).json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
 
         return;
       }
 
-      const expiryTimestamp: number | null = await suspendAccountRequest('account_deletion', accountDetails.request_id, dbPool, req);
+      const expiryTimestamp: number | null = await suspendAccountRequest('account_deletion', requestDetails.request_id, dbPool, req);
       if (!expiryTimestamp) {
         res.status(500).json({ message: 'Internal server error.' });
         return;

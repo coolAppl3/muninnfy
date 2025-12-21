@@ -61,14 +61,9 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
       }
 
       if (status === 404) {
-        if (errReason === 'requestNotFound') {
-          setOngoingEmailUpdateRequest(null);
-          setProfileSection(null);
+        setOngoingEmailUpdateRequest(null);
+        setProfileSection(null);
 
-          return;
-        }
-
-        setAuthStatus('unauthenticated');
         return;
       }
 
