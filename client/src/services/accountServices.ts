@@ -132,3 +132,7 @@ export function startAccountDeletionService(body: StartAccountDeletionServicePay
 export function resendAccountDeletionEmailService(): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/deletion/resendEmail`);
 }
+
+export function confirmAccountDeletionService(confirmationCode: string): Promise<AxiosResponse> {
+  return axios.delete(`${accountsApiUrl}/deletion/confirm/${confirmationCode}`);
+}
