@@ -16,7 +16,7 @@ export default function AccountChangeEmailSuspended(): JSX.Element {
     <div>
       <h4 className='text-danger mb-1'>Email update request suspended.</h4>
 
-      <p className='text-description text-sm mb-2'>
+      <p className='text-description text-sm mb-2 max-w-4/5'>
         The request has been suspended for 24 hours as a result of multiple failed attempts. You can try again after{' '}
         <span className='text-title font-medium'>{getDateAndTimeString(ongoingEmailUpdateRequest.expiry_timestamp)}</span>.
       </p>
