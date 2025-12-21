@@ -172,7 +172,7 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
             return;
           }
 
-          const newErrorMessage: string | null = validateHexCode(value.toUpperCase());
+          const newErrorMessage: string | null = validateHexCode(value);
           if (newErrorMessage) {
             setErrorMessage(newErrorMessage);
             displayPopupMessage(newErrorMessage, 'error');
