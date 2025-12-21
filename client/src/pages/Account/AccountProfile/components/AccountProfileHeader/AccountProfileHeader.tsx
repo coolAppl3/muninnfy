@@ -75,7 +75,7 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className='context-menu-btn text-danger'
+          className={`context-menu-btn ${profileSection === 'DELETE_ACCOUNT' ? 'text-cta' : 'text-danger'}`}
           onClick={() => {
             setMenuIsOpen(false);
             setProfileSection('DELETE_ACCOUNT');
