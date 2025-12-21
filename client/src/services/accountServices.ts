@@ -128,3 +128,7 @@ type StartAccountDeletionServicePayload = {
 export function startAccountDeletionService(body: StartAccountDeletionServicePayload): Promise<AxiosResponse> {
   return axios.post(`${accountsApiUrl}/deletion/start`, body);
 }
+
+export function resendAccountDeletionEmailService(): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/deletion/resendEmail`);
+}
