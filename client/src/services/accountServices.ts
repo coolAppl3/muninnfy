@@ -125,7 +125,13 @@ type StartAccountDeletionServicePayload = {
   password: string;
 };
 
-export function startAccountDeletionService(body: StartAccountDeletionServicePayload): Promise<AxiosResponse> {
+type StartAccountDeletionServiceData = {
+  expiryTimestamp: number;
+};
+
+export function startAccountDeletionService(
+  body: StartAccountDeletionServicePayload
+): Promise<AxiosResponse<StartAccountDeletionServiceData>> {
   return axios.post(`${accountsApiUrl}/deletion/start`, body);
 }
 
