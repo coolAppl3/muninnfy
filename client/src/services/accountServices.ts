@@ -120,3 +120,11 @@ type ConfirmEmailUpdateServicePayload = {
 export function confirmEmailUpdateService(body: ConfirmEmailUpdateServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/details/email/confirm`, body);
 }
+
+type StartAccountDeletionServicePayload = {
+  password: string;
+};
+
+export function startAccountDeletionService(body: StartAccountDeletionServicePayload): Promise<AxiosResponse> {
+  return axios.post(`${accountsApiUrl}/deletion/start`, body);
+}
