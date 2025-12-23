@@ -2374,3 +2374,121 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
     connection?.release();
   }
 });
+
+accountsRouter.post('/followRequests/send', async (req: Request, res: Response) => {
+  const authSessionOd: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionOd) {
+    return;
+  }
+
+  type RequestData = {
+    requesteePublicAccountId: string;
+  };
+
+  const requestData: RequestData = req.body;
+
+  const expectedKeys: string[] = ['requesteePublicAccountId'];
+  if (undefinedValuesDetected(requestData, expectedKeys)) {
+    res.status(400).json({ message: 'Invalid request data.' });
+    return;
+  }
+
+  const { requesteePublicAccountId } = requestData;
+
+  if (!isValidUuid(requesteePublicAccountId)) {
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionOd, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type FollowDetails = {
+      requestee_account_id: number;
+      requestee_is_verified: boolean;
+      already_following: boolean;
+      already_requested: boolean;
+    };
+
+    const [followRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        account_id AS requestee_account_id,
+        is_verified AS requestee_is_verified,
+
+        EXISTS (
+          SELECT 1 FROM followers WHERE follower_id = :accountId AND account_id = accounts.account_id
+        ) AS already_following,
+
+        EXISTS (
+          SELECT 1 FROM follow_requests WHERE requester_id = :accountId AND requestee_id = accounts.account_id
+        ) AS already_requested
+      FROM
+        accounts
+      WHERE
+        public_account_id = :requesteePublicAccountId;`,
+      { accountId, requesteePublicAccountId }
+    );
+
+    const followDetails = followRows[0] as FollowDetails | undefined;
+
+    if (!followDetails || !followDetails.requestee_is_verified) {
+      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (followDetails.requestee_account_id === accountId) {
+      res.status(409).json({ message: `Can't follow yourself.`, reason: 'selfFollow' });
+      return;
+    }
+
+    if (followDetails.already_following) {
+      res.status(409).json({ message: 'Already following this user.', reason: 'alreadyFollowing' });
+      return;
+    }
+
+    if (followDetails.already_requested) {
+      res.status(409).json({ message: 'Follow request already sent.', reason: 'alreadySent' });
+      return;
+    }
+
+    const requestTimestamp: number = Date.now();
+
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `INSERT INTO follow_requests (
+        requester_id,
+        requestee_id,
+        request_timestamp
+      ) VALUES (${generatePlaceHolders(3)})`,
+      [accountId, followDetails.requestee_account_id, requestTimestamp]
+    );
+
+    res.json({ requestId: resultSetHeader.insertId, requestTimestamp });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, null, 'Attempted to send two responses.');
+      return;
+    }
+
+    if (!isSqlError(err)) {
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
+
+      return;
+    }
+
+    if (err.errno === 1452) {
+      res.status(409).json({ message: 'Follow request already sent.', reason: 'alreadySent' });
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
