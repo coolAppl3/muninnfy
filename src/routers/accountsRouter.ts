@@ -2108,7 +2108,7 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
         expiry_timestamp,
         emails_sent,
         failed_attempts
-      ) VALUES(${generatePlaceHolders(5)});`,
+      ) VALUES (${generatePlaceHolders(5)});`,
       [accountId, confirmationCode, expiryTimestamp, 1, 0]
     );
 
