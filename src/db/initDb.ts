@@ -18,6 +18,7 @@ export async function initDb(): Promise<void> {
   await createAuthSessionsTable();
 
   await createFollowRequestsTable();
+  await createFollowersTable();
 
   await createWishlistsTable();
   await createWishlistItemsTable();
@@ -154,6 +155,24 @@ async function createFollowRequestsTable(): Promise<void> {
         FOREIGN KEY (request_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         FOREIGN KEY (requester_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         UNIQUE(requester_id, requestee_id)
+      )`
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
+
+async function createFollowersTable(): Promise<void> {
+  try {
+    await dbPool.execute(
+      `CREATE TABLE IF NOT EXISTS followers (
+        follow_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        account_id INT UNSIGNED NOT NULL,
+        follower_id INT UNSIGNED NOT NULL,
+        follow_timestamp BIGINT UNSIGNED NOT NULL,
+        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        FOREIGN KEY (follower_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        UNIQUE(account_id, follower_id)
       )`
     );
   } catch (err: unknown) {
