@@ -152,8 +152,8 @@ async function createFollowRequestsTable(): Promise<void> {
         requester_id INT UNSIGNED NOT NULL,
         requestee_id INT UNSIGNED NOT NULL,
         request_timestamp BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY (request_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         FOREIGN KEY (requester_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        FOREIGN KEY (requestee_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         UNIQUE(requester_id, requestee_id)
       )`
     );
