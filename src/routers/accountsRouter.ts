@@ -2472,7 +2472,7 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
     console.log(err);
 
     if (res.headersSent) {
-      await logUnexpectedError(req, null, 'Attempted to send two responses.');
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
@@ -2533,7 +2533,7 @@ accountsRouter.delete('/followRequests/cancel/:requestId', async (req: Request, 
     console.log(err);
 
     if (res.headersSent) {
-      await logUnexpectedError(req, null, 'Attempted to send two responses.');
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
       return;
     }
 
