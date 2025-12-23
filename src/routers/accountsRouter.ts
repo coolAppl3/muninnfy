@@ -2492,3 +2492,52 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
     await logUnexpectedError(req, err);
   }
 });
+
+accountsRouter.delete('/followRequests/cancel/:requestId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const requestId: number | undefined = req.params.requestId ? +req.params.requestId : undefined;
+
+  if (!requestId || !Number.isInteger(requestId)) {
+    res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      `DELETE FROM
+        follow_requests
+      WHERE
+        request_id = ? AND
+        requester_id = ?;`,
+      [requestId, accountId]
+    );
+
+    if (resultSetHeader.affectedRows === 0) {
+      res.status(404).json({ message: 'Request not found.', reason: 'requestNotFound' });
+      return;
+    }
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, null, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
