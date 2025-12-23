@@ -149,12 +149,12 @@ async function createFollowRequestsTable(): Promise<void> {
     await dbPool.execute(
       `CREATE TABLE IF NOT EXISTS follow_requests (
         request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-        requester_id INT UNSIGNED NOT NULL,
-        requestee_id INT UNSIGNED NOT NULL,
+        requester_account_id INT UNSIGNED NOT NULL,
+        requestee_account_id INT UNSIGNED NOT NULL,
         request_timestamp BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY (requester_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
-        FOREIGN KEY (requestee_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
-        UNIQUE(requester_id, requestee_id)
+        FOREIGN KEY (requester_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        FOREIGN KEY (requestee_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        UNIQUE(requester_account_id, requestee_account_id)
       )`
     );
   } catch (err: unknown) {
@@ -168,11 +168,11 @@ async function createFollowersTable(): Promise<void> {
       `CREATE TABLE IF NOT EXISTS followers (
         follow_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         account_id INT UNSIGNED NOT NULL,
-        follower_id INT UNSIGNED NOT NULL,
+        follower_account_id INT UNSIGNED NOT NULL,
         follow_timestamp BIGINT UNSIGNED NOT NULL,
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
-        FOREIGN KEY (follower_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
-        UNIQUE(account_id, follower_id)
+        FOREIGN KEY (follower_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        UNIQUE(account_id, follower_account_id)
       )`
     );
   } catch (err: unknown) {

@@ -2421,11 +2421,11 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
         is_verified AS requestee_is_verified,
 
         EXISTS (
-          SELECT 1 FROM followers WHERE follower_id = :accountId AND account_id = accounts.account_id
+          SELECT 1 FROM followers WHERE follower_account_id = :accountId AND account_id = accounts.account_id
         ) AS already_following,
 
         EXISTS (
-          SELECT 1 FROM follow_requests WHERE requester_id = :accountId AND requestee_id = accounts.account_id
+          SELECT 1 FROM follow_requests WHERE requester_account_id = :accountId AND requestee_account_id = accounts.account_id
         ) AS already_requested
       FROM
         accounts
@@ -2460,8 +2460,8 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
 
     const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
       `INSERT INTO follow_requests (
-        requester_id,
-        requestee_id,
+        requester_account_id,
+        requestee_account_id,
         request_timestamp
       ) VALUES (${generatePlaceHolders(3)})`,
       [accountId, followDetails.requestee_account_id, requestTimestamp]
@@ -2519,7 +2519,7 @@ accountsRouter.delete('/followRequests/cancel/:requestId', async (req: Request, 
         follow_requests
       WHERE
         request_id = ? AND
-        requester_id = ?;`,
+        requester_account_id = ?;`,
       [requestId, accountId]
     );
 
