@@ -2755,3 +2755,47 @@ accountsRouter.delete('/followers/unfollow/:followId', async (req: Request, res:
     await logUnexpectedError(req, err);
   }
 });
+
+accountsRouter.delete('/followers/remove/:followId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const followId: number | undefined = req.params.followId ? +req.params.followId : undefined;
+
+  if (!followId || !Number.isInteger(followId)) {
+    res.status(400).json({ messagE: 'Invalid follow ID.', reason: 'invalidFollowId' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    await dbPool.execute<ResultSetHeader>(
+      `DELETE FROM
+        followers
+      WHERE
+        follow_id = ? AND
+        account_id = ?;`,
+      [followId, accountId]
+    );
+
+    res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
