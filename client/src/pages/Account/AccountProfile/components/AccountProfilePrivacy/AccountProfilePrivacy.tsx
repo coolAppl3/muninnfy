@@ -29,7 +29,7 @@ export default function AccountProfilePrivacy(): JSX.Element {
       await updateAccountPrivacyService({ isPrivate, approveFollowRequests });
       setAccountDetails((prev) => ({ ...prev, is_private: isPrivate, approve_follow_requests: approveFollowRequests }));
 
-      displayPopupMessage('Privacy preferences updated.', 'success');
+      displayPopupMessage('Privacy preferences changed.', 'success');
       setProfileSection(null);
     } catch (err: unknown) {
       console.log(err);

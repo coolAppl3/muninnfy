@@ -43,7 +43,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
       setTitleValue('');
       setEditMode(null);
 
-      displayPopupMessage('Title updated.', 'success');
+      displayPopupMessage('Title changed.', 'success');
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
