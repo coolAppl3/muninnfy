@@ -155,7 +155,7 @@ async function createFollowRequestsTable(): Promise<void> {
         FOREIGN KEY (requester_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         FOREIGN KEY (requestee_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         UNIQUE(requester_account_id, requestee_account_id)
-      )`
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
@@ -173,7 +173,7 @@ async function createFollowersTable(): Promise<void> {
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         FOREIGN KEY (follower_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         UNIQUE(account_id, follower_account_id)
-      )`
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
