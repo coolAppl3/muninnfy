@@ -2514,7 +2514,7 @@ accountsRouter.delete('/followRequests/cancel/:requestId', async (req: Request, 
   }
 
   try {
-    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute<ResultSetHeader>(
       `DELETE FROM
         follow_requests
       WHERE
@@ -2522,11 +2522,6 @@ accountsRouter.delete('/followRequests/cancel/:requestId', async (req: Request, 
         requester_account_id = ?;`,
       [requestId, accountId]
     );
-
-    if (resultSetHeader.affectedRows === 0) {
-      res.status(404).json({ message: 'Request not found.', reason: 'requestNotFound' });
-      return;
-    }
 
     res.json({});
   } catch (err: unknown) {
@@ -2686,7 +2681,7 @@ accountsRouter.delete('/followRequests/decline/:requestId', async (req: Request,
   }
 
   try {
-    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute<ResultSetHeader>(
       `DELETE FROM
         follow_requests
       WHERE
@@ -2694,11 +2689,6 @@ accountsRouter.delete('/followRequests/decline/:requestId', async (req: Request,
         requestee_account_id = ?;`,
       [requestId, accountId]
     );
-
-    if (resultSetHeader.affectedRows === 0) {
-      res.status(404).json({ message: 'Request not found.', reason: 'requestNotFound' });
-      return;
-    }
 
     res.json({});
   } catch (err: unknown) {
@@ -2743,6 +2733,8 @@ accountsRouter.delete('/followers/unfollow/:followId', async (req: Request, res:
         follower_account_id = ?;`,
       [followId, accountId]
     );
+
+    res.json({});
   } catch (err: unknown) {
     console.log(err);
 
