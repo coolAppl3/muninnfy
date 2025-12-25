@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.2.6] (2024-12-25)
+
+### Features
+
+- Added the following tables:
+  - `follow_requests`.
+  - `followers`.
+- Added the following endpoints:
+  - POST `accounts/followRequests/send`.
+  - DELETE `accounts/followRequests/cancel/:requestId`.
+  - POST `accounts/followRequests/accept`.
+  - DELETE `accounts/followRequests/decline/:requestId`.
+  - DELETE `accounts/followers/unfollow/:followId`.
+  - DELETE `accounts/followers/remove/:followId`.
+
+
+### Bug Fixes
+
+- Fixed `null` being used instead of `err` when using `logUnexpectedError()` to log attempts of sending two responses..
+
+
+### Code Refactoring
+
+- Removed unused `App.css` file.
+
+
 ## [0.2.5] (2024-12-21)
 
 ### Features
