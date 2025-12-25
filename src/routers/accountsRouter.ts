@@ -2411,6 +2411,7 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
     type FollowDetails = {
       requestee_account_id: number;
       requestee_is_verified: boolean;
+      follow_requires_approval: boolean;
       already_following: boolean;
       already_requested: boolean;
     };
@@ -2419,6 +2420,8 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
       `SELECT
         account_id AS requestee_account_id,
         is_verified AS requestee_is_verified,
+
+        (SELECT approve_follow_requests FROM account_preferences WHERE account_id = accounts.account_id) AS follow_requires_approval,
 
         EXISTS (
           SELECT 1 FROM followers WHERE follower_account_id = :accountId AND account_id = accounts.account_id
@@ -2456,7 +2459,21 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
       return;
     }
 
-    const requestTimestamp: number = Date.now();
+    const currentTimestamp: number = Date.now();
+
+    if (!followDetails.follow_requires_approval) {
+      const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+        `INSERT INTO followers (
+          account_id,
+          follower_account_id,
+          follow_timestamp
+        ) VALUES (${generatePlaceHolders(3)});`,
+        [followDetails.requestee_account_id, accountId, currentTimestamp]
+      );
+
+      res.json({ followId: resultSetHeader.insertId, followTimestamp: currentTimestamp });
+      return;
+    }
 
     const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
       `INSERT INTO follow_requests (
@@ -2464,10 +2481,10 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
         requestee_account_id,
         request_timestamp
       ) VALUES (${generatePlaceHolders(3)})`,
-      [accountId, followDetails.requestee_account_id, requestTimestamp]
+      [accountId, followDetails.requestee_account_id, currentTimestamp]
     );
 
-    res.json({ requestId: resultSetHeader.insertId, requestTimestamp });
+    res.json({ requestId: resultSetHeader.insertId, requestTimestamp: currentTimestamp });
   } catch (err: unknown) {
     console.log(err);
 
