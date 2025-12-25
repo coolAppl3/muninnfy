@@ -15,8 +15,10 @@ export async function initDb(): Promise<void> {
   await createAccountRecoveryTable();
   await createAccountDeletionTable();
   await createEmailUpdateTable();
-
   await createAuthSessionsTable();
+
+  await createFollowRequestsTable();
+  await createFollowersTable();
 
   await createWishlistsTable();
   await createWishlistItemsTable();
@@ -136,6 +138,42 @@ async function createEmailUpdateTable(): Promise<void> {
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`,
       [ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_ATTEMPTS_LIMIT]
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
+
+async function createFollowRequestsTable(): Promise<void> {
+  try {
+    await dbPool.execute(
+      `CREATE TABLE IF NOT EXISTS follow_requests (
+        request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        requester_account_id INT UNSIGNED NOT NULL,
+        requestee_account_id INT UNSIGNED NOT NULL,
+        request_timestamp BIGINT UNSIGNED NOT NULL,
+        FOREIGN KEY (requester_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        FOREIGN KEY (requestee_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        UNIQUE(requester_account_id, requestee_account_id)
+      );`
+    );
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
+
+async function createFollowersTable(): Promise<void> {
+  try {
+    await dbPool.execute(
+      `CREATE TABLE IF NOT EXISTS followers (
+        follow_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+        account_id INT UNSIGNED NOT NULL,
+        follower_account_id INT UNSIGNED NOT NULL,
+        follow_timestamp BIGINT UNSIGNED NOT NULL,
+        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        FOREIGN KEY (follower_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+        UNIQUE(account_id, follower_account_id)
+      );`
     );
   } catch (err: unknown) {
     console.log(err);
