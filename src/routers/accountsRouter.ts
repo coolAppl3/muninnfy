@@ -2610,7 +2610,7 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
       return;
     }
 
-    const requestTimestamp: number = Date.now();
+    const followTimestamp: number = Date.now();
 
     const [firstResultSetheader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO followers (
@@ -2618,7 +2618,7 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
         follower_account_Id,
         follow_timestamp
       ) VALUES (${generatePlaceHolders(3)});`,
-      [accountId, followDetails.requester_account_id, requestTimestamp]
+      [accountId, followDetails.requester_account_id, followTimestamp]
     );
 
     const [secondResultSetHeader] = await connection.execute<ResultSetHeader>(
@@ -2639,11 +2639,7 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
     }
 
     await connection.commit();
-    res.json({
-      follow_id: firstResultSetheader.insertId,
-      follower_account_id: followDetails.requester_account_id,
-      requestTimestamp,
-    });
+    res.json({ followId: firstResultSetheader.insertId, followTimestamp });
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
