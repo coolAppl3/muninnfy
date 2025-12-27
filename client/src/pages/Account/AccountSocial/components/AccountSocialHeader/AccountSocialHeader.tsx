@@ -1,10 +1,10 @@
-import { FocusEvent, JSX, useState } from 'react';
+import { FocusEvent, JSX } from 'react';
 import TripleDotMenuIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import StatisticItem from '../../../../../components/StatisticItem/StatisticItem';
+import useAccountSocial from '../../../hooks/useAccountSocial';
 
-// TODO: continue implementation
 export default function AccountSocialHeader(): JSX.Element {
-  const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
+  const { menuIsOpen, socialSection, setMenuIsOpen, setSocialSection } = useAccountSocial();
 
   return (
     <header>
@@ -35,7 +35,8 @@ export default function AccountSocialHeader(): JSX.Element {
             type='button'
             className='context-menu-btn bg-primary'
             onClick={() => {
-              // TODO: implement
+              setMenuIsOpen(false);
+              // TODO: continue implementation
             }}
           >
             Copy account link
@@ -43,9 +44,10 @@ export default function AccountSocialHeader(): JSX.Element {
 
           <button
             type='button'
-            className='context-menu-btn bg-primary'
+            className={`context-menu-btn bg-primary ${socialSection === 'FIND_ACCOUNT' ? 'text-cta' : ''}`}
             onClick={() => {
-              // TODO: implement
+              setMenuIsOpen(false);
+              setSocialSection('FIND_ACCOUNT');
             }}
           >
             Find account
@@ -57,37 +59,43 @@ export default function AccountSocialHeader(): JSX.Element {
         <div className='grid md:grid-cols-3 gap-1 text-sm text-description relative z-0 h-fit'>
           <button
             type='button'
+            onClick={() => setSocialSection('FOLLOWERS')}
             className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
-              true ? 'text-cta' : ''
+              socialSection === 'FOLLOWERS' ? 'text-cta' : ''
             }`}
           >
             <StatisticItem
               title='Followers'
               value='13'
+              // TODO: use fetched values
             />
           </button>
 
           <button
             type='button'
+            onClick={() => setSocialSection('FOLLOWING')}
             className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
-              false ? 'text-cta' : ''
+              socialSection === 'FOLLOWING' ? 'text-cta' : ''
             }`}
           >
             <StatisticItem
               title='Following'
               value='24'
+              // TODO: use fetched values
             />
           </button>
 
           <button
             type='button'
+            onClick={() => setSocialSection('FOLLOW_REQUESTS')}
             className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
-              false ? 'text-cta' : ''
+              socialSection === 'FOLLOW_REQUESTS' ? 'text-cta' : ''
             }`}
           >
             <StatisticItem
               title='Follow requests'
               value='3'
+              // TODO: use fetched values
             />
           </button>
         </div>
