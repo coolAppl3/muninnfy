@@ -27,10 +27,7 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
     };
 
     checkForAuthSession();
-
-    return () => {
-      abortController.abort();
-    };
+    return () => abortController.abort();
   }, []);
 
   const contextValue: AuthContextType = useMemo(() => ({ authStatus, setAuthStatus }), [authStatus]);
