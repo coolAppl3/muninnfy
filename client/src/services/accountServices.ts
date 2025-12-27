@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { AccountDetailsType, OngoingAccountRequest } from '../types/accountTypes';
+import { AccountDetailsType, FollowDetails, FollowRequest, OngoingAccountRequest } from '../types/accountTypes';
 
 axios.defaults.withCredentials = true;
 const accountsApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/accounts` : `https://muninnfy/api/accounts`;
@@ -68,6 +68,16 @@ type GetAccountDetailsServiceData = {
 
 export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
   return axios.get(accountsApiUrl, { signal: abortSignal });
+}
+
+type GetAccountSocialDetailsServiceData = {
+  followers: FollowDetails[];
+  following: FollowDetails[];
+  followRequests: FollowRequest[];
+};
+
+export function getAccountSocialDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountSocialDetailsServiceData>> {
+  return axios.get(`${accountsApiUrl}/social`, { signal: abortSignal });
 }
 
 type UpdateAccountPrivacyServicePayload = {
