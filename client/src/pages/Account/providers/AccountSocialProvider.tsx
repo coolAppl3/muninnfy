@@ -6,7 +6,7 @@ type AccountSocialProviderProps = {
 };
 
 export default function AccountSocialProvider({ children }: AccountSocialProviderProps): JSX.Element {
-  const [socialSection, setSocialSection] = useState<AccountSocialSection | null>(null);
+  const [socialSection, setSocialSection] = useState<AccountSocialSection>('FOLLOWERS');
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 

@@ -3,8 +3,8 @@ import { createContext, Dispatch, SetStateAction } from 'react';
 export type AccountSocialSection = 'FOLLOWERS' | 'FOLLOWING' | 'FOLLOW_REQUESTS' | 'FIND_ACCOUNT';
 
 export type AccountSocialContextType = {
-  socialSection: AccountSocialSection | null;
-  setSocialSection: Dispatch<SetStateAction<AccountSocialSection | null>>;
+  socialSection: AccountSocialSection;
+  setSocialSection: Dispatch<SetStateAction<AccountSocialSection>>;
 
   menuIsOpen: boolean;
   setMenuIsOpen: Dispatch<SetStateAction<boolean>>;
