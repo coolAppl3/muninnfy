@@ -83,7 +83,7 @@ export default function FollowCard({ isFollowerCard, followDetails }: FollowCard
           </Button>
 
           <Button
-            className='bg-secondary border-title text-title order-2 sm:order-1 w-full sm:w-fit'
+            className='bg-primary border-title text-title order-2 sm:order-1 w-full sm:w-fit'
             onClick={() => setCardMode('view')}
           >
             Cancel
