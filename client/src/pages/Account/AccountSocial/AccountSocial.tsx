@@ -4,6 +4,7 @@ import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/us
 import useAccountSocialDetails from '../hooks/useAccountSocialDetails';
 import { getAccountSocialDetailsService } from '../../../services/accountServices';
 import { CanceledError } from 'axios';
+import ContentLoadingSkeleton from '../components/ContentLoadingSkeleton';
 
 export default function AccountSocial(): JSX.Element {
   const { initialFetchCompleted, setInitialFetchCompleted, setFollowers, setFollowing, setFollowRequests } = useAccountSocialDetails();
@@ -38,9 +39,5 @@ export default function AccountSocial(): JSX.Element {
     return () => abortController.abort();
   });
 
-  return (
-    <>
-      <AccountSocialHeader />
-    </>
-  );
+  return <>{!initialFetchCompleted ? <ContentLoadingSkeleton /> : <AccountSocialHeader />}</>;
 }
