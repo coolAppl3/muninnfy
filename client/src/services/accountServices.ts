@@ -156,3 +156,7 @@ export function confirmAccountDeletionService(confirmationCode: string): Promise
 export function unfollowService(followId: number): Promise<AxiosResponse> {
   return axios.delete(`${accountsApiUrl}/followers/unfollow/${followId}`);
 }
+
+export function removeFollowerService(followId: number): Promise<AxiosResponse> {
+  return axios.delete(`${accountsApiUrl}/followers/remove/${followId}`);
+}
