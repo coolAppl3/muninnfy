@@ -160,3 +160,18 @@ export function unfollowService(followId: number): Promise<AxiosResponse> {
 export function removeFollowerService(followId: number): Promise<AxiosResponse> {
   return axios.delete(`${accountsApiUrl}/followers/remove/${followId}`);
 }
+
+type AcceptFollowRequestServicePayload = {
+  requestId: number;
+};
+
+type AcceptFollowRequestServiceData = {
+  follow_id: number;
+  follow_timestamp: number;
+};
+
+export function acceptFollowRequestService(
+  body: AcceptFollowRequestServicePayload
+): Promise<AxiosResponse<AcceptFollowRequestServiceData>> {
+  return axios.post(`${accountsApiUrl}/followRequests/accept`, body);
+}
