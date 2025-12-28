@@ -2778,7 +2778,7 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
     }
 
     await connection.commit();
-    res.json({ followId: firstResultSetheader.insertId, followTimestamp });
+    res.json({ follow_id: firstResultSetheader.insertId, follow_timestamp: followTimestamp });
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
