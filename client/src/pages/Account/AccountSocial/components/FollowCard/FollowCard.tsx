@@ -53,7 +53,7 @@ export default function FollowCard({ isFollowerCard, followDetails }: FollowCard
 
   if (cardMode === 'loading') {
     return (
-      <div className='p-1 bg-primary rounded text-description text-sm min-h-[9.4rem] grid place-items-center'>
+      <div className='p-1 bg-primary rounded min-h-[9.4rem] grid place-items-center'>
         <div className='spinner w-[2.4rem] h-[2.4rem]'></div>
       </div>
     );
