@@ -4,7 +4,7 @@ import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/us
 import useAccountSocialDetails from '../hooks/useAccountSocialDetails';
 import { getAccountSocialDetailsService } from '../../../services/accountServices';
 import { CanceledError } from 'axios';
-import ContentLoadingSkeleton from '../components/ContentLoadingSkeleton';
+import ContentLoadingSkeleton from '../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 import { AccountSocialSection } from '../contexts/AccountSocialContext';
 import useAccountSocial from '../hooks/useAccountSocial';
 import AccountSocialFollowers from './components/AccountSocialFollowers/AccountSocialFollowers';
