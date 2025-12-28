@@ -1,11 +1,12 @@
 import { JSX, useState } from 'react';
-import { FollowRequest } from '../../../../../../../types/accountTypes';
+import { FollowDetails, FollowRequest } from '../../../../../../../types/accountTypes';
 import useAccountSocialDetails from '../../../../../hooks/useAccountSocialDetails';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../../hooks/useHandleAsyncError';
 import usePopupMessage from '../../../../../../../hooks/usePopupMessage';
 import Button from '../../../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
 import { getFullDateString } from '../../../../../../../utils/globalUtils';
+import { acceptFollowRequestService, declineFollowRequestService } from '../../../../../../../services/accountServices';
 
 type FollowRequestCardProps = {
   followRequest: FollowRequest;
@@ -13,7 +14,7 @@ type FollowRequestCardProps = {
 
 export default function FollowRequestCard({ followRequest }: FollowRequestCardProps): JSX.Element {
   const { request_id, public_account_id, username, display_name, request_timestamp } = followRequest;
-  const { setFollowRequests } = useAccountSocialDetails();
+  const { setFollowRequests, setFollowers } = useAccountSocialDetails();
 
   const [actionLoading, setActionLoading] = useState<boolean>(false);
 
@@ -21,11 +22,67 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
   const { displayPopupMessage } = usePopupMessage();
 
   async function acceptFollowRequest(): Promise<void> {
-    // TODO: continue implementation
+    try {
+      const { follow_id, follow_timestamp } = (await acceptFollowRequestService({ requestId: request_id })).data;
+
+      const newFollowerDetails: FollowDetails = {
+        follow_id,
+        follow_timestamp,
+        public_account_id,
+        display_name,
+        username,
+      };
+
+      setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      setFollowers((prev) => [...prev, newFollowerDetails]);
+
+      displayPopupMessage('Request accepted.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+      const { isHandled, status } = handleAsyncError(err);
+
+      setActionLoading(false);
+
+      if (isHandled) {
+        return;
+      }
+
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      if (status === 404) {
+        setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      }
+    }
   }
 
   async function declineFollowRequest(): Promise<void> {
-    // TODO: continue implementation
+    try {
+      await declineFollowRequestService(request_id);
+      setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+
+      displayPopupMessage('Requested declined.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+      const { isHandled, status } = handleAsyncError(err);
+
+      setActionLoading(false);
+
+      if (isHandled) {
+        return;
+      }
+
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      if (status === 404) {
+        setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      }
+    }
   }
 
   return (
