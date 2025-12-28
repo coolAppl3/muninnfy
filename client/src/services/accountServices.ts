@@ -175,3 +175,7 @@ export function acceptFollowRequestService(
 ): Promise<AxiosResponse<AcceptFollowRequestServiceData>> {
   return axios.post(`${accountsApiUrl}/followRequests/accept`, body);
 }
+
+export function declineFollowRequestService(requestId: number): Promise<AxiosResponse> {
+  return axios.delete(`${accountsApiUrl}/followRequests/decline/${requestId}`);
+}
