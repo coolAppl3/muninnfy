@@ -5,9 +5,17 @@ import useAccountSocialDetails from '../hooks/useAccountSocialDetails';
 import { getAccountSocialDetailsService } from '../../../services/accountServices';
 import { CanceledError } from 'axios';
 import ContentLoadingSkeleton from '../components/ContentLoadingSkeleton';
+import { AccountSocialSection } from '../contexts/AccountSocialContext';
+import useAccountSocial from '../hooks/useAccountSocial';
+import AccountSocialFollowers from './components/AccountSocialFollowers/AccountSocialFollowers';
+import AccountSocialFollowing from './components/AccountSocialFollowing/AccountSocialFollowing';
+import AccountSocialFollowRequests from './components/AccountSocialFollowRequests/AccountSocialFollowRequests';
+import AccountSocialFindAccount from './components/AccountSocialFindAccount/AccountSocialFindAccount';
 
 export default function AccountSocial(): JSX.Element {
+  const { socialSection } = useAccountSocial();
   const { initialFetchCompleted, setInitialFetchCompleted, setFollowers, setFollowing, setFollowRequests } = useAccountSocialDetails();
+
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
   useEffect(() => {
@@ -39,5 +47,23 @@ export default function AccountSocial(): JSX.Element {
     return () => abortController.abort();
   });
 
-  return <>{!initialFetchCompleted ? <ContentLoadingSkeleton /> : <AccountSocialHeader />}</>;
+  return (
+    <>
+      {!initialFetchCompleted ? (
+        <ContentLoadingSkeleton />
+      ) : (
+        <>
+          <AccountSocialHeader />
+          {contentRecord[socialSection]}
+        </>
+      )}
+    </>
+  );
 }
+
+const contentRecord: Record<AccountSocialSection, JSX.Element> = {
+  FOLLOWERS: <AccountSocialFollowers />,
+  FOLLOWING: <AccountSocialFollowing />,
+  FOLLOW_REQUESTS: <AccountSocialFollowRequests />,
+  FIND_ACCOUNT: <AccountSocialFindAccount />,
+};
