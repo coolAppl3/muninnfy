@@ -2,9 +2,11 @@ import { FocusEvent, JSX } from 'react';
 import TripleDotMenuIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import StatisticItem from '../../../../../components/StatisticItem/StatisticItem';
 import useAccountSocial from '../../../hooks/useAccountSocial';
+import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 
 export default function AccountSocialHeader(): JSX.Element {
   const { menuIsOpen, socialSection, setMenuIsOpen, setSocialSection } = useAccountSocial();
+  const { followers, following, followRequests } = useAccountSocialDetails();
 
   return (
     <header>
@@ -66,8 +68,7 @@ export default function AccountSocialHeader(): JSX.Element {
           >
             <StatisticItem
               title='Followers'
-              value='13'
-              // TODO: use fetched values
+              value={`${followers.length}`}
             />
           </button>
 
@@ -80,8 +81,7 @@ export default function AccountSocialHeader(): JSX.Element {
           >
             <StatisticItem
               title='Following'
-              value='24'
-              // TODO: use fetched values
+              value={`${following.length}`}
             />
           </button>
 
@@ -94,8 +94,7 @@ export default function AccountSocialHeader(): JSX.Element {
           >
             <StatisticItem
               title='Follow requests'
-              value='3'
-              // TODO: use fetched values
+              value={`${followRequests.length}`}
             />
           </button>
         </div>
