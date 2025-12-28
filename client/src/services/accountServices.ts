@@ -152,3 +152,7 @@ export function resendAccountDeletionEmailService(): Promise<AxiosResponse> {
 export function confirmAccountDeletionService(confirmationCode: string): Promise<AxiosResponse> {
   return axios.delete(`${accountsApiUrl}/deletion/confirm/${confirmationCode}`);
 }
+
+export function unfollowService(followId: number): Promise<AxiosResponse> {
+  return axios.delete(`${accountsApiUrl}/followers/unfollow/${followId}`);
+}
