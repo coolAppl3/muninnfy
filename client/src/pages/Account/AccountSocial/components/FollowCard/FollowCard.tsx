@@ -4,6 +4,10 @@ import { getFullDateString } from '../../../../../utils/globalUtils';
 import RemoveIcon from '../../../../../assets/svg/RemoveIcon.svg?react';
 import Button from '../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
+import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import { removeFollowerService, unfollowService } from '../../../../../services/accountServices';
+import usePopupMessage from '../../../../../hooks/usePopupMessage';
+import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 
 type FollowCardProps = {
   isFollowerCard: boolean;
@@ -11,16 +15,40 @@ type FollowCardProps = {
 };
 
 export default function FollowCard({ isFollowerCard, followDetails }: FollowCardProps): JSX.Element {
-  const { public_account_id, username, display_name, follow_timestamp } = followDetails;
+  const { follow_id, public_account_id, username, display_name, follow_timestamp } = followDetails;
+  const { setFollowing, setFollowers } = useAccountSocialDetails();
 
   const [cardMode, setCardMode] = useState<'view' | 'confirm' | 'loading'>('view');
 
-  async function removeFollower(): Promise<void> {
-    // TODO: continue implementation
-  }
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
+  const { displayPopupMessage } = usePopupMessage();
 
   async function unfollow(): Promise<void> {
-    // TODO: continue implementation
+    try {
+      await unfollowService(follow_id);
+      setFollowing((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
+
+      displayPopupMessage('Unfollowed.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+      handleAsyncError(err);
+
+      setCardMode('view');
+    }
+  }
+
+  async function removeFollower(): Promise<void> {
+    try {
+      await removeFollowerService(follow_id);
+      setFollowers((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
+
+      displayPopupMessage('Unfollowed.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+      handleAsyncError(err);
+
+      setCardMode('view');
+    }
   }
 
   if (cardMode === 'loading') {
