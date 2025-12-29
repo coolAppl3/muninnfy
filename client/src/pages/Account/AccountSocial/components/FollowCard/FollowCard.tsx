@@ -73,7 +73,7 @@ export default function FollowCard({ isFollowerCard, followDetails }: FollowCard
 
         <div className='flex flex-col justify-start items-center gap-1 sm:flex-row'>
           <Button
-            className='bg-danger border-danger text-dark order-1 sm:order-2 w-full sm:w-fit'
+            className='bg-danger border-danger text-dark order-1 sm:order-2 w-full sm:w-fit text-sm !leading-[1.2]'
             onClick={async () => {
               setCardMode('loading');
               isFollowerCard ? await removeFollower() : await unfollow();
@@ -83,7 +83,7 @@ export default function FollowCard({ isFollowerCard, followDetails }: FollowCard
           </Button>
 
           <Button
-            className='bg-primary border-title text-title order-2 sm:order-1 w-full sm:w-fit'
+            className='bg-primary border-title text-title order-2 sm:order-1 w-full sm:w-fit text-sm !leading-[1.2]'
             onClick={() => setCardMode('view')}
           >
             Cancel
