@@ -768,7 +768,7 @@ accountsRouter.get('/social', async (req: Request, res: Response) => {
       FROM
         follow_requests
       INNER JOIN
-        accounts ON follow_requests.requestee_account_id = accounts.account_id
+        accounts ON follow_requests.requester_account_id = accounts.account_id
       WHERE
         follow_requests.requestee_account_id = :accountId
       ORDER BY
