@@ -31,7 +31,11 @@ export default function FollowCard({ isFollowerCard, followDetails }: FollowCard
       displayPopupMessage('Unfollowed.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      handleAsyncError(err);
+      const { status } = handleAsyncError(err);
+
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
+      }
 
       setCardMode('view');
     }
@@ -45,8 +49,11 @@ export default function FollowCard({ isFollowerCard, followDetails }: FollowCard
       displayPopupMessage('Unfollowed.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      handleAsyncError(err);
+      const { status } = handleAsyncError(err);
 
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
+      }
       setCardMode('view');
     }
   }
