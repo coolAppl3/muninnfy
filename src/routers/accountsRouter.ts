@@ -27,6 +27,7 @@ import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
   deleteAccountById,
+  deleteFollowRequest,
   handleIncorrectPassword,
   incrementAccountRequestEmailsSent,
   incrementFailedAccountRequestAttempts,
@@ -2751,7 +2752,7 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
 
     const followTimestamp: number = Date.now();
 
-    const [firstResultSetheader] = await connection.execute<ResultSetHeader>(
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO followers (
         account_id,
         follower_account_Id,
@@ -2760,25 +2761,16 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
       [accountId, followDetails.requester_account_id, followTimestamp]
     );
 
-    const [secondResultSetHeader] = await connection.execute<ResultSetHeader>(
-      `DELETE FROM
-        follow_requests
-      WHERE
-        request_id = ?;`,
-      [requestId]
-    );
-
-    if (secondResultSetHeader.affectedRows === 0) {
+    const followRequestDeleted: boolean = await deleteFollowRequest(requestId, connection, req);
+    if (!followRequestDeleted) {
       await connection.rollback();
 
       res.status(500).json({ message: 'Internal server error.' });
-      await logUnexpectedError(req, null, 'Failed to delete follow request.');
-
       return;
     }
 
     await connection.commit();
-    res.json({ follow_id: firstResultSetheader.insertId, follow_timestamp: followTimestamp });
+    res.json({ follow_id: resultSetHeader.insertId, follow_timestamp: followTimestamp });
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
