@@ -2744,6 +2744,14 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
     }
 
     if (followDetails.requester_already_following) {
+      const followRequestDeleted: boolean = await deleteFollowRequest(requestId, connection, req);
+      if (!followRequestDeleted) {
+        await connection.rollback();
+
+        res.status(500).json({ message: 'Internal server error.' });
+        return;
+      }
+
       await connection.commit();
       res.json({});
 
