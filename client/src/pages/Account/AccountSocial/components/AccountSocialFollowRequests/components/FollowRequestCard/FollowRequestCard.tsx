@@ -34,7 +34,7 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
       };
 
       setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-      setFollowers((prev) => [...prev, newFollowerDetails]);
+      setFollowers((prev) => [newFollowerDetails, ...prev]);
 
       displayPopupMessage('Request accepted.', 'success');
     } catch (err: unknown) {
