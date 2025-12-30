@@ -15,6 +15,7 @@ import {
   ACCOUNT_FAILED_ATTEMPTS_LIMIT,
   ACCOUNT_RECOVERY_WINDOW,
   ACCOUNT_VERIFICATION_WINDOW,
+  ACCOUNT_SOCIAL_FETCH_BATCH_SIZE,
 } from '../util/constants/accountConstants';
 import {
   sendAccountDeletionEmailService,
@@ -26,6 +27,7 @@ import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import {
   deleteAccountById,
+  deleteFollowRequest,
   handleIncorrectPassword,
   incrementAccountRequestEmailsSent,
   incrementFailedAccountRequestAttempts,
@@ -684,6 +686,127 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     await logUnexpectedError(req, err);
   } finally {
     connection?.release();
+  }
+});
+
+accountsRouter.get('/social', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type Followers = {
+      follow_id: number;
+      follow_timestamp: number;
+      public_account_id: string;
+      username: string;
+      display_name: string;
+    };
+
+    type Following = {
+      follow_id: number;
+      follow_timestamp: number;
+      public_account_id: string;
+      username: string;
+      display_name: string;
+    };
+
+    type FollowRequests = {
+      request_id: number;
+      request_timestamp: number;
+      public_account_id: string;
+      username: string;
+      display_name: string;
+    };
+
+    const [socialRows] = await dbPool.query<RowDataPacket[][]>(
+      `SELECT
+        followers.follow_id,
+        followers.follow_timestamp,
+        accounts.public_account_id,
+        accounts.username,
+        accounts.display_name
+      FROM
+        followers
+      INNER JOIN
+        accounts ON followers.follower_account_id = accounts.account_id
+      WHERE
+        followers.account_id = :accountId
+      ORDER BY
+        followers.follow_timestamp DESC
+      LIMIT :socialFetchBatchSize;
+
+      SELECT
+        followers.follow_id,
+        followers.follow_timestamp,
+        accounts.public_account_id,
+        accounts.username,
+        accounts.display_name
+      FROM
+        followers
+      INNER JOIN
+        accounts ON followers.account_id = accounts.account_id
+      WHERE
+        followers.follower_account_id = :accountId
+      ORDER BY
+        followers.follow_timestamp DESC
+      LIMIT :socialFetchBatchSize;
+      
+      SELECT
+        follow_requests.request_id,
+        follow_requests.request_timestamp,
+        accounts.public_account_id,
+        accounts.username,
+        accounts.display_name
+      FROM
+        follow_requests
+      INNER JOIN
+        accounts ON follow_requests.requester_account_id = accounts.account_id
+      WHERE
+        follow_requests.requestee_account_id = :accountId
+      ORDER BY
+        follow_requests.request_timestamp DESC
+      LIMIT :socialFetchBatchSize;`,
+      { accountId, socialFetchBatchSize: ACCOUNT_SOCIAL_FETCH_BATCH_SIZE }
+    );
+
+    const followers = socialRows[0] as Followers[] | undefined;
+    const following = socialRows[1] as Following[] | undefined;
+    const followRequests = socialRows[2] as FollowRequests[] | undefined;
+
+    if (!followers || !following || !followRequests) {
+      res.status(500).json({ message: 'Internal server error.' });
+
+      await logUnexpectedError(
+        req,
+        null,
+        `Failed to fetch social data. Followers fetched: ${Boolean(followers)}. Following fetched: ${Boolean(
+          following
+        )}. Follow requests fetched: ${Boolean(followRequests)}.`
+      );
+
+      return;
+    }
+
+    res.json({ followers, following, followRequests });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
   }
 });
 
@@ -2621,6 +2744,14 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
     }
 
     if (followDetails.requester_already_following) {
+      const followRequestDeleted: boolean = await deleteFollowRequest(requestId, connection, req);
+      if (!followRequestDeleted) {
+        await connection.rollback();
+
+        res.status(500).json({ message: 'Internal server error.' });
+        return;
+      }
+
       await connection.commit();
       res.json({});
 
@@ -2629,7 +2760,7 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
 
     const followTimestamp: number = Date.now();
 
-    const [firstResultSetheader] = await connection.execute<ResultSetHeader>(
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO followers (
         account_id,
         follower_account_Id,
@@ -2638,25 +2769,16 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
       [accountId, followDetails.requester_account_id, followTimestamp]
     );
 
-    const [secondResultSetHeader] = await connection.execute<ResultSetHeader>(
-      `DELETE FROM
-        follow_requests
-      WHERE
-        request_id = ?;`,
-      [requestId]
-    );
-
-    if (secondResultSetHeader.affectedRows === 0) {
+    const followRequestDeleted: boolean = await deleteFollowRequest(requestId, connection, req);
+    if (!followRequestDeleted) {
       await connection.rollback();
 
       res.status(500).json({ message: 'Internal server error.' });
-      await logUnexpectedError(req, null, 'Failed to delete follow request.');
-
       return;
     }
 
     await connection.commit();
-    res.json({ followId: firstResultSetheader.insertId, followTimestamp });
+    res.json({ follow_id: resultSetHeader.insertId, follow_timestamp: followTimestamp });
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();

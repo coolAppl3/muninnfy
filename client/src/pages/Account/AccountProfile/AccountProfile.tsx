@@ -22,8 +22,8 @@ export function AccountProfile(): JSX.Element {
       <AccountProfileHeader />
 
       <div className='text-description/50 text-xs mb-[1.2rem]'>
-        <p className='leading-[1] mb-[4px]'>{public_account_id}</p>
-        <p className='leading-[1]'>Created on {getFullDateString(created_on_timestamp)}</p>
+        <p className='leading-[1] mb-[4px]'>Created on {getFullDateString(created_on_timestamp)}</p>
+        <p className='leading-[1]'>{public_account_id}</p>
       </div>
 
       <div className={`grid transition-[grid] ${profileSection ? 'grid-rows-[auto_1fr]' : 'grid-rows-[auto_0fr]'}`}>

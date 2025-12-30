@@ -6,6 +6,8 @@ import AccountSocial from '../AccountSocial/AccountSocial';
 import { AccountLocation } from '../contexts/AccountLocationContext';
 import AccountWishlists from '../AccountWishlists/AccountWishlists';
 import AccountProfileProvider from '../providers/AccountProfileProvider';
+import AccountSocialProvider from '../providers/AccountSocialProvider';
+import AccountSocialDetailsProvider from '../providers/AccountSocialDetailsProvider';
 
 export default function AccountContent(): JSX.Element {
   const { accountLocation } = useAccountLocation();
@@ -23,7 +25,15 @@ const contentRecord: Record<AccountLocation, JSX.Element> = {
       <AccountProfile />
     </AccountProfileProvider>
   ),
-  social: <AccountSocial />,
+
+  social: (
+    <AccountSocialProvider>
+      <AccountSocialDetailsProvider>
+        <AccountSocial />
+      </AccountSocialDetailsProvider>
+    </AccountSocialProvider>
+  ),
+
   notifications: <AccountNotifications />,
   wishlists: <AccountWishlists />,
 };

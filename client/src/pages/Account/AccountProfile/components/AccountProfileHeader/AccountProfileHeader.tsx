@@ -1,5 +1,5 @@
 import { FocusEvent, JSX } from 'react';
-import TripleDotIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
+import TripleDotMenuIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import useAccountProfile from '../../../hooks/useAccountProfile';
 
 export default function AccountProfileHeader(): JSX.Element {
@@ -25,7 +25,7 @@ export default function AccountProfileHeader(): JSX.Element {
         title={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
         aria-label={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
       >
-        <TripleDotIcon className={`w-[1.6rem] h-[1.6rem] transition-colors ${menuIsOpen ? 'text-cta' : ''}`} />
+        <TripleDotMenuIcon className={`w-[1.6rem] h-[1.6rem] transition-colors ${menuIsOpen ? 'text-cta' : ''}`} />
       </button>
 
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
