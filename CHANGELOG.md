@@ -1,5 +1,48 @@
 # Changelog
 
+## [0.2.7] (2024-12-30)
+
+### Features
+
+- Added the following social functionality:
+  - Unfollow.
+  - Remove follower
+  - Accept follow requests.
+  - Decline follow requests.
+- Added the following components:
+  - `AccountSocialHeader`.
+  - `FollowCard`.
+  - `FollowRequestCard`.
+  - `ContentLoadingSkeleton`.
+  - `AccountSocialFollowers`.
+  - `AccountSocialFollowing`.
+  - `AccountSocialFollowRequests`.
+  - `AccountSocialFindAccount`.
+- Added `AccountSocialContext`, `AccountSocialProvider`, and `useAccountSocial()` custom hook.
+- Added `AccountSocialDetailsContext` and `AccountSocialDetailsProvider` and `useAccountSocialDetails()` custom hook.
+- Added `SocialData`, `FollowDetails`, and `FollowRequest` types.
+- Added `ACCOUNT_SOCIAL_FETCH_BATCH_SIZE` constant.
+- Added the following services:
+  - `getAccountSocialDetailsService()`.
+  - `unfollowService()`.
+  - `removeFollowerService()`.
+  - `acceptFollowRequestService()`.
+  - `declineFollowRequestService()`.
+- Added GET `accounts/social`.
+- Added `deleteFollowRequest()` helper.
+- Added `RemoveIcon` SVG.
+
+
+### Bug Fixes
+
+- Fixed POST `accounts/followRequests/accept` not deleting follow requests if the requester is already following.
+
+
+### Code Refactoring
+
+- Minor refactors.
+
+
 ## [0.2.6] (2024-12-25)
 
 ### Features
