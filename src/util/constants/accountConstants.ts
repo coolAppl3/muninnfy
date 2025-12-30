@@ -11,4 +11,4 @@ export const ACCOUNT_EMAIL_UPDATE_WINDOW: number = hourMilliseconds;
 
 export const ACCOUNT_UPDATE_SUSPENSION_DURATION: number = dayMilliseconds;
 
-export const ACCOUNT_SOCIAL_FETCH_BATCH_SIZE: number = 12;
+export const ACCOUNT_SOCIAL_FETCH_BATCH_SIZE: number = 100;
