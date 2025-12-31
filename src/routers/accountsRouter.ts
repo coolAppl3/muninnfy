@@ -16,6 +16,7 @@ import {
   ACCOUNT_RECOVERY_WINDOW,
   ACCOUNT_VERIFICATION_WINDOW,
   ACCOUNT_SOCIAL_FETCH_BATCH_SIZE,
+  ACCOUNT_MAX_FOLLOWING_LIMIT,
 } from '../util/constants/accountConstants';
 import {
   sendAccountDeletionEmailService,
@@ -2530,21 +2531,27 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
     return;
   }
 
+  let connection: PoolConnection | null = null;
+
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type FollowDetails = {
       requestee_account_id: number;
       requestee_is_verified: boolean;
       follow_requires_approval: boolean;
       already_following: boolean;
       already_requested: boolean;
+
+      requester_following_count: number;
+      requester_follow_requests_count: number;
     };
 
-    const [followRows] = await dbPool.execute<RowDataPacket[]>(
+    const [followRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         account_id AS requestee_account_id,
         is_verified AS requestee_is_verified,
-
-        (SELECT approve_follow_requests FROM account_preferences WHERE account_id = accounts.account_id) AS follow_requires_approval,
 
         EXISTS (
           SELECT 1 FROM followers WHERE follower_account_id = :accountId AND account_id = accounts.account_id
@@ -2552,7 +2559,12 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
 
         EXISTS (
           SELECT 1 FROM follow_requests WHERE requester_account_id = :accountId AND requestee_account_id = accounts.account_id
-        ) AS already_requested
+        ) AS already_requested,
+
+        (SELECT approve_follow_requests FROM account_preferences WHERE account_id = accounts.account_id) AS follow_requires_approval,
+        
+        (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId FOR UPDATE) AS requester_following_count,
+        (SELECT COUNT(*) FROM follow_requests WHERE requester_account_id = :accountId FOR UPDATE) AS requester_follow_requests_count
       FROM
         accounts
       WHERE
@@ -2563,29 +2575,44 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
     const followDetails = followRows[0] as FollowDetails | undefined;
 
     if (!followDetails || !followDetails.requestee_is_verified) {
+      await connection.rollback();
       res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+
       return;
     }
 
     if (followDetails.requestee_account_id === accountId) {
+      await connection.rollback();
       res.status(409).json({ message: `Can't follow yourself.`, reason: 'selfFollow' });
+
       return;
     }
 
     if (followDetails.already_following) {
+      await connection.rollback();
       res.status(409).json({ message: 'Already following this user.', reason: 'alreadyFollowing' });
+
       return;
     }
 
     if (followDetails.already_requested) {
+      await connection.rollback();
       res.status(409).json({ message: 'Follow request already sent.', reason: 'alreadySent' });
+
+      return;
+    }
+
+    if (followDetails.requester_following_count + followDetails.requester_follow_requests_count >= ACCOUNT_MAX_FOLLOWING_LIMIT) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Following limit reached.', reason: 'followingLimitReached' });
+
       return;
     }
 
     const currentTimestamp: number = Date.now();
 
     if (!followDetails.follow_requires_approval) {
-      const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+      const [resultSetHeader] = await connection.execute<ResultSetHeader>(
         `INSERT INTO followers (
           account_id,
           follower_account_id,
@@ -2594,11 +2621,13 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
         [followDetails.requestee_account_id, accountId, currentTimestamp]
       );
 
+      await connection.commit();
       res.json({ followId: resultSetHeader.insertId, followTimestamp: currentTimestamp });
+
       return;
     }
 
-    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
+    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO follow_requests (
         requester_account_id,
         requestee_account_id,
@@ -2607,9 +2636,11 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
       [accountId, followDetails.requestee_account_id, currentTimestamp]
     );
 
+    await connection.commit();
     res.json({ requestId: resultSetHeader.insertId, requestTimestamp: currentTimestamp });
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       await logUnexpectedError(req, err, 'Attempted to send two responses.');
@@ -2630,6 +2661,8 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
 
