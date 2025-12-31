@@ -11,6 +11,7 @@ import {
 import { minuteMilliseconds } from '../util/constants/globalConstants';
 import { deleteExpiredAuthSessionsCron } from '../auth/authSessions';
 import { decayWishlistsInteractivityIndexCron } from './wishlistCronJobs';
+import { deleteStaleFollowRequestsCron } from './socialCronJobs';
 
 export function initCronJobs(): void {
   // every 30 seconds
@@ -38,6 +39,7 @@ export function initCronJobs(): void {
     const currentTimestamp: number = Date.now();
 
     await decayWishlistsInteractivityIndexCron(currentTimestamp);
+    await deleteStaleFollowRequestsCron(currentTimestamp);
   });
 
   // every day
