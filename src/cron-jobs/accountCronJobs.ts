@@ -1,5 +1,5 @@
 import { dbPool } from '../db/db';
-import { dayMilliseconds, minuteMilliseconds } from '../util/constants/globalConstants';
+import { minuteMilliseconds } from '../util/constants/globalConstants';
 
 export async function deleteUnverifiedAccountsCron(currentTimestamp: number): Promise<void> {
   try {
@@ -66,22 +66,6 @@ export async function deleteStaleAccountDeletionRequestsCron(currentTimestamp: n
       WHERE
         expiry_timestamp <= ?;`,
       [currentTimestamp]
-    );
-  } catch (err: unknown) {
-    console.log(err);
-  }
-}
-
-export async function deleteStaleFollowRequestsCron(currentTimestamp: number): Promise<void> {
-  const cutoffTimestamp: number = currentTimestamp - dayMilliseconds * 7;
-
-  try {
-    await dbPool.execute(
-      `DELETE FROM
-        follow_requests
-      WHERE
-        request_timestamp <= ?;`,
-      [cutoffTimestamp]
     );
   } catch (err: unknown) {
     console.log(err);

@@ -6,12 +6,12 @@ import {
   deleteStaleAccountRecoveryRequestsCron,
   deleteStaleAccountVerificationRequestsCron,
   deleteStaleEmailUpdateRequestsCron,
-  deleteStaleFollowRequestsCron,
   deleteUnverifiedAccountsCron,
 } from './accountCronJobs';
 import { minuteMilliseconds } from '../util/constants/globalConstants';
 import { deleteExpiredAuthSessionsCron } from '../auth/authSessions';
 import { decayWishlistsInteractivityIndexCron } from './wishlistCronJobs';
+import { deleteStaleFollowRequestsCron } from './socialCronJobs';
 
 export function initCronJobs(): void {
   // every 30 seconds
