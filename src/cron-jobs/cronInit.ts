@@ -6,6 +6,7 @@ import {
   deleteStaleAccountRecoveryRequestsCron,
   deleteStaleAccountVerificationRequestsCron,
   deleteStaleEmailUpdateRequestsCron,
+  deleteStaleFollowRequestsCron,
   deleteUnverifiedAccountsCron,
 } from './accountCronJobs';
 import { minuteMilliseconds } from '../util/constants/globalConstants';
@@ -38,6 +39,7 @@ export function initCronJobs(): void {
     const currentTimestamp: number = Date.now();
 
     await decayWishlistsInteractivityIndexCron(currentTimestamp);
+    await deleteStaleFollowRequestsCron(currentTimestamp);
   });
 
   // every day
