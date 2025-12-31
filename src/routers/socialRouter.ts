@@ -240,6 +240,63 @@ socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
   }
 });
 
+socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const offset = req.params.offset ? +req.params.offset : undefined;
+
+  if (offset === undefined || !Number.isInteger(offset)) {
+    res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    const [followRequests] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        follow_requests.request_id,
+        follow_requests.request_timestamp,
+        accounts.public_account_id,
+        accounts.username,
+        accounts.display_name
+      FROM
+        follow_requests
+      INNER JOIN
+        accounts ON follow_requests.requester_account_id = accounts.account_id
+      WHERE
+        follow_requests.requestee_account_id = :accountId
+      ORDER BY
+        follow_requests.request_timestamp DESC
+      LIMIT
+        :socialFetchBatchSize
+      OFFSET
+        :offset;`,
+      { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+    );
+
+    res.json({ followRequestsBatch: followRequests as FollowRequest[] });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 socialRouter.post('/followRequests/send', async (req: Request, res: Response) => {
   const authSessionOd: string | null = getAuthSessionId(req, res);
 
