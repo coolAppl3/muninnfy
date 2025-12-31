@@ -13,6 +13,22 @@ import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 
 export const socialRouter: Router = express.Router();
 
+type SocialData = {
+  public_account_id: string;
+  username: string;
+  display_name: string;
+};
+
+type FollowDetails = SocialData & {
+  follow_id: number;
+  follow_timestamp: number;
+};
+
+type FollowRequest = SocialData & {
+  request_id: number;
+  request_timestamp: number;
+};
+
 socialRouter.get('/', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
@@ -27,30 +43,6 @@ socialRouter.get('/', async (req: Request, res: Response) => {
   }
 
   try {
-    type Followers = {
-      follow_id: number;
-      follow_timestamp: number;
-      public_account_id: string;
-      username: string;
-      display_name: string;
-    };
-
-    type Following = {
-      follow_id: number;
-      follow_timestamp: number;
-      public_account_id: string;
-      username: string;
-      display_name: string;
-    };
-
-    type FollowRequests = {
-      request_id: number;
-      request_timestamp: number;
-      public_account_id: string;
-      username: string;
-      display_name: string;
-    };
-
     const [socialRows] = await dbPool.query<RowDataPacket[][]>(
       `SELECT
         followers.follow_id,
@@ -102,9 +94,9 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       { accountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    const followers = socialRows[0] as Followers[] | undefined;
-    const following = socialRows[1] as Following[] | undefined;
-    const followRequests = socialRows[2] as FollowRequests[] | undefined;
+    const followers = socialRows[0] as FollowDetails[] | undefined;
+    const following = socialRows[1] as FollowDetails[] | undefined;
+    const followRequests = socialRows[2] as FollowRequest[] | undefined;
 
     if (!followers || !following || !followRequests) {
       res.status(500).json({ message: 'Internal server error.' });
