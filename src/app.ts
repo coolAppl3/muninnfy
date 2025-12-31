@@ -12,6 +12,7 @@ import { accountsRouter } from './routers/accountsRouter';
 import { authRouter } from './routers/authRouter';
 import { wishlistsRouter } from './routers/wishlistsRouter';
 import { wishlistItemsRouter } from './routers/wishlistItemsRouter';
+import { socialRouter } from './routers/socialRouter';
 
 // router imports
 
@@ -63,6 +64,7 @@ app.use('/api/accounts', accountsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/wishlists', wishlistsRouter);
 app.use('/api/wishlistItems', wishlistItemsRouter);
+app.use('/api/social', socialRouter);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
