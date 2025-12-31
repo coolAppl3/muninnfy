@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { AccountDetailsType, FollowDetails, FollowRequest, OngoingAccountRequest } from '../types/accountTypes';
+import { AccountDetailsType, OngoingAccountRequest } from '../types/accountTypes';
 
 axios.defaults.withCredentials = true;
 const accountsApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/accounts` : `https://muninnfy/api/accounts`;
@@ -68,16 +68,6 @@ type GetAccountDetailsServiceData = {
 
 export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
   return axios.get(accountsApiUrl, { signal: abortSignal });
-}
-
-type GetAccountSocialDetailsServiceData = {
-  followers: FollowDetails[];
-  following: FollowDetails[];
-  followRequests: FollowRequest[];
-};
-
-export function getAccountSocialDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountSocialDetailsServiceData>> {
-  return axios.get(`${accountsApiUrl}/social`, { signal: abortSignal });
 }
 
 type UpdateAccountPrivacyServicePayload = {
@@ -151,31 +141,4 @@ export function resendAccountDeletionEmailService(): Promise<AxiosResponse> {
 
 export function confirmAccountDeletionService(confirmationCode: string): Promise<AxiosResponse> {
   return axios.delete(`${accountsApiUrl}/deletion/confirm/${confirmationCode}`);
-}
-
-export function unfollowService(followId: number): Promise<AxiosResponse> {
-  return axios.delete(`${accountsApiUrl}/followers/unfollow/${followId}`);
-}
-
-export function removeFollowerService(followId: number): Promise<AxiosResponse> {
-  return axios.delete(`${accountsApiUrl}/followers/remove/${followId}`);
-}
-
-type AcceptFollowRequestServicePayload = {
-  requestId: number;
-};
-
-type AcceptFollowRequestServiceData = {
-  follow_id: number;
-  follow_timestamp: number;
-};
-
-export function acceptFollowRequestService(
-  body: AcceptFollowRequestServicePayload
-): Promise<AxiosResponse<AcceptFollowRequestServiceData>> {
-  return axios.post(`${accountsApiUrl}/followRequests/accept`, body);
-}
-
-export function declineFollowRequestService(requestId: number): Promise<AxiosResponse> {
-  return axios.delete(`${accountsApiUrl}/followRequests/decline/${requestId}`);
 }

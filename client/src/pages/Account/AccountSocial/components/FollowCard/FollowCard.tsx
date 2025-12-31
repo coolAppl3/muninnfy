@@ -1,11 +1,11 @@
 import { JSX, useState } from 'react';
-import { FollowDetails } from '../../../../../types/accountTypes';
+import { FollowDetails } from '../../../../../types/socialTypes';
 import { getFullDateString } from '../../../../../utils/globalUtils';
 import RemoveIcon from '../../../../../assets/svg/RemoveIcon.svg?react';
 import Button from '../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
-import { removeFollowerService, unfollowService } from '../../../../../services/accountServices';
+import { removeFollowerService, unfollowService } from '../../../../../services/socialServices';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 

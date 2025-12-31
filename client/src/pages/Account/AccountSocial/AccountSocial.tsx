@@ -2,7 +2,7 @@ import { JSX, useEffect } from 'react';
 import AccountSocialHeader from './components/AccountSocialHeader/AccountSocialHeader';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import useAccountSocialDetails from '../hooks/useAccountSocialDetails';
-import { getAccountSocialDetailsService } from '../../../services/accountServices';
+import { getAccountSocialDetailsService } from '../../../services/socialServices';
 import { CanceledError } from 'axios';
 import ContentLoadingSkeleton from '../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 import { AccountSocialSection } from '../contexts/AccountSocialContext';

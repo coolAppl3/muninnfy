@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import FollowCard from '../FollowCard/FollowCard';
-import { FollowDetails } from '../../../../../types/accountTypes';
+import { FollowDetails } from '../../../../../types/socialTypes';
 
 export default function AccountSocialFollowing(): JSX.Element {
   const { following } = useAccountSocialDetails();

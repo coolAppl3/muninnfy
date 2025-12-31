@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
-import { FollowDetails, FollowRequest } from '../../../types/accountTypes';
+import { FollowDetails, FollowRequest } from '../../../types/socialTypes';
 import AccountSocialDetailsContext, { AccountSocialDetailsContextType } from '../contexts/AccountSocialDetailsContext';
 
 type AccountSocialDetailsProviderProps = {

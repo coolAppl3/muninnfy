@@ -1,12 +1,12 @@
 import { JSX, useState } from 'react';
-import { FollowDetails, FollowRequest } from '../../../../../../../types/accountTypes';
+import { FollowDetails, FollowRequest } from '../../../../../../../types/socialTypes';
 import useAccountSocialDetails from '../../../../../hooks/useAccountSocialDetails';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../../hooks/useHandleAsyncError';
 import usePopupMessage from '../../../../../../../hooks/usePopupMessage';
 import Button from '../../../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
 import { getFullDateString } from '../../../../../../../utils/globalUtils';
-import { acceptFollowRequestService, declineFollowRequestService } from '../../../../../../../services/accountServices';
+import { acceptFollowRequestService, declineFollowRequestService } from '../../../../../../../services/socialServices';
 import useInfoModal from '../../../../../../../hooks/useInfoModal';
 
 type FollowRequestCardProps = {

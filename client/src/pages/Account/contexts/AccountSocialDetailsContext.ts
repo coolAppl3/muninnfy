@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
-import { FollowDetails, FollowRequest } from '../../../types/accountTypes';
+import { FollowDetails, FollowRequest } from '../../../types/socialTypes';
 
 export type AccountSocialDetailsContextType = {
   initialFetchCompleted: boolean;
