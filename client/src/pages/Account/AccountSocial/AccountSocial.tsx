@@ -45,7 +45,7 @@ export default function AccountSocial(): JSX.Element {
 
     getSocialDetails();
     return () => abortController.abort();
-  });
+  }, [initialFetchCompleted, setInitialFetchCompleted, setFollowers, setFollowing, setFollowRequests, handleAsyncError]);
 
   return (
     <>
