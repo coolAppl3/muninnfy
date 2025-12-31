@@ -2541,12 +2541,13 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
     type FollowDetails = {
       requestee_account_id: number;
       requestee_is_verified: boolean;
-      follow_requires_approval: boolean;
       already_following: boolean;
       already_requested: boolean;
 
       requester_following_count: number;
       requester_follow_requests_count: number;
+      requestee_followers_count: number;
+      follow_requires_approval: boolean;
     };
 
     const [followRows] = await connection.execute<RowDataPacket[]>(
@@ -2562,10 +2563,11 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
           SELECT 1 FROM follow_requests WHERE requester_account_id = :accountId AND requestee_account_id = accounts.account_id
         ) AS already_requested,
 
-        (SELECT approve_follow_requests FROM account_preferences WHERE account_id = accounts.account_id) AS follow_requires_approval,
         
         (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId FOR UPDATE) AS requester_following_count,
-        (SELECT COUNT(*) FROM follow_requests WHERE requester_account_id = :accountId FOR UPDATE) AS requester_follow_requests_count
+        (SELECT COUNT(*) FROM follow_requests WHERE requester_account_id = :accountId FOR UPDATE) AS requester_follow_requests_count,
+        (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id FOR UPDATE) AS requestee_followers_count,
+        (SELECT approve_follow_requests FROM account_preferences WHERE account_id = accounts.account_id) AS follow_requires_approval
       FROM
         accounts
       WHERE
@@ -2606,6 +2608,13 @@ accountsRouter.post('/followRequests/send', async (req: Request, res: Response) 
     if (followDetails.requester_following_count + followDetails.requester_follow_requests_count >= ACCOUNT_MAX_FOLLOWING_LIMIT) {
       await connection.rollback();
       res.status(409).json({ message: 'Following limit reached.', reason: 'followingLimitReached' });
+
+      return;
+    }
+
+    if (followDetails.requestee_followers_count >= ACCOUNT_MAX_FOLLOWERS_LIMIT) {
+      await connection.rollback();
+      res.status(409).json({ message: `User can't accept followers at this time.`, reason: 'requesteeFollowersLimitReached' });
 
       return;
     }
