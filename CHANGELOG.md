@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.2.8] (2024-12-31)
+
+### Features
+
+- Added the following constants:
+  - `ACCOUNT_MAX_FOLLOWERS_LIMIT`.
+  - `ACCOUNT_MAX_FOLLOWING_LIMIT`.
+  - `SOCIAL_FETCH_BATCH_SIZE` under `socialConstants` on the front end.
+- Added `deleteStaleFollowRequestsCron()` cron job to run every 6 hours, removing follow requests 7 weeks or older. 
+
+
+### Changes
+
+- Increased `ACCOUNT_SOCIAL_FETCH_BATCH_SIZE` to 100.
+- Reworked the following endpoints to account for the new maximum following and followers limits:
+  - POST `accounts/followRequests/send`.
+  - POST `accounts/followRequests/accept`.
+    - NOTE: endpoint paths above have been reworked with this patch. See improvements below.
+
+
+### Improvements
+
+- Separated account-related and social-related endpoints and logic for better maintainability.
+  - All social-related logic now goes through the `/api/social` endpoint prefix, and is handled by the newly-added `socialRouter`.
+  - Constants, types, helpers, cron jobs, utility functions, and modules have been separated.
+  - Plenty of refactoring went into this, introducing new modules in the process.
+
+
+### Bug Fixes
+
+- Added missing `useEffect` dependency array in `AccountSocial`.
+
+
 ## [0.2.7] (2024-12-30)
 
 ### Features
