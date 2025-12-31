@@ -7,6 +7,7 @@ import Button from '../../../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
 import { getFullDateString } from '../../../../../../../utils/globalUtils';
 import { acceptFollowRequestService, declineFollowRequestService } from '../../../../../../../services/accountServices';
+import useInfoModal from '../../../../../../../hooks/useInfoModal';
 
 type FollowRequestCardProps = {
   followRequest: FollowRequest;
@@ -20,6 +21,7 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayPopupMessage } = usePopupMessage();
+  const { displayInfoModal, removeInfoModal } = useInfoModal();
 
   async function acceptFollowRequest(): Promise<void> {
     try {
@@ -52,12 +54,32 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
         return;
       }
 
-      if (status !== 404 && status !== 409) {
+      if (status === 404) {
+        setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
         return;
       }
 
-      setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-      errReason === 'alreadyAccepted' && displayPopupMessage(errMessage, 'success');
+      if (status !== 409) {
+        return;
+      }
+
+      if (errReason === 'alreadyAccepted') {
+        setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+        displayPopupMessage(errMessage, 'success');
+
+        return;
+      }
+
+      if (errReason !== 'followersLimitReached') {
+        return;
+      }
+
+      displayInfoModal({
+        title: errMessage,
+        description: `You'll have to remove some of your existing followers before accepting new ones.`,
+        btnTitle: 'Okay',
+        onClick: removeInfoModal,
+      });
     }
   }
 

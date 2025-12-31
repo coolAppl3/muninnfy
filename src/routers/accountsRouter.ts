@@ -17,6 +17,7 @@ import {
   ACCOUNT_VERIFICATION_WINDOW,
   ACCOUNT_SOCIAL_FETCH_BATCH_SIZE,
   ACCOUNT_MAX_FOLLOWING_LIMIT,
+  ACCOUNT_MAX_FOLLOWERS_LIMIT,
 } from '../util/constants/accountConstants';
 import {
   sendAccountDeletionEmailService,
@@ -2750,12 +2751,15 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
 
     type FollowDetails = {
       requester_account_id: number;
+      followers_count: number;
       requester_already_following: boolean;
     };
 
     const [followRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         requester_account_id,
+        (SELECT COUNT(*) FROM followers WHERE account_id = :accountId FOR UPDATE) AS followers_count,
+
         EXISTS (
           SELECT 1 FROM followers WHERE account_id = :accountId AND follower_account_id = follow_requests.requester_account_id
         ) AS requester_already_following
@@ -2786,6 +2790,13 @@ accountsRouter.post('/followRequests/accept', async (req: Request, res: Response
       }
 
       res.status(409).json({ message: 'Request already accepted.', reason: 'alreadyAccepted' });
+      return;
+    }
+
+    if (followDetails.followers_count >= ACCOUNT_MAX_FOLLOWERS_LIMIT) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Followers limit reached.', reason: 'followersLimitReached' });
+
       return;
     }
 
