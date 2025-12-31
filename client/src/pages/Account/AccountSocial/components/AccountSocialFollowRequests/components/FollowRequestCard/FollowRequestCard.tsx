@@ -39,7 +39,7 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
       displayPopupMessage('Request accepted.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const { isHandled, status } = handleAsyncError(err);
+      const { isHandled, status, errMessage, errReason } = handleAsyncError(err);
 
       setActionLoading(false);
 
@@ -52,9 +52,12 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
         return;
       }
 
-      if (status === 404) {
-        setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      if (status !== 404 && status !== 409) {
+        return;
       }
+
+      setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      errReason === 'alreadyAccepted' && displayPopupMessage(errMessage, 'success');
     }
   }
 
