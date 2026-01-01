@@ -207,8 +207,6 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
       if (!existingWishlistItem) {
         res.status(500).json({ message: 'Internal server error.' });
-        await logUnexpectedError(req, err, 'Detected a duplicate wishlist item title, but failed to fetch it.');
-
         return;
       }
 
@@ -427,8 +425,6 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
       if (!existingWishlistItem) {
         res.status(500).json({ message: 'Internal server error.' });
-        await logUnexpectedError(req, err, 'Detected a duplicate wishlist item title, but failed to fetch it.');
-
         return;
       }
 
