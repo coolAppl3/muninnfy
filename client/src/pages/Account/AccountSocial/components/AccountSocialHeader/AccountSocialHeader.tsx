@@ -3,10 +3,16 @@ import TripleDotMenuIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?r
 import StatisticItem from '../../../../../components/StatisticItem/StatisticItem';
 import useAccountSocial from '../../../hooks/useAccountSocial';
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
+import { copyToClipboard } from '../../../../../utils/globalUtils';
+import useAccountDetails from '../../../hooks/useAccountDetails';
+import usePopupMessage from '../../../../../hooks/usePopupMessage';
 
 export default function AccountSocialHeader(): JSX.Element {
+  const { accountDetails } = useAccountDetails();
   const { menuIsOpen, socialSection, setMenuIsOpen, setSocialSection } = useAccountSocial();
   const { followers, following, followRequests } = useAccountSocialDetails();
+
+  const { displayPopupMessage } = usePopupMessage();
 
   return (
     <header>
@@ -36,9 +42,13 @@ export default function AccountSocialHeader(): JSX.Element {
           <button
             type='button'
             className='context-menu-btn bg-primary'
-            onClick={() => {
+            onClick={async () => {
               setMenuIsOpen(false);
-              // TODO: continue implementation
+
+              const successfullyCopied: boolean = await copyToClipboard(
+                `${window.location.origin}/accounts/view/${accountDetails.public_account_id}`
+              );
+              successfullyCopied ? displayPopupMessage('Copied to clipboard.', 'success') : displayPopupMessage('Failed to copy.', 'error');
             }}
           >
             Copy account link
