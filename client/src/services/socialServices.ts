@@ -22,6 +22,14 @@ export function getFollowersBatchService(offset: number): Promise<AxiosResponse<
   return axios.get(`${socialApiUrl}/followers/${offset}`);
 }
 
+type GetFollowingBatchServiceData = {
+  followersBatch: FollowDetails[];
+};
+
+export function getFollowingBatchService(offset: number): Promise<AxiosResponse<GetFollowingBatchServiceData>> {
+  return axios.get(`${socialApiUrl}/following/${offset}`);
+}
+
 type AcceptFollowRequestServicePayload = {
   requestId: number;
 };
