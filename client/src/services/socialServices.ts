@@ -14,6 +14,14 @@ export function getAccountSocialDetailsService(abortSignal: AbortSignal): Promis
   return axios.get(socialApiUrl, { signal: abortSignal });
 }
 
+type GetFollowersBatchServiceData = {
+  followersBatch: FollowDetails[];
+};
+
+export function getFollowersBatchService(offset: number): Promise<AxiosResponse<GetFollowersBatchServiceData>> {
+  return axios.get(`${socialApiUrl}/followers/${offset}`);
+}
+
 type AcceptFollowRequestServicePayload = {
   requestId: number;
 };
