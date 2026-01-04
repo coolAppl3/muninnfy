@@ -8,9 +8,14 @@ type AccountSocialDetailsProviderProps = {
 
 export default function AccountSocialDetailsProvider({ children }: AccountSocialDetailsProviderProps): JSX.Element {
   const [initialFetchCompleted, setInitialFetchCompleted] = useState<boolean>(false);
+
   const [followers, setFollowers] = useState<FollowDetails[]>([]);
   const [following, setFollowing] = useState<FollowDetails[]>([]);
   const [followRequests, setFollowRequests] = useState<FollowRequest[]>([]);
+
+  const [allFollowersFetched, setAllFollowersFetched] = useState<boolean>(false);
+  const [allFollowingFetched, setAllFollowingFetched] = useState<boolean>(false);
+  const [allFollowRequestsFetched, setAllFollowRequestsFetched] = useState<boolean>(false);
 
   const contextValue: AccountSocialDetailsContextType = useMemo(
     () => ({
@@ -25,8 +30,17 @@ export default function AccountSocialDetailsProvider({ children }: AccountSocial
 
       followRequests,
       setFollowRequests,
+
+      allFollowersFetched,
+      setAllFollowersFetched,
+
+      allFollowingFetched,
+      setAllFollowingFetched,
+
+      allFollowRequestsFetched,
+      setAllFollowRequestsFetched,
     }),
-    [initialFetchCompleted, followers, following, followRequests]
+    [initialFetchCompleted, followers, following, followRequests, allFollowersFetched, allFollowingFetched, allFollowRequestsFetched]
   );
 
   return <AccountSocialDetailsContext value={contextValue}>{children}</AccountSocialDetailsContext>;

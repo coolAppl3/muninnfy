@@ -13,6 +13,15 @@ export type AccountSocialDetailsContextType = {
 
   followRequests: FollowRequest[];
   setFollowRequests: Dispatch<SetStateAction<FollowRequest[]>>;
+
+  allFollowersFetched: boolean;
+  setAllFollowersFetched: Dispatch<SetStateAction<boolean>>;
+
+  allFollowingFetched: boolean;
+  setAllFollowingFetched: Dispatch<SetStateAction<boolean>>;
+
+  allFollowRequestsFetched: boolean;
+  setAllFollowRequestsFetched: Dispatch<SetStateAction<boolean>>;
 };
 
 const AccountSocialDetailsContext = createContext<AccountSocialDetailsContextType | null>(null);
