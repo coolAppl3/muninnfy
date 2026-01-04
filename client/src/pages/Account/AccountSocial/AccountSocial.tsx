@@ -11,15 +11,16 @@ import AccountSocialFollowers from './components/AccountSocialFollowers/AccountS
 import AccountSocialFollowing from './components/AccountSocialFollowing/AccountSocialFollowing';
 import AccountSocialFollowRequests from './components/AccountSocialFollowRequests/AccountSocialFollowRequests';
 import AccountSocialFindAccount from './components/AccountSocialFindAccount/AccountSocialFindAccount';
+import { SOCIAL_FETCH_BATCH_SIZE } from '../../../utils/constants/socialConstants';
 
 export default function AccountSocial(): JSX.Element {
   const { socialSection } = useAccountSocial();
-  const { initialFetchCompleted, setInitialFetchCompleted, setFollowers, setFollowing, setFollowRequests } = useAccountSocialDetails();
+  const { fetchDetails, setFetchDetails, setFollowers, setFollowing, setFollowRequests } = useAccountSocialDetails();
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
   useEffect(() => {
-    if (initialFetchCompleted) {
+    if (fetchDetails.initialFetchCompleted) {
       return;
     }
 
@@ -29,10 +30,17 @@ export default function AccountSocial(): JSX.Element {
       try {
         const { followers, following, followRequests } = (await getAccountSocialDetailsService(abortController.signal)).data;
 
-        setInitialFetchCompleted(true);
         setFollowers(followers);
         setFollowing(following);
         setFollowRequests(followRequests);
+
+        setFetchDetails({
+          initialFetchCompleted: true,
+
+          allFollowersFetched: followers.length < SOCIAL_FETCH_BATCH_SIZE,
+          allFollowingFetched: following.length < SOCIAL_FETCH_BATCH_SIZE,
+          allFollowRequestsFetched: followRequests.length < SOCIAL_FETCH_BATCH_SIZE,
+        });
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
           return;
@@ -45,11 +53,11 @@ export default function AccountSocial(): JSX.Element {
 
     getSocialDetails();
     return () => abortController.abort();
-  }, [initialFetchCompleted, setInitialFetchCompleted, setFollowers, setFollowing, setFollowRequests, handleAsyncError]);
+  }, [fetchDetails, setFetchDetails, setFollowers, setFollowing, setFollowRequests, handleAsyncError]);
 
   return (
     <>
-      {!initialFetchCompleted ? (
+      {!fetchDetails.initialFetchCompleted ? (
         <ContentLoadingSkeleton />
       ) : (
         <>

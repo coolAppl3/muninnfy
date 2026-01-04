@@ -1,10 +1,15 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 import { FollowDetails, FollowRequest } from '../../../types/socialTypes';
 
-export type AccountSocialDetailsContextType = {
+export type AccountSocialFetchDetails = {
   initialFetchCompleted: boolean;
-  setInitialFetchCompleted: Dispatch<SetStateAction<boolean>>;
 
+  allFollowersFetched: boolean;
+  allFollowingFetched: boolean;
+  allFollowRequestsFetched: boolean;
+};
+
+export type AccountSocialDetailsContextType = {
   followers: FollowDetails[];
   setFollowers: Dispatch<SetStateAction<FollowDetails[]>>;
 
@@ -14,14 +19,8 @@ export type AccountSocialDetailsContextType = {
   followRequests: FollowRequest[];
   setFollowRequests: Dispatch<SetStateAction<FollowRequest[]>>;
 
-  allFollowersFetched: boolean;
-  setAllFollowersFetched: Dispatch<SetStateAction<boolean>>;
-
-  allFollowingFetched: boolean;
-  setAllFollowingFetched: Dispatch<SetStateAction<boolean>>;
-
-  allFollowRequestsFetched: boolean;
-  setAllFollowRequestsFetched: Dispatch<SetStateAction<boolean>>;
+  fetchDetails: AccountSocialFetchDetails;
+  setFetchDetails: Dispatch<SetStateAction<AccountSocialFetchDetails>>;
 };
 
 const AccountSocialDetailsContext = createContext<AccountSocialDetailsContextType | null>(null);
