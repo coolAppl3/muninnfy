@@ -13,6 +13,7 @@ import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHa
 import { CanceledError } from 'axios';
 import useAuth from '../../hooks/useAuth';
 import AccountOngoingRequestsProvider from './providers/AccountOngoingRequestsProvider';
+import AccountSocialDetailsProvider from './providers/AccountSocialDetailsProvider';
 
 export default function Account(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -79,7 +80,9 @@ export default function Account(): JSX.Element {
                   initialOngoingEmailUpdateRequest={initialOngoingEmailUpdateRequest}
                   initialOngoingAccountDeletionRequest={initialOngoingAccountDeletionRequest}
                 >
-                  <AccountContent />
+                  <AccountSocialDetailsProvider>
+                    <AccountContent />
+                  </AccountSocialDetailsProvider>
                 </AccountOngoingRequestsProvider>
               </AccountDetailsProvider>
             </Container>
