@@ -133,9 +133,9 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
     return;
   }
 
-  const offset = req.params.offset ? +req.params.offset : undefined;
+  const offset: number = +(req.params.offset || 0);
 
-  if (offset === undefined || !Number.isInteger(offset)) {
+  if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
     return;
   }
@@ -190,9 +190,9 @@ socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
     return;
   }
 
-  const offset = req.params.offset ? +req.params.offset : undefined;
+  const offset: number = +(req.params.offset || 0);
 
-  if (offset === undefined || !Number.isInteger(offset)) {
+  if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
     return;
   }
@@ -247,9 +247,9 @@ socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) 
     return;
   }
 
-  const offset = req.params.offset ? +req.params.offset : undefined;
+  const offset: number = +(req.params.offset || 0);
 
-  if (offset === undefined || !Number.isInteger(offset)) {
+  if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
     return;
   }
