@@ -249,6 +249,71 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
   }
 });
 
+socialRouter.get('/following/search', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const searchQuery: string = req.query.searchQuery?.toString().trim() || '';
+  const offset: number = +(req.query.offset || 0);
+
+  if (!isValidDisplayName(searchQuery) && !isValidUsername(searchQuery)) {
+    res.status(400).json({ message: 'Invalid search query.', reason: 'invalidSearchQuery' });
+    return;
+  }
+
+  if (!Number.isInteger(offset)) {
+    res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    const [following] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        followers.follow_id,
+        followers.follow_timestamp,
+        accounts.public_account_id,
+        accounts.username,
+        accounts.display_name
+      FROM
+        followers
+      INNER JOIN
+        accounts ON followers.account_id = accounts.account_id
+      WHERE
+        followers.follower_account_id = :accountId AND (
+          accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
+        )
+      ORDER BY
+        followers.follow_timestamp DESC
+      LIMIT
+        :socialFetchBatchSize
+      OFFSET
+        :offset;`,
+      { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+    );
+
+    res.json({ followersBatch: following as FollowDetails[] });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
