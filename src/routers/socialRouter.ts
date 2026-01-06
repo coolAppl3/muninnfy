@@ -300,7 +300,7 @@ socialRouter.get('/following/search', async (req: Request, res: Response) => {
       { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    res.json({ followersBatch: following as FollowDetails[] });
+    res.json({ followingBatch: following as FollowDetails[] });
   } catch (err: unknown) {
     console.log(err);
 
