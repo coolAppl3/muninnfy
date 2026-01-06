@@ -134,7 +134,7 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
     return;
   }
 
-  const searchQuery: string = req.query.searchQuery?.toString() || '';
+  const searchQuery: string = req.query.searchQuery?.toString().trim() || '';
   const offset: number = +(req.query.offset || 0);
 
   if (!isValidDisplayName(searchQuery) && !isValidUsername(searchQuery)) {
