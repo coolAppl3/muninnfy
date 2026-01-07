@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.2.9] (2026-01-07)
+
+### Features
+
+- Added the following endpoints:
+  - GET `social/followers/:offset`.
+  - GET `social/following/:offset`.
+  - GET `social/followRequests/:offset`.
+  - GET `social/followers/search`.
+  - GET `social/following/search`.
+  - GET `social/followRequests/search`.
+- Added the following services:
+  - `getFollowersBatchService()`.
+  - `getFollowingBatchService()`.
+  - `getFollowRequestsBatchService()`.
+- Implement account link copy logic.
+- Added state to track fetch status in `AccountSocialDetailsContext`.
+- Added `socialValidation` with `isValidSocialQuery()`.
+
+
+### Bug Fixes
+
+- Fixed `AccountSocialDetailsProvider` being in the wrong location, causing a fetch every time the user navigated to the section.
+
+
+### Code Refactoring
+
+- simplify data types in GET `social`.
+- Remove double logging in some instances of using helper functions.
+
+
+### Documentation Changes
+
+- Fixed incorrect 2024 being used instead of 2025 since the first patch.
+
+
 ## [0.2.8] (2025-12-31)
 
 ### Features
