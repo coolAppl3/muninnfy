@@ -28,9 +28,7 @@ const contentRecord: Record<AccountLocation, JSX.Element> = {
 
   social: (
     <AccountSocialProvider>
-      <AccountSocialDetailsProvider>
-        <AccountSocial />
-      </AccountSocialDetailsProvider>
+      <AccountSocial />
     </AccountSocialProvider>
   ),
 

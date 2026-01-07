@@ -786,12 +786,7 @@ wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
 
   const wishlistId: string | undefined = req.params.wishlistId;
 
-  if (!wishlistId) {
-    res.status(400).json({ message: 'Invalid request data.' });
-    return;
-  }
-
-  if (!isValidUuid(wishlistId)) {
+  if (!wishlistId || !isValidUuid(wishlistId)) {
     res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
     return;
   }
