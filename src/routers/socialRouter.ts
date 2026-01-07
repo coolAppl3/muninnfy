@@ -11,6 +11,7 @@ import { deleteFollowRequest } from '../db/helpers/socialDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { isValidDisplayName, isValidUsername } from '../util/validation/userValidation';
+import { isValidSocialQuery } from '../util/validation/socialValidation';
 
 export const socialRouter: Router = express.Router();
 
@@ -137,7 +138,7 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
   const searchQuery: string = req.query.searchQuery?.toString().trim() || '';
   const offset: number = +(req.query.offset || 0);
 
-  if (!isValidDisplayName(searchQuery) && !isValidUsername(searchQuery)) {
+  if (!isValidSocialQuery(searchQuery)) {
     res.status(400).json({ message: 'Invalid search query.', reason: 'invalidSearchQuery' });
     return;
   }
@@ -259,7 +260,7 @@ socialRouter.get('/following/search', async (req: Request, res: Response) => {
   const searchQuery: string = req.query.searchQuery?.toString().trim() || '';
   const offset: number = +(req.query.offset || 0);
 
-  if (!isValidDisplayName(searchQuery) && !isValidUsername(searchQuery)) {
+  if (!isValidSocialQuery(searchQuery)) {
     res.status(400).json({ message: 'Invalid search query.', reason: 'invalidSearchQuery' });
     return;
   }
@@ -381,7 +382,7 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
   const searchQuery: string = req.query.searchQuery?.toString().trim() || '';
   const offset: number = +(req.query.offset || 0);
 
-  if (!isValidDisplayName(searchQuery) && !isValidUsername(searchQuery)) {
+  if (!isValidSocialQuery(searchQuery)) {
     res.status(400).json({ message: 'Invalid search query.', reason: 'invalidSearchQuery' });
     return;
   }
