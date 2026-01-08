@@ -14,6 +14,14 @@ export function getAccountSocialDetailsService(abortSignal: AbortSignal): Promis
   return axios.get(socialApiUrl, { signal: abortSignal });
 }
 
+type SearchFollowersServiceData = {
+  followersBatch: FollowDetails[];
+};
+
+export function searchFollowersService(searchQuery: string, offset: number): Promise<AxiosResponse<SearchFollowersServiceData>> {
+  return axios.get(`${socialApiUrl}/followers/search?searchQuery=${searchQuery}&offset=${offset}`);
+}
+
 type GetFollowersBatchServiceData = {
   followersBatch: FollowDetails[];
 };
