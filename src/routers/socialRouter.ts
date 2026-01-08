@@ -10,7 +10,6 @@ import { logUnexpectedError } from '../logs/errorLogger';
 import { deleteFollowRequest } from '../db/helpers/socialDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
-import { isValidDisplayName, isValidUsername } from '../util/validation/userValidation';
 import { isValidSocialQuery } from '../util/validation/socialValidation';
 
 export const socialRouter: Router = express.Router();
