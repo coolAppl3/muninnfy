@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
-import { FollowDetails, FollowRequest } from '../../../types/socialTypes';
+import { FollowDetails, FollowRequest, SocialCounts } from '../../../types/socialTypes';
 
 export type AccountSocialFetchDetails = {
   initialFetchCompleted: boolean;
@@ -10,6 +10,9 @@ export type AccountSocialFetchDetails = {
 };
 
 export type AccountSocialDetailsContextType = {
+  socialCounts: SocialCounts;
+  setSocialCounts: Dispatch<SetStateAction<SocialCounts>>;
+
   followers: FollowDetails[];
   setFollowers: Dispatch<SetStateAction<FollowDetails[]>>;
 

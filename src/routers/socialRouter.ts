@@ -14,6 +14,12 @@ import { isValidSocialQuery } from '../util/validation/socialValidation';
 
 export const socialRouter: Router = express.Router();
 
+type SocialCounts = {
+  followers_count: number;
+  following_count: number;
+  follow_requests_count: number;
+};
+
 type SocialData = {
   public_account_id: string;
   username: string;
@@ -46,6 +52,11 @@ socialRouter.get('/', async (req: Request, res: Response) => {
   try {
     const [socialRows] = await dbPool.query<RowDataPacket[][]>(
       `SELECT
+        (SELECT COUNT(*) FROM followers WHERE account_id = :accountId) AS followers_count,
+        (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId) AS following_count,
+        (SELECT COUNT(*) FROM follow_requests WHERE requestee_account_id = :accountId) AS follow_requests_count;
+      
+      SELECT
         followers.follow_id,
         followers.follow_timestamp,
         accounts.public_account_id,
@@ -95,25 +106,26 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       { accountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    const followers = socialRows[0] as FollowDetails[] | undefined;
-    const following = socialRows[1] as FollowDetails[] | undefined;
-    const followRequests = socialRows[2] as FollowRequest[] | undefined;
+    const socialCounts = (socialRows[0] ? socialRows[0][0] : undefined) as SocialCounts | undefined;
+    const followers = socialRows[1] as FollowDetails[] | undefined;
+    const following = socialRows[2] as FollowDetails[] | undefined;
+    const followRequests = socialRows[3] as FollowRequest[] | undefined;
 
-    if (!followers || !following || !followRequests) {
+    if (!socialCounts || !followers || !following || !followRequests) {
       res.status(500).json({ message: 'Internal server error.' });
 
       await logUnexpectedError(
         req,
         null,
-        `Failed to fetch social data. Followers fetched: ${Boolean(followers)}. Following fetched: ${Boolean(
-          following
-        )}. Follow requests fetched: ${Boolean(followRequests)}.`
+        `Failed to fetch social data. Social count dat fetched: ${Boolean(socialCounts)}. Followers fetched: ${Boolean(
+          followers
+        )}. Following fetched: ${Boolean(following)}. Follow requests fetched: ${Boolean(followRequests)}.`
       );
 
       return;
     }
 
-    res.json({ followers, following, followRequests });
+    res.json({ socialCounts, followers, following, followRequests });
   } catch (err: unknown) {
     console.log(err);
 

@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
-import { FollowDetails, FollowRequest } from '../../../types/socialTypes';
+import { FollowDetails, FollowRequest, SocialCounts } from '../../../types/socialTypes';
 import AccountSocialDetailsContext, {
   AccountSocialDetailsContextType,
   AccountSocialFetchDetails,
@@ -10,6 +10,7 @@ type AccountSocialDetailsProviderProps = {
 };
 
 export default function AccountSocialDetailsProvider({ children }: AccountSocialDetailsProviderProps): JSX.Element {
+  const [socialCounts, setSocialCounts] = useState<SocialCounts>({ followers_count: 0, following_count: 0, follow_requests_count: 0 });
   const [followers, setFollowers] = useState<FollowDetails[]>([]);
   const [following, setFollowing] = useState<FollowDetails[]>([]);
   const [followRequests, setFollowRequests] = useState<FollowRequest[]>([]);
@@ -23,6 +24,9 @@ export default function AccountSocialDetailsProvider({ children }: AccountSocial
 
   const contextValue: AccountSocialDetailsContextType = useMemo(
     () => ({
+      socialCounts,
+      setSocialCounts,
+
       followers,
       setFollowers,
 
@@ -35,7 +39,7 @@ export default function AccountSocialDetailsProvider({ children }: AccountSocial
       fetchDetails,
       setFetchDetails,
     }),
-    [followers, following, followRequests, fetchDetails]
+    [socialCounts, followers, following, followRequests, fetchDetails]
   );
 
   return <AccountSocialDetailsContext value={contextValue}>{children}</AccountSocialDetailsContext>;

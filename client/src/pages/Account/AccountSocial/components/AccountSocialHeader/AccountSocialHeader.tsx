@@ -10,7 +10,7 @@ import usePopupMessage from '../../../../../hooks/usePopupMessage';
 export default function AccountSocialHeader(): JSX.Element {
   const { accountDetails } = useAccountDetails();
   const { menuIsOpen, socialSection, setMenuIsOpen, setSocialSection } = useAccountSocial();
-  const { followers, following, followRequests } = useAccountSocialDetails();
+  const { socialCounts } = useAccountSocialDetails();
 
   const { displayPopupMessage } = usePopupMessage();
 
@@ -78,7 +78,7 @@ export default function AccountSocialHeader(): JSX.Element {
           >
             <StatisticItem
               title='Followers'
-              value={`${followers.length}`}
+              value={`${socialCounts.followers_count}`}
             />
           </button>
 
@@ -91,7 +91,7 @@ export default function AccountSocialHeader(): JSX.Element {
           >
             <StatisticItem
               title='Following'
-              value={`${following.length}`}
+              value={`${socialCounts.following_count}`}
             />
           </button>
 
@@ -104,7 +104,7 @@ export default function AccountSocialHeader(): JSX.Element {
           >
             <StatisticItem
               title='Follow requests'
-              value={`${followRequests.length}`}
+              value={`${socialCounts.follow_requests_count}`}
             />
           </button>
         </div>

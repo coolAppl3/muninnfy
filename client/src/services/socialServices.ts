@@ -1,10 +1,11 @@
 import axios, { AxiosResponse } from 'axios';
-import { FollowDetails, FollowRequest } from '../types/socialTypes';
+import { FollowDetails, FollowRequest, SocialCounts } from '../types/socialTypes';
 
 axios.defaults.withCredentials = true;
 const socialApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/social` : `https://muninnfy/api/social`;
 
 type GetAccountSocialDetailsServiceData = {
+  socialCounts: SocialCounts;
   followers: FollowDetails[];
   following: FollowDetails[];
   followRequests: FollowRequest[];
