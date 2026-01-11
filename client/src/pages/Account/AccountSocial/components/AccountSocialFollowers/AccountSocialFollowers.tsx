@@ -18,7 +18,7 @@ export default function AccountSocialFollowers(): JSX.Element {
 
   async function getFollowersBatch(): Promise<void> {
     try {
-      const followersBatch: FollowDetails[] = (await getFollowersBatchService(0)).data.followersBatch;
+      const followersBatch: FollowDetails[] = (await getFollowersBatchService(followers.length)).data.followersBatch;
 
       setFollowers((prev) => [...prev, ...followersBatch]);
       followersBatch.length < SOCIAL_FETCH_BATCH_SIZE && setFetchDetails((prev) => ({ ...prev, allFollowersFetched: true }));
@@ -36,17 +36,13 @@ export default function AccountSocialFollowers(): JSX.Element {
     <>
       <div className='h-line mt-1 mb-2'></div>
       <div className='grid md:grid-cols-2 gap-1 items-start'>
-        {followers.map((followDetails: FollowDetails, index: number) =>
-          index >= renderLimit ? (
-            <></>
-          ) : (
-            <FollowCard
-              key={followDetails.follow_id}
-              isFollowerCard={true}
-              followDetails={followDetails}
-            />
-          )
-        )}
+        {followers.slice(0, renderLimit).map((followDetails: FollowDetails) => (
+          <FollowCard
+            key={followDetails.follow_id}
+            isFollowerCard={true}
+            followDetails={followDetails}
+          />
+        ))}
 
         {!allFollowersRendered && (
           <button
