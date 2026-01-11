@@ -1,3 +1,5 @@
+import { containsInvalidWhitespace } from '../globalUtils';
+
 export function validateEmail(value: string): string | null {
   if (value === '') {
     return 'A valid email is required.';
@@ -93,7 +95,7 @@ export function validateDisplayName(value: string): string | null {
     return 'Display name must not contain leading or trailing whitespace.';
   }
 
-  if (/\s{2,}/.test(value)) {
+  if (containsInvalidWhitespace(value)) {
     return 'Display name must not contain consecutive whitespaces.';
   }
 
