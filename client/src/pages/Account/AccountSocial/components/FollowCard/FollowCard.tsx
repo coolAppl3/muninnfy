@@ -1,4 +1,4 @@
-import { JSX, useState } from 'react';
+import { JSX, memo, useState } from 'react';
 import { FollowDetails } from '../../../../../types/socialTypes';
 import { getFullDateString } from '../../../../../utils/globalUtils';
 import RemoveIcon from '../../../../../assets/svg/RemoveIcon.svg?react';
@@ -14,7 +14,8 @@ type FollowCardProps = {
   followDetails: FollowDetails;
 };
 
-export default function FollowCard({ isFollowerCard, followDetails }: FollowCardProps): JSX.Element {
+export default memo(FollowCard);
+function FollowCard({ isFollowerCard, followDetails }: FollowCardProps): JSX.Element {
   const { follow_id, public_account_id, username, display_name, follow_timestamp } = followDetails;
   const { setFollowing, setFollowers } = useAccountSocialDetails();
 
