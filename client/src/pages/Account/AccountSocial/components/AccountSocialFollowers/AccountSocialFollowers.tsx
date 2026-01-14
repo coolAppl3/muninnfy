@@ -10,6 +10,7 @@ import DefaultFormGroup from '../../../../../components/DefaultFormGroup/Default
 import { validateSearchQuery } from '../../../../../utils/validation/socialValidation';
 import { debounce } from '../../../../../utils/debounce';
 import { CanceledError } from 'axios';
+import Button from '../../../../../components/Button/Button';
 
 export default function AccountSocialFollowers(): JSX.Element {
   const { followers, socialCounts, setFollowers, setFetchDetails } = useAccountSocialDetails();
@@ -163,9 +164,8 @@ export default function AccountSocialFollowers(): JSX.Element {
             <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-1 sm:col-span-2'></div>
           ) : (
             allFollowersRendered || (
-              <button
-                type='button'
-                className='link text-sm sm:col-span-2 w-fit mx-auto'
+              <Button
+                className='bg-description border-description text-dark text-sm py-[4px] w-full sm:w-fit sm:col-span-2 mx-auto rounded-pill'
                 onClick={async () => {
                   if (allFollowersRendered) {
                     return;
@@ -190,7 +190,7 @@ export default function AccountSocialFollowers(): JSX.Element {
                 }}
               >
                 Load more
-              </button>
+              </Button>
             )
           )}
         </div>
