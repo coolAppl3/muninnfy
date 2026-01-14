@@ -24,6 +24,9 @@ export default function AccountSocialFollowers(): JSX.Element {
   const [searchQueryResults, setSearchQueryResults] = useState<FollowDetails[]>(followers);
   const [allSearchQueryResultsFetched, setAllSearchQueryResultsFetched] = useState<boolean>(false);
 
+  const [fetchingSearchQueryResults, setFetchingSearchQueryResults] = useState<boolean>(false);
+  const [fetchingAdditionalFollowers, setFetchingAdditionalFollowers] = useState<boolean>(false);
+
   const { displayPopupMessage } = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
@@ -34,9 +37,11 @@ export default function AccountSocialFollowers(): JSX.Element {
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
         const followersBatch: FollowDetails[] = (await searchFollowersService(searchQuery, offset, abortSignal)).data.followersBatch;
-        offset === 0 ? setSearchQueryResults(followersBatch) : setSearchQueryResults((prev) => [...prev, ...followersBatch]);
 
+        offset === 0 ? setSearchQueryResults(followersBatch) : setSearchQueryResults((prev) => [...prev, ...followersBatch]);
         followersBatch.length < SOCIAL_FETCH_BATCH_SIZE ? setAllSearchQueryResultsFetched(true) : setAllSearchQueryResultsFetched(false);
+
+        setFetchingSearchQueryResults(false);
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
           return;
@@ -89,6 +94,8 @@ export default function AccountSocialFollowers(): JSX.Element {
       if (followers.length + followersBatch.length >= socialCounts.followers_count) {
         setFetchDetails((prev) => ({ ...prev, allFollowersFetched: true }));
       }
+
+      setFetchingAdditionalFollowers(false);
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status } = handleAsyncError(err);
@@ -134,44 +141,60 @@ export default function AccountSocialFollowers(): JSX.Element {
             return;
           }
 
+          setFetchingSearchQueryResults(true);
           debouncedSetSearchQuery(newValue);
           setRenderMode('query');
         }}
       ></DefaultFormGroup>
 
-      <div className='grid md:grid-cols-2 gap-1 items-start'>
-        {renderArray.slice(0, renderLimit).map((followDetails: FollowDetails) => (
-          <FollowCard
-            key={followDetails.follow_id}
-            isFollowerCard={true}
-            followDetails={followDetails}
-          />
-        ))}
+      {fetchingSearchQueryResults ? (
+        <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-2'></div>
+      ) : (
+        <div className='grid md:grid-cols-2 gap-1 items-start'>
+          {renderArray.slice(0, renderLimit).map((followDetails: FollowDetails) => (
+            <FollowCard
+              key={followDetails.follow_id}
+              isFollowerCard={true}
+              followDetails={followDetails}
+            />
+          ))}
 
-        {allFollowersRendered || (
-          <button
-            type='button'
-            className='link text-sm sm:col-span-2 w-fit mx-auto'
-            onClick={async () => {
-              if (allFollowersRendered) {
-                return;
-              }
+          {fetchingAdditionalFollowers ? (
+            <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-1 sm:col-span-2'></div>
+          ) : (
+            allFollowersRendered || (
+              <button
+                type='button'
+                className='link text-sm sm:col-span-2 w-fit mx-auto'
+                onClick={async () => {
+                  if (allFollowersRendered) {
+                    return;
+                  }
 
-              if (renderMode === 'local') {
-                renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length && (await getFollowersBatch());
+                  setFetchingAdditionalFollowers(true);
 
-                return;
-              }
+                  if (renderMode === 'local') {
+                    renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length && (await getFollowersBatch());
 
-              renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length &&
-                (await searchFollowers(searchQuery, renderArray.length, new AbortController().signal));
-              setRenderLimit((prev) => prev + SOCIAL_RENDER_BATCH_SIZE);
-            }}
-          >
-            Load more
-          </button>
-        )}
-      </div>
+                    setRenderLimit((prev) => prev + SOCIAL_RENDER_BATCH_SIZE);
+                    setFetchingAdditionalFollowers(false);
+
+                    return;
+                  }
+
+                  renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length &&
+                    (await searchFollowers(searchQuery, renderArray.length, new AbortController().signal));
+
+                  setRenderLimit((prev) => prev + SOCIAL_RENDER_BATCH_SIZE);
+                  setFetchingAdditionalFollowers(false);
+                }}
+              >
+                Load more
+              </button>
+            )
+          )}
+        </div>
+      )}
     </>
   );
 }
