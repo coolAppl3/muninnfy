@@ -17,7 +17,7 @@ type FollowCardProps = {
 export default memo(FollowCard);
 function FollowCard({ isFollowerCard, followDetails }: FollowCardProps): JSX.Element {
   const { follow_id, public_account_id, username, display_name, follow_timestamp } = followDetails;
-  const { setFollowing, setFollowers } = useAccountSocialDetails();
+  const { setFollowing, setFollowers, setSocialCounts } = useAccountSocialDetails();
 
   const [cardMode, setCardMode] = useState<'view' | 'confirm' | 'loading'>('view');
 
@@ -27,7 +27,9 @@ function FollowCard({ isFollowerCard, followDetails }: FollowCardProps): JSX.Ele
   async function unfollow(): Promise<void> {
     try {
       await unfollowService(follow_id);
+
       setFollowing((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
+      setSocialCounts((prev) => ({ ...prev, following_count: prev.following_count - 1 }));
 
       displayPopupMessage('Unfollowed.', 'success');
     } catch (err: unknown) {
@@ -45,7 +47,9 @@ function FollowCard({ isFollowerCard, followDetails }: FollowCardProps): JSX.Ele
   async function removeFollower(): Promise<void> {
     try {
       await removeFollowerService(follow_id);
+
       setFollowers((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
+      setSocialCounts((prev) => ({ ...prev, followers_count: prev.followers_count - 1 }));
 
       displayPopupMessage('Unfollowed.', 'success');
     } catch (err: unknown) {
