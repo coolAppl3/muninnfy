@@ -152,13 +152,17 @@ export default function AccountSocialFollowing(): JSX.Element {
         <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-2'></div>
       ) : (
         <div className='grid md:grid-cols-2 gap-1 items-start'>
-          {renderArray.slice(0, renderLimit).map((followDetails: FollowDetails) => (
-            <FollowCard
-              key={followDetails.follow_id}
-              isFollowerCard={false}
-              followDetails={followDetails}
-            />
-          ))}
+          {renderArray.length === 0 ? (
+            <p className='text-sm text-description w-fit mx-auto sm:col-span-2'>No users found</p>
+          ) : (
+            renderArray.slice(0, renderLimit).map((followDetails: FollowDetails) => (
+              <FollowCard
+                key={followDetails.follow_id}
+                isFollowerCard={false}
+                followDetails={followDetails}
+              />
+            ))
+          )}
 
           {fetchingAdditionalFollowing ? (
             <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-1 sm:col-span-2'></div>
