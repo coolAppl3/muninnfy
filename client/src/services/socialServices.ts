@@ -59,8 +59,12 @@ type SearchFollowRequestsServiceData = {
   followersBatch: FollowDetails[];
 };
 
-export function searchFollowRequestsService(searchQuery: string, offset: number): Promise<AxiosResponse<SearchFollowRequestsServiceData>> {
-  return axios.get(`${socialApiUrl}/followRequests/search?searchQuery=${searchQuery}&offset=${offset}`);
+export function searchFollowRequestsService(
+  searchQuery: string,
+  offset: number,
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<SearchFollowRequestsServiceData>> {
+  return axios.get(`${socialApiUrl}/followRequests/search?searchQuery=${searchQuery}&offset=${offset}`, { signal: abortSignal });
 }
 
 type GetFollowRequestsBatchServiceData = {
