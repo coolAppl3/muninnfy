@@ -69,7 +69,8 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       WHERE
         followers.account_id = :accountId
       ORDER BY
-        followers.follow_timestamp DESC
+        followers.follow_timestamp DESC,
+        followers.follow_id ASC
       LIMIT :socialFetchBatchSize;
 
       SELECT
@@ -85,7 +86,8 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       WHERE
         followers.follower_account_id = :accountId
       ORDER BY
-        followers.follow_timestamp DESC
+        followers.follow_timestamp DESC,
+        followers.follow_id ASC
       LIMIT :socialFetchBatchSize;
       
       SELECT
@@ -101,7 +103,8 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       WHERE
         follow_requests.requestee_account_id = :accountId
       ORDER BY
-        follow_requests.request_timestamp DESC
+        follow_requests.request_timestamp DESC,
+        follow_requests.request_id ASC
       LIMIT :socialFetchBatchSize;`,
       { accountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
@@ -182,7 +185,8 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
-        followers.follow_timestamp DESC
+        followers.follow_timestamp DESC,
+        followers.follow_id ASC
       LIMIT
         :socialFetchBatchSize
       OFFSET
@@ -212,6 +216,7 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
   }
 
   const offset: number = +(req.params.offset || 0);
+  console.log(offset);
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
@@ -239,7 +244,8 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
       WHERE
         followers.account_id = :accountId
       ORDER BY
-        followers.follow_timestamp DESC
+        followers.follow_timestamp DESC,
+        followers.follow_id ASC
       LIMIT
         :socialFetchBatchSize
       OFFSET
@@ -304,7 +310,8 @@ socialRouter.get('/following/search', async (req: Request, res: Response) => {
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
-        followers.follow_timestamp DESC
+        followers.follow_timestamp DESC,
+        followers.follow_id ASC
       LIMIT
         :socialFetchBatchSize
       OFFSET
@@ -361,7 +368,8 @@ socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
       WHERE
         followers.follower_account_id = :accountId
       ORDER BY
-        followers.follow_timestamp DESC
+        followers.follow_timestamp DESC,
+        followers.follow_id ASC
       LIMIT
         :socialFetchBatchSize
       OFFSET
@@ -426,7 +434,8 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
-        follow_requests.request_timestamp DESC
+        follow_requests.request_timestamp DESC,
+        follow_requests.request_id ASC
       LIMIT
         :socialFetchBatchSize
       OFFSET
@@ -483,7 +492,8 @@ socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) 
       WHERE
         follow_requests.requestee_account_id = :accountId
       ORDER BY
-        follow_requests.request_timestamp DESC
+        follow_requests.request_timestamp DESC,
+        follow_requests.request_id ASC
       LIMIT
         :socialFetchBatchSize
       OFFSET
