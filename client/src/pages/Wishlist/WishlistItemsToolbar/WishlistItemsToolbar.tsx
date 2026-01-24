@@ -15,7 +15,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
 
   const { setItemsFilterConfig } = useWishlistItems();
 
-  const debounceSetTitleQuery: (titleQuery: string) => void = useMemo(
+  const debouncedSetTitleQuery: (titleQuery: string) => void = useMemo(
     () =>
       debounce((titleQuery: string) => {
         setItemsFilterConfig((prev) => ({
@@ -63,7 +63,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
             const newValue: string = e.target.value;
             setTitleQuery(newValue);
 
-            debounceSetTitleQuery(newValue.toLowerCase());
+            debouncedSetTitleQuery(newValue.toLowerCase());
           }}
         />
       </Container>
