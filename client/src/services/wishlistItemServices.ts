@@ -33,7 +33,7 @@ export async function editWishlistItemService(body: EditWishlistItemServicePaylo
 }
 
 export async function deleteWishlistItemService(wishlistId: string, itemId: number): Promise<AxiosResponse> {
-  return axios.delete(`${wishlistItemsApiUrl}?wishlistId=${wishlistId}&itemId=${itemId}`);
+  return axios.delete(wishlistItemsApiUrl, { params: { wishlistId, itemId } });
 }
 
 type BulkDeleteWishlistItemsServicePayload = {

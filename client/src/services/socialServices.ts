@@ -24,7 +24,10 @@ export function searchFollowersService(
   offset: number,
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/followers/search?searchQuery=${searchQuery}&offset=${offset}`, { signal: abortSignal });
+  return axios.get(`${socialApiUrl}/followers/search`, {
+    params: { searchQuery, offset },
+    signal: abortSignal,
+  });
 }
 
 export function getFollowersBatchService(offset: number): Promise<AxiosResponse<FollowDetailsBatch>> {
@@ -36,7 +39,10 @@ export function searchFollowingService(
   offset: number,
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/following/search?searchQuery=${searchQuery}&offset=${offset}`, { signal: abortSignal });
+  return axios.get(`${socialApiUrl}/following/search`, {
+    params: { searchQuery, offset },
+    signal: abortSignal,
+  });
 }
 
 export function getFollowingBatchService(offset: number): Promise<AxiosResponse<FollowDetailsBatch>> {
@@ -48,7 +54,10 @@ export function searchFollowRequestsService(
   offset: number,
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/followRequests/search?searchQuery=${searchQuery}&offset=${offset}`, { signal: abortSignal });
+  return axios.get(`${socialApiUrl}/followRequests/search`, {
+    params: { searchQuery, offset },
+    signal: abortSignal,
+  });
 }
 
 type GetFollowRequestsBatchServiceData = {
