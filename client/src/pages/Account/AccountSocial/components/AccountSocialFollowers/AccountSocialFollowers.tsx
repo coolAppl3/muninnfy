@@ -142,6 +142,10 @@ export default function AccountSocialFollowers(): JSX.Element {
             return;
           }
 
+          if (newValue === searchQuery) {
+            return;
+          }
+
           setFetchingSearchQueryResults(true);
           debouncedSetSearchQuery(newValue);
           setRenderMode('query');
