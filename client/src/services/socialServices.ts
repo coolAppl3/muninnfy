@@ -49,22 +49,22 @@ export function getFollowingBatchService(offset: number): Promise<AxiosResponse<
   return axios.get(`${socialApiUrl}/following/${offset}`);
 }
 
+type FollowRequestsBatch = {
+  batch: FollowRequest[];
+};
+
 export function searchFollowRequestsService(
   searchQuery: string,
   offset: number,
   abortSignal: AbortSignal
-): Promise<AxiosResponse<FollowDetailsBatch>> {
+): Promise<AxiosResponse<FollowRequestsBatch>> {
   return axios.get(`${socialApiUrl}/followRequests/search`, {
     params: { searchQuery, offset },
     signal: abortSignal,
   });
 }
 
-type GetFollowRequestsBatchServiceData = {
-  batch: FollowRequest[];
-};
-
-export function getFollowRequestsBatchService(offset: number): Promise<AxiosResponse<GetFollowRequestsBatchServiceData>> {
+export function getFollowRequestsBatchService(offset: number): Promise<AxiosResponse<FollowRequestsBatch>> {
   return axios.get(`${socialApiUrl}/followRequests/${offset}`);
 }
 
