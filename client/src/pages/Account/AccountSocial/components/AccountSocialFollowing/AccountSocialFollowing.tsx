@@ -146,7 +146,7 @@ export default function AccountSocialFollowing(): JSX.Element {
           debouncedSetSearchQuery(newValue);
           setRenderMode('query');
         }}
-      ></DefaultFormGroup>
+      />
 
       {fetchingSearchQueryResults ? (
         <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-2'></div>
