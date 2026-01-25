@@ -13,7 +13,7 @@ import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
 
 export default function AccountSocialFollowing(): JSX.Element {
-  const { following, socialCounts, setFollowing, setFetchDetails } = useAccountSocialDetails();
+  const { following, socialCounts, setFollowing, setFollowers, setSocialCounts, setFetchDetails } = useAccountSocialDetails();
 
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -164,6 +164,9 @@ export default function AccountSocialFollowing(): JSX.Element {
                 key={followDetails.follow_id}
                 isFollowerCard={false}
                 followDetails={followDetails}
+                setFollowers={setFollowers}
+                setFollowing={setFollowing}
+                setSocialCounts={setSocialCounts}
               />
             ))
           )}
