@@ -1,4 +1,4 @@
-import { Dispatch, JSX, SetStateAction, useState } from 'react';
+import { Dispatch, JSX, memo, SetStateAction, useState } from 'react';
 import { FollowDetails, FollowRequest, SocialCounts } from '../../../../../../../types/socialTypes';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../../hooks/useHandleAsyncError';
 import usePopupMessage from '../../../../../../../hooks/usePopupMessage';
@@ -16,7 +16,8 @@ type FollowRequestCardProps = {
   setSocialCounts: Dispatch<SetStateAction<SocialCounts>>;
 };
 
-export default function FollowRequestCard({ followRequest, setFollowRequests, setFollowers }: FollowRequestCardProps): JSX.Element {
+export default memo(FollowRequestCard);
+function FollowRequestCard({ followRequest, setFollowRequests, setFollowers }: FollowRequestCardProps): JSX.Element {
   const { request_id, public_account_id, username, display_name, request_timestamp } = followRequest;
 
   const [actionLoading, setActionLoading] = useState<boolean>(false);
