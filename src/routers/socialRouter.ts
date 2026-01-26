@@ -216,7 +216,6 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
   }
 
   const offset: number = +(req.params.offset || 0);
-  console.log(offset);
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
