@@ -1,3 +1,5 @@
+import { containsInvalidWhitespace } from '../globalUtils';
+
 export function validateWishlistItemTitle(value: string): string | null {
   if (value === '') {
     return 'A valid item title is required.';
@@ -7,7 +9,7 @@ export function validateWishlistItemTitle(value: string): string | null {
     return 'Title must not contain leading or trailing whitespace.';
   }
 
-  if (/\s{2,}/.test(value)) {
+  if (containsInvalidWhitespace(value)) {
     return 'Title must not contain consecutive whitespaces.';
   }
 

@@ -1,3 +1,9 @@
+export type SocialCounts = {
+  followers_count: number;
+  following_count: number;
+  follow_requests_count: number;
+};
+
 type SocialData = {
   public_account_id: string;
   username: string;

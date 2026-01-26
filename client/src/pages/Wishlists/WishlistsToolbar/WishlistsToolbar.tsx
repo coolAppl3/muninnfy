@@ -16,7 +16,7 @@ export function WishlistsToolbar(): JSX.Element {
   const [titleQueryValue, setTitleQueryValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
-  const debounceSetTitleQuery: (titleQuery: string) => void = useMemo(
+  const debouncedSetTitleQuery: (titleQuery: string) => void = useMemo(
     () =>
       debounce((titleQuery: string) => {
         setWishlistsFilterConfig((prev) => ({
@@ -66,7 +66,7 @@ export function WishlistsToolbar(): JSX.Element {
             const newValue: string = e.target.value;
             setTitleQueryValue(newValue);
 
-            debounceSetTitleQuery(newValue.toLowerCase());
+            debouncedSetTitleQuery(newValue.toLowerCase());
           }}
         />
       </Container>

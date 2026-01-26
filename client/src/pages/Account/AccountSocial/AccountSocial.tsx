@@ -15,7 +15,7 @@ import { SOCIAL_FETCH_BATCH_SIZE } from '../../../utils/constants/socialConstant
 
 export default function AccountSocial(): JSX.Element {
   const { socialSection } = useAccountSocial();
-  const { fetchDetails, setFetchDetails, setFollowers, setFollowing, setFollowRequests } = useAccountSocialDetails();
+  const { fetchDetails, setFetchDetails, setSocialCounts, setFollowers, setFollowing, setFollowRequests } = useAccountSocialDetails();
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
@@ -28,8 +28,9 @@ export default function AccountSocial(): JSX.Element {
 
     const getSocialDetails = async () => {
       try {
-        const { followers, following, followRequests } = (await getAccountSocialDetailsService(abortController.signal)).data;
+        const { socialCounts, followers, following, followRequests } = (await getAccountSocialDetailsService(abortController.signal)).data;
 
+        setSocialCounts({ ...socialCounts });
         setFollowers(followers);
         setFollowing(following);
         setFollowRequests(followRequests);
@@ -53,7 +54,7 @@ export default function AccountSocial(): JSX.Element {
 
     getSocialDetails();
     return () => abortController.abort();
-  }, [fetchDetails, setFetchDetails, setFollowers, setFollowing, setFollowRequests, handleAsyncError]);
+  }, [fetchDetails, setFetchDetails, setSocialCounts, setFollowers, setFollowing, setFollowRequests, handleAsyncError]);
 
   return (
     <>

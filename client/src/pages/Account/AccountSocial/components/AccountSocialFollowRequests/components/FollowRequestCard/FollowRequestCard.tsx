@@ -1,6 +1,5 @@
-import { JSX, useState } from 'react';
-import { FollowDetails, FollowRequest } from '../../../../../../../types/socialTypes';
-import useAccountSocialDetails from '../../../../../hooks/useAccountSocialDetails';
+import { Dispatch, JSX, memo, SetStateAction, useState } from 'react';
+import { FollowDetails, FollowRequest, SocialCounts } from '../../../../../../../types/socialTypes';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../../hooks/useHandleAsyncError';
 import usePopupMessage from '../../../../../../../hooks/usePopupMessage';
 import Button from '../../../../../../../components/Button/Button';
@@ -11,11 +10,15 @@ import useInfoModal from '../../../../../../../hooks/useInfoModal';
 
 type FollowRequestCardProps = {
   followRequest: FollowRequest;
+
+  setFollowRequests: Dispatch<SetStateAction<FollowRequest[]>>;
+  setFollowers: Dispatch<SetStateAction<FollowDetails[]>>;
+  setSocialCounts: Dispatch<SetStateAction<SocialCounts>>;
 };
 
-export default function FollowRequestCard({ followRequest }: FollowRequestCardProps): JSX.Element {
+export default memo(FollowRequestCard);
+function FollowRequestCard({ followRequest, setFollowRequests, setFollowers, setSocialCounts }: FollowRequestCardProps): JSX.Element {
   const { request_id, public_account_id, username, display_name, request_timestamp } = followRequest;
-  const { setFollowRequests, setFollowers } = useAccountSocialDetails();
 
   const [actionLoading, setActionLoading] = useState<boolean>(false);
 
@@ -37,6 +40,11 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
 
       setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
       setFollowers((prev) => [newFollowerDetails, ...prev]);
+      setSocialCounts((prev) => ({
+        ...prev,
+        followers_count: prev.followers_count + 1,
+        follow_requests_count: prev.follow_requests_count - 1,
+      }));
 
       displayPopupMessage('Request accepted.', 'success');
     } catch (err: unknown) {
@@ -65,8 +73,9 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
 
       if (errReason === 'alreadyAccepted') {
         setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-        displayPopupMessage(errMessage, 'success');
+        setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
 
+        displayPopupMessage(errMessage, 'success');
         return;
       }
 
@@ -86,7 +95,9 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
   async function declineFollowRequest(): Promise<void> {
     try {
       await declineFollowRequestService(request_id);
+
       setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
 
       displayPopupMessage('Requested declined.', 'success');
     } catch (err: unknown) {
@@ -106,6 +117,7 @@ export default function FollowRequestCard({ followRequest }: FollowRequestCardPr
 
       if (status === 404) {
         setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+        setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
       }
     }
   }
