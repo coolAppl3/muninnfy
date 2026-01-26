@@ -17,7 +17,7 @@ type FollowRequestCardProps = {
 };
 
 export default memo(FollowRequestCard);
-function FollowRequestCard({ followRequest, setFollowRequests, setFollowers }: FollowRequestCardProps): JSX.Element {
+function FollowRequestCard({ followRequest, setFollowRequests, setFollowers, setSocialCounts }: FollowRequestCardProps): JSX.Element {
   const { request_id, public_account_id, username, display_name, request_timestamp } = followRequest;
 
   const [actionLoading, setActionLoading] = useState<boolean>(false);
@@ -40,6 +40,11 @@ function FollowRequestCard({ followRequest, setFollowRequests, setFollowers }: F
 
       setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
       setFollowers((prev) => [newFollowerDetails, ...prev]);
+      setSocialCounts((prev) => ({
+        ...prev,
+        followers_count: prev.followers_count + 1,
+        follow_requests_count: prev.follow_requests_count - 1,
+      }));
 
       displayPopupMessage('Request accepted.', 'success');
     } catch (err: unknown) {
@@ -68,8 +73,9 @@ function FollowRequestCard({ followRequest, setFollowRequests, setFollowers }: F
 
       if (errReason === 'alreadyAccepted') {
         setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-        displayPopupMessage(errMessage, 'success');
+        setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
 
+        displayPopupMessage(errMessage, 'success');
         return;
       }
 
@@ -89,7 +95,9 @@ function FollowRequestCard({ followRequest, setFollowRequests, setFollowers }: F
   async function declineFollowRequest(): Promise<void> {
     try {
       await declineFollowRequestService(request_id);
+
       setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
 
       displayPopupMessage('Requested declined.', 'success');
     } catch (err: unknown) {
@@ -109,6 +117,7 @@ function FollowRequestCard({ followRequest, setFollowRequests, setFollowers }: F
 
       if (status === 404) {
         setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+        setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
       }
     }
   }
