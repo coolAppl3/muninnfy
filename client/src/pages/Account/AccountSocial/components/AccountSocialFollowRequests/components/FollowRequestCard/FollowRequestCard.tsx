@@ -1,6 +1,5 @@
-import { JSX, useState } from 'react';
-import { FollowDetails, FollowRequest } from '../../../../../../../types/socialTypes';
-import useAccountSocialDetails from '../../../../../hooks/useAccountSocialDetails';
+import { Dispatch, JSX, SetStateAction, useState } from 'react';
+import { FollowDetails, FollowRequest, SocialCounts } from '../../../../../../../types/socialTypes';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../../hooks/useHandleAsyncError';
 import usePopupMessage from '../../../../../../../hooks/usePopupMessage';
 import Button from '../../../../../../../components/Button/Button';
@@ -11,11 +10,14 @@ import useInfoModal from '../../../../../../../hooks/useInfoModal';
 
 type FollowRequestCardProps = {
   followRequest: FollowRequest;
+
+  setFollowRequests: Dispatch<SetStateAction<FollowRequest[]>>;
+  setFollowers: Dispatch<SetStateAction<FollowDetails[]>>;
+  setSocialCounts: Dispatch<SetStateAction<SocialCounts>>;
 };
 
-export default function FollowRequestCard({ followRequest }: FollowRequestCardProps): JSX.Element {
+export default function FollowRequestCard({ followRequest, setFollowRequests, setFollowers }: FollowRequestCardProps): JSX.Element {
   const { request_id, public_account_id, username, display_name, request_timestamp } = followRequest;
-  const { setFollowRequests, setFollowers } = useAccountSocialDetails();
 
   const [actionLoading, setActionLoading] = useState<boolean>(false);
 
