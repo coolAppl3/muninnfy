@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.2.10] (2026-01-26)
+
+### Features
+
+- Added the following services:
+  - `searchFollowersService()`.
+  - `searchFollowingService()`.
+  - `searchFollowRequestsService()`.
+- Added `SOCIAL_RENDER_BATCH_SIZE` constant.
+- Implemented the following components, completing the Social section:
+  `AccountSocialFollowers()`.
+  `AccountSocialFollowing()`.
+  `AccountSocialFollowRequests()`.
+
+
+### Improvements
+
+- Reduced restrictions on search query validation.
+- Memoized `FollowCard` and `FollowRequestCard`.
+- Improved typing related to social services.
+
+
+### Bug Fixes
+
+- Fixed followers, following, and follow requests counts being incorrectly calculated and displayed.
+- Fixed `socialCounts` not being updated when a user is unfollowed or removed as a follower.
+- Fixed searchFollowRequestsService() using an incorrect return type.
+- Fixed `socialCounts` not being updated accordingly in `FollowRequestCard`.
+
+
+### Code Refactoring
+
+- Added `containsInvalidWhitespace()` and implemented it to improve readability in a few validation functions.
+- Renamed some debouncing functions for consistency.
+- Implement the use of params for query-string-based axios services.
+
+
 ## [0.2.9] (2026-01-07)
 
 ### Features
