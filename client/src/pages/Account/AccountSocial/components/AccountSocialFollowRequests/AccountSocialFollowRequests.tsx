@@ -158,9 +158,9 @@ export default function AccountSocialFollowRequests(): JSX.Element {
       {fetchingSearchQueryResults ? (
         <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-2'></div>
       ) : (
-        <div className='grid md:grid-cols-2 gap-1 items-start'>
+        <div className='grid gap-1 items-start'>
           {renderArray.length === 0 ? (
-            <p className='text-sm text-description w-fit mx-auto sm:col-span-2'>No users found</p>
+            <p className='text-sm text-description w-fit mx-auto'>No users found</p>
           ) : (
             renderArray.slice(0, renderLimit).map((followDetails: FollowRequest) => (
               <FollowRequestCard
@@ -174,11 +174,11 @@ export default function AccountSocialFollowRequests(): JSX.Element {
           )}
 
           {fetchingAdditionalFollowRequests ? (
-            <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-1 sm:col-span-2'></div>
+            <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-1'></div>
           ) : (
             allFollowRequestsRendered || (
               <Button
-                className='bg-description border-description text-dark text-sm py-[4px] w-full sm:w-fit sm:col-span-2 mx-auto rounded-pill'
+                className='bg-description border-description text-dark text-sm py-[4px] w-full sm:w-fit mx-auto rounded-pill'
                 onClick={async () => {
                   if (allFollowRequestsRendered) {
                     return;
