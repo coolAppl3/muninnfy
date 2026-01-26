@@ -61,6 +61,7 @@ function FollowCard({ isFollowerCard, followDetails, setFollowers, setFollowing,
       if (status === 400) {
         displayPopupMessage('Something went wrong.', 'error');
       }
+
       setCardMode('view');
     }
   }
