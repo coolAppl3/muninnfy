@@ -53,7 +53,7 @@ function FollowCard({ isFollowerCard, followDetails, setFollowers, setFollowing,
       setFollowers((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
       setSocialCounts((prev) => ({ ...prev, followers_count: prev.followers_count - 1 }));
 
-      displayPopupMessage('Unfollowed.', 'success');
+      displayPopupMessage('Follower removed.', 'success');
     } catch (err: unknown) {
       console.log(err);
       const { status } = handleAsyncError(err);
