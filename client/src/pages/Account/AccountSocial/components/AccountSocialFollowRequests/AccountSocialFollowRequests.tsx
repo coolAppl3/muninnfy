@@ -2,7 +2,7 @@ import { ChangeEvent, JSX, useCallback, useEffect, useMemo, useState } from 'rea
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import { FollowRequest } from '../../../../../types/socialTypes';
 import FollowRequestCard from './components/FollowRequestCard/FollowRequestCard';
-import { getSocialBatchService, searchFollowRequestsService } from '../../../../../services/socialServices';
+import { getSocialBatchService, searchSocialService } from '../../../../../services/socialServices';
 import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_RENDER_BATCH_SIZE } from '../../../../../utils/constants/socialConstants';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
@@ -38,7 +38,8 @@ export default function AccountSocialFollowRequests(): JSX.Element {
   const searchFollowRequests = useCallback(
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
-        const followRequestsBatch: FollowRequest[] = (await searchFollowRequestsService(searchQuery, offset, abortSignal)).data.batch;
+        const followRequestsBatch: FollowRequest[] = (await searchSocialService('followRequests', searchQuery, offset, abortSignal)).data
+          .batch;
 
         offset === 0 ? setSearchQueryResults(followRequestsBatch) : setSearchQueryResults((prev) => [...prev, ...followRequestsBatch]);
         followRequestsBatch.length < SOCIAL_FETCH_BATCH_SIZE
