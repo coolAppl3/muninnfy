@@ -19,6 +19,19 @@ type FollowDetailsBatch = {
   batch: FollowDetails[];
 };
 
+type FollowRequestsBatch = {
+  batch: FollowRequest[];
+};
+
+type SocialType = 'followers' | 'following' | 'followRequests';
+
+export function getSocialBatchService(type: 'followers' | 'following', offset: number): Promise<AxiosResponse<FollowDetailsBatch>>;
+export function getSocialBatchService(type: 'followRequests', offset: number): Promise<AxiosResponse<FollowRequestsBatch>>;
+
+export function getSocialBatchService(type: SocialType, offset: number): Promise<AxiosResponse<FollowDetailsBatch | FollowRequestsBatch>> {
+  return axios.get(`${socialApiUrl}/${type}/${offset}`);
+}
+
 export function searchFollowersService(
   searchQuery: string,
   offset: number,
@@ -28,10 +41,6 @@ export function searchFollowersService(
     params: { searchQuery, offset },
     signal: abortSignal,
   });
-}
-
-export function getFollowersBatchService(offset: number): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/followers/${offset}`);
 }
 
 export function searchFollowingService(
@@ -45,14 +54,6 @@ export function searchFollowingService(
   });
 }
 
-export function getFollowingBatchService(offset: number): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/following/${offset}`);
-}
-
-type FollowRequestsBatch = {
-  batch: FollowRequest[];
-};
-
 export function searchFollowRequestsService(
   searchQuery: string,
   offset: number,
@@ -62,10 +63,6 @@ export function searchFollowRequestsService(
     params: { searchQuery, offset },
     signal: abortSignal,
   });
-}
-
-export function getFollowRequestsBatchService(offset: number): Promise<AxiosResponse<FollowRequestsBatch>> {
-  return axios.get(`${socialApiUrl}/followRequests/${offset}`);
 }
 
 type AcceptFollowRequestServicePayload = {

@@ -2,7 +2,7 @@ import { ChangeEvent, JSX, useCallback, useEffect, useMemo, useState } from 'rea
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import FollowCard from '../FollowCard/FollowCard';
 import { FollowDetails } from '../../../../../types/socialTypes';
-import { getFollowersBatchService, searchFollowersService } from '../../../../../services/socialServices';
+import { getSocialBatchService, searchFollowersService } from '../../../../../services/socialServices';
 import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_RENDER_BATCH_SIZE } from '../../../../../utils/constants/socialConstants';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
@@ -89,7 +89,7 @@ export default function AccountSocialFollowers(): JSX.Element {
 
   async function getFollowersBatch(): Promise<void> {
     try {
-      const followersBatch: FollowDetails[] = (await getFollowersBatchService(followers.length)).data.batch;
+      const followersBatch: FollowDetails[] = (await getSocialBatchService('followers', followers.length)).data.batch;
       setFollowers((prev) => [...prev, ...followersBatch]);
 
       if (followers.length + followersBatch.length >= socialCounts.followers_count) {
