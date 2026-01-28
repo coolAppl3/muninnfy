@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { FollowDetails, FollowRequest, SocialCounts } from '../types/socialTypes';
+import { FollowDetails, FollowRequest, SocialCounts, SocialSectionType } from '../types/socialTypes';
 
 axios.defaults.withCredentials = true;
 const socialApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/social` : `https://muninnfy/api/social`;
@@ -23,12 +23,13 @@ type FollowRequestsBatch = {
   batch: FollowRequest[];
 };
 
-type SocialType = 'followers' | 'following' | 'followRequests';
-
 export function getSocialBatchService(type: 'followers' | 'following', offset: number): Promise<AxiosResponse<FollowDetailsBatch>>;
 export function getSocialBatchService(type: 'followRequests', offset: number): Promise<AxiosResponse<FollowRequestsBatch>>;
 
-export function getSocialBatchService(type: SocialType, offset: number): Promise<AxiosResponse<FollowDetailsBatch | FollowRequestsBatch>> {
+export function getSocialBatchService(
+  type: SocialSectionType,
+  offset: number
+): Promise<AxiosResponse<FollowDetailsBatch | FollowRequestsBatch>> {
   return axios.get(`${socialApiUrl}/${type}/${offset}`);
 }
 
@@ -47,7 +48,7 @@ export function searchSocialService(
 ): Promise<AxiosResponse<FollowRequestsBatch>>;
 
 export function searchSocialService(
-  type: SocialType,
+  type: SocialSectionType,
   searchQuery: string,
   offset: number,
   abortSignal: AbortSignal

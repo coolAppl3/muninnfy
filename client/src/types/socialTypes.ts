@@ -19,3 +19,5 @@ export type FollowRequest = SocialData & {
   request_id: number;
   request_timestamp: number;
 };
+
+export type SocialSectionType = 'followers' | 'following' | 'followRequests';
