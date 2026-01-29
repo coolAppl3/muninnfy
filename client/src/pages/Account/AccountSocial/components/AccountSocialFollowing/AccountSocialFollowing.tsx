@@ -45,6 +45,7 @@ export default function AccountSocialFollowing(): JSX.Element {
         setFetchingSearchQueryResults(false);
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
+          setFetchingSearchQueryResults(false);
           return;
         }
 
