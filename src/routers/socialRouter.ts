@@ -1057,6 +1057,7 @@ socialRouter.get('/find/:searchQuery', async (req: Request, res: Response) => {
           follow_requests_2.requestee_account_id = :accountId
         )
       WHERE
+        accounts.account_id != :accountId AND
         ${isPublicAccountIdQuery ? `public_account_id = :searchQuery` : `accounts.username LIKE CONCAT('%', :searchQuery, '%')`}
       LIMIT 20;`,
       { accountId, searchQuery }
