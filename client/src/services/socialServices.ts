@@ -86,7 +86,7 @@ export function removeFollowerService(followId: number): Promise<AxiosResponse> 
   return axios.delete(`${socialApiUrl}/followers/remove/${followId}`);
 }
 
-export type FindAccountDetails = {
+export type FindAccountsDetails = {
   public_account_id: string;
   username: string;
   display_name: string;
@@ -96,6 +96,6 @@ export type FindAccountDetails = {
   follow_request_received: boolean;
 };
 
-export function findAccountService(searchQuery: string): Promise<AxiosResponse<FindAccountDetails[]>> {
+export function findAccountsService(searchQuery: string): Promise<AxiosResponse<FindAccountsDetails[]>> {
   return axios.get(`${socialApiUrl}/find/${searchQuery}`);
 }
