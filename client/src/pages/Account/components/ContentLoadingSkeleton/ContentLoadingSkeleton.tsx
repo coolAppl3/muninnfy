@@ -1,8 +1,12 @@
 import { JSX } from 'react';
 
-export default function ContentLoadingSkeleton(): JSX.Element {
+type ContentLoadingSkeletonProps = {
+  className?: string;
+};
+
+export default function ContentLoadingSkeleton({ className }: ContentLoadingSkeletonProps): JSX.Element {
   return (
-    <div className='grid gap-1'>
+    <div className={`grid gap-1 ${className || ''}`}>
       {Array.from({ length: 3 }).map((_, index: number) => (
         <div
           key={index}
