@@ -1018,59 +1018,20 @@ socialRouter.get('/find/:searchQuery', async (req: Request, res: Response) => {
       public_account_id: string;
       username: string;
       display_name: string;
-      is_follower: boolean;
-      is_followed: boolean;
-      follow_request_sent: boolean;
-      follow_request_received: boolean;
     };
 
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+    const [results] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        accounts.public_account_id,
-        accounts.username,
-        accounts.display_name,
-
-        (followers_1.follower_account_id IS NOT NULL) AS is_follower,
-        (followers_2.account_id IS NOT NULL) AS is_followed,
-        (follow_requests_1.requestee_account_id IS NOT NULL) AS follow_request_sent,
-        (follow_requests_2.requester_account_id IS NOT NULL) AS follow_request_received
+        public_account_id,
+        username,
+        display_name
       FROM
         accounts
-      LEFT JOIN
-        followers followers_1 ON (
-          accounts.account_id = followers_1.follower_account_id AND
-          followers_1.account_id = :accountId
-        )
-      LEFT JOIN
-        followers followers_2 ON (
-          accounts.account_id = followers_2.account_id AND
-          followers_2.follower_account_id = :accountId
-        )
-      LEFT JOIN
-        follow_requests follow_requests_1 ON (
-          accounts.account_id = follow_requests_1.requestee_account_id AND
-          follow_requests_1.requester_account_id = :accountId
-        )
-      LEFT JOIN
-        follow_requests follow_requests_2 ON (
-          accounts.account_id = follow_requests_2.requester_account_id AND
-          follow_requests_2.requestee_account_id = :accountId
-        )
       WHERE
-        accounts.account_id != :accountId AND
-        ${isPublicAccountIdQuery ? `public_account_id = :searchQuery` : `accounts.username LIKE CONCAT('%', :searchQuery, '%')`}
+        account_id != :accountId AND
+        ${isPublicAccountIdQuery ? `public_account_id = :searchQuery` : `username LIKE CONCAT('%', :searchQuery, '%')`}
       LIMIT 20;`,
       { accountId, searchQuery }
-    );
-
-    const results: AccountDetails[] = (accountRows as AccountDetails[]).map(
-      ({ is_follower, is_followed, follow_request_sent, follow_request_received, ...rest }) => ({
-        ...rest,
-        is_follower: Boolean(is_follower),
-        is_followed: Boolean(is_followed),
-        follow_request_sent: Boolean(follow_request_sent),
-        follow_request_received: Boolean(follow_request_received),
-      })
     );
 
     res.json(results as AccountDetails[]);

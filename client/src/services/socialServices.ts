@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { FollowDetails, FollowRequest, SocialCounts, SocialSectionType } from '../types/socialTypes';
+import { BasicSocialData, FollowDetails, FollowRequest, SocialCounts, SocialSectionType } from '../types/socialTypes';
 
 axios.defaults.withCredentials = true;
 const socialApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/social` : `https://muninnfy/api/social`;
@@ -86,16 +86,6 @@ export function removeFollowerService(followId: number): Promise<AxiosResponse> 
   return axios.delete(`${socialApiUrl}/followers/remove/${followId}`);
 }
 
-export type FindAccountsDetails = {
-  public_account_id: string;
-  username: string;
-  display_name: string;
-  is_follower: boolean;
-  is_followed: boolean;
-  follow_request_sent: boolean;
-  follow_request_received: boolean;
-};
-
-export function findAccountsService(searchQuery: string): Promise<AxiosResponse<FindAccountsDetails[]>> {
+export function findAccountsService(searchQuery: string): Promise<AxiosResponse<BasicSocialData[]>> {
   return axios.get(`${socialApiUrl}/find/${searchQuery}`);
 }
