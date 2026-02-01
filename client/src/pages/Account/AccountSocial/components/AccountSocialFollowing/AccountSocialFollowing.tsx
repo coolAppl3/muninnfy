@@ -121,6 +121,7 @@ export default function AccountSocialFollowing(): JSX.Element {
       <DefaultFormGroup
         id='search-following'
         label='Search following'
+        placeholder='Username or display name'
         autoComplete='off'
         className='mb-2'
         value={value}

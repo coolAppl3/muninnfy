@@ -122,6 +122,7 @@ export default function AccountSocialFollowers(): JSX.Element {
         id='search-followers'
         label='Search followers'
         autoComplete='off'
+        placeholder='Username or display name'
         className='mb-2'
         value={value}
         errorMessage={errorMessage}
