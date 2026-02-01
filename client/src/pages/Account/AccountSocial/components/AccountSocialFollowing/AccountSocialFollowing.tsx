@@ -166,6 +166,7 @@ export default function AccountSocialFollowing(): JSX.Element {
                 key={followDetails.follow_id}
                 isFollowerCard={false}
                 followDetails={followDetails}
+                setSearchQueryResults={setSearchQueryResults}
                 setFollowers={setFollowers}
                 setFollowing={setFollowing}
                 setSocialCounts={setSocialCounts}
