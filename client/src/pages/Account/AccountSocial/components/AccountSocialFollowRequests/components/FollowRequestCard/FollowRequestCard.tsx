@@ -132,9 +132,9 @@ function FollowRequestCard({ followRequest, setFollowRequests, setFollowers, set
           <p className='text-title leading-[1] mb-[4px]'>{display_name}</p>
           <Link
             to={`/account/view/${public_account_id}`}
-            className='block leading-[1] underline transition-colors hover:text-cta'
+            className='block leading-[1] transition-colors hover:text-cta'
           >
-            {username}
+            @{username}
           </Link>
         </div>
         <div className='text-description/50 text-xs'>

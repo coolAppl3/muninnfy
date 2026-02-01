@@ -115,9 +115,9 @@ function FollowCard({ isFollowerCard, followDetails, setFollowers, setFollowing,
           <p className='text-title leading-[1] mb-[4px]'>{display_name}</p>
           <Link
             to={`/account/view/${public_account_id}`}
-            className='block leading-[1] underline transition-colors hover:text-cta'
+            className='block leading-[1] transition-colors hover:!text-cta'
           >
-            {username}
+            @{username}
           </Link>
         </div>
 
