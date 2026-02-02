@@ -2,7 +2,7 @@ import { ChangeEvent, JSX, useCallback, useEffect, useMemo, useState } from 'rea
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import FollowCard from '../FollowCard/FollowCard';
 import { FollowDetails } from '../../../../../types/socialTypes';
-import { getFollowingBatchService, searchFollowingService } from '../../../../../services/socialServices';
+import { getSocialBatchService, searchSocialService } from '../../../../../services/socialServices';
 import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_RENDER_BATCH_SIZE } from '../../../../../utils/constants/socialConstants';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
@@ -11,9 +11,10 @@ import { validateSearchQuery } from '../../../../../utils/validation/socialValid
 import { debounce } from '../../../../../utils/debounce';
 import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
+import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 
 export default function AccountSocialFollowing(): JSX.Element {
-  const { following, socialCounts, setFollowing, setFollowers, setSocialCounts, setFetchDetails } = useAccountSocialDetails();
+  const { following, socialCounts, fetchDetails, setFollowing, setFollowers, setSocialCounts, setFetchDetails } = useAccountSocialDetails();
 
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -37,7 +38,7 @@ export default function AccountSocialFollowing(): JSX.Element {
   const searchFollowing = useCallback(
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
-        const followingBatch: FollowDetails[] = (await searchFollowingService(searchQuery, offset, abortSignal)).data.batch;
+        const followingBatch: FollowDetails[] = (await searchSocialService('following', searchQuery, offset, abortSignal)).data.batch;
 
         offset === 0 ? setSearchQueryResults(followingBatch) : setSearchQueryResults((prev) => [...prev, ...followingBatch]);
         followingBatch.length < SOCIAL_FETCH_BATCH_SIZE ? setAllSearchQueryResultsFetched(true) : setAllSearchQueryResultsFetched(false);
@@ -45,6 +46,7 @@ export default function AccountSocialFollowing(): JSX.Element {
         setFetchingSearchQueryResults(false);
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
+          setFetchingSearchQueryResults(false);
           return;
         }
 
@@ -89,7 +91,7 @@ export default function AccountSocialFollowing(): JSX.Element {
 
   async function getFollowingBatch(): Promise<void> {
     try {
-      const followingBatch: FollowDetails[] = (await getFollowingBatchService(following.length)).data.batch;
+      const followingBatch: FollowDetails[] = (await getSocialBatchService('following', following.length)).data.batch;
       setFollowing((prev) => [...prev, ...followingBatch]);
 
       if (following.length + followingBatch.length >= socialCounts.following_count) {
@@ -120,6 +122,7 @@ export default function AccountSocialFollowing(): JSX.Element {
       <DefaultFormGroup
         id='search-following'
         label='Search following'
+        placeholder='Username or display name'
         autoComplete='off'
         className='mb-2'
         value={value}
@@ -153,7 +156,7 @@ export default function AccountSocialFollowing(): JSX.Element {
       />
 
       {fetchingSearchQueryResults ? (
-        <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-2'></div>
+        <ContentLoadingSkeleton className='sm:grid-cols-2' />
       ) : (
         <div className='grid md:grid-cols-2 gap-1 items-start'>
           {renderArray.length === 0 ? (
@@ -164,6 +167,7 @@ export default function AccountSocialFollowing(): JSX.Element {
                 key={followDetails.follow_id}
                 isFollowerCard={false}
                 followDetails={followDetails}
+                setSearchQueryResults={setSearchQueryResults}
                 setFollowers={setFollowers}
                 setFollowing={setFollowing}
                 setSocialCounts={setSocialCounts}
@@ -172,7 +176,7 @@ export default function AccountSocialFollowing(): JSX.Element {
           )}
 
           {fetchingAdditionalFollowing ? (
-            <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-1 sm:col-span-2'></div>
+            <ContentLoadingSkeleton className='sm:grid-cols-2 sm:col-span-2' />
           ) : (
             allFollowingRendered || (
               <Button
@@ -185,7 +189,10 @@ export default function AccountSocialFollowing(): JSX.Element {
                   setFetchingAdditionalFollowing(true);
 
                   if (renderMode === 'local') {
-                    renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length && (await getFollowingBatch());
+                    const nextRenderOverflowsFetchedData: boolean = renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length;
+                    if (nextRenderOverflowsFetchedData && !fetchDetails.allFollowingFetched) {
+                      await getFollowingBatch();
+                    }
 
                     setRenderLimit((prev) => prev + SOCIAL_RENDER_BATCH_SIZE);
                     setFetchingAdditionalFollowing(false);

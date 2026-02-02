@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { FollowDetails, FollowRequest, SocialCounts } from '../types/socialTypes';
+import { BasicSocialData, FollowDetails, FollowRequest, SocialCounts, SocialSectionType } from '../types/socialTypes';
 
 axios.defaults.withCredentials = true;
 const socialApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/social` : `https://muninnfy/api/social`;
@@ -19,53 +19,44 @@ type FollowDetailsBatch = {
   batch: FollowDetails[];
 };
 
-export function searchFollowersService(
-  searchQuery: string,
-  offset: number,
-  abortSignal: AbortSignal
-): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/followers/search`, {
-    params: { searchQuery, offset },
-    signal: abortSignal,
-  });
-}
-
-export function getFollowersBatchService(offset: number): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/followers/${offset}`);
-}
-
-export function searchFollowingService(
-  searchQuery: string,
-  offset: number,
-  abortSignal: AbortSignal
-): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/following/search`, {
-    params: { searchQuery, offset },
-    signal: abortSignal,
-  });
-}
-
-export function getFollowingBatchService(offset: number): Promise<AxiosResponse<FollowDetailsBatch>> {
-  return axios.get(`${socialApiUrl}/following/${offset}`);
-}
-
 type FollowRequestsBatch = {
   batch: FollowRequest[];
 };
 
-export function searchFollowRequestsService(
+export function getSocialBatchService(type: 'followers' | 'following', offset: number): Promise<AxiosResponse<FollowDetailsBatch>>;
+export function getSocialBatchService(type: 'followRequests', offset: number): Promise<AxiosResponse<FollowRequestsBatch>>;
+
+export function getSocialBatchService(
+  type: SocialSectionType,
+  offset: number
+): Promise<AxiosResponse<FollowDetailsBatch | FollowRequestsBatch>> {
+  return axios.get(`${socialApiUrl}/${type}/${offset}`);
+}
+
+export function searchSocialService(
+  type: 'followers' | 'following',
   searchQuery: string,
   offset: number,
   abortSignal: AbortSignal
-): Promise<AxiosResponse<FollowRequestsBatch>> {
-  return axios.get(`${socialApiUrl}/followRequests/search`, {
+): Promise<AxiosResponse<FollowDetailsBatch>>;
+
+export function searchSocialService(
+  type: 'followRequests',
+  searchQuery: string,
+  offset: number,
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<FollowRequestsBatch>>;
+
+export function searchSocialService(
+  type: SocialSectionType,
+  searchQuery: string,
+  offset: number,
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<FollowDetailsBatch | FollowRequestsBatch>> {
+  return axios.get(`${socialApiUrl}/${type}/search`, {
     params: { searchQuery, offset },
     signal: abortSignal,
   });
-}
-
-export function getFollowRequestsBatchService(offset: number): Promise<AxiosResponse<FollowRequestsBatch>> {
-  return axios.get(`${socialApiUrl}/followRequests/${offset}`);
 }
 
 type AcceptFollowRequestServicePayload = {
@@ -93,4 +84,8 @@ export function unfollowService(followId: number): Promise<AxiosResponse> {
 
 export function removeFollowerService(followId: number): Promise<AxiosResponse> {
   return axios.delete(`${socialApiUrl}/followers/remove/${followId}`);
+}
+
+export function findAccountsService(searchQuery: string): Promise<AxiosResponse<BasicSocialData[]>> {
+  return axios.get(`${socialApiUrl}/find/${searchQuery}`);
 }

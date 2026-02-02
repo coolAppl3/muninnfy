@@ -10,7 +10,7 @@ import { logUnexpectedError } from '../logs/errorLogger';
 import { deleteFollowRequest } from '../db/helpers/socialDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
-import { isValidSocialQuery } from '../util/validation/socialValidation';
+import { isValidSocialFindQuery, isValidSocialQuery } from '../util/validation/socialValidation';
 
 export const socialRouter: Router = express.Router();
 
@@ -989,5 +989,61 @@ socialRouter.delete('/followers/remove/:followId', async (req: Request, res: Res
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  }
+});
+
+socialRouter.get('/find/:searchQuery', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res);
+
+  if (!authSessionId) {
+    return;
+  }
+
+  const searchQuery: string | undefined = req.params.searchQuery;
+
+  if (!searchQuery || !isValidSocialFindQuery(searchQuery)) {
+    res.status(400).json({ message: 'Invalid search query.', reason: 'invalidSearchQuery' });
+    return;
+  }
+
+  const isPublicAccountIdQuery: boolean = searchQuery.includes('-');
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      public_account_id: string;
+      username: string;
+      display_name: string;
+    };
+
+    const [results] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        public_account_id,
+        username,
+        display_name
+      FROM
+        accounts
+      WHERE
+        account_id != :accountId AND
+        ${isPublicAccountIdQuery ? `public_account_id = :searchQuery` : `username LIKE CONCAT('%', :searchQuery, '%')`}
+      LIMIT 20;`,
+      { accountId, searchQuery }
+    );
+
+    res.json(results as AccountDetails[]);
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    await logUnexpectedError(req, err);
+    res.status(500).json({ message: 'Internal server error.' });
   }
 });

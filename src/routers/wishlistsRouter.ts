@@ -237,7 +237,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
         COALESCE(SUM(
           CASE
             WHEN wishlist_items.purchased_on_timestamp IS NULL
-            THEN 0
+              THEN 0
             ELSE 1
           END
         ), 0)AS purchased_items_count,
@@ -245,7 +245,7 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
         COALESCE(SUM(
           CASE
             WHEN wishlist_items.purchased_on_timestamp IS NULL
-            THEN wishlist_items.price
+              THEN wishlist_items.price
             ELSE 0
           END
         ), 0) AS price_to_complete

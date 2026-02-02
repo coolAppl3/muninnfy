@@ -9,6 +9,7 @@ type DefaultFormGroupProps = {
   onChange: ChangeEventHandler<HTMLInputElement>;
   className?: string;
   ref?: Ref<HTMLInputElement>;
+  placeholder?: string;
 };
 
 export default function DefaultFormGroup({
@@ -20,6 +21,7 @@ export default function DefaultFormGroup({
   onChange,
   className,
   ref,
+  placeholder,
 }: DefaultFormGroupProps): JSX.Element {
   return (
     <div className={`flex flex-col justify-center items-start gap-[6px] ${className || ''}`}>
@@ -35,6 +37,7 @@ export default function DefaultFormGroup({
         name={id}
         id={id}
         autoComplete={autoComplete}
+        placeholder={placeholder}
         value={value}
         onChange={onChange}
         ref={ref}

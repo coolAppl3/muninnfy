@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.2.11] (2026-02-02)
+
+### Features
+
+- Added optional `placeholder` prop for `DefaultFormGroup`.
+- Added the following validation functions:
+  - `isValidSocialFindQuery()`.
+  - `validateSocialFindQuery()`.
+- Added GET `social/find/:searchQuery`.
+- Added `findAccountService()`.
+- implement `AccountSocialFindAccount`.
+- Added optional `cardsCount` to `ContentLoadingSkeleton` prop to allow for a dynamic number of cards to be rendered.
+
+
+### Improvements
+
+- Consolidated social fetching services into `getSocialBatchService()`.
+- Consolidated social query services to `searchSocialService()`.
+- Added `@` symbol before usernames in `FollowCard` and `FollowRequestCard` to visually differentiate it from the display name.
+- Added a placeholder for the search bar in `AccountSocialFollowers`, `AccountSocialFollowing`, and `AccountSocialFollowRequests`.
+
+
+### Bug Fixes
+
+- Fixed edge case causing infinite loading until user intervention when cancelling an HTTP request by emptying the search query in `AccountSocialFollowers`, `AccountSocialFollowing`, and `AccountSocialFollowRequests`.
+- Fixed `FollowCard` and `FollowRequestCard` components not being removed when displaying the results of a search query.
+- Fixed and edge case causing an additional fetch requests for social data despite already having fetched it all in `AccountSocialFollowers`, `AccountSocialFollowing`, and `AccountSocialFollowRequests`.
+
+
+### Code Refactoring
+
+- Renamed `SocialType` type to `SocialSectionType` and move it to `socialTypes`.
+- Renamed `AccountDetails` type to `FindAccountDetails` and exported it.
+- Improved padding consistency for CASE statements.
+
+
 ## [0.2.10] (2026-01-26)
 
 ### Features

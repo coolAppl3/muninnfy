@@ -2,7 +2,7 @@ import { ChangeEvent, JSX, useCallback, useEffect, useMemo, useState } from 'rea
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import { FollowRequest } from '../../../../../types/socialTypes';
 import FollowRequestCard from './components/FollowRequestCard/FollowRequestCard';
-import { getFollowRequestsBatchService, searchFollowRequestsService } from '../../../../../services/socialServices';
+import { getSocialBatchService, searchSocialService } from '../../../../../services/socialServices';
 import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_RENDER_BATCH_SIZE } from '../../../../../utils/constants/socialConstants';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
@@ -11,9 +11,11 @@ import { validateSearchQuery } from '../../../../../utils/validation/socialValid
 import { debounce } from '../../../../../utils/debounce';
 import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
+import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 
 export default function AccountSocialFollowRequests(): JSX.Element {
-  const { followRequests, socialCounts, setFollowRequests, setSocialCounts, setFollowers, setFetchDetails } = useAccountSocialDetails();
+  const { followRequests, socialCounts, fetchDetails, setFollowRequests, setSocialCounts, setFollowers, setFetchDetails } =
+    useAccountSocialDetails();
 
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -38,7 +40,8 @@ export default function AccountSocialFollowRequests(): JSX.Element {
   const searchFollowRequests = useCallback(
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
-        const followRequestsBatch: FollowRequest[] = (await searchFollowRequestsService(searchQuery, offset, abortSignal)).data.batch;
+        const followRequestsBatch: FollowRequest[] = (await searchSocialService('followRequests', searchQuery, offset, abortSignal)).data
+          .batch;
 
         offset === 0 ? setSearchQueryResults(followRequestsBatch) : setSearchQueryResults((prev) => [...prev, ...followRequestsBatch]);
         followRequestsBatch.length < SOCIAL_FETCH_BATCH_SIZE
@@ -48,6 +51,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
         setFetchingSearchQueryResults(false);
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
+          setFetchingSearchQueryResults(false);
           return;
         }
 
@@ -92,7 +96,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
 
   async function getFollowRequestsBatch(): Promise<void> {
     try {
-      const followRequestsBatch: FollowRequest[] = (await getFollowRequestsBatchService(followRequests.length)).data.batch;
+      const followRequestsBatch: FollowRequest[] = (await getSocialBatchService('followRequests', followRequests.length)).data.batch;
       setFollowRequests((prev) => [...prev, ...followRequestsBatch]);
 
       if (followRequests.length + followRequestsBatch.length >= socialCounts.follow_requests_count) {
@@ -123,6 +127,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
       <DefaultFormGroup
         id='search-follow-requests'
         label='Search follow requests'
+        placeholder='Username or display name'
         autoComplete='off'
         className='mb-2'
         value={value}
@@ -156,7 +161,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
       />
 
       {fetchingSearchQueryResults ? (
-        <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-2'></div>
+        <ContentLoadingSkeleton />
       ) : (
         <div className='grid gap-1 items-start'>
           {renderArray.length === 0 ? (
@@ -166,6 +171,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
               <FollowRequestCard
                 key={followDetails.request_id}
                 followRequest={followDetails}
+                setSearchQueryResults={setSearchQueryResults}
                 setFollowRequests={setFollowRequests}
                 setFollowers={setFollowers}
                 setSocialCounts={setSocialCounts}
@@ -174,7 +180,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
           )}
 
           {fetchingAdditionalFollowRequests ? (
-            <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-1'></div>
+            <ContentLoadingSkeleton />
           ) : (
             allFollowRequestsRendered || (
               <Button
@@ -187,7 +193,10 @@ export default function AccountSocialFollowRequests(): JSX.Element {
                   setFetchingAdditionalFollowRequests(true);
 
                   if (renderMode === 'local') {
-                    renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length && (await getFollowRequestsBatch());
+                    const nextRenderOverflowsFetchedData: boolean = renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length;
+                    if (nextRenderOverflowsFetchedData && !fetchDetails.allFollowRequestsFetched) {
+                      await getFollowRequestsBatch();
+                    }
 
                     setRenderLimit((prev) => prev + SOCIAL_RENDER_BATCH_SIZE);
                     setFetchingAdditionalFollowRequests(false);

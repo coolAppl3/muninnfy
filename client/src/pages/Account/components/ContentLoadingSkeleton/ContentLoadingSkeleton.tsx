@@ -1,9 +1,14 @@
 import { JSX } from 'react';
 
-export default function ContentLoadingSkeleton(): JSX.Element {
+type ContentLoadingSkeletonProps = {
+  cardsCount?: number;
+  className?: string;
+};
+
+export default function ContentLoadingSkeleton({ cardsCount, className }: ContentLoadingSkeletonProps): JSX.Element {
   return (
-    <div className='grid gap-1'>
-      {Array.from({ length: 3 }).map((_, index: number) => (
+    <div className={`grid gap-1 ${className || ''}`}>
+      {Array.from({ length: cardsCount || 4 }).map((_, index: number) => (
         <div
           key={index}
           className={`${skeletonContainerClassname} grid gap-1`}
