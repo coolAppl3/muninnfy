@@ -14,7 +14,8 @@ import Button from '../../../../../components/Button/Button';
 import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 
 export default function AccountSocialFollowRequests(): JSX.Element {
-  const { followRequests, socialCounts, setFollowRequests, setSocialCounts, setFollowers, setFetchDetails } = useAccountSocialDetails();
+  const { followRequests, socialCounts, fetchDetails, setFollowRequests, setSocialCounts, setFollowers, setFetchDetails } =
+    useAccountSocialDetails();
 
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -192,7 +193,10 @@ export default function AccountSocialFollowRequests(): JSX.Element {
                   setFetchingAdditionalFollowRequests(true);
 
                   if (renderMode === 'local') {
-                    renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length && (await getFollowRequestsBatch());
+                    const nextRenderOverflowsFetchedData: boolean = renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length;
+                    if (nextRenderOverflowsFetchedData && !fetchDetails.allFollowRequestsFetched) {
+                      await getFollowRequestsBatch();
+                    }
 
                     setRenderLimit((prev) => prev + SOCIAL_RENDER_BATCH_SIZE);
                     setFetchingAdditionalFollowRequests(false);
