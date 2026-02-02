@@ -42,11 +42,13 @@ export default function Wishlists(): JSX.Element {
         }
 
         console.log(err);
-        const { isHandled, status } = handleAsyncError(err);
+        const { isHandled } = handleAsyncError(err);
 
-        if (!isHandled || status !== 401) {
-          navigate(referrerLocation || '/account');
+        if (isHandled) {
+          return;
         }
+
+        navigate(referrerLocation || '/account');
       }
     };
 
