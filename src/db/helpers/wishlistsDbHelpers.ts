@@ -18,8 +18,10 @@ export async function incrementWishlistInteractivityIndex(
       SET
         interactivity_index = LEAST(:maximumInteractivityValue, (
           CASE
-            WHEN :currentTimestamp - latest_interaction_timestamp < :throttleWindow THEN interactivity_index + (:increment / 2)
-            ELSE interactivity_index + :increment
+            WHEN :currentTimestamp - latest_interaction_timestamp < :throttleWindow
+              THEN interactivity_index + (:increment / 2)
+            ELSE
+              interactivity_index + :increment
           END
         )),
         latest_interaction_timestamp = :currentTimestamp
