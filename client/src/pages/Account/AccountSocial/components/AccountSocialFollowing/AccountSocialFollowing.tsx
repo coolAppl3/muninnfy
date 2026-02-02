@@ -11,6 +11,7 @@ import { validateSearchQuery } from '../../../../../utils/validation/socialValid
 import { debounce } from '../../../../../utils/debounce';
 import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
+import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 
 export default function AccountSocialFollowing(): JSX.Element {
   const { following, socialCounts, setFollowing, setFollowers, setSocialCounts, setFetchDetails } = useAccountSocialDetails();
@@ -155,7 +156,7 @@ export default function AccountSocialFollowing(): JSX.Element {
       />
 
       {fetchingSearchQueryResults ? (
-        <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-2'></div>
+        <ContentLoadingSkeleton className='sm:grid-cols-2' />
       ) : (
         <div className='grid md:grid-cols-2 gap-1 items-start'>
           {renderArray.length === 0 ? (
@@ -175,7 +176,7 @@ export default function AccountSocialFollowing(): JSX.Element {
           )}
 
           {fetchingAdditionalFollowing ? (
-            <div className='spinner w-[2.4rem] h-[2.4rem] mx-auto mt-1 sm:col-span-2'></div>
+            <ContentLoadingSkeleton className='sm:grid-cols-2 sm:col-span-2' />
           ) : (
             allFollowingRendered || (
               <Button
