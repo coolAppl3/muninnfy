@@ -12,12 +12,19 @@ type FollowRequestCardProps = {
   followRequest: FollowRequest;
 
   setFollowRequests: Dispatch<SetStateAction<FollowRequest[]>>;
+  setSearchQueryResults: Dispatch<SetStateAction<FollowRequest[]>>;
   setFollowers: Dispatch<SetStateAction<FollowDetails[]>>;
   setSocialCounts: Dispatch<SetStateAction<SocialCounts>>;
 };
 
 export default memo(FollowRequestCard);
-function FollowRequestCard({ followRequest, setFollowRequests, setFollowers, setSocialCounts }: FollowRequestCardProps): JSX.Element {
+function FollowRequestCard({
+  followRequest,
+  setFollowRequests,
+  setSearchQueryResults,
+  setFollowers,
+  setSocialCounts,
+}: FollowRequestCardProps): JSX.Element {
   const { request_id, public_account_id, username, display_name, request_timestamp } = followRequest;
 
   const [actionLoading, setActionLoading] = useState<boolean>(false);
@@ -39,6 +46,7 @@ function FollowRequestCard({ followRequest, setFollowRequests, setFollowers, set
       };
 
       setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      setSearchQueryResults((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
       setFollowers((prev) => [newFollowerDetails, ...prev]);
       setSocialCounts((prev) => ({
         ...prev,
@@ -97,6 +105,7 @@ function FollowRequestCard({ followRequest, setFollowRequests, setFollowers, set
       await declineFollowRequestService(request_id);
 
       setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      setSearchQueryResults((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
       setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
 
       displayPopupMessage('Requested declined.', 'success');

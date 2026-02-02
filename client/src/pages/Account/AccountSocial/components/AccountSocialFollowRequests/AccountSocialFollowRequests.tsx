@@ -169,6 +169,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
               <FollowRequestCard
                 key={followDetails.request_id}
                 followRequest={followDetails}
+                setSearchQueryResults={setSearchQueryResults}
                 setFollowRequests={setFollowRequests}
                 setFollowers={setFollowers}
                 setSocialCounts={setSocialCounts}
