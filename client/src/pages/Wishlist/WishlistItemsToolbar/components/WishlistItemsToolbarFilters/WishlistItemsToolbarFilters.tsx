@@ -113,7 +113,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       filterByLink: null,
       filterByPrice: null,
 
-      tagsSet: new Set(),
+      tagsSet: new Set<string>(),
       requireAllFilterTags: false,
     }));
 
