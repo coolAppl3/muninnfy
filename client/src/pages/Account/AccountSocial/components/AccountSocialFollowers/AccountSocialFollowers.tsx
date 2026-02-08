@@ -38,7 +38,7 @@ export default function AccountSocialFollowers(): JSX.Element {
   const searchFollowers = useCallback(
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
-        const followersBatch: FollowDetails[] = (await searchSocialService('followers', searchQuery, offset, abortSignal)).data.batch;
+        const followersBatch: FollowDetails[] = (await searchSocialService('followers', searchQuery, offset, abortSignal)).data;
 
         offset === 0 ? setSearchQueryResults(followersBatch) : setSearchQueryResults((prev) => [...prev, ...followersBatch]);
         followersBatch.length < SOCIAL_FETCH_BATCH_SIZE ? setAllSearchQueryResultsFetched(true) : setAllSearchQueryResultsFetched(false);
@@ -91,7 +91,7 @@ export default function AccountSocialFollowers(): JSX.Element {
 
   async function getFollowersBatch(): Promise<void> {
     try {
-      const followersBatch: FollowDetails[] = (await getSocialBatchService('followers', followers.length)).data.batch;
+      const followersBatch: FollowDetails[] = (await getSocialBatchService('followers', followers.length)).data;
       setFollowers((prev) => [...prev, ...followersBatch]);
 
       if (followers.length + followersBatch.length >= socialCounts.followers_count) {

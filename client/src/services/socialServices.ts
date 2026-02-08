@@ -15,21 +15,9 @@ export function getAccountSocialDetailsService(abortSignal: AbortSignal): Promis
   return axios.get(socialApiUrl, { signal: abortSignal });
 }
 
-type FollowDetailsBatch = {
-  batch: FollowDetails[];
-};
-
-type FollowRequestsBatch = {
-  batch: FollowRequest[];
-};
-
-export function getSocialBatchService(type: 'followers' | 'following', offset: number): Promise<AxiosResponse<FollowDetailsBatch>>;
-export function getSocialBatchService(type: 'followRequests', offset: number): Promise<AxiosResponse<FollowRequestsBatch>>;
-
-export function getSocialBatchService(
-  type: SocialSectionType,
-  offset: number
-): Promise<AxiosResponse<FollowDetailsBatch | FollowRequestsBatch>> {
+export function getSocialBatchService(type: 'followers' | 'following', offset: number): Promise<AxiosResponse<FollowDetails[]>>;
+export function getSocialBatchService(type: 'followRequests', offset: number): Promise<AxiosResponse<FollowRequest[]>>;
+export function getSocialBatchService(type: SocialSectionType, offset: number): Promise<AxiosResponse<FollowDetails[] | FollowRequest[]>> {
   return axios.get(`${socialApiUrl}/${type}/${offset}`);
 }
 
@@ -38,21 +26,21 @@ export function searchSocialService(
   searchQuery: string,
   offset: number,
   abortSignal: AbortSignal
-): Promise<AxiosResponse<FollowDetailsBatch>>;
+): Promise<AxiosResponse<FollowDetails[]>>;
 
 export function searchSocialService(
   type: 'followRequests',
   searchQuery: string,
   offset: number,
   abortSignal: AbortSignal
-): Promise<AxiosResponse<FollowRequestsBatch>>;
+): Promise<AxiosResponse<FollowRequest[]>>;
 
 export function searchSocialService(
   type: SocialSectionType,
   searchQuery: string,
   offset: number,
   abortSignal: AbortSignal
-): Promise<AxiosResponse<FollowDetailsBatch | FollowRequestsBatch>> {
+): Promise<AxiosResponse<FollowDetails[] | FollowRequest[]>> {
   return axios.get(`${socialApiUrl}/${type}/search`, {
     params: { searchQuery, offset },
     signal: abortSignal,

@@ -195,7 +195,7 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
       { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    res.json({ batch: followers as FollowDetails[] });
+    res.json(followers as FollowDetails[]);
   } catch (err: unknown) {
     console.log(err);
 
@@ -253,7 +253,7 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
       { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    res.json({ batch: followers as FollowDetails[] });
+    res.json(followers as FollowDetails[]);
   } catch (err: unknown) {
     console.log(err);
 
@@ -319,7 +319,7 @@ socialRouter.get('/following/search', async (req: Request, res: Response) => {
       { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    res.json({ batch: following as FollowDetails[] });
+    res.json(following as FollowDetails[]);
   } catch (err: unknown) {
     console.log(err);
 
@@ -377,7 +377,7 @@ socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
       { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    res.json({ batch: following as FollowDetails[] });
+    res.json(following as FollowDetails[]);
   } catch (err: unknown) {
     console.log(err);
 
@@ -443,7 +443,7 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
       { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    res.json({ batch: followRequests as FollowRequest[] });
+    res.json(followRequests as FollowRequest[]);
   } catch (err: unknown) {
     console.log(err);
 
@@ -501,7 +501,7 @@ socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) 
       { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    res.json({ batch: followRequests as FollowRequest[] });
+    res.json(followRequests as FollowRequest[]);
   } catch (err: unknown) {
     console.log(err);
 
