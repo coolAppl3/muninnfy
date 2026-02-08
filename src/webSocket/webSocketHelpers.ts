@@ -1,3 +1,5 @@
+import { RowDataPacket } from 'mysql2/promise';
+import { dbPool } from '../db/db';
 import { WebSocketDetails, wsMap } from './webSocketServer';
 
 type WebSocketMessage = {
@@ -6,15 +8,31 @@ type WebSocketMessage = {
   data: { [key: string]: unknown };
 };
 
-export function sendWebSocketMessage(authSessionId: string, data: WebSocketMessage): void {
+export async function sendWebSocketMessage(accountId: number, data: WebSocketMessage): Promise<void> {
   try {
-    const wsDetails: WebSocketDetails | undefined = wsMap.get(authSessionId);
+    type AuthSessionDetails = {
+      authSessionId: string;
+    };
 
-    if (!wsDetails) {
-      return;
+    const [authSessionRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        session_id
+      FROM
+        auth_sessions
+      WHERE
+        account_id = ?;`,
+      [accountId]
+    );
+
+    for (const { authSessionId } of authSessionRows as AuthSessionDetails[]) {
+      const wsDetails: WebSocketDetails | undefined = wsMap.get(authSessionId);
+
+      if (!wsDetails) {
+        return;
+      }
+
+      wsDetails.ws.send(JSON.stringify(data), (err: Error | undefined) => err && console.log(err));
     }
-
-    wsDetails.ws.send(JSON.stringify(data), (err: Error | undefined) => err && console.log(err));
   } catch (err: unknown) {
     console.log(err);
   }
