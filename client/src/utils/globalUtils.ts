@@ -13,8 +13,8 @@ export function getFullDateString(timestamp: number): string {
 
   const date: number = dateObject.getDate();
   const monthName: string = getMonthName(dateObject);
-  const year: number = dateObject.getFullYear();
   const ordinalSuffix: string = getDateOrdinalSuffix(date);
+  const year: number = dateObject.getFullYear();
 
   return `${monthName} ${date}${ordinalSuffix}, ${year}`;
 }
@@ -24,22 +24,23 @@ export function getShortenedDateString(timestamp: number): string {
 
   const date: number = dateObject.getDate();
   const monthName: string = getShortMonthName(dateObject);
-  const year: number = dateObject.getFullYear();
   const ordinalSuffix: string = getDateOrdinalSuffix(date);
+  const year: number = dateObject.getFullYear();
 
   return `${monthName} ${date}${ordinalSuffix}, ${year}`;
 }
 
-export function getDateAndTimeString(timestamp: number): string {
+export function getDateAndTimeString(timestamp: number, includeYear: boolean = false): string {
   const dateObject: Date = new Date(timestamp);
 
   const date: number = dateObject.getDate();
   const monthName: string = getMonthName(dateObject);
   const ordinalSuffix: string = getDateOrdinalSuffix(date);
+  const year: number = dateObject.getFullYear();
 
   const time = new Intl.DateTimeFormat('en-GB', { timeStyle: 'short' }).format(dateObject);
 
-  return `${monthName} ${date}${ordinalSuffix}, ${time}`;
+  return `${monthName} ${date}${ordinalSuffix}${includeYear ? `, ${year} -` : ','} ${time}`;
 }
 
 function getMonthName(date: Date): string {
