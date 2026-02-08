@@ -11,6 +11,7 @@ import { deleteFollowRequest } from '../db/helpers/socialDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { isValidSocialFindQuery, isValidSocialQuery } from '../util/validation/socialValidation';
+import { addNotification } from '../db/helpers/notificationsDbHelpers';
 
 export const socialRouter: Router = express.Router();
 
@@ -648,6 +649,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       await connection.commit();
       res.json({ followId: resultSetHeader.insertId, followTimestamp: currentTimestamp });
 
+      await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'NEW_FOLLOWER');
       return;
     }
 
@@ -662,6 +664,8 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
 
     await connection.commit();
     res.json({ requestId: resultSetHeader.insertId, requestTimestamp: currentTimestamp });
+
+    await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'NEW_FOLLOW_REQUEST');
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -823,7 +827,7 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
       return;
     }
 
-    const followTimestamp: number = Date.now();
+    const currentTimestamp: number = Date.now();
 
     const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO followers (
@@ -831,7 +835,7 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
         follower_account_Id,
         follow_timestamp
       ) VALUES (${generatePlaceHolders(3)});`,
-      [accountId, followDetails.requester_account_id, followTimestamp]
+      [accountId, followDetails.requester_account_id, currentTimestamp]
     );
 
     const followRequestDeleted: boolean = await deleteFollowRequest(requestId, connection, req);
@@ -843,7 +847,9 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
     }
 
     await connection.commit();
-    res.json({ follow_id: resultSetHeader.insertId, follow_timestamp: followTimestamp });
+    res.json({ follow_id: resultSetHeader.insertId, follow_timestamp: currentTimestamp });
+
+    await addNotification(followDetails.requester_account_id, accountId, currentTimestamp, 'FOLLOW_REQUEST_ACCEPTED');
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
