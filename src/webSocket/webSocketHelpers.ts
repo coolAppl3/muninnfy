@@ -16,7 +16,7 @@ export type NotificationDetails = {
 export async function sendWebSocketNotification(accountId: number, notificationDetails: NotificationDetails): Promise<void> {
   try {
     type AuthSessionDetails = {
-      authSessionId: string;
+      session_id: string;
     };
 
     const [authSessionRows] = await dbPool.execute<RowDataPacket[]>(
@@ -29,8 +29,10 @@ export async function sendWebSocketNotification(accountId: number, notificationD
       [accountId]
     );
 
-    for (const { authSessionId } of authSessionRows as AuthSessionDetails[]) {
-      const wsDetails: WebSocketDetails | undefined = wsMap.get(authSessionId);
+    for (const { session_id } of authSessionRows as AuthSessionDetails[]) {
+      console.log(session_id);
+
+      const wsDetails: WebSocketDetails | undefined = wsMap.get(session_id);
 
       if (!wsDetails) {
         return;
