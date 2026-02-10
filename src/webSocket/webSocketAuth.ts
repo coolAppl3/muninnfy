@@ -61,7 +61,7 @@ function getAuthSessionId(req: IncomingMessage): string | null {
   const cookiesArr: string[] = cookie.split(';');
 
   for (const cookie of cookiesArr) {
-    const [name, value] = cookie.split('=');
+    const [name, value] = cookie.trim().split('=');
 
     if (name !== 'authSessionId') {
       continue;
@@ -77,18 +77,16 @@ function getAuthSessionId(req: IncomingMessage): string | null {
   return null;
 }
 
-async function isValidAuthSessionId(authSessionId: string): Promise<number | null> {
+async function isValidAuthSessionId(authSessionId: string): Promise<boolean> {
   const currentTimestamp: number = Date.now();
 
   try {
     type AuthSessionDetails = {
-      account_id: number;
       expiry_timestamp: number;
     };
 
     const [authSessionRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        account_id,
         expiry_timestamp
       FROM
         auth_sessions
@@ -100,16 +98,17 @@ async function isValidAuthSessionId(authSessionId: string): Promise<number | nul
     const authSessionDetails = authSessionRows[0] as AuthSessionDetails | undefined;
 
     if (!authSessionDetails) {
-      return null;
+      return false;
     }
 
     if (currentTimestamp >= authSessionDetails.expiry_timestamp) {
-      return null;
+      return false;
     }
 
-    return authSessionDetails.account_id;
+    return true;
   } catch (err: unknown) {
     console.log(err);
-    return null;
+
+    return false;
   }
 }
