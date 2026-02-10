@@ -1,3 +1,4 @@
+import { FollowDetails, FollowRequest, SocialData } from '../../routers/socialRouter';
 import { generatePlaceHolders } from '../../util/sqlUtils/generatePlaceHolders';
 import { NotificationDetails, NotificationType, sendWebSocketNotification } from '../../webSocket/webSocketHelpers';
 import { dbPool } from '../db';
@@ -7,7 +8,8 @@ export async function addNotification(
   receiver_account_id: number,
   sender_account_id: number,
   notificationTimestamp: number,
-  notificationType: NotificationType
+  notificationType: NotificationType,
+  insertId: number
 ): Promise<void> {
   try {
     const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
@@ -44,11 +46,31 @@ export async function addNotification(
       return;
     }
 
+    const socialData: SocialData = {
+      public_account_id: senderDetails.sender_public_account_id,
+      username: senderDetails.sender_username,
+      display_name: senderDetails.sender_display_name,
+    };
+
+    const isFollowRequestNotification: boolean = notificationType === 'NEW_FOLLOW_REQUEST';
+    const notificationData: FollowDetails | FollowRequest = isFollowRequestNotification
+      ? {
+          request_id: insertId,
+          request_timestamp: notificationTimestamp,
+          ...socialData,
+        }
+      : {
+          follow_id: insertId,
+          follow_timestamp: notificationTimestamp,
+          ...socialData,
+        };
+
     const notificationDetails: NotificationDetails = {
       notification_id: resultSetHeader.affectedRows,
       ...senderDetails,
       notification_timestamp: notificationTimestamp,
       notification_type: notificationType,
+      notification_data: notificationData,
     };
 
     await sendWebSocketNotification(receiver_account_id, notificationDetails);

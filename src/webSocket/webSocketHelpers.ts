@@ -1,6 +1,7 @@
 import { RowDataPacket } from 'mysql2/promise';
 import { dbPool } from '../db/db';
 import { WebSocketDetails, wsMap } from './webSocketServer';
+import { FollowDetails, FollowRequest } from '../routers/socialRouter';
 
 export type NotificationType = 'NEW_FOLLOWER' | 'NEW_FOLLOW_REQUEST' | 'FOLLOW_REQUEST_ACCEPTED';
 
@@ -11,6 +12,7 @@ export type NotificationDetails = {
   sender_display_name: string;
   notification_timestamp: number;
   notification_type: NotificationType;
+  notification_data: FollowDetails | FollowRequest;
 };
 
 export async function sendWebSocketNotification(accountId: number, notificationDetails: NotificationDetails): Promise<void> {

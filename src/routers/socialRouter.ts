@@ -21,18 +21,18 @@ type SocialCounts = {
   follow_requests_count: number;
 };
 
-type SocialData = {
+export type SocialData = {
   public_account_id: string;
   username: string;
   display_name: string;
 };
 
-type FollowDetails = SocialData & {
+export type FollowDetails = SocialData & {
   follow_id: number;
   follow_timestamp: number;
 };
 
-type FollowRequest = SocialData & {
+export type FollowRequest = SocialData & {
   request_id: number;
   request_timestamp: number;
 };
@@ -649,7 +649,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       await connection.commit();
       res.json({ followId: resultSetHeader.insertId, followTimestamp: currentTimestamp });
 
-      await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'NEW_FOLLOWER');
+      await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'NEW_FOLLOWER', resultSetHeader.insertId);
       return;
     }
 
@@ -665,7 +665,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     await connection.commit();
     res.json({ requestId: resultSetHeader.insertId, requestTimestamp: currentTimestamp });
 
-    await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'NEW_FOLLOW_REQUEST');
+    await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'NEW_FOLLOW_REQUEST', resultSetHeader.insertId);
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -849,7 +849,13 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
     await connection.commit();
     res.json({ follow_id: resultSetHeader.insertId, follow_timestamp: currentTimestamp });
 
-    await addNotification(followDetails.requester_account_id, accountId, currentTimestamp, 'FOLLOW_REQUEST_ACCEPTED');
+    await addNotification(
+      followDetails.requester_account_id,
+      accountId,
+      currentTimestamp,
+      'FOLLOW_REQUEST_ACCEPTED',
+      resultSetHeader.insertId
+    );
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
