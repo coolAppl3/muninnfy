@@ -1,3 +1,5 @@
+import { FollowDetails, FollowRequest } from './socialTypes';
+
 export type NotificationType = 'NEW_FOLLOWER' | 'NEW_FOLLOW_REQUEST' | 'FOLLOW_REQUEST_ACCEPTED';
 
 export type NotificationDetails = {
@@ -7,4 +9,5 @@ export type NotificationDetails = {
   sender_display_name: string;
   notification_timestamp: number;
   notification_type: NotificationType;
+  notification_data: FollowDetails | FollowRequest;
 };
