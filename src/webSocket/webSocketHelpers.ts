@@ -32,8 +32,6 @@ export async function sendWebSocketNotification(accountId: number, notificationD
     );
 
     for (const { session_id } of authSessionRows as AuthSessionDetails[]) {
-      console.log(session_id);
-
       const wsDetails: WebSocketDetails | undefined = wsMap.get(session_id);
 
       if (!wsDetails) {
