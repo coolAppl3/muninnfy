@@ -1,17 +1,41 @@
 import { NotificationDetails, NotificationType } from '../../types/notificationTypes';
 
-const ws: WebSocket = new WebSocket('ws://localhost:5000/');
+let ws: WebSocket | null = null;
 const wsListenersSet = new Set<(data: NotificationDetails) => void>();
 
-ws.addEventListener('message', (e: MessageEvent) => {
-  const notificationDetails = e.data;
+let reconnectionDelayMilliseconds: number = 1000;
+const maxReconnectionDelayMilliseconds: number = 1000 * 60 * 5;
 
-  if (!isValidNotificationDetails(notificationDetails)) {
-    return;
-  }
+export function connectAccountNotificationsWebSocket(): void {
+  ws = new WebSocket('ws://localhost:5000/');
 
-  wsListenersSet.forEach((listener: (data: NotificationDetails) => void) => listener(notificationDetails));
-});
+  ws.addEventListener('open', () => {
+    reconnectionDelayMilliseconds = 1000;
+  });
+
+  ws.addEventListener('message', (e: MessageEvent) => {
+    const notificationDetails = e.data;
+
+    if (!isValidNotificationDetails(notificationDetails)) {
+      return;
+    }
+
+    wsListenersSet.forEach((listener: (data: NotificationDetails) => void) => listener(notificationDetails));
+  });
+
+  ws.addEventListener('close', (e: CloseEvent) => {
+    if (e.code === 1000 || e.code === 1001) {
+      return;
+    }
+
+    setTimeout(connectAccountNotificationsWebSocket, reconnectionDelayMilliseconds);
+    reconnectionDelayMilliseconds = Math.min(reconnectionDelayMilliseconds * 2, maxReconnectionDelayMilliseconds);
+  });
+
+  ws.addEventListener('error', () => {
+    ws?.close();
+  });
+}
 
 export function subscribeToAccountNotifications(fn: (data: NotificationDetails) => void): () => void {
   wsListenersSet.add(fn);
