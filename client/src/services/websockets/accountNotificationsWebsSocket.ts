@@ -115,7 +115,7 @@ function isValidNotificationDetails(data: unknown): data is NotificationDetails 
     return false;
   }
 
-  if (isValidNotificationData(notification_data, notification_type)) {
+  if (!isValidNotificationData(notification_data, notification_type)) {
     return false;
   }
 
