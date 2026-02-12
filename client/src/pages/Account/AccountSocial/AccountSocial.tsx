@@ -59,7 +59,7 @@ export default function AccountSocial(): JSX.Element {
     return () => abortController.abort();
   }, [fetchDetails, setFetchDetails, setSocialCounts, setFollowers, setFollowing, setFollowRequests, handleAsyncError]);
 
-  const handler = useCallback(
+  const notificationsHandler = useCallback(
     (data: NotificationDetails) => {
       const { notification_type, notification_data } = data;
 
@@ -85,7 +85,7 @@ export default function AccountSocial(): JSX.Element {
     [setFollowers, setFollowing, setFollowRequests, setSocialCounts]
   );
 
-  useAccountNotificationsWebsocket(handler);
+  useAccountNotificationsWebsocket(notificationsHandler);
 
   return (
     <>

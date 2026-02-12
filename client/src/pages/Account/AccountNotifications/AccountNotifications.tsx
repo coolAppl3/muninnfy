@@ -53,14 +53,14 @@ export default function AccountNotifications(): JSX.Element {
     return () => abortController.abort();
   }, [initialFetchCompleted, getNotificationsBatch]);
 
-  const handler = useCallback(
+  const notificationsHandler = useCallback(
     (data: NotificationDetails) => {
       setNotifications((prev) => [data, ...prev]);
     },
     [setNotifications]
   );
 
-  useAccountNotificationsWebsocket(handler);
+  useAccountNotificationsWebsocket(notificationsHandler);
 
   return (
     <>
