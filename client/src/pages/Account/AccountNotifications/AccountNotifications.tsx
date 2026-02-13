@@ -1,4 +1,4 @@
-import { JSX, useCallback, useEffect } from 'react';
+import { JSX, useCallback, useEffect, useState } from 'react';
 import ContentLoadingSkeleton from '../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import usePopupMessage from '../../../hooks/usePopupMessage';
@@ -8,9 +8,17 @@ import { NotificationDetails } from '../../../types/notificationTypes';
 import { CanceledError } from 'axios';
 import NotificationCard from './components/NotificationCard';
 import { subscribeToAccountNotifications } from '../../../services/websockets/accountNotificationsWebsSocket';
+import { NOTIFICATIONS_FETCH_BATCH_SIZE, NOTIFICATIONS_RENDER_BATCH_SIZE } from '../../../utils/constants/notificationsConstants';
+import Button from '../../../components/Button/Button';
 
 export default function AccountNotifications(): JSX.Element {
   const { notifications, initialFetchCompleted, setNotifications, setInitialFetchCompleted } = useAccountNotifications();
+
+  const [renderLimit, setRenderLimit] = useState<number>(NOTIFICATIONS_RENDER_BATCH_SIZE);
+  const [fetchingAdditionalNotifications, setFetchingAdditionalNotifications] = useState<boolean>(false);
+  const [allNotificationsFetched, setAllNotificationsFetched] = useState<boolean>(false);
+
+  const allNotificationsRendered: boolean = renderLimit >= notifications.length;
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayPopupMessage } = usePopupMessage();
@@ -22,6 +30,10 @@ export default function AccountNotifications(): JSX.Element {
 
         setNotifications((prev) => [...prev, ...notificationsBatch]);
         setInitialFetchCompleted(true);
+
+        if (notificationsBatch.length < NOTIFICATIONS_FETCH_BATCH_SIZE) {
+          setAllNotificationsFetched(true);
+        }
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
           return;
@@ -71,8 +83,12 @@ export default function AccountNotifications(): JSX.Element {
       <div className='h-line my-1'></div>
 
       <div className='grid gap-1'>
+        {initialFetchCompleted && notifications.length === 0 && (
+          <p className='text-sm text-description w-fit mx-auto'>No notifications found</p>
+        )}
+
         {initialFetchCompleted ? (
-          notifications.map((notification: NotificationDetails) => (
+          notifications.slice(0, renderLimit).map((notification: NotificationDetails) => (
             <NotificationCard
               key={notification.notification_id}
               notification={notification}
@@ -80,6 +96,33 @@ export default function AccountNotifications(): JSX.Element {
           ))
         ) : (
           <ContentLoadingSkeleton />
+        )}
+
+        {fetchingAdditionalNotifications ? (
+          <ContentLoadingSkeleton />
+        ) : (
+          allNotificationsRendered || (
+            <Button
+              className='bg-description border-description text-dark text-sm py-[4px] w-full sm:w-fit mx-auto rounded-pill'
+              onClick={async () => {
+                if (allNotificationsRendered) {
+                  return;
+                }
+
+                setFetchingAdditionalNotifications(true);
+
+                const nextRenderOverflowsFetchedData: boolean = renderLimit + NOTIFICATIONS_RENDER_BATCH_SIZE > notifications.length;
+                if (nextRenderOverflowsFetchedData && !allNotificationsFetched) {
+                  await getNotificationsBatch(notifications.length, new AbortController().signal);
+                }
+
+                setRenderLimit((prev) => prev + NOTIFICATIONS_RENDER_BATCH_SIZE);
+                setFetchingAdditionalNotifications(false);
+              }}
+            >
+              Load more
+            </Button>
+          )
         )}
       </div>
     </>
