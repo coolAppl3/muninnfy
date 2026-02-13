@@ -646,7 +646,6 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
     return;
   }
 
-  console.log(req.body);
   type RequestData = {
     wishlistId: string;
     newIsFavorited: boolean;

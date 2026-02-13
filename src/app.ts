@@ -13,6 +13,7 @@ import { authRouter } from './routers/authRouter';
 import { wishlistsRouter } from './routers/wishlistsRouter';
 import { wishlistItemsRouter } from './routers/wishlistItemsRouter';
 import { socialRouter } from './routers/socialRouter';
+import { notificationsRouter } from './routers/notificationsRouter';
 
 // router imports
 
@@ -65,6 +66,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/wishlists', wishlistsRouter);
 app.use('/api/wishlistItems', wishlistItemsRouter);
 app.use('/api/social', socialRouter);
+app.use('/api/notifications', notificationsRouter);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));

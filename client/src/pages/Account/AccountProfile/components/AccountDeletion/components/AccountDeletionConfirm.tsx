@@ -88,7 +88,7 @@ export default function AccountDeletionConfirm(): JSX.Element {
       displayPopupMessage('Email resent.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const { isHandled, status, errMessage, errReason, errResData } = handleAsyncError(err);
+      const { isHandled, status, errReason, errResData } = handleAsyncError(err);
 
       if (isHandled) {
         return;

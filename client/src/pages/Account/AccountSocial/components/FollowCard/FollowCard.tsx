@@ -45,13 +45,17 @@ function FollowCard({
       displayPopupMessage('Unfollowed.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const { status } = handleAsyncError(err);
+      const { isHandled, status } = handleAsyncError(err);
+
+      setCardMode('view');
+
+      if (isHandled) {
+        return;
+      }
 
       if (status === 400) {
         displayPopupMessage('Something went wrong.', 'error');
       }
-
-      setCardMode('view');
     }
   }
 
@@ -66,13 +70,17 @@ function FollowCard({
       displayPopupMessage('Follower removed.', 'success');
     } catch (err: unknown) {
       console.log(err);
-      const { status } = handleAsyncError(err);
+      const { isHandled, status } = handleAsyncError(err);
+
+      setCardMode('view');
+
+      if (isHandled) {
+        return;
+      }
 
       if (status === 400) {
         displayPopupMessage('Something went wrong.', 'error');
       }
-
-      setCardMode('view');
     }
   }
 

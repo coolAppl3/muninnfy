@@ -12,6 +12,7 @@ import { minuteMilliseconds } from '../util/constants/globalConstants';
 import { deleteExpiredAuthSessionsCron } from '../auth/authSessions';
 import { decayWishlistsInteractivityIndexCron } from './wishlistCronJobs';
 import { deleteStaleFollowRequestsCron } from './socialCronJobs';
+import { destroyStaleWebSocketsCron } from './webSocketCronJobs';
 
 export function initCronJobs(): void {
   // every 30 seconds
@@ -32,6 +33,8 @@ export function initCronJobs(): void {
     await deleteStaleEmailUpdateRequestsCron(currentTimestamp);
     await deleteStaleAccountRecoveryRequestsCron(currentTimestamp);
     await deleteStaleAccountDeletionRequestsCron(currentTimestamp);
+
+    destroyStaleWebSocketsCron(currentTimestamp);
   });
 
   // every 6 hours

@@ -40,9 +40,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
   const searchFollowRequests = useCallback(
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
-        const followRequestsBatch: FollowRequest[] = (await searchSocialService('followRequests', searchQuery, offset, abortSignal)).data
-          .batch;
-
+        const followRequestsBatch: FollowRequest[] = (await searchSocialService('followRequests', searchQuery, offset, abortSignal)).data;
         offset === 0 ? setSearchQueryResults(followRequestsBatch) : setSearchQueryResults((prev) => [...prev, ...followRequestsBatch]);
         followRequestsBatch.length < SOCIAL_FETCH_BATCH_SIZE
           ? setAllSearchQueryResultsFetched(true)
@@ -96,7 +94,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
 
   async function getFollowRequestsBatch(): Promise<void> {
     try {
-      const followRequestsBatch: FollowRequest[] = (await getSocialBatchService('followRequests', followRequests.length)).data.batch;
+      const followRequestsBatch: FollowRequest[] = (await getSocialBatchService('followRequests', followRequests.length)).data;
       setFollowRequests((prev) => [...prev, ...followRequestsBatch]);
 
       if (followRequests.length + followRequestsBatch.length >= socialCounts.follow_requests_count) {

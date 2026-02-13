@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.2.12] (2026-02-13)
+
+### Features
+
+- Implement the use of WebSockets for social-related notifications and live state updates.
+  - Added `ws` and `@types/ws` libraries.
+  - Added `webSocketHelpers` with `sendWebSocketMessage()`.
+  - Added `webSocketConstants` with `WEB_SOCKET_INACTIVITY_THRESHOLD` constant.
+  - Added `destroyStaleWebSocketsCron()`.
+  - Added `notifications` table.
+  - Added `notificationsDbHelpers` with `addNotification()`.
+  - Added `notificationTypes` with `NotificationType` and `NotificationDetails`.
+  - Added `accountNotificationsWebsSocket`.
+- Added optional `includeYear` parameter to `getDateAndTimeString()`.
+- Added `NotificationCard` page component.
+- Added `notificationsConstants` with `NOTIFICATIONS_FETCH_BATCH_SIZE`.
+- Added `notificationsRouter`.
+- Added GET `notifications/:offset`.
+- Added `notificationServices` with `getNotificationsBatchService()`.
+- Added `AccountNotificationsContext`, `AccountNotificationsProvider`, and `useAccountNotifications` custom hook.
+- Added useAccountNotificationsWebsocket custom hook.
+- Added `notificationsConstants` with `NOTIFICATIONS_FETCH_BATCH_SIZE` and `NOTIFICATIONS_RENDER_BATCH_SIZE`.
+- Completed `AccountNotifications` implementation.
+
+
+### Code Refactoring
+
+- Minor consistency-related refactors.
+- Minor simplification to the structure of returned data in social endpoints.
+
+
 ## [0.2.11] (2026-02-02)
 
 ### Features

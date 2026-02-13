@@ -12,7 +12,7 @@
     "isolatedModules": true,
     "removeComments": true,
     "typeRoots": ["./node_modules/@types"],
-    "types": ["node", "express", "cors", "bcrypt", "nodemailer", "node-cron", "compression", "cookie-parser"]
+    "types": ["node", "express", "cors", "bcrypt", "nodemailer", "node-cron", "compression", "cookie-parser", "ws"]
   },
   "include": ["src"],
   "exclude": ["node_modules"]

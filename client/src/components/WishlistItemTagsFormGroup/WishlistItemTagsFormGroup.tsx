@@ -47,7 +47,7 @@ export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }
         return;
       }
 
-      setTagsSet(new Set(tagsSet).add(value.toLowerCase()));
+      setTagsSet(new Set<string>(tagsSet).add(value.toLowerCase()));
       setValue('');
     }
   }
