@@ -13,8 +13,8 @@ import AccountSocialFollowRequests from './components/AccountSocialFollowRequest
 import AccountSocialFindAccount from './components/AccountSocialFindAccount/AccountSocialFindAccount';
 import { SOCIAL_FETCH_BATCH_SIZE } from '../../../utils/constants/socialConstants';
 import { NotificationDetails } from '../../../types/notificationTypes';
-import { useAccountNotificationsWebsocket } from '../../../hooks/useAccountNotificationsWebsocket';
 import { FollowDetails, FollowRequest } from '../../../types/socialTypes';
+import { subscribeToAccountNotifications } from '../../../services/websockets/accountNotificationsWebsSocket';
 
 export default function AccountSocial(): JSX.Element {
   const { socialSection } = useAccountSocial();
@@ -85,7 +85,10 @@ export default function AccountSocial(): JSX.Element {
     [setFollowers, setFollowing, setFollowRequests, setSocialCounts]
   );
 
-  useAccountNotificationsWebsocket(notificationsHandler);
+  useEffect(() => {
+    subscribeToAccountNotifications('social', notificationsHandler);
+    // unsubscribed when Account unmounts
+  }, [notificationsHandler]);
 
   return (
     <>

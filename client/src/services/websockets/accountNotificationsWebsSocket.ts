@@ -1,8 +1,10 @@
 import { NotificationDetails, NotificationType } from '../../types/notificationTypes';
 import { FollowDetails, FollowRequest } from '../../types/socialTypes';
 
+type HandlerType = 'social' | 'notifications';
+
 let ws: WebSocket | null = null;
-const wsListenersSet = new Set<(data: NotificationDetails) => void>();
+const wsListenersMap = new Map<HandlerType, (data: NotificationDetails) => void>();
 
 let reconnectionDelayMilliseconds: number = 1000;
 const maxReconnectionDelayMilliseconds: number = 1000 * 60 * 5;
@@ -21,7 +23,7 @@ export function connectAccountNotificationsWebSocket(): void {
       return;
     }
 
-    wsListenersSet.forEach((listener: (data: NotificationDetails) => void) => listener(notificationDetails));
+    wsListenersMap.forEach((listener: (data: NotificationDetails) => void) => listener(notificationDetails));
   });
 
   ws.addEventListener('close', (e: CloseEvent) => {
@@ -38,9 +40,12 @@ export function connectAccountNotificationsWebSocket(): void {
   });
 }
 
-export function subscribeToAccountNotifications(fn: (data: NotificationDetails) => void): () => void {
-  wsListenersSet.add(fn);
-  return () => wsListenersSet.delete(fn);
+export function subscribeToAccountNotifications(handlerType: HandlerType, handler: (data: NotificationDetails) => void): void {
+  wsListenersMap.set(handlerType, handler);
+}
+
+export function clearAccountNotificationsSubscriptions(): void {
+  wsListenersMap.clear();
 }
 
 function parseWebSocketMessageData(data: any): NotificationDetails | null {

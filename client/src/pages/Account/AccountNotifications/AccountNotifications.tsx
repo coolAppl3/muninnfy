@@ -7,7 +7,7 @@ import { getNotificationsBatchService } from '../../../services/notificationServ
 import { NotificationDetails } from '../../../types/notificationTypes';
 import { CanceledError } from 'axios';
 import NotificationCard from './components/NotificationCard';
-import { useAccountNotificationsWebsocket } from '../../../hooks/useAccountNotificationsWebsocket';
+import { subscribeToAccountNotifications } from '../../../services/websockets/accountNotificationsWebsSocket';
 
 export default function AccountNotifications(): JSX.Element {
   const { notifications, initialFetchCompleted, setNotifications, setInitialFetchCompleted } = useAccountNotifications();
@@ -60,7 +60,10 @@ export default function AccountNotifications(): JSX.Element {
     [setNotifications]
   );
 
-  useAccountNotificationsWebsocket(notificationsHandler);
+  useEffect(() => {
+    subscribeToAccountNotifications('notifications', notificationsHandler);
+    // unsubscribed when Account unmounts
+  }, [notificationsHandler]);
 
   return (
     <>

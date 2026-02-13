@@ -15,6 +15,7 @@ import useAuth from '../../hooks/useAuth';
 import AccountOngoingRequestsProvider from './providers/AccountOngoingRequestsProvider';
 import AccountSocialDetailsProvider from './providers/AccountSocialDetailsProvider';
 import AccountNotificationsProvider from './providers/AccountNotificationsProvider';
+import { clearAccountNotificationsSubscriptions } from '../../services/websockets/accountNotificationsWebsSocket';
 
 export default function Account(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -64,6 +65,12 @@ export default function Account(): JSX.Element {
 
     return () => abortController.abort();
   }, [setAuthStatus, handleAsyncError]);
+
+  console.log(true);
+
+  useEffect(() => {
+    return clearAccountNotificationsSubscriptions;
+  });
 
   return (
     <>
