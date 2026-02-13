@@ -66,8 +66,6 @@ export default function Account(): JSX.Element {
     return () => abortController.abort();
   }, [setAuthStatus, handleAsyncError]);
 
-  console.log(true);
-
   useEffect(() => {
     return clearAccountNotificationsSubscriptions;
   });
