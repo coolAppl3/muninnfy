@@ -18,7 +18,7 @@ export default function AccountNotifications(): JSX.Element {
   const [fetchingAdditionalNotifications, setFetchingAdditionalNotifications] = useState<boolean>(false);
   const [allNotificationsFetched, setAllNotificationsFetched] = useState<boolean>(false);
 
-  const allNotificationsRendered: boolean = renderLimit >= notifications.length;
+  const allNotificationsRendered: boolean = allNotificationsFetched && renderLimit >= notifications.length;
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayPopupMessage } = usePopupMessage();
