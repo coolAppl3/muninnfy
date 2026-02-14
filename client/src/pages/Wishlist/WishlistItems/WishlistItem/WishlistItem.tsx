@@ -21,14 +21,14 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
 
   const { toggleWishlistItemExpansion, isExpanded } = useWishlistItemsExpansionStore(
     useShallow((store) => ({
-      toggleWishlistItemExpansion: store.toggleWishlistItemsExpansion,
+      toggleWishlistItemExpansion: store.toggleWishlistItemExpansion,
       isExpanded: store.expandedItemsIdsSet.has(wishlistItem.item_id),
     }))
   );
 
   const { toggleWishlistItemSelection, isSelected } = useWishlistItemsSelectionStore(
     useShallow((store) => ({
-      toggleWishlistItemSelection: store.toggleWishlistItemSelection,
+      toggleWishlistItemSelection: store.toggleWishlistItemExpansion,
       isSelected: store.selectedItemsIdsSet.has(wishlistItem.item_id),
     }))
   );

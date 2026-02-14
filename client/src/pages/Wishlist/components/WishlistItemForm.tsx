@@ -36,7 +36,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   const { expandedItemsIdsSet, toggleWishlistItemExpansion } = useWishlistItemsExpansionStore(
     useShallow((store) => ({
       expandedItemsIdsSet: store.expandedItemsIdsSet,
-      toggleWishlistItemExpansion: store.toggleWishlistItemsExpansion,
+      toggleWishlistItemExpansion: store.toggleWishlistItemExpansion,
     }))
   );
 
