@@ -25,10 +25,10 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const { selectionModeActive, setSelectionModeActive, wishlistItems, setWishlistItems, itemMatchesFilterConfig } = useWishlistItems();
 
   const { selectedItemsIdsSet, selectAllWishlistItems, unselectAllWishlistItems } = useWishlistItemsSelectionStore(
-    useShallow((store) => ({
-      selectedItemsIdsSet: store.selectedItemsIdsSet,
-      selectAllWishlistItems: store.selectAllWishlistItems,
-      unselectAllWishlistItems: store.unselectAllWishlistItems,
+    useShallow(({ selectedItemsIdsSet, selectAllWishlistItems, unselectAllWishlistItems }) => ({
+      selectedItemsIdsSet,
+      selectAllWishlistItems,
+      unselectAllWishlistItems,
     }))
   );
 
