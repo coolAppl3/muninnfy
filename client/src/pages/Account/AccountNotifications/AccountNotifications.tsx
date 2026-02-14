@@ -101,7 +101,8 @@ export default function AccountNotifications(): JSX.Element {
         {fetchingAdditionalNotifications ? (
           <ContentLoadingSkeleton />
         ) : (
-          allNotificationsRendered || (
+          allNotificationsRendered ||
+          !initialFetchCompleted || (
             <Button
               className='bg-description border-description text-dark text-sm py-[4px] w-full sm:w-fit mx-auto rounded-pill'
               onClick={async () => {
