@@ -87,7 +87,7 @@ export default function AccountNotifications(): JSX.Element {
       <div className='h-line my-1'></div>
 
       <div className='grid gap-1'>
-        {notifications.length === 0 && <p className='text-sm text-description w-fit mx-auto'>No notifications found</p>}
+        {notifications.length === 0 && <p className='text-sm text-description w-fit mx-auto'>No recent notifications</p>}
 
         {notifications.slice(0, renderLimit).map((notification: NotificationDetails) => (
           <NotificationCard
