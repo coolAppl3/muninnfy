@@ -143,6 +143,16 @@ export function resendAccountRecoveryEmailService(body: ResendAccountRecoveryEma
   return axios.patch(`${accountsApiUrl}/recovery/resendEmail`, body);
 }
 
+type ConfirmAccountRecoveryServicePayload = {
+  publicAccountId: string;
+  recoveryToken: string;
+  newPassword: string;
+};
+
+export function confirmAccountRecoveryService(body: ConfirmAccountRecoveryServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/recovery/confirm`, body);
+}
+
 type StartAccountDeletionServicePayload = {
   password: string;
 };
