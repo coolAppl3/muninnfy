@@ -12,8 +12,8 @@ type ResendAccountVerificationEmailProps = {
 };
 
 export default function ResendAccountVerificationEmail({ publicAccountId }: ResendAccountVerificationEmailProps): JSX.Element {
-  const [title, setTitle] = useState<string>('Ongoing account verification detected.');
-  const [description, setDescription] = useState<string>('Check your inbox for the verification email and click the link to continue.');
+  const [title, setTitle] = useState<string>('Account verification in progress.');
+  const [description, setDescription] = useState<string>('Check your inbox for a verification email and click the link to continue.');
 
   const [btnDisabled, setBtnDisabled] = useState<boolean>(false);
   const [btnTitle, setBtnTitle] = useState<string>('Resend email');
