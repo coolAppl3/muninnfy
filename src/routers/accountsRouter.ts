@@ -1548,7 +1548,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
 accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
@@ -1680,7 +1680,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
@@ -1806,7 +1806,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
 accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
