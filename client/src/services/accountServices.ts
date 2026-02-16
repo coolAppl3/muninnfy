@@ -121,6 +121,20 @@ export function confirmEmailUpdateService(body: ConfirmEmailUpdateServicePayload
   return axios.patch(`${accountsApiUrl}/details/email/confirm`, body);
 }
 
+type StartAccountRecoveryServicePayload = {
+  email: string;
+};
+
+type StartAccountRecoveryServiceData = {
+  publicAccountId: string;
+};
+
+export function startAccountRecoveryService(
+  body: StartAccountRecoveryServicePayload
+): Promise<AxiosResponse<StartAccountRecoveryServiceData>> {
+  return axios.post(`${accountsApiUrl}/recovery/start`, body);
+}
+
 type StartAccountDeletionServicePayload = {
   password: string;
 };
