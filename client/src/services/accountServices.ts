@@ -135,6 +135,14 @@ export function startAccountRecoveryService(
   return axios.post(`${accountsApiUrl}/recovery/start`, body);
 }
 
+type ResendAccountRecoveryEmailServicePayload = {
+  publicAccountId: string;
+};
+
+export function resendAccountRecoveryEmailService(body: ResendAccountRecoveryEmailServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/recovery/resendEmail`, body);
+}
+
 type StartAccountDeletionServicePayload = {
   password: string;
 };
