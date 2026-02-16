@@ -1,6 +1,8 @@
 import { NotificationDetails, NotificationType } from '../../types/notificationTypes';
 import { FollowDetails, FollowRequest } from '../../types/socialTypes';
 
+const webSocketServerURL: string = window.location.hostname === 'localhost' ? 'ws://localhost:5000' : `wss://${window.location.hostname}`;
+
 type HandlerType = 'social' | 'notifications';
 
 let ws: WebSocket | null = null;
@@ -10,7 +12,7 @@ let reconnectionDelayMilliseconds: number = 1000;
 const maxReconnectionDelayMilliseconds: number = 1000 * 60 * 5;
 
 export function connectAccountNotificationsWebSocket(): void {
-  ws = new WebSocket('ws://localhost:5000/');
+  ws = new WebSocket(webSocketServerURL);
 
   ws.addEventListener('open', () => {
     reconnectionDelayMilliseconds = 1000;
