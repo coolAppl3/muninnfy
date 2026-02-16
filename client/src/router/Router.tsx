@@ -15,6 +15,7 @@ import { AuthStatus } from '../contexts/AuthContext';
 import useAuth from '../hooks/useAuth';
 import useHistory from '../hooks/useHistory';
 import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
+import AccountRecovery from '../pages/AccountRecovery/AccountRecovery';
 
 type RouteDetails = {
   path: string;
@@ -32,6 +33,7 @@ export default function Router(): JSX.Element {
   ];
 
   const nonAuthOnlyRoutes: RouteDetails[] = [
+    { path: '/account/recovery', element: <AccountRecovery /> },
     { path: '/sign-up', element: <SignUp /> },
     { path: '/sign-up/verification', element: <AccountVerification /> },
     { path: '/sign-in', element: <SignIn /> },
