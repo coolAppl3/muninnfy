@@ -69,8 +69,7 @@ export default function NewWishlist(): JSX.Element {
       <section className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
-            <h1 className='text-title text-xl 3xs:text-2xl font-bold text-center'>New wishlist</h1>
-            <div className='h-line my-2'></div>
+            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>New wishlist</h1>
 
             <form
               className='grid grid-cols-1 gap-2'
