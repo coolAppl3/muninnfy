@@ -1,6 +1,6 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 
-export type AccountLocation = 'profile' | 'social' | 'notifications' | 'wishlists';
+export type AccountLocation = 'profile' | 'social' | 'notifications';
 
 export type AccountLocationContextType = {
   accountLocation: AccountLocation;

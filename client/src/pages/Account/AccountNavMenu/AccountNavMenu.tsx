@@ -3,6 +3,7 @@ import HamMenuIcon from '../../../assets/svg/HamMenuIcon.svg?react';
 import CrossIcon from '../../../assets/svg/CrossIcon.svg?react';
 import useAccountLocation from '../hooks/useAccountLocation';
 import AccountNavMenuButton from './components/AccountNavMenuButton';
+import { Link } from 'react-router-dom';
 
 export default function AccountNavMenu(): JSX.Element {
   const { accountLocation, setAccountLocation } = useAccountLocation();
@@ -62,15 +63,12 @@ export default function AccountNavMenu(): JSX.Element {
           Notifications
         </AccountNavMenuButton>
 
-        <AccountNavMenuButton
-          isSelected={accountLocation === 'wishlists'}
-          onClick={() => {
-            setAccountLocation('wishlists');
-            setIsOpen(false);
-          }}
+        <Link
+          to='/account/wishlists'
+          className='nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-secondary'
         >
           Wishlists
-        </AccountNavMenuButton>
+        </Link>
       </nav>
     </div>
   );

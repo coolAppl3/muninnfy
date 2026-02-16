@@ -4,7 +4,6 @@ import AccountNotifications from '../AccountNotifications/AccountNotifications';
 import { AccountProfile } from '../AccountProfile/AccountProfile';
 import AccountSocial from '../AccountSocial/AccountSocial';
 import { AccountLocation } from '../contexts/AccountLocationContext';
-import AccountWishlists from '../AccountWishlists/AccountWishlists';
 import AccountProfileProvider from '../providers/AccountProfileProvider';
 import AccountSocialProvider from '../providers/AccountSocialProvider';
 
@@ -32,5 +31,4 @@ const contentRecord: Record<AccountLocation, JSX.Element> = {
   ),
 
   notifications: <AccountNotifications />,
-  wishlists: <AccountWishlists />,
 };

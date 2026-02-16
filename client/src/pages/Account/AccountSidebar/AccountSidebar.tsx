@@ -1,6 +1,8 @@
 import { JSX } from 'react';
 import AccountSidebarButton from './components/AccountSidebarButton';
 import useAccountLocation from '../hooks/useAccountLocation';
+import { Link } from 'react-router-dom';
+import RedirectIcon from '../../../assets/svg/RedirectIcon.svg?react';
 
 export default function AccountSidebar(): JSX.Element {
   const { accountLocation, setAccountLocation } = useAccountLocation();
@@ -28,12 +30,13 @@ export default function AccountSidebar(): JSX.Element {
         Notifications
       </AccountSidebarButton>
 
-      <AccountSidebarButton
-        isSelected={accountLocation === 'wishlists'}
-        onClick={() => setAccountLocation('wishlists')}
+      <Link
+        to='/account/wishlists'
+        className='flex justify-between items-center px-2 py-[1.6rem] text-start bg-secondary border-b-1 border-b-light-gray cursor-pointer transition-[filter] hover:brightness-90 last:border-b-secondary'
       >
-        Wishlists
-      </AccountSidebarButton>
+        <span>Wishlists</span>
+        <RedirectIcon className='w-[1.6rem] h-[1.6rem]' />
+      </Link>
     </nav>
   );
 }
