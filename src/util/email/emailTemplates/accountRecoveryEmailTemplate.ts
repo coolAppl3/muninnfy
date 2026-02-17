@@ -28,8 +28,8 @@ export default function accountRecoveryEmailTemplate({
   
             <p>
               We received a request to recover your account. To continue, please click the following link:
-              <a href="${origin}/sign-up/verification?publicAccountId=${publicAccountId}&recoveryToken=${recoveryToken}"
-                >${origin}/sign-up/verification?publicAccountId=${publicAccountId}&recoveryToken=${recoveryToken}</a
+              <a href="${origin}/account/recovery?publicAccountId=${publicAccountId}&recoveryToken=${recoveryToken}"
+                >${origin}/account/recovery?publicAccountId=${publicAccountId}&recoveryToken=${recoveryToken}</a
               >.
             </p>
   
