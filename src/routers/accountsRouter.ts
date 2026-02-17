@@ -1752,7 +1752,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
 
     if (!accountDetails.request_id) {
       await connection.rollback();
-      res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
+      res.status(404).json({ message: 'Recovery request not found or has expired.', reason: 'requestNotFound' });
 
       return;
     }
@@ -1888,7 +1888,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
 
     if (!accountDetails.account_id) {
       await connection.rollback();
-      res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
+      res.status(404).json({ message: 'Recovery request not found or has expired.', reason: 'requestNotFound' });
 
       return;
     }
