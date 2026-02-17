@@ -68,5 +68,11 @@ function AccountRecoveryChildren({
     );
   }
 
-  return <ConfirmAccountRecovery />;
+  return (
+    <ConfirmAccountRecovery
+      publicAccountId={publicAccountId}
+      recoveryToken={recoveryToken}
+      setIsValidRecoveryLink={setIsValidRecoveryLink}
+    />
+  );
 }
