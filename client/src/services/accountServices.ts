@@ -149,7 +149,13 @@ type ConfirmAccountRecoveryServicePayload = {
   newPassword: string;
 };
 
-export function confirmAccountRecoveryService(body: ConfirmAccountRecoveryServicePayload): Promise<AxiosResponse> {
+type confirmAccountRecoveryServiceData = {
+  authSessionCreated: boolean;
+};
+
+export function confirmAccountRecoveryService(
+  body: ConfirmAccountRecoveryServicePayload
+): Promise<AxiosResponse<confirmAccountRecoveryServiceData>> {
   return axios.patch(`${accountsApiUrl}/recovery/confirm`, body);
 }
 

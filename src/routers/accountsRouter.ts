@@ -1974,10 +1974,11 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       return;
     }
 
-    connection.commit();
-    res.json({});
-
     await purgeAuthSessions(accountDetails.account_id);
+    const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, false);
+
+    connection.commit();
+    res.json({ authSessionCreated });
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
