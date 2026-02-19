@@ -1,12 +1,12 @@
 import { Dispatch, JSX, SetStateAction, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import Button from '../../../components/Button/Button';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { resendAccountRecoveryEmailService } from '../../../services/accountServices';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import { getDateAndTimeString } from '../../../utils/globalUtils';
 import useAuth from '../../../hooks/useAuth';
+import InstructionCard from '../../../components/InstructionCard/InstructionCard';
 
 type ResendAccountRecoveryEmailProps = {
   publicAccountId: string;
@@ -97,11 +97,11 @@ export default function ResendAccountRecoveryEmail({
 
   return (
     <>
-      <h4 className='text-title font-medium mb-1'>{title}</h4>
-      <p className='text-description text-sm mb-2'>{description}</p>
-      <Button
-        className='bg-description border-description text-dark w-full'
-        disabled={btnDisabled}
+      <InstructionCard
+        title={title}
+        description={description}
+        btnTitle={btnTitle}
+        btnDisabled={btnDisabled}
         onClick={async () => {
           if (btnNavigateLocation) {
             navigate(btnNavigateLocation);
@@ -116,9 +116,7 @@ export default function ResendAccountRecoveryEmail({
           setBtnDisabled(false);
           removeLoadingOverlay();
         }}
-      >
-        {btnTitle}
-      </Button>
+      />
     </>
   );
 }
