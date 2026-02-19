@@ -3,10 +3,10 @@ import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import StartAccountRecovery from './components/StartAccountRecovery';
 import ResendAccountRecoveryEmail from './components/ResendAccountRecoveryEmail';
-import { useSearchParams } from 'react-router-dom';
+import { NavigateFunction, useNavigate, useSearchParams } from 'react-router-dom';
 import ConfirmAccountRecovery from './components/ConfirmAccountRecovery';
 import { isValidUuid } from '../../utils/validation/generalValidation';
-import { InvalidRecoveryLink } from './components/InvalidRecoveryLink';
+import InstructionCard from '../../components/InstructionCard/InstructionCard';
 
 export default function AccountRecovery(): JSX.Element {
   const [urlSearchParams] = useSearchParams();
@@ -51,8 +51,18 @@ function AccountRecoveryChildren({
   publicAccountId,
   recoveryToken,
 }: AccountRecoveryChildrenProps): JSX.Element {
+  const navigate: NavigateFunction = useNavigate();
+
   if (!linkParamsValid) {
-    return <InvalidRecoveryLink />;
+    return (
+      <InstructionCard
+        title='Invalid recovery link.'
+        description='Check your inbox for a recovery email and make sure you click the link within.'
+        btnTitle='Go to homepage'
+        btnDisabled={false}
+        onClick={() => navigate('/home')}
+      />
+    );
   }
 
   if (!publicAccountId) {
