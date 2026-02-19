@@ -5,11 +5,11 @@ type InstructionCardProps = {
   title: string;
   description: string;
   btnTitle: string;
-  onClick: () => void;
   btnDisabled: boolean;
+  onClick: () => void;
 };
 
-export default function InstructionCard({ title, description, btnTitle, onClick, btnDisabled = false }: InstructionCardProps): JSX.Element {
+export default function InstructionCard({ title, description, btnTitle, btnDisabled = false, onClick }: InstructionCardProps): JSX.Element {
   return (
     <>
       <h4 className='text-title font-medium mb-1'>{title}</h4>
