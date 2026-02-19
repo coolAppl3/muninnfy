@@ -1923,7 +1923,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       }
 
       res.status(401).json({
-        message: 'Incorrect recovery token.',
+        message: 'Incorrect recovery token. Recovery suspended.',
         reason: 'incorrectToken_suspended',
         resData: { expiryTimestamp },
       });
