@@ -9,6 +9,7 @@ import { confirmAccountRecoveryService } from '../../../services/accountServices
 import { getDateAndTimeString } from '../../../utils/globalUtils';
 import useAuth from '../../../hooks/useAuth';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import InstructionCard from '../../../components/InstructionCard/InstructionCard';
 
 type ConfirmAccountRecoveryProps = {
   publicAccountId: string;
@@ -22,6 +23,9 @@ export default function ConfirmAccountRecovery({
   recoveryToken,
   setIsValidRecoveryLink,
 }: ConfirmAccountRecoveryProps): JSX.Element {
+  const [renderMode, setRenderMode] = useState<'form' | 'incorrectToken' | 'requestSuspended'>('form');
+  const [suspensionRecoveryTimestamp, setSuspensionRecoveryTimestamp] = useState<number | null>(null);
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [password, setPassword] = useState<string>('');
@@ -40,10 +44,18 @@ export default function ConfirmAccountRecovery({
     const newPassword: string = password;
 
     try {
-      await confirmAccountRecoveryService({ publicAccountId, recoveryToken, newPassword });
+      const authSessionCreated: boolean = (await confirmAccountRecoveryService({ publicAccountId, recoveryToken, newPassword })).data
+        .authSessionCreated;
 
-      navigate('/sign-in');
       displayPopupMessage('Recovery successful.', 'success');
+
+      if (!authSessionCreated) {
+        navigate('/sign-in');
+        return;
+      }
+
+      setAuthStatus('authenticated');
+      navigate('/account');
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errMessage, errReason, errResData } = handleAsyncError(err);
@@ -53,7 +65,7 @@ export default function ConfirmAccountRecovery({
       }
 
       if (status === 401) {
-        errReason === 'incorrectToken_suspended' ? handleRequestSuspended(errResData) : setPasswordErrorMessage(errMessage);
+        errReason === 'incorrectToken_suspended' ? handleRequestSuspended(errResData) : setRenderMode('incorrectToken');
         return;
       }
 
@@ -103,7 +115,8 @@ export default function ConfirmAccountRecovery({
       return;
     }
 
-    setPasswordErrorMessage(`Recovery request suspended until ${getDateAndTimeString(errResData.expiryTimestamp)}.`);
+    setSuspensionRecoveryTimestamp(errResData.expiryTimestamp);
+    setRenderMode('requestSuspended');
   }
 
   function allFieldsValid(): boolean {
@@ -121,6 +134,30 @@ export default function ConfirmAccountRecovery({
     }
 
     return true;
+  }
+
+  if (renderMode === 'incorrectToken') {
+    return (
+      <InstructionCard
+        title='Incorrect recovery token.'
+        description={`Please make sure you use the full recovery link we've sent you.`}
+        btnTitle='Go to homepage'
+        btnDisabled={false}
+        onClick={() => navigate('/home')}
+      />
+    );
+  }
+
+  if (renderMode === 'requestSuspended') {
+    return (
+      <InstructionCard
+        title='Recovery suspended.'
+        description={`Too many failed attempts were made. You can try again after ${suspensionRecoveryTimestamp ? getDateAndTimeString(suspensionRecoveryTimestamp) : '24 hours'}.`}
+        btnTitle='Go to homepage'
+        btnDisabled={false}
+        onClick={() => navigate('/home')}
+      />
+    );
   }
 
   return (
