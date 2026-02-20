@@ -26,7 +26,7 @@ export default function AccountRecovery(): JSX.Element {
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
             <AccountRecoveryChildren
-              linkParamsValid={isValidRecoveryLink}
+              isValidRecoveryLink={isValidRecoveryLink}
               setIsValidRecoveryLink={setIsValidRecoveryLink}
               publicAccountId={publicAccountId}
               recoveryToken={recoveryToken}
@@ -39,21 +39,21 @@ export default function AccountRecovery(): JSX.Element {
 }
 
 type AccountRecoveryChildrenProps = {
-  linkParamsValid: boolean;
+  isValidRecoveryLink: boolean;
   setIsValidRecoveryLink: Dispatch<SetStateAction<boolean>>;
   publicAccountId: string | null;
   recoveryToken: string | null;
 };
 
 function AccountRecoveryChildren({
-  linkParamsValid,
+  isValidRecoveryLink,
   setIsValidRecoveryLink,
   publicAccountId,
   recoveryToken,
 }: AccountRecoveryChildrenProps): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
 
-  if (!linkParamsValid) {
+  if (!isValidRecoveryLink) {
     return (
       <InstructionCard
         title='Invalid recovery link.'
