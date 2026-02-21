@@ -315,7 +315,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
   const { publicAccountId } = requestData;
 
   if (!isValidUuid(publicAccountId)) {
-    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
     return;
   }
 
@@ -441,7 +441,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
   const { publicAccountId, verificationToken } = requestData;
 
   if (!isValidUuid(publicAccountId)) {
-    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
     return;
   }
 
@@ -1827,7 +1827,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
   const { publicAccountId, recoveryToken, newPassword } = requestData;
 
   if (!isValidUuid(publicAccountId)) {
-    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
     return;
   }
 
