@@ -6,5 +6,5 @@ type ContainerProps = {
 };
 
 export default function Container({ children, className }: ContainerProps): JSX.Element {
-  return <div className={`max-w-[1200px] mx-auto px-2 h-full ${className || ''}`}>{children}</div>;
+  return <div className={`w-full max-w-[1200px] mx-auto px-2 h-full ${className || ''}`}>{children}</div>;
 }
