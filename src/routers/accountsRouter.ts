@@ -526,8 +526,10 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
         return;
       }
 
+      const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, false);
+
       await connection.commit();
-      res.json({});
+      res.json({ authSessionCreated });
 
       return;
     }
