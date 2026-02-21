@@ -96,27 +96,25 @@ export default function ResendAccountRecoveryEmail({
   }
 
   return (
-    <>
-      <InstructionCard
-        title={title}
-        description={description}
-        btnTitle={btnTitle}
-        btnDisabled={btnDisabled}
-        onClick={async () => {
-          if (btnNavigateLocation) {
-            navigate(btnNavigateLocation);
-            return;
-          }
+    <InstructionCard
+      title={title}
+      description={description}
+      btnTitle={btnTitle}
+      btnDisabled={btnDisabled}
+      onClick={async () => {
+        if (btnNavigateLocation) {
+          navigate(btnNavigateLocation);
+          return;
+        }
 
-          displayLoadingOverlay();
-          setBtnDisabled(true);
+        displayLoadingOverlay();
+        setBtnDisabled(true);
 
-          await resendAccountRecoveryEmail();
+        await resendAccountRecoveryEmail();
 
-          setBtnDisabled(false);
-          removeLoadingOverlay();
-        }}
-      />
-    </>
+        setBtnDisabled(false);
+        removeLoadingOverlay();
+      }}
+    />
   );
 }
