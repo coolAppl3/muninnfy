@@ -33,30 +33,30 @@ export function continueAccountVerificationService(
   return axios.post(`${accountsApiUrl}/verification/continue`, body);
 }
 
-type ResendVerificationEmailPayload = {
+type ResendAccountVerificationEmailServicePayload = {
   publicAccountId: string;
 };
 
-export function resendAccountVerificationEmailService(body: ResendVerificationEmailPayload): Promise<AxiosResponse> {
+export function resendAccountVerificationEmailService(body: ResendAccountVerificationEmailServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/verification/resendEmail`, body);
 }
 
-type VerifyAccountPayload = {
+type VerifyAccountServicePayload = {
   publicAccountId: string;
   verificationToken: string;
 };
 
-export function verifyAccountService(body: VerifyAccountPayload, abortSignal: AbortSignal): Promise<AxiosResponse> {
+export function verifyAccountService(body: VerifyAccountServicePayload, abortSignal: AbortSignal): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/verification/verify`, body, { signal: abortSignal });
 }
 
-type SignInPayload = {
+type SignInServicePayload = {
   email: string;
   password: string;
   keepSignedIn: boolean;
 };
 
-export function signInService(body: SignInPayload): Promise<AxiosResponse> {
+export function signInService(body: SignInServicePayload): Promise<AxiosResponse> {
   return axios.post(`${accountsApiUrl}/signIn`, body);
 }
 
