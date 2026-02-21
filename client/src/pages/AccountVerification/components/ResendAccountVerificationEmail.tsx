@@ -1,17 +1,21 @@
-import { JSX, useState } from 'react';
+import { Dispatch, JSX, SetStateAction, useState } from 'react';
 import useAuth from '../../../hooks/useAuth';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
-import Button from '../../../components/Button/Button';
 import { resendAccountVerificationEmailService } from '../../../services/accountServices';
+import InstructionCard from '../../../components/InstructionCard/InstructionCard';
 
 type ResendAccountVerificationEmailProps = {
   publicAccountId: string;
+  setIsValidVerificationLink: Dispatch<SetStateAction<boolean>>;
 };
 
-export default function ResendAccountVerificationEmail({ publicAccountId }: ResendAccountVerificationEmailProps): JSX.Element {
+export default function ResendAccountVerificationEmail({
+  publicAccountId,
+  setIsValidVerificationLink,
+}: ResendAccountVerificationEmailProps): JSX.Element {
   const [title, setTitle] = useState<string>('Account verification in progress.');
   const [description, setDescription] = useState<string>('Check your inbox for a verification email and click the link to continue.');
 
@@ -26,9 +30,6 @@ export default function ResendAccountVerificationEmail({ publicAccountId }: Rese
   const { displayPopupMessage } = usePopupMessage();
 
   async function resendAccountVerificationEmail(): Promise<void> {
-    displayLoadingOverlay();
-    setBtnDisabled(true);
-
     try {
       await resendAccountVerificationEmailService({ publicAccountId });
       displayPopupMessage('Email resent.', 'success');
@@ -40,64 +41,66 @@ export default function ResendAccountVerificationEmail({ publicAccountId }: Rese
         return;
       }
 
-      if (status === 403 && errReason === 'signedIn') {
-        setAuthStatus('authenticated');
+      if (status === 400) {
+        displayPopupMessage('Invalid recovery link.', 'error');
+        setIsValidVerificationLink(false);
+
         return;
       }
 
       setTitle(errMessage);
 
-      if (status === 400 || (status === 403 && errReason === 'emailsSentLimitReached')) {
-        setBtnTitle('Go to homepage');
-        setBtnNavigateLocation('/home');
-
-        setDescription(
-          status === 400
-            ? 'Check your inbox for a verification email, or start the sign up process again.'
-            : `If you still can't find the email, wait 20 minutes and start again.`
-        );
-
-        return;
-      }
-
       if (status === 404) {
-        setBtnTitle('Sign up again');
+        setDescription(`Account either doesn't exist or has had its verification window expire.`);
+        setBtnTitle('Sign up');
         setBtnNavigateLocation('/sign-up');
 
-        setDescription('Accounts are deleted within 20 minutes of being created if left unverified.');
         return;
       }
 
       if (status === 409) {
+        setDescription('You may proceed with signing in.');
         setBtnTitle('Sign in');
         setBtnNavigateLocation('/sign-in');
 
-        setDescription('You may simply proceed with signing in.');
+        return;
       }
-    } finally {
-      removeLoadingOverlay();
-      setBtnDisabled(false);
+
+      if (status !== 403) {
+        return;
+      }
+
+      if (errReason === 'signedIn') {
+        setAuthStatus('authenticated');
+        return;
+      }
+
+      setDescription(`If you still can't find the email, you can try signing up again after 20 minutes.`);
+      setBtnTitle('Go to homepage');
+      setBtnNavigateLocation('/home');
     }
   }
 
   return (
-    <>
-      <h4 className='text-title font-medium mb-1'>{title}</h4>
-      <p className='text-description text-sm mb-2'>{description}</p>
-      <Button
-        className='bg-description border-description text-dark w-full'
-        disabled={btnDisabled}
-        onClick={async () => {
-          if (btnNavigateLocation) {
-            navigate(btnNavigateLocation);
-            return;
-          }
+    <InstructionCard
+      title={title}
+      description={description}
+      btnTitle={btnTitle}
+      btnDisabled={btnDisabled}
+      onClick={async () => {
+        if (btnNavigateLocation) {
+          navigate(btnNavigateLocation);
+          return;
+        }
 
-          await resendAccountVerificationEmail();
-        }}
-      >
-        {btnTitle}
-      </Button>
-    </>
+        displayLoadingOverlay();
+        setBtnDisabled(true);
+
+        await resendAccountVerificationEmail();
+
+        setBtnDisabled(false);
+        removeLoadingOverlay();
+      }}
+    />
   );
 }
