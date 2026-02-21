@@ -32,10 +32,17 @@ export default function ConfirmAccountVerification({
   const verifyAccount = useCallback(
     async (abortSignal: AbortSignal = new AbortController().signal) => {
       try {
-        await verifyAccountService({ publicAccountId, verificationToken }, abortSignal);
+        const authSessionCreated: boolean = (await verifyAccountService({ publicAccountId, verificationToken }, abortSignal)).data
+          .authSessionCreated;
 
         displayPopupMessage('Account verified.', 'success');
-        navigate('/sign-in');
+
+        if (!authSessionCreated) {
+          navigate('/sign-in');
+          return;
+        }
+        setAuthStatus('authenticated');
+        navigate('/account');
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
           return;
