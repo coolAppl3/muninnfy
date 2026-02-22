@@ -112,8 +112,7 @@ export default function SignIn(): JSX.Element {
       <section className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
-            <h1 className='text-title text-xl 3xs:text-2xl font-bold text-center'>Sign in</h1>
-            <div className='h-line my-2'></div>
+            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>Sign in to your account</h1>
 
             <form
               id='sign-up-form'

@@ -12,7 +12,8 @@ import { minuteMilliseconds } from '../util/constants/globalConstants';
 import { deleteExpiredAuthSessionsCron } from '../auth/authSessions';
 import { decayWishlistsInteractivityIndexCron } from './wishlistCronJobs';
 import { deleteStaleFollowRequestsCron } from './socialCronJobs';
-import { destroyStaleWebSocketsCron } from './webSocketCronJobs';
+import { deleteStaleNotificationsCron } from './notificationCronJobs';
+import { pingWebSocketsCron } from './webSocketCronJobs';
 
 export function initCronJobs(): void {
   // every 30 seconds
@@ -34,7 +35,7 @@ export function initCronJobs(): void {
     await deleteStaleAccountRecoveryRequestsCron(currentTimestamp);
     await deleteStaleAccountDeletionRequestsCron(currentTimestamp);
 
-    destroyStaleWebSocketsCron(currentTimestamp);
+    pingWebSocketsCron(currentTimestamp);
   });
 
   // every 6 hours
@@ -51,6 +52,7 @@ export function initCronJobs(): void {
 
     await removeLightRateAbusersCron(currentTimestamp);
     await clearErrorLogsCron(currentTimestamp);
+    await deleteStaleNotificationsCron;
   });
 
   console.log('CRON jobs started.');

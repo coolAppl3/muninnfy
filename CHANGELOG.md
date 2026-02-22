@@ -1,6 +1,63 @@
 # Changelog
 
-## [0.2.12] (2026-02-13)
+## [0.3.1] (2026-02-22)
+
+### Features
+
+- Added `deleteStaleNotificationsCron()`.
+- rework `destroyStaleWebSocketsCron()` into `pingWebSocketsCron()` and improved overall logic.
+- Added and implemented`AccountNavMenuButton` component.
+- Removed `AccountWishlists` and rework the nav button to redirect the user to `Wishlists`.
+- Added `webSocketServerURL` to `accountNotificationsWebSocket`.
+- Implemented an account recovery process:
+  - Added the following components:
+    - `AccountRecovery`.
+    - `StartAccountRecovery`.
+    - `ResendAccountRecoveryEmail`.
+    - `ConfirmAccountRecovery`.
+  - Added the following services:
+    - `startAccountRecoveryService()`.
+    - `resendAccountRecoveryEmailService()`.
+    - `confirmAccountRecoveryService()`.
+- Added non-auth route for `AccountVerification`.
+- Added `InstructionCard` as utility component and implemented in both account the verification and recovery processes.
+
+
+### Changes
+
+- Removed `UNIQUE` constraint from `notifications` table.
+- Rework PATCH `accounts/verification/verify` and PATCH `accounts/recovery/confirm` to grant the user an auth session upon a completed operation to improve user experience.
+
+
+### Improvements
+
+- Memoized `NotificationCard`.
+- Improved phrasing in a number of components.
+- Improved UI design for `SignIn`, `SignUp`, and `NewWishlist`.
+- Improved behavior of `Container` to take all available space up to `1200px`.
+- Refined the logic and efficiency of the verification process.
+
+
+### Bug Fixes
+
+- Fixed `allNotificationsRendered` in `AccountNotifications` not being correctly determined.
+- Fixed some naming inconsistencies with stores.
+- Fixed "Load more" button in `AccountNotifications` rendering while the initial fetch is in progress.
+- Fixed incorrect path in recovery link within `accountRecoveryEmailTemplate()`.
+- Fixed types not containing their full function name in `accountServices`.
+
+
+### Code Refactoring
+
+- Refactored store objects to be destructured upon use for better readability.
+
+
+### Documentation Changes
+
+- Fixed previous patch not being declared as `0.3.0`.
+
+
+## [0.3.0] (2026-02-13)
 
 ### Features
 

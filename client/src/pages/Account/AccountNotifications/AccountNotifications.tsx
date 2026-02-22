@@ -77,26 +77,24 @@ export default function AccountNotifications(): JSX.Element {
     // unsubscribed when Account unmounts
   }, [notificationsHandler]);
 
+  if (!initialFetchCompleted) {
+    return <ContentLoadingSkeleton />;
+  }
+
   return (
     <>
       <h3 className='text-title text-md font-normal leading-[3.6rem]'>Notifications</h3>
       <div className='h-line my-1'></div>
 
       <div className='grid gap-1'>
-        {initialFetchCompleted && notifications.length === 0 && (
-          <p className='text-sm text-description w-fit mx-auto'>No notifications found</p>
-        )}
+        {notifications.length === 0 && <p className='text-sm text-description w-fit mx-auto'>No recent notifications</p>}
 
-        {initialFetchCompleted ? (
-          notifications.slice(0, renderLimit).map((notification: NotificationDetails) => (
-            <NotificationCard
-              key={notification.notification_id}
-              notification={notification}
-            />
-          ))
-        ) : (
-          <ContentLoadingSkeleton />
-        )}
+        {notifications.slice(0, renderLimit).map((notification: NotificationDetails) => (
+          <NotificationCard
+            key={notification.notification_id}
+            notification={notification}
+          />
+        ))}
 
         {fetchingAdditionalNotifications ? (
           <ContentLoadingSkeleton />

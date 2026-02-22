@@ -315,7 +315,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
   const { publicAccountId } = requestData;
 
   if (!isValidUuid(publicAccountId)) {
-    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
     return;
   }
 
@@ -441,7 +441,7 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
   const { publicAccountId, verificationToken } = requestData;
 
   if (!isValidUuid(publicAccountId)) {
-    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
     return;
   }
 
@@ -526,8 +526,10 @@ accountsRouter.patch('/verification/verify', async (req: Request, res: Response)
         return;
       }
 
+      const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, false);
+
       await connection.commit();
-      res.json({});
+      res.json({ authSessionCreated });
 
       return;
     }
@@ -1548,7 +1550,7 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
 accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
@@ -1680,7 +1682,7 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
@@ -1752,7 +1754,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
 
     if (!accountDetails.request_id) {
       await connection.rollback();
-      res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
+      res.status(404).json({ message: 'Recovery request not found or has expired.', reason: 'requestNotFound' });
 
       return;
     }
@@ -1806,7 +1808,7 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
 accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIN' });
+    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
@@ -1827,7 +1829,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
   const { publicAccountId, recoveryToken, newPassword } = requestData;
 
   if (!isValidUuid(publicAccountId)) {
-    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidAccountId' });
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
     return;
   }
 
@@ -1888,7 +1890,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
 
     if (!accountDetails.account_id) {
       await connection.rollback();
-      res.status(404).json({ message: 'Recovery request not found.', reason: 'requestNotFound' });
+      res.status(404).json({ message: 'Recovery request not found or has expired.', reason: 'requestNotFound' });
 
       return;
     }
@@ -1923,7 +1925,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       }
 
       res.status(401).json({
-        message: 'Incorrect recovery token.',
+        message: 'Incorrect recovery token. Recovery suspended.',
         reason: 'incorrectToken_suspended',
         resData: { expiryTimestamp },
       });
@@ -1974,10 +1976,11 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       return;
     }
 
-    connection.commit();
-    res.json({});
-
     await purgeAuthSessions(accountDetails.account_id);
+    const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, false);
+
+    connection.commit();
+    res.json({ authSessionCreated });
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();

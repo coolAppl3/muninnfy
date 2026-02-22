@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { JSX, memo } from 'react';
 import { NotificationDetails, NotificationType } from '../../../../types/notificationTypes';
 import { getDateAndTimeString } from '../../../../utils/globalUtils';
 
@@ -6,7 +6,8 @@ type NotificationCardProps = {
   notification: NotificationDetails;
 };
 
-export default function NotificationCard({ notification }: NotificationCardProps): JSX.Element {
+export default memo(NotificationCard);
+function NotificationCard({ notification }: NotificationCardProps): JSX.Element {
   const { notification_type, notification_timestamp, sender_public_account_id, sender_username, sender_display_name } = notification;
 
   const notificationDescription: string = getNotificationDescription(notification_type);

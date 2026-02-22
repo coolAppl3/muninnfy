@@ -2,6 +2,8 @@ import { FocusEvent, JSX, useState } from 'react';
 import HamMenuIcon from '../../../assets/svg/HamMenuIcon.svg?react';
 import CrossIcon from '../../../assets/svg/CrossIcon.svg?react';
 import useAccountLocation from '../hooks/useAccountLocation';
+import AccountNavMenuButton from './components/AccountNavMenuButton';
+import { Link } from 'react-router-dom';
 
 export default function AccountNavMenu(): JSX.Element {
   const { accountLocation, setAccountLocation } = useAccountLocation();
@@ -31,57 +33,42 @@ export default function AccountNavMenu(): JSX.Element {
           isOpen ? 'transition-all opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
         }`}
       >
-        <button
-          type='button'
-          className={`nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-light-gray ${
-            accountLocation === 'profile' ? 'text-cta' : ''
-          }`}
+        <AccountNavMenuButton
+          isSelected={accountLocation === 'profile'}
           onClick={() => {
             setAccountLocation('profile');
             setIsOpen(false);
           }}
         >
           Profile
-        </button>
+        </AccountNavMenuButton>
 
-        <button
-          type='button'
-          className={`nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-light-gray ${
-            accountLocation === 'social' ? 'text-cta' : ''
-          }`}
+        <AccountNavMenuButton
+          isSelected={accountLocation === 'social'}
           onClick={() => {
             setAccountLocation('social');
             setIsOpen(false);
           }}
         >
           Social
-        </button>
+        </AccountNavMenuButton>
 
-        <button
-          type='button'
-          className={`nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-light-gray ${
-            accountLocation === 'notifications' ? 'text-cta' : ''
-          }`}
+        <AccountNavMenuButton
+          isSelected={accountLocation === 'notifications'}
           onClick={() => {
             setAccountLocation('notifications');
             setIsOpen(false);
           }}
         >
           Notifications
-        </button>
+        </AccountNavMenuButton>
 
-        <button
-          type='button'
-          className={`nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-secondary ${
-            accountLocation === 'wishlists' ? 'text-cta' : ''
-          }`}
-          onClick={() => {
-            setAccountLocation('wishlists');
-            setIsOpen(false);
-          }}
+        <Link
+          to='/account/wishlists'
+          className='nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-secondary'
         >
           Wishlists
-        </button>
+        </Link>
       </nav>
     </div>
   );

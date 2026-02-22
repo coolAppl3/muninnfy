@@ -20,16 +20,16 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const { toggleWishlistItemExpansion, isExpanded } = useWishlistItemsExpansionStore(
-    useShallow((store) => ({
-      toggleWishlistItemExpansion: store.toggleWishlistItemsExpansion,
-      isExpanded: store.expandedItemsIdsSet.has(wishlistItem.item_id),
+    useShallow(({ toggleWishlistItemExpansion, expandedItemsIdsSet }) => ({
+      toggleWishlistItemExpansion,
+      isExpanded: expandedItemsIdsSet.has(wishlistItem.item_id),
     }))
   );
 
   const { toggleWishlistItemSelection, isSelected } = useWishlistItemsSelectionStore(
-    useShallow((store) => ({
-      toggleWishlistItemSelection: store.toggleWishlistItemSelection,
-      isSelected: store.selectedItemsIdsSet.has(wishlistItem.item_id),
+    useShallow(({ toggleWishlistItemSelection, selectedItemsIdsSet }) => ({
+      toggleWishlistItemSelection,
+      isSelected: selectedItemsIdsSet.has(wishlistItem.item_id),
     }))
   );
 

@@ -10,10 +10,10 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { expandedItemsIdsSet, expandAllWishlistItems, collapseAllWishlistItems } = useWishlistItemsExpansionStore(
-    useShallow((store) => ({
-      expandedItemsIdsSet: store.expandedItemsIdsSet,
-      expandAllWishlistItems: store.expandAllWishlistItems,
-      collapseAllWishlistItems: store.collapseAllWishlistItems,
+    useShallow(({ expandedItemsIdsSet, expandAllWishlistItems, collapseAllWishlistItems }) => ({
+      expandedItemsIdsSet,
+      expandAllWishlistItems,
+      collapseAllWishlistItems,
     }))
   );
 

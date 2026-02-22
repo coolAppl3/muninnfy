@@ -49,7 +49,8 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
 
   return (
     <>
-      <h4 className='text-title font-medium mb-1'>Continue account verification.</h4>
+      <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Account verification</h1>
+
       <p className='text-description text-sm mb-1'>Enter the email address you used for signing up below.</p>
       <p className='text-description text-sm mb-2'>Unverified accounts are automatically deleted after 20 minutes.</p>
 

@@ -24,11 +24,11 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const { wishlistId } = useWishlist();
   const { selectionModeActive, setSelectionModeActive, wishlistItems, setWishlistItems, itemMatchesFilterConfig } = useWishlistItems();
 
-  const { selectedItemsSet, selectAllWishlistItems, unselectAllWishlistItems } = useWishlistItemsSelectionStore(
-    useShallow((store) => ({
-      selectedItemsSet: store.selectedItemsIdsSet,
-      selectAllWishlistItems: store.selectAllWishlistItems,
-      unselectAllWishlistItems: store.unselectAllWishlistItems,
+  const { selectedItemsIdsSet, selectAllWishlistItems, unselectAllWishlistItems } = useWishlistItemsSelectionStore(
+    useShallow(({ selectedItemsIdsSet, selectAllWishlistItems, unselectAllWishlistItems }) => ({
+      selectedItemsIdsSet,
+      selectAllWishlistItems,
+      unselectAllWishlistItems,
     }))
   );
 
@@ -45,19 +45,19 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
       return;
     }
 
-    if (selectedItemsSet.size === 0) {
+    if (selectedItemsIdsSet.size === 0) {
       displayPopupMessage('No items selected.', 'error');
       return;
     }
 
     const markAsPurchased: boolean = selectedAction === 'mark_as_purchased' ? true : false;
-    const expectedUpdatesCount: number = selectedItemsSet.size;
+    const expectedUpdatesCount: number = selectedItemsIdsSet.size;
 
     displayLoadingOverlay();
 
     try {
       const { newPurchasedOnTimestamp, updatedItemsCount } = (
-        await bulkSetWishlistItemIsPurchasedService({ wishlistId, itemsIdArr: [...selectedItemsSet], markAsPurchased })
+        await bulkSetWishlistItemIsPurchasedService({ wishlistId, itemsIdArr: [...selectedItemsIdsSet], markAsPurchased })
       ).data;
 
       if (updatedItemsCount === 0) {
@@ -67,7 +67,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
       setWishlistItems((prev) =>
         prev.map((item: WishlistItemType) =>
-          selectedItemsSet.has(item.item_id) ? { ...item, purchased_on_timestamp: newPurchasedOnTimestamp } : item
+          selectedItemsIdsSet.has(item.item_id) ? { ...item, purchased_on_timestamp: newPurchasedOnTimestamp } : item
         )
       );
 
@@ -99,17 +99,17 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
       return;
     }
 
-    if (selectedItemsSet.size === 0) {
+    if (selectedItemsIdsSet.size === 0) {
       displayPopupMessage('No items selected.', 'error');
       return;
     }
 
-    const expectedUpdatesCount: number = selectedItemsSet.size;
+    const expectedUpdatesCount: number = selectedItemsIdsSet.size;
 
     displayLoadingOverlay();
 
     try {
-      const deletedItemsCount: number = (await bulkDeleteWishlistItemsService({ wishlistId, itemsIdArr: [...selectedItemsSet] })).data
+      const deletedItemsCount: number = (await bulkDeleteWishlistItemsService({ wishlistId, itemsIdArr: [...selectedItemsIdsSet] })).data
         .deletedItemsCount;
 
       if (deletedItemsCount === 0) {
@@ -117,7 +117,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
         return;
       }
 
-      setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => !selectedItemsSet.has(item_id)));
+      setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => !selectedItemsIdsSet.has(item_id)));
 
       setSelectionModeActive(false);
       setSelectedAction('mark_as_purchased');
@@ -163,7 +163,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
   const allItemsSelected: boolean =
     wishlistItems.length > 0 &&
-    wishlistItems.every((item: WishlistItemType) => selectedItemsSet.has(item.item_id) || !itemMatchesFilterConfig(item));
+    wishlistItems.every((item: WishlistItemType) => selectedItemsIdsSet.has(item.item_id) || !itemMatchesFilterConfig(item));
 
   const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
@@ -173,7 +173,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
         <div className='p-2 bg-dark rounded-sm shadow-simple-tiny'>
           <div className='text-description text-sm mb-[1.6rem]'>
             <p>
-              Items selected: <span className='text-title font-medium'>{selectedItemsSet.size}</span>
+              Items selected: <span className='text-title font-medium'>{selectedItemsIdsSet.size}</span>
             </p>
 
             <p>
@@ -182,7 +182,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
                 {localCurrencyFormatter
                   .format(
                     wishlistItems.reduce((acc: number, curr: WishlistItemType) => {
-                      const itemSelected: boolean = selectedItemsSet.has(curr.item_id);
+                      const itemSelected: boolean = selectedItemsIdsSet.has(curr.item_id);
 
                       if (!itemSelected || !curr.price) {
                         return acc;
@@ -230,8 +230,8 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
           <div className='flex flex-col sm:flex-row gap-1'>
             <Button
-              disabled={selectedItemsSet.size === 0}
-              className={`bg-cta border-cta text-dark w-full sm:w-fit order-1 sm:order-2 ${selectedItemsSet.size === 0 ? 'disabled' : ''} ${
+              disabled={selectedItemsIdsSet.size === 0}
+              className={`bg-cta border-cta text-dark w-full sm:w-fit order-1 sm:order-2 ${selectedItemsIdsSet.size === 0 ? 'disabled' : ''} ${
                 selectedAction === 'delete' ? '!bg-danger !border-danger' : ''
               }`}
               onClick={async () => {
@@ -242,10 +242,10 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
                 displayConfirmModal({
                   description: `Are you sure you want to delete the${
-                    selectedItemsSet.size === 1 ? '' : ` ${selectedItemsSet.size}`
-                  } selected ${selectedItemsSet.size === 1 ? 'item' : 'items'}?`,
+                    selectedItemsIdsSet.size === 1 ? '' : ` ${selectedItemsIdsSet.size}`
+                  } selected ${selectedItemsIdsSet.size === 1 ? 'item' : 'items'}?`,
                   isDangerous: true,
-                  confirmBtnTitle: `Delete ${selectedItemsSet.size === 1 ? 'item' : 'items'}`,
+                  confirmBtnTitle: `Delete ${selectedItemsIdsSet.size === 1 ? 'item' : 'items'}`,
                   cancelBtnTitle: 'Cancel',
                   onConfirm: async () => {
                     removeConfirmModal();
@@ -255,7 +255,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
                 });
               }}
             >
-              {selectedAction === 'delete' ? 'Delete' : 'Update'} {selectedItemsSet.size === 1 ? 'item' : 'items'}
+              {selectedAction === 'delete' ? 'Delete' : 'Update'} {selectedItemsIdsSet.size === 1 ? 'item' : 'items'}
             </Button>
 
             <Button

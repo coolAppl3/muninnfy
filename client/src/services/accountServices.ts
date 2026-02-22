@@ -33,30 +33,37 @@ export function continueAccountVerificationService(
   return axios.post(`${accountsApiUrl}/verification/continue`, body);
 }
 
-type ResendVerificationEmailPayload = {
+type ResendAccountVerificationEmailServicePayload = {
   publicAccountId: string;
 };
 
-export function resendAccountVerificationEmailService(body: ResendVerificationEmailPayload): Promise<AxiosResponse> {
+export function resendAccountVerificationEmailService(body: ResendAccountVerificationEmailServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/verification/resendEmail`, body);
 }
 
-type VerifyAccountPayload = {
+type VerifyAccountServicePayload = {
   publicAccountId: string;
   verificationToken: string;
 };
 
-export function verifyAccountService(body: VerifyAccountPayload, abortSignal: AbortSignal): Promise<AxiosResponse> {
+type VerifyAccountServiceData = {
+  authSessionCreated: boolean;
+};
+
+export function verifyAccountService(
+  body: VerifyAccountServicePayload,
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<VerifyAccountServiceData>> {
   return axios.patch(`${accountsApiUrl}/verification/verify`, body, { signal: abortSignal });
 }
 
-type SignInPayload = {
+type SignInServicePayload = {
   email: string;
   password: string;
   keepSignedIn: boolean;
 };
 
-export function signInService(body: SignInPayload): Promise<AxiosResponse> {
+export function signInService(body: SignInServicePayload): Promise<AxiosResponse> {
   return axios.post(`${accountsApiUrl}/signIn`, body);
 }
 
@@ -119,6 +126,44 @@ type ConfirmEmailUpdateServicePayload = {
 
 export function confirmEmailUpdateService(body: ConfirmEmailUpdateServicePayload): Promise<AxiosResponse> {
   return axios.patch(`${accountsApiUrl}/details/email/confirm`, body);
+}
+
+type StartAccountRecoveryServicePayload = {
+  email: string;
+};
+
+type StartAccountRecoveryServiceData = {
+  publicAccountId: string;
+};
+
+export function startAccountRecoveryService(
+  body: StartAccountRecoveryServicePayload
+): Promise<AxiosResponse<StartAccountRecoveryServiceData>> {
+  return axios.post(`${accountsApiUrl}/recovery/start`, body);
+}
+
+type ResendAccountRecoveryEmailServicePayload = {
+  publicAccountId: string;
+};
+
+export function resendAccountRecoveryEmailService(body: ResendAccountRecoveryEmailServicePayload): Promise<AxiosResponse> {
+  return axios.patch(`${accountsApiUrl}/recovery/resendEmail`, body);
+}
+
+type ConfirmAccountRecoveryServicePayload = {
+  publicAccountId: string;
+  recoveryToken: string;
+  newPassword: string;
+};
+
+type confirmAccountRecoveryServiceData = {
+  authSessionCreated: boolean;
+};
+
+export function confirmAccountRecoveryService(
+  body: ConfirmAccountRecoveryServicePayload
+): Promise<AxiosResponse<confirmAccountRecoveryServiceData>> {
+  return axios.patch(`${accountsApiUrl}/recovery/confirm`, body);
 }
 
 type StartAccountDeletionServicePayload = {
