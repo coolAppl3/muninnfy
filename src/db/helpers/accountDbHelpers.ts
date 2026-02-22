@@ -10,8 +10,10 @@ import {
 import { removeRequestCookie } from '../../util/cookieUtils';
 import { purgeAuthSessions } from '../../auth/authSessions';
 
+type AccountRequestTables = 'account_verification' | 'account_recovery' | 'account_deletion' | 'email_update';
+
 export async function incrementAccountRequestEmailsSent(
-  tableName: 'account_verification' | 'account_recovery' | 'account_deletion' | 'email_update',
+  tableName: AccountRequestTables,
   requestId: number,
   executor: Pool | PoolConnection,
   req: Request
@@ -37,7 +39,7 @@ export async function incrementAccountRequestEmailsSent(
 }
 
 export async function incrementFailedAccountRequestAttempts(
-  tableName: 'account_verification' | 'account_recovery' | 'account_deletion' | 'email_update',
+  tableName: AccountRequestTables,
   requestId: number,
   executor: Pool | PoolConnection,
   req: Request
@@ -63,7 +65,7 @@ export async function incrementFailedAccountRequestAttempts(
 }
 
 export async function suspendAccountRequest(
-  tableName: 'account_recovery' | 'account_deletion' | 'email_update',
+  tableName: Exclude<AccountRequestTables, 'account_verification'>,
   requestId: number,
   executor: Pool | PoolConnection,
   req: Request
