@@ -92,7 +92,7 @@ export default function SignUp(): JSX.Element {
               }}
             >
               <DefaultFormGroup
-                id='displayName'
+                id='display-name'
                 label='Display name'
                 autoComplete='name'
                 value={formData.displayName}
@@ -127,7 +127,7 @@ export default function SignUp(): JSX.Element {
               />
 
               <PasswordFormGroup
-                id='confirmPassword'
+                id='confirm-password'
                 label='Confirm password'
                 value={formData.confirmPassword}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'VALIDATE_FIELD', payload: e })}

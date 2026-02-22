@@ -163,8 +163,8 @@ export default function SignIn(): JSX.Element {
               />
 
               <CheckboxFormGroup
+                id='keep-signed-in'
                 label='Keep me signed in'
-                id='keepSignedIn'
                 isChecked={keepSignedInValue}
                 onClick={() => setKeepSignedIn((prev) => !prev)}
               />
