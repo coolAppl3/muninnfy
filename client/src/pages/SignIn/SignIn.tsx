@@ -61,7 +61,9 @@ export default function SignIn(): JSX.Element {
       }
 
       if (errReason === 'alreadySignedIn') {
+        displayPopupMessage(errMessage, 'success');
         setAuthStatus('authenticated');
+
         return;
       }
 
