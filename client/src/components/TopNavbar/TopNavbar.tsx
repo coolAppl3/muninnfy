@@ -70,7 +70,7 @@ function AdditionalLinks(): JSX.Element {
 
       {pathname === '/sign-up' || (
         <Button
-          className='bg-cta border-cta text-dark'
+          className={pathname === '/sign-in' ? 'bg-description border-description text-dark' : 'bg-cta border-cta text-dark'}
           onClick={() => navigate('/sign-up')}
         >
           Sign up
