@@ -7,17 +7,19 @@ import DeleteWishlistForm from './DeleteWishlistForm';
 export default function WishlistHeaderEditingContainer(): JSX.Element {
   const { editMode } = useWishlistHeader();
 
-  if (editMode === 'TITLE') {
+  if (editMode === 'title') {
     return <EditWishlistTitleForm />;
   }
 
-  if (editMode === 'PRIVACY_LEVEL') {
+  if (editMode === 'privacyLevel') {
     return <EditPrivacyLevelContainer />;
   }
 
-  if (editMode === 'DELETE_WISHLIST') {
+  if (editMode === 'deleteWishlist') {
     return <DeleteWishlistForm />;
   }
+
+  editMode;
 
   return <div className='h-[15rem] w-full'></div>;
 }

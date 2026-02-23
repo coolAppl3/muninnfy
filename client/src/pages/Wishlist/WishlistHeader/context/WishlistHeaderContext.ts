@@ -1,6 +1,6 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 
-export type WishlistHeaderEditMode = 'TITLE' | 'PRIVACY_LEVEL' | 'DELETE_WISHLIST';
+export type WishlistHeaderEditMode = 'title' | 'privacyLevel' | 'deleteWishlist';
 
 export type WishlistHeaderContextType = {
   editMode: WishlistHeaderEditMode | null;

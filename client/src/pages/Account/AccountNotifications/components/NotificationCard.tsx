@@ -27,11 +27,11 @@ function NotificationCard({ notification }: NotificationCardProps): JSX.Element 
 }
 
 function getNotificationDescription(notificationType: NotificationType): string {
-  if (notificationType === 'NEW_FOLLOWER') {
+  if (notificationType === 'new_follower') {
     return 'started following you.';
   }
 
-  if (notificationType === 'NEW_FOLLOW_REQUEST') {
+  if (notificationType === 'new_follow_request') {
     return 'requested to follow you.';
   }
 

@@ -31,10 +31,10 @@ export default function AccountProfileHeader(): JSX.Element {
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className={`context-menu-btn ${profileSection === 'PRIVACY_SETTINGS' ? 'text-cta' : ''}`}
+          className={`context-menu-btn ${profileSection === 'privacySettings' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setProfileSection('PRIVACY_SETTINGS');
+            setProfileSection('privacySettings');
           }}
         >
           Privacy settings
@@ -42,10 +42,10 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${profileSection === 'CHANGE_DISPLAY_NAME' ? 'text-cta' : ''}`}
+          className={`context-menu-btn ${profileSection === 'changeDisplayName' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setProfileSection('CHANGE_DISPLAY_NAME');
+            setProfileSection('changeDisplayName');
           }}
         >
           Change display name
@@ -53,10 +53,10 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${profileSection === 'CHANGE_PASSWORD' ? 'text-cta' : ''}`}
+          className={`context-menu-btn ${profileSection === 'changePassword' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setProfileSection('CHANGE_PASSWORD');
+            setProfileSection('changePassword');
           }}
         >
           Change password
@@ -64,10 +64,10 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn border-t-1 border-t-description/50 ${profileSection === 'CHANGE_EMAIL' ? 'text-cta' : ''}`}
+          className={`context-menu-btn border-t-1 border-t-description/50 ${profileSection === 'changeEmail' ? 'text-cta' : ''}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setProfileSection('CHANGE_EMAIL');
+            setProfileSection('changeEmail');
           }}
         >
           Change email address
@@ -75,10 +75,10 @@ export default function AccountProfileHeader(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${profileSection === 'DELETE_ACCOUNT' ? 'text-cta' : 'text-danger'}`}
+          className={`context-menu-btn ${profileSection === 'deleteAccount' ? 'text-cta' : 'text-danger'}`}
           onClick={() => {
             setMenuIsOpen(false);
-            setProfileSection('DELETE_ACCOUNT');
+            setProfileSection('deleteAccount');
           }}
         >
           Delete account

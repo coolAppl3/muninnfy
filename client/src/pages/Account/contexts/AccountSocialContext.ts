@@ -1,6 +1,6 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 
-export type AccountSocialSection = 'FOLLOWERS' | 'FOLLOWING' | 'FOLLOW_REQUESTS' | 'FIND_ACCOUNT';
+export type AccountSocialSection = 'followers' | 'following' | 'followRequests' | 'findAccount';
 
 export type AccountSocialContextType = {
   socialSection: AccountSocialSection;

@@ -23,7 +23,7 @@ import { validatePrice } from '../../../utils/validation/sharedValidation';
 import { WISHLIST_ITEM_MAX_PRICE } from '../../../utils/constants/wishlistItemConstants';
 
 type WishlistItemFromProps = {
-  formMode: 'NEW_ITEM' | 'EDIT_ITEM';
+  formMode: 'newItem' | 'editItem';
   wishlistItem?: WishlistItemType;
   onFinish: () => void;
   className?: string;
@@ -75,7 +75,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   }, []);
 
   async function handleSubmit(): Promise<void> {
-    if (formMode === 'NEW_ITEM' && !itemAlreadyInWishlist()) {
+    if (formMode === 'newItem' && !itemAlreadyInWishlist()) {
       await addWishlistItem();
       return;
     }
@@ -107,7 +107,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, price, tags })).data;
 
       setWishlistItems((prev) => [newWishlistItem, ...prev]);
-      itemsSortingMode === 'newest_first' || sortWishlistItems();
+      itemsSortingMode === 'newest' || sortWishlistItems();
 
       const allItemsExpanded: boolean = expandedItemsIdsSet.size === wishlistItems.length;
       allItemsExpanded && toggleWishlistItemExpansion(newWishlistItem.item_id);
@@ -331,7 +331,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
         id='item-title'
         label='Title (required)'
         autoComplete='off'
-        ref={formMode === 'NEW_ITEM' ? titleInputRef : null}
+        ref={formMode === 'newItem' ? titleInputRef : null}
         value={titleValue}
         errorMessage={titleErrorMessage}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -391,25 +391,25 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
       <div
         className={`btn-container flex flex-col justify-start items-center gap-1 ${
-          formMode === 'EDIT_ITEM' ? 'sm:flex-col md:flex-row' : 'sm:flex-row'
+          formMode === 'editItem' ? 'sm:flex-col md:flex-row' : 'sm:flex-row'
         }`}
       >
         <Button
           className={`bg-secondary border-title text-title w-full order-2 ${
-            formMode === 'EDIT_ITEM' ? 'sm:w-full md:w-fit sm:order-2 md:order-1' : 'sm:w-fit sm:order-1'
+            formMode === 'editItem' ? 'sm:w-full md:w-fit sm:order-2 md:order-1' : 'sm:w-fit sm:order-1'
           }`}
           onClick={() => {
             clearForm();
             onFinish();
           }}
         >
-          {formMode === 'NEW_ITEM' ? 'Close' : 'Cancel'}
+          {formMode === 'newItem' ? 'Close' : 'Cancel'}
         </Button>
 
         <Button
           isSubmitBtn
           className={`bg-cta border-cta w-full order-1 ${
-            formMode === 'EDIT_ITEM' ? 'sm:w-full md:w-fit sm:order-1 md:order-2' : 'sm:w-fit sm:order-2'
+            formMode === 'editItem' ? 'sm:w-full md:w-fit sm:order-1 md:order-2' : 'sm:w-fit sm:order-2'
           }`}
         >
           {wishlistItem ? 'Update wishlist item' : 'Add wishlist item'}

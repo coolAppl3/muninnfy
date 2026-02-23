@@ -42,32 +42,32 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
         <button
           type='button'
-          className={`context-menu-btn ${itemsSortingMode === 'newest_first' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('newest_first')}
+          className={`context-menu-btn ${itemsSortingMode === 'newest' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('newest')}
         >
           Newest first
         </button>
 
         <button
           type='button'
-          className={`context-menu-btn ${itemsSortingMode === 'oldest_first' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('oldest_first')}
+          className={`context-menu-btn ${itemsSortingMode === 'oldest' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('oldest')}
         >
           Oldest first
         </button>
 
         <button
           type='button'
-          className={`context-menu-btn ${itemsSortingMode === 'cheapest_first' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('cheapest_first')}
+          className={`context-menu-btn ${itemsSortingMode === 'cheapest' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('cheapest')}
         >
           Cheapest first
         </button>
 
         <button
           type='button'
-          className={`context-menu-btn ${itemsSortingMode === 'priciest_first' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('priciest_first')}
+          className={`context-menu-btn ${itemsSortingMode === 'priciest' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('priciest')}
         >
           Priciest first
         </button>

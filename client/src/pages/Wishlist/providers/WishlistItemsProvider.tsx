@@ -10,7 +10,7 @@ type WishlistItemsProviderProps = {
 export default function WishlistItemsProvider({ initialWishlistItems, children }: WishlistItemsProviderProps): JSX.Element {
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
   const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfigType>(defaultItemsFilterConfig);
-  const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest_first');
+  const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest');
   const [selectionModeActive, setSelectionModeActive] = useState<boolean>(false);
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
 
@@ -100,22 +100,22 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
     (explicitSortingMode?: ItemsSortingMode) => {
       const sortingMode: ItemsSortingMode = explicitSortingMode || itemsSortingMode;
 
-      if (sortingMode === 'newest_first') {
+      if (sortingMode === 'newest') {
         setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
         return;
       }
 
-      if (sortingMode === 'oldest_first') {
+      if (sortingMode === 'oldest') {
         setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
         return;
       }
 
-      if (sortingMode === 'cheapest_first') {
+      if (sortingMode === 'cheapest') {
         setWishlistItems((prev) => prev.toSorted((a, b) => (a.price || 0) - (b.price || 0)));
         return;
       }
 
-      if (sortingMode === 'priciest_first') {
+      if (sortingMode === 'priciest') {
         setWishlistItems((prev) => prev.toSorted((a, b) => (b.price || 0) - (a.price || 0)));
         return;
       }

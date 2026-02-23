@@ -52,7 +52,7 @@ export async function addNotification(
       display_name: senderDetails.sender_display_name,
     };
 
-    const isFollowRequestNotification: boolean = notificationType === 'NEW_FOLLOW_REQUEST';
+    const isFollowRequestNotification: boolean = notificationType === 'new_follow_request';
     const notificationData: FollowDetails | FollowRequest = isFollowRequestNotification
       ? {
           request_id: insertId,

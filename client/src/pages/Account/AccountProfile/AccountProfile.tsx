@@ -57,9 +57,9 @@ export function AccountProfile(): JSX.Element {
 }
 
 const contentRecord: Record<AccountProfileSection, JSX.Element> = {
-  PRIVACY_SETTINGS: <AccountProfilePrivacy />,
-  CHANGE_DISPLAY_NAME: <AccountChangeDisplayName />,
-  CHANGE_EMAIL: <AccountChangeEmail />,
-  CHANGE_PASSWORD: <AccountChangePassword />,
-  DELETE_ACCOUNT: <AccountDeletion />,
+  privacySettings: <AccountProfilePrivacy />,
+  changeDisplayName: <AccountChangeDisplayName />,
+  changeEmail: <AccountChangeEmail />,
+  changePassword: <AccountChangePassword />,
+  deleteAccount: <AccountDeletion />,
 };

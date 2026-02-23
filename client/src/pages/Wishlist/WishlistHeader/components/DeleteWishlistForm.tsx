@@ -81,7 +81,7 @@ export default function DeleteWishlistForm(): JSX.Element {
         <Button
           isSubmitBtn
           className='bg-danger border-danger order-1 sm:order-2 w-full sm:w-fit'
-          disabled={editMode === 'DELETE_WISHLIST' ? confirmationTitleValue !== wishlistDetails.title : true}
+          disabled={editMode === 'deleteWishlist' ? confirmationTitleValue !== wishlistDetails.title : true}
         >
           Delete wishlist
         </Button>

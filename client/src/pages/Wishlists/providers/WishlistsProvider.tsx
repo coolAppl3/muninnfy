@@ -82,22 +82,22 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
     (explicitSortingMode?: WishlistsSortingMode) => {
       const sortingMode: WishlistsSortingMode = explicitSortingMode || wishlistsSortingMode;
 
-      if (sortingMode === 'newest_first') {
+      if (sortingMode === 'newest') {
         setWishlists((prev) => prev.toSorted((a, b) => b.created_on_timestamp - a.created_on_timestamp));
         return;
       }
 
-      if (sortingMode === 'oldest_first') {
+      if (sortingMode === 'oldest') {
         setWishlists((prev) => prev.toSorted((a, b) => a.created_on_timestamp - b.created_on_timestamp));
         return;
       }
 
-      if (sortingMode === 'largest_first') {
+      if (sortingMode === 'largest') {
         setWishlists((prev) => prev.toSorted((a, b) => b.items_count - a.items_count));
         return;
       }
 
-      if (sortingMode === 'smallest_first') {
+      if (sortingMode === 'smallest') {
         setWishlists((prev) => prev.toSorted((a, b) => a.items_count - b.items_count));
         return;
       }

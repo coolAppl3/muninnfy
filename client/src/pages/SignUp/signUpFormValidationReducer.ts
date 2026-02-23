@@ -41,17 +41,17 @@ export const initialSignUpFormValidationState: SignUpFormValidationState = {
 };
 
 type ValidateField = {
-  type: 'VALIDATE_FIELD';
+  type: 'validateField';
   payload: ChangeEvent<HTMLInputElement>;
 };
 
 type ValidateAllFields = {
-  type: 'VALIDATE_ALL_FIELDS';
+  type: 'validateAllFields';
   payload: null;
 };
 
 type AddFieldError = {
-  type: 'ADD_FIELD_ERROR';
+  type: 'addFieldError';
   payload: { errMessage: string; errReason: string };
 };
 
@@ -61,7 +61,7 @@ export default function signUpFormValidationReducer(
 ): SignUpFormValidationState {
   const { type, payload } = action;
 
-  if (type === 'VALIDATE_ALL_FIELDS') {
+  if (type === 'validateAllFields') {
     const { displayName, username, email, password, confirmPassword } = state.formData;
 
     const updatedState: SignUpFormValidationState = {
@@ -78,7 +78,7 @@ export default function signUpFormValidationReducer(
     return updatedState;
   }
 
-  if (type === 'ADD_FIELD_ERROR') {
+  if (type === 'addFieldError') {
     const { errMessage, errReason } = payload;
 
     const errFieldRecord: Record<string, string> = {

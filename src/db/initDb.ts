@@ -190,7 +190,7 @@ async function createNotificationsTable(): Promise<void> {
         receiver_account_id INT UNSIGNED NOT NULL,
         sender_account_id INT UNSIGNED NOT NULL,
         notification_timestamp BIGINT UNSIGNED NOT NULL,
-        notification_type ENUM('NEW_FOLLOWER', 'NEW_FOLLOW_REQUEST', 'FOLLOW_REQUEST_ACCEPTED') NOT NULL,
+        notification_type ENUM('new_follower', 'new_follow_request', 'follow_request_accepted') NOT NULL,
         FOREIGN KEY (receiver_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         FOREIGN KEY (sender_account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
       );`

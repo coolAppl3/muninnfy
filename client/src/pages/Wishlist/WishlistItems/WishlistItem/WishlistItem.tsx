@@ -41,7 +41,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
     return (
       <div className='py-2 bg-secondary rounded-sm shadow-simple-tiny'>
         <WishlistItemForm
-          formMode='EDIT_ITEM'
+          formMode='editItem'
           wishlistItem={wishlistItem}
           onFinish={() => setIsEditing(false)}
         />

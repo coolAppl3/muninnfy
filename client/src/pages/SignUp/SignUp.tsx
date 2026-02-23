@@ -44,14 +44,14 @@ export default function SignUp(): JSX.Element {
       }
 
       if (status === 400 || status === 409) {
-        errReason && dispatch({ type: 'ADD_FIELD_ERROR', payload: { errMessage, errReason } });
+        errReason && dispatch({ type: 'addFieldError', payload: { errMessage, errReason } });
       }
     }
   }
 
   function allFieldsValid(): boolean {
-    dispatch({ type: 'VALIDATE_ALL_FIELDS', payload: null });
-    const newState = signUpFormValidationReducer({ formData, formErrors }, { type: 'VALIDATE_ALL_FIELDS', payload: null });
+    dispatch({ type: 'validateAllFields', payload: null });
+    const newState = signUpFormValidationReducer({ formData, formErrors }, { type: 'validateAllFields', payload: null });
 
     for (const errorMessage of Object.values(newState.formErrors)) {
       if (errorMessage) {
@@ -96,7 +96,7 @@ export default function SignUp(): JSX.Element {
                 label='Display name'
                 autoComplete='name'
                 value={formData.displayName}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'VALIDATE_FIELD', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
                 errorMessage={formErrors.displayName}
               />
 
@@ -105,7 +105,7 @@ export default function SignUp(): JSX.Element {
                 label='Username'
                 autoComplete='username'
                 value={formData.username}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'VALIDATE_FIELD', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
                 errorMessage={formErrors.username}
               />
 
@@ -114,7 +114,7 @@ export default function SignUp(): JSX.Element {
                 label='Email address'
                 autoComplete='email'
                 value={formData.email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'VALIDATE_FIELD', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
                 errorMessage={formErrors.email}
               />
 
@@ -122,7 +122,7 @@ export default function SignUp(): JSX.Element {
                 id='password'
                 label='Password'
                 value={formData.password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'VALIDATE_FIELD', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
                 errorMessage={formErrors.password}
               />
 
@@ -130,7 +130,7 @@ export default function SignUp(): JSX.Element {
                 id='confirm-password'
                 label='Confirm password'
                 value={formData.confirmPassword}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'VALIDATE_FIELD', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
                 errorMessage={formErrors.confirmPassword}
               />
 

@@ -63,7 +63,7 @@ export default function AccountSocial(): JSX.Element {
     (data: NotificationDetails) => {
       const { notification_type, notification_data } = data;
 
-      if (notification_type === 'NEW_FOLLOW_REQUEST') {
+      if (notification_type === 'new_follow_request') {
         setFollowRequests((prev) => [notification_data as FollowRequest, ...prev]);
         setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count + 1 }));
 
@@ -72,7 +72,7 @@ export default function AccountSocial(): JSX.Element {
 
       const followDetails = notification_data as FollowDetails;
 
-      if (notification_type === 'NEW_FOLLOWER') {
+      if (notification_type === 'new_follower') {
         setFollowers((prev) => [followDetails, ...prev]);
         setSocialCounts((prev) => ({ ...prev, followers_count: prev.followers_count + 1 }));
 
@@ -105,8 +105,8 @@ export default function AccountSocial(): JSX.Element {
 }
 
 const contentRecord: Record<AccountSocialSection, JSX.Element> = {
-  FOLLOWERS: <AccountSocialFollowers />,
-  FOLLOWING: <AccountSocialFollowing />,
-  FOLLOW_REQUESTS: <AccountSocialFollowRequests />,
-  FIND_ACCOUNT: <AccountSocialFindAccount />,
+  followers: <AccountSocialFollowers />,
+  following: <AccountSocialFollowing />,
+  followRequests: <AccountSocialFollowRequests />,
+  findAccount: <AccountSocialFindAccount />,
 };

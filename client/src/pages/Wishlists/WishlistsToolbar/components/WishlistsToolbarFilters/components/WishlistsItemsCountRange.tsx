@@ -23,7 +23,7 @@ export default function WishlistsItemsCountRange({ dispatch, className }: Wishli
     setCountToErrorMessage(countToErrorMessage);
 
     if (countFromErrorMessage || countToErrorMessage) {
-      dispatch({ type: 'SET_ITEMS_COUNT_RANGE_VALID', payload: { newValue: false } });
+      dispatch({ type: 'setItemsCountRangeValid', payload: { newValue: false } });
       return;
     }
 
@@ -31,14 +31,14 @@ export default function WishlistsItemsCountRange({ dispatch, className }: Wishli
     const finalCountTo: number | null = toValue === '' ? null : +toValue;
 
     if (finalCountFrom && finalCountTo && finalCountFrom > finalCountTo) {
-      dispatch({ type: 'SET_ITEMS_COUNT_RANGE_VALID', payload: { newValue: false } });
+      dispatch({ type: 'setItemsCountRangeValid', payload: { newValue: false } });
       setCountToErrorMessage(`Can't be lower than the start of the range.`);
 
       return;
     }
 
-    dispatch({ type: 'SET_ITEMS_COUNT', payload: { fromValue: finalCountFrom, toValue: finalCountTo } });
-    dispatch({ type: 'SET_ITEMS_COUNT_RANGE_VALID', payload: { newValue: true } });
+    dispatch({ type: 'setItemsCountRange', payload: { fromValue: finalCountFrom, toValue: finalCountTo } });
+    dispatch({ type: 'setItemsCountRangeValid', payload: { newValue: true } });
   }
 
   function validateCount(value: string): string | null {

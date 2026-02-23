@@ -73,7 +73,7 @@ export default function AccountSocialHeader(): JSX.Element {
             type='button'
             onClick={() => setSocialSection('FOLLOWERS')}
             className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
-              socialSection === 'FOLLOWERS' ? 'text-cta' : ''
+              socialSection === 'followers' ? 'text-cta' : ''
             }`}
           >
             <StatisticItem

@@ -21,7 +21,7 @@ export type ItemsFilterConfigType = {
   requireAllFilterTags: boolean;
 };
 
-export type ItemsSortingMode = 'newest_first' | 'oldest_first' | 'cheapest_first' | 'priciest_first' | 'lexicographical';
+export type ItemsSortingMode = 'newest' | 'oldest' | 'cheapest' | 'priciest' | 'lexicographical';
 
 export type WishlistItemsContextType = {
   wishlistItems: WishlistItemType[];
