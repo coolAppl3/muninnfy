@@ -12,8 +12,10 @@ import { BasicSocialData } from '../../../../../types/socialTypes';
 export default function AccountSocialFindAccount(): JSX.Element {
   const [results, setResults] = useState<BasicSocialData[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const [firstSearchCompleted, setFirstSearchCompleted] = useState<boolean>(false);
   const [lastSearchQuery, setLastSearchQuery] = useState<string>('');
 

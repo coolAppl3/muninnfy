@@ -11,7 +11,8 @@ import Button from '../../../components/Button/Button';
 
 export default function ContinueAccountVerificationForm(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [emailValue, setEmailValue] = useState<string>('');
+
+  const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { setAuthStatus } = useAuth();
@@ -21,7 +22,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
   const { displayPopupMessage } = usePopupMessage();
 
   async function continueAccountVerification(): Promise<void> {
-    const email: string = emailValue;
+    const email: string = value;
 
     try {
       const publicAccountId: string = (await continueAccountVerificationService({ email })).data.publicAccountId;
@@ -62,7 +63,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
             return;
           }
 
-          const newErrorMessage: string | null = validateEmail(emailValue);
+          const newErrorMessage: string | null = validateEmail(value);
           if (newErrorMessage) {
             setErrorMessage(newErrorMessage);
             displayPopupMessage(newErrorMessage, 'error');
@@ -82,12 +83,12 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
         <DefaultFormGroup
           id='email'
           label='Email address'
-          value={emailValue}
+          value={value}
           autoComplete='email'
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             const newValue: string = e.target.value;
 
-            setEmailValue(newValue);
+            setValue(newValue);
             setErrorMessage(validateEmail(newValue));
           }}
           errorMessage={errorMessage}
