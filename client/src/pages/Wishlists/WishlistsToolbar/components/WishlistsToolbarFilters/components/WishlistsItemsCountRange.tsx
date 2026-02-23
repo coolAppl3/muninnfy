@@ -53,11 +53,11 @@ export default function WishlistsItemsCountRange({ dispatch, className }: Wishli
     }
 
     if (numberValue < 0) {
-      return `Count can't be negative.`;
+      return `Items count can't be negative.`;
     }
 
     if (numberValue > WISHLIST_ITEMS_LIMIT) {
-      return `Count can't exceed ${WISHLIST_ITEMS_LIMIT}.`;
+      return `Items count can't exceed ${WISHLIST_ITEMS_LIMIT}.`;
     }
 
     return null;
