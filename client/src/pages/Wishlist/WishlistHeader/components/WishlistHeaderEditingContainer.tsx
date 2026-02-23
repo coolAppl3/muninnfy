@@ -19,7 +19,5 @@ export default function WishlistHeaderEditingContainer(): JSX.Element {
     return <DeleteWishlistForm />;
   }
 
-  editMode;
-
   return <div className='h-[15rem] w-full'></div>;
 }
