@@ -56,10 +56,10 @@ export default function AccountSocialHeader(): JSX.Element {
 
           <button
             type='button'
-            className={`context-menu-btn bg-primary ${socialSection === 'FIND_ACCOUNT' ? 'text-cta' : ''}`}
+            className={`context-menu-btn bg-primary ${socialSection === 'findAccount' ? 'text-cta' : ''}`}
             onClick={() => {
               setMenuIsOpen(false);
-              setSocialSection('FIND_ACCOUNT');
+              setSocialSection('findAccount');
             }}
           >
             Find account
@@ -71,7 +71,7 @@ export default function AccountSocialHeader(): JSX.Element {
         <div className='grid md:grid-cols-3 gap-1 text-sm text-description relative z-0 h-fit'>
           <button
             type='button'
-            onClick={() => setSocialSection('FOLLOWERS')}
+            onClick={() => setSocialSection('followers')}
             className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
               socialSection === 'followers' ? 'text-cta' : ''
             }`}
@@ -84,9 +84,9 @@ export default function AccountSocialHeader(): JSX.Element {
 
           <button
             type='button'
-            onClick={() => setSocialSection('FOLLOWING')}
+            onClick={() => setSocialSection('following')}
             className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
-              socialSection === 'FOLLOWING' ? 'text-cta' : ''
+              socialSection === 'following' ? 'text-cta' : ''
             }`}
           >
             <StatisticItem
@@ -97,9 +97,9 @@ export default function AccountSocialHeader(): JSX.Element {
 
           <button
             type='button'
-            onClick={() => setSocialSection('FOLLOW_REQUESTS')}
+            onClick={() => setSocialSection('followRequests')}
             className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
-              socialSection === 'FOLLOW_REQUESTS' ? 'text-cta' : ''
+              socialSection === 'followRequests' ? 'text-cta' : ''
             }`}
           >
             <StatisticItem
