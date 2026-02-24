@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { ComponentType, JSX } from 'react';
 import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import AccountProfileHeader from './components/AccountProfileHeader/AccountProfileHeader';
 import AccountProfilePrivacy from './components/AccountProfilePrivacy/AccountProfilePrivacy';
@@ -16,6 +16,8 @@ export function AccountProfile(): JSX.Element {
   const { profileSection } = useAccountProfile();
   const { accountDetails } = useAccountDetails();
   const { public_account_id, created_on_timestamp, display_name, username, email } = accountDetails;
+
+  const MappedComponent: ComponentType | null = profileSection && componentRecord[profileSection];
 
   return (
     <>
@@ -47,7 +49,7 @@ export function AccountProfile(): JSX.Element {
 
         <div className='z-0 overflow-hidden'>
           <div className='h-line mt-2 mb-[1rem]'></div>
-          {profileSection && contentRecord[profileSection]}
+          {MappedComponent && <MappedComponent />}
         </div>
       </div>
 
@@ -56,10 +58,10 @@ export function AccountProfile(): JSX.Element {
   );
 }
 
-const contentRecord: Record<AccountProfileSection, JSX.Element> = {
-  privacySettings: <AccountProfilePrivacy />,
-  changeDisplayName: <AccountChangeDisplayName />,
-  changeEmail: <AccountChangeEmail />,
-  changePassword: <AccountChangePassword />,
-  deleteAccount: <AccountDeletion />,
+const componentRecord: Record<AccountProfileSection, ComponentType> = {
+  privacySettings: AccountProfilePrivacy,
+  changeDisplayName: AccountChangeDisplayName,
+  changeEmail: AccountChangeEmail,
+  changePassword: AccountChangePassword,
+  deleteAccount: AccountDeletion,
 };

@@ -1,4 +1,4 @@
-import { JSX, useCallback, useEffect } from 'react';
+import { ComponentType, JSX, useCallback, useEffect } from 'react';
 import AccountSocialHeader from './components/AccountSocialHeader/AccountSocialHeader';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import useAccountSocialDetails from '../hooks/useAccountSocialDetails';
@@ -90,6 +90,8 @@ export default function AccountSocial(): JSX.Element {
     // unsubscribed when Account unmounts
   }, [notificationsHandler]);
 
+  const MappedComponent: ComponentType = componentRecord[socialSection];
+
   return (
     <>
       {!fetchDetails.initialFetchCompleted ? (
@@ -97,16 +99,16 @@ export default function AccountSocial(): JSX.Element {
       ) : (
         <>
           <AccountSocialHeader />
-          {contentRecord[socialSection]}
+          <MappedComponent />
         </>
       )}
     </>
   );
 }
 
-const contentRecord: Record<AccountSocialSection, JSX.Element> = {
-  followers: <AccountSocialFollowers />,
-  following: <AccountSocialFollowing />,
-  followRequests: <AccountSocialFollowRequests />,
-  findAccount: <AccountSocialFindAccount />,
+const componentRecord: Record<AccountSocialSection, ComponentType> = {
+  followers: AccountSocialFollowers,
+  following: AccountSocialFollowing,
+  followRequests: AccountSocialFollowRequests,
+  findAccount: AccountSocialFindAccount,
 };
