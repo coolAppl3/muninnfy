@@ -13,7 +13,7 @@ import WishlistsToolbarFilters from './components/WishlistsToolbarFilters/Wishli
 export function WishlistsToolbar(): JSX.Element {
   const { setWishlistsFilterConfig } = useWishlists();
 
-  const [titleQueryValue, setTitleQueryValue] = useState<string>('');
+  const [value, setValue] = useState<string>('');
   const [filtersMenuOpen, setFiltersMenuOpen] = useState<boolean>(false);
 
   const debouncedSetTitleQuery: (titleQuery: string) => void = useMemo(
@@ -60,12 +60,16 @@ export function WishlistsToolbar(): JSX.Element {
           id='search-wishlists'
           label='Search wishlists'
           autoComplete='off'
-          value={titleQueryValue}
+          value={value}
           errorMessage={null}
           onChange={(e) => {
             const newValue: string = e.target.value;
-            setTitleQueryValue(newValue);
 
+            if (newValue.length > 50) {
+              return;
+            }
+
+            setValue(newValue);
             debouncedSetTitleQuery(newValue.toLowerCase());
           }}
         />
