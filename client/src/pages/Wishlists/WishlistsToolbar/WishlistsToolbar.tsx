@@ -59,6 +59,7 @@ export function WishlistsToolbar(): JSX.Element {
         <DefaultFormGroup
           id='search-wishlists'
           label='Search wishlists'
+          placeholder='Wishlist title'
           autoComplete='off'
           value={value}
           errorMessage={null}
