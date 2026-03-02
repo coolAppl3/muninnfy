@@ -1,6 +1,6 @@
 import { isValidUuid } from './generalValidation';
 
-export function validateSearchQuery(value: string): string | null {
+export function validateSocialSearchQuery(value: string): string | null {
   if (value.length === 0) {
     return null;
   }
