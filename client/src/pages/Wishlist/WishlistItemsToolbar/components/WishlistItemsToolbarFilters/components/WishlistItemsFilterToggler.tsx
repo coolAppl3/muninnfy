@@ -24,7 +24,7 @@ export default function WishlistItemsFilterToggler({
           isToggled={filterBy !== null}
           onClick={() => setFilterBy(filterBy === null ? true : null)}
         />
-        <p className='text-title text-sm leading-[1]'>{title}</p>
+        <p className='text-title text-sm leading-none'>{title}</p>
       </header>
 
       <div className={`gap-[1.4rem] pl-1 ${filterBy === null ? 'hidden' : 'grid'}`}>

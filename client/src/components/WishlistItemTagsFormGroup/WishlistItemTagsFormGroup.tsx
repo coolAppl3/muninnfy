@@ -97,7 +97,7 @@ export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }
             key={tag}
             title='Remove tag'
             aria-label='Remove tag'
-            className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-[1] break-words max-w-[20rem] transition-colors hover:bg-danger cursor-pointer'
+            className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-none break-words max-w-[20rem] transition-colors hover:bg-danger cursor-pointer'
           >
             {tag}
           </span>

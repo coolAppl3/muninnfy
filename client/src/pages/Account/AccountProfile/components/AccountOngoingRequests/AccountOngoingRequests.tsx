@@ -23,7 +23,7 @@ export default function AccountOngoingRequests(): JSX.Element {
               key={index}
               className='flex justify-between items-center p-1 bg-dark rounded'
             >
-              <p className='leading-[1]'>{index === 0 ? 'Email update' : 'Account deletion'}</p>
+              <p className='leading-none'>{index === 0 ? 'Email update' : 'Account deletion'}</p>
 
               <button
                 type='button'

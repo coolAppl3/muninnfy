@@ -23,7 +23,7 @@ export default function InfoModal({ title, description, btnTitle, onClick }: Inf
 
   return (
     <div
-      className='fixed top-0 left-0 w-full h-[100vh] bg-overlay z-10 flex justify-center items-center outline-none'
+      className='fixed top-0 left-0 w-full h-screen bg-overlay z-10 flex justify-center items-center outline-none'
       tabIndex={0}
       ref={modalRef}
     >

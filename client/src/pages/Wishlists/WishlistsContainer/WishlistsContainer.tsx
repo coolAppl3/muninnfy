@@ -33,11 +33,11 @@ export default function WishlistsContainer(): JSX.Element {
         {filtersAppliedCount > 0 && (
           <>
             <div className='text-sm font-medium flex justify-between items-center'>
-              <p className='text-cta leading-[1] flex gap-1'>
+              <p className='text-cta leading-none flex gap-1'>
                 {filtersAppliedCount === 1 ? '1 filter' : `${filtersAppliedCount} filters`} applied
               </p>
 
-              <p className='text-description leading-[1]'>
+              <p className='text-description leading-none'>
                 Showing {filteredWishlists.length} of {wishlists.length}
               </p>
             </div>
