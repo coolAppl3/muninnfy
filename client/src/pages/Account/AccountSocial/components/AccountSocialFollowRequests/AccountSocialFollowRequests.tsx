@@ -163,7 +163,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
       ) : (
         <div className='grid gap-1 items-start'>
           {renderArray.length === 0 ? (
-            <p className='text-sm text-description w-fit mx-auto'>No users found</p>
+            <p className='text-sm text-description font-medium w-fit mx-auto'>No users found</p>
           ) : (
             renderArray.slice(0, renderLimit).map((followDetails: FollowRequest) => (
               <FollowRequestCard

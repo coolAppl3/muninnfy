@@ -108,7 +108,7 @@ export default function AccountSocialFindAccount(): JSX.Element {
           {firstSearchCompleted && (
             <>
               <div className='h-line my-2'></div>
-              {results.length === 0 && <p className='text-sm text-description w-fit mx-auto'>No users found</p>}
+              {results.length === 0 && <p className='text-sm text-description font-medium w-fit mx-auto'>No users found</p>}
             </>
           )}
           <div className='grid gap-1 sm:grid-cols-2'>
