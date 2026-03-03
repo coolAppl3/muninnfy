@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import { NavLink, Location, useLocation } from 'react-router-dom';
 import HomeIcon from '../../assets/svg/HomeIcon.svg?react';
 import SignInIcon from '../../assets/svg/SignInIcon.svg?react';
-import CrossIcon from '../../assets/svg/CrossIcon.svg?react';
+import MultipleWishlistsIcon from '../../assets/svg/MultipleWishlistsIcon.svg?react';
 import useAuth from '../../hooks/useAuth';
 import NavbarAccountMenu from '../NavbarAccountMenu/NavbarAccountMenu';
 
@@ -10,7 +10,6 @@ const navLinkClassname: string =
   'border-r-1 border-r-light-gray last:border-r-transparent flex flex-col justify-center items-center shrink-0 gap-[4px]';
 
 export default function BottomNavbar(): JSX.Element {
-  const { authStatus } = useAuth();
   const { pathname }: Location = useLocation();
 
   return (
@@ -25,11 +24,11 @@ export default function BottomNavbar(): JSX.Element {
         </NavLink>
 
         <NavLink
-          to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
+          to='/account/wishlists'
           className={({ isActive }) => (isActive ? `text-cta ${navLinkClassname}` : navLinkClassname)}
         >
-          <CrossIcon className='w-[2.4rem] h-[2.4rem]' />
-          <span>New wishlist</span>
+          <MultipleWishlistsIcon className='w-[2.4rem] h-[2.4rem]' />
+          <span>Wishlists</span>
         </NavLink>
 
         <AdditionalLinks />

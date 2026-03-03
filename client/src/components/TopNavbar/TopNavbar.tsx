@@ -7,7 +7,6 @@ import useAuth from '../../hooks/useAuth';
 import NavbarAccountMenu from '../NavbarAccountMenu/NavbarAccountMenu';
 
 export default function TopNavbar(): JSX.Element {
-  const { authStatus } = useAuth();
   const { pathname }: Location = useLocation();
 
   return (
@@ -31,10 +30,10 @@ export default function TopNavbar(): JSX.Element {
           </NavLink>
 
           <NavLink
-            to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
+            to='/account/wishlists'
             className={({ isActive }) => (isActive ? `after:bg-cta/100 ${navLinkClassname}` : navLinkClassname)}
           >
-            New wishlist
+            Wishlists
           </NavLink>
         </div>
 

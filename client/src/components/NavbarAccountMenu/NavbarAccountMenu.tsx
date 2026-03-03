@@ -2,7 +2,8 @@ import { FocusEvent, JSX, useState } from 'react';
 import useAuthSession from '../../hooks/useAuthSession';
 import useConfirmModal from '../../hooks/useConfirmModal';
 import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
 type NavbarAccountMenuProps = {
   navbarType: 'top' | 'bottom';
@@ -12,6 +13,7 @@ export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
+  const { authStatus } = useAuth();
   const { signOut } = useAuthSession();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
@@ -53,26 +55,26 @@ export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps
           navbarType === 'top' ? 'top-4 right-0' : 'bottom-[6.4rem] right-[1px] w-full border-1 border-cta'
         } ${isOpen ? 'block' : 'hidden'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}
       >
-        <Link
+        <NavLink
           to='/account'
-          className='context-menu-btn bg-secondary'
+          className={({ isActive }) => `context-menu-btn bg-secondary ${isActive ? 'text-cta' : ''}`}
           onClick={() => {
             setIsVisible(false);
             setIsOpen(false);
           }}
         >
           My account
-        </Link>
-        <Link
-          to='/account/wishlists'
-          className='context-menu-btn bg-secondary'
+        </NavLink>
+        <NavLink
+          to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
+          className={({ isActive }) => `context-menu-btn bg-secondary ${isActive ? 'text-cta' : ''}`}
           onClick={() => {
             setIsVisible(false);
             setIsOpen(false);
           }}
         >
-          Wishlists
-        </Link>
+          New wishlist
+        </NavLink>
 
         <button
           type='button'
