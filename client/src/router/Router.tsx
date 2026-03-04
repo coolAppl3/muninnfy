@@ -79,11 +79,6 @@ export default function Router(): JSX.Element {
         </Route>
 
         {/* public routes */}
-        <Route
-          path='/wishlist/view/:wishlistId'
-          element={<ViewWishlist />}
-        />
-
         {publicRoutes.map(({ path, element }: RouteDetails) => (
           <Route
             key={path}
