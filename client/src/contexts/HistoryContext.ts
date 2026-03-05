@@ -2,7 +2,7 @@ import { createContext, Dispatch, SetStateAction } from 'react';
 
 export type HistoryContextType = {
   referrerLocation: string | null;
-  setReferrerLocation: Dispatch<SetStateAction<string | null>>;
+  setReferrerLocation: (newReferrerLocation: string | null) => void;
 
   postAuthNavigate: string | null;
   setPostAuthNavigate: Dispatch<SetStateAction<string | null>>;
@@ -10,3 +10,5 @@ export type HistoryContextType = {
 
 const HistoryContext = createContext<HistoryContextType | null>(null);
 export default HistoryContext;
+
+// }
