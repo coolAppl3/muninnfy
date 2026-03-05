@@ -92,7 +92,7 @@ export default function SignUp(): JSX.Element {
               }}
             >
               <DefaultFormGroup
-                id='display-name'
+                id='displayName'
                 label='Display name'
                 autoComplete='name'
                 value={formData.displayName}

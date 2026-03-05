@@ -144,7 +144,7 @@ export default function signUpFormValidationReducer(
     return updatedState;
   }
 
-  if (name === 'confirmPassword') {
+  if (name === 'confirm-password') {
     const updatedState: SignUpFormValidationState = {
       formData: {
         ...state.formData,
