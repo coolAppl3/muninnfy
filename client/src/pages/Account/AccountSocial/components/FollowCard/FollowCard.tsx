@@ -130,10 +130,10 @@ function FollowCard({
     <div className='p-1 bg-primary rounded text-description text-sm'>
       <div className='flex justify-between items-start mb-[1.4rem]'>
         <div style={{ wordBreak: 'break-word' }}>
-          <p className='text-title leading-[1] mb-[4px]'>{display_name}</p>
+          <p className='text-title leading-none mb-[4px]'>{display_name}</p>
           <Link
             to={`/account/view/${public_account_id}`}
-            className='block leading-[1] transition-colors hover:!text-cta'
+            className='block leading-none transition-colors hover:!text-cta'
           >
             @{username}
           </Link>
@@ -151,8 +151,8 @@ function FollowCard({
       </div>
 
       <div className='text-description/50 text-xs'>
-        <p className='leading-[1] mb-[4px]'>Since {getFullDateString(follow_timestamp)}</p>
-        <p className='leading-[1]'>{public_account_id}</p>
+        <p className='leading-none mb-[4px]'>Since {getFullDateString(follow_timestamp)}</p>
+        <p className='leading-none'>{public_account_id}</p>
       </div>
     </div>
   );

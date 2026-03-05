@@ -74,7 +74,7 @@ function isValidNotificationType(notificationType: unknown): notificationType is
     return false;
   }
 
-  const validNotificationTypes: string[] = ['NEW_FOLLOWER', 'NEW_FOLLOW_REQUEST', 'FOLLOW_REQUEST_ACCEPTED'];
+  const validNotificationTypes: string[] = ['new_follower', 'new_follow_request', 'follow_request_accepted'];
   return validNotificationTypes.includes(notificationType);
 }
 
@@ -147,7 +147,7 @@ function isValidNotificationData(
     return false;
   }
 
-  if (notificationType === 'NEW_FOLLOW_REQUEST') {
+  if (notificationType === 'new_follow_request') {
     if (!('request_id' in notificationData) || !('request_timestamp' in notificationData)) {
       return false;
     }

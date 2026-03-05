@@ -61,7 +61,9 @@ export default function SignIn(): JSX.Element {
       }
 
       if (errReason === 'alreadySignedIn') {
+        displayPopupMessage(errMessage, 'success');
         setAuthStatus('authenticated');
+
         return;
       }
 
@@ -112,7 +114,7 @@ export default function SignIn(): JSX.Element {
       <section className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
-            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>Sign in to your account</h1>
+            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>Sign in to Muninnfy</h1>
 
             <form
               id='sign-up-form'
@@ -161,8 +163,8 @@ export default function SignIn(): JSX.Element {
               />
 
               <CheckboxFormGroup
+                id='keep-signed-in'
                 label='Keep me signed in'
-                id='keepSignedIn'
                 isChecked={keepSignedInValue}
                 onClick={() => setKeepSignedIn((prev) => !prev)}
               />

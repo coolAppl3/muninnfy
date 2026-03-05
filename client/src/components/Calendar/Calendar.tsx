@@ -179,12 +179,12 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
   }
 
   return (
-    <div className='fixed top-0 left-0 w-full h-[100vh] bg-overlay z-10 flex justify-center items-center outline-none'>
+    <div className='fixed top-0 left-0 w-full h-screen bg-overlay z-10 flex justify-center items-center outline-none'>
       <div className='w-[32rem] max-w-[32rem] py-3 px-2 mx-2 rounded-sm bg-primary border-1 border-cta/15 shadow-simple-tiny break-words'>
         <header className='flex justify-between items-center mb-2'>
           <button
             type='button'
-            className='w-full py-1 mr-1 bg-cta/10 rounded transition-[filter] hover:brightness-75 text-title text-start text-sm leading-[1] px-1 cursor-pointer disabled:hover:brightness-100 disabled:cursor-default disabled:bg-transparent'
+            className='w-full py-1 mr-1 bg-cta/10 rounded transition-[filter] hover:brightness-75 text-title text-start text-sm leading-none px-1 cursor-pointer disabled:hover:brightness-100 disabled:cursor-default disabled:bg-transparent'
             disabled={renderMode === 'years'}
             onClick={handleHeaderBtnClick}
           >

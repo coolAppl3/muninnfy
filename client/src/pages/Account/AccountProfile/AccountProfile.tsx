@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { ComponentType, JSX } from 'react';
 import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import AccountProfileHeader from './components/AccountProfileHeader/AccountProfileHeader';
 import AccountProfilePrivacy from './components/AccountProfilePrivacy/AccountProfilePrivacy';
@@ -17,13 +17,15 @@ export function AccountProfile(): JSX.Element {
   const { accountDetails } = useAccountDetails();
   const { public_account_id, created_on_timestamp, display_name, username, email } = accountDetails;
 
+  const MappedComponent: ComponentType | null = profileSection && componentRecord[profileSection];
+
   return (
     <>
       <AccountProfileHeader />
 
       <div className='text-description/50 text-xs mb-[1.2rem]'>
-        <p className='leading-[1] mb-[4px]'>Created on {getFullDateString(created_on_timestamp)}</p>
-        <p className='leading-[1]'>{public_account_id}</p>
+        <p className='leading-none mb-[4px]'>Created on {getFullDateString(created_on_timestamp)}</p>
+        <p className='leading-none'>{public_account_id}</p>
       </div>
 
       <div className={`grid transition-[grid] ${profileSection ? 'grid-rows-[auto_1fr]' : 'grid-rows-[auto_0fr]'}`}>
@@ -47,7 +49,7 @@ export function AccountProfile(): JSX.Element {
 
         <div className='z-0 overflow-hidden'>
           <div className='h-line mt-2 mb-[1rem]'></div>
-          {profileSection && contentRecord[profileSection]}
+          {MappedComponent && <MappedComponent />}
         </div>
       </div>
 
@@ -56,10 +58,10 @@ export function AccountProfile(): JSX.Element {
   );
 }
 
-const contentRecord: Record<AccountProfileSection, JSX.Element> = {
-  PRIVACY_SETTINGS: <AccountProfilePrivacy />,
-  CHANGE_DISPLAY_NAME: <AccountChangeDisplayName />,
-  CHANGE_EMAIL: <AccountChangeEmail />,
-  CHANGE_PASSWORD: <AccountChangePassword />,
-  DELETE_ACCOUNT: <AccountDeletion />,
+const componentRecord: Record<AccountProfileSection, ComponentType> = {
+  privacySettings: AccountProfilePrivacy,
+  changeDisplayName: AccountChangeDisplayName,
+  changeEmail: AccountChangeEmail,
+  changePassword: AccountChangePassword,
+  deleteAccount: AccountDeletion,
 };

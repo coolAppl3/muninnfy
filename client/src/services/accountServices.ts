@@ -50,11 +50,11 @@ type VerifyAccountServiceData = {
   authSessionCreated: boolean;
 };
 
-export function verifyAccountService(
+export function confirmAccountVerificationService(
   body: VerifyAccountServicePayload,
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<VerifyAccountServiceData>> {
-  return axios.patch(`${accountsApiUrl}/verification/verify`, body, { signal: abortSignal });
+  return axios.patch(`${accountsApiUrl}/verification/confirm`, body, { signal: abortSignal });
 }
 
 type SignInServicePayload = {

@@ -19,7 +19,7 @@ export default function FilterTogglerCheckboxBtn({ onClick, title, isChecked }: 
           className={`w-[1rem] h-[1rem] transition-transform text-cta ${isChecked ? 'scale-100 rotate-0' : 'rotate-180 scale-0'}`}
         />
       </div>
-      <span className='text-sm text-description leading-[1]'>{title}</span>
+      <span className='text-sm text-description leading-none'>{title}</span>
     </button>
   );
 }

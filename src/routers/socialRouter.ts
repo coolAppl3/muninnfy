@@ -649,7 +649,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       await connection.commit();
       res.json({ followId: resultSetHeader.insertId, followTimestamp: currentTimestamp });
 
-      await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'NEW_FOLLOWER', resultSetHeader.insertId);
+      await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'new_follower', resultSetHeader.insertId);
       return;
     }
 
@@ -665,7 +665,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     await connection.commit();
     res.json({ requestId: resultSetHeader.insertId, requestTimestamp: currentTimestamp });
 
-    await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'NEW_FOLLOW_REQUEST', resultSetHeader.insertId);
+    await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'new_follow_request', resultSetHeader.insertId);
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -853,7 +853,7 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
       followDetails.requester_account_id,
       accountId,
       currentTimestamp,
-      'FOLLOW_REQUEST_ACCEPTED',
+      'follow_request_accepted',
       resultSetHeader.insertId
     );
   } catch (err: unknown) {

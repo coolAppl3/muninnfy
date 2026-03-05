@@ -1,6 +1,6 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 
-export type AccountProfileSection = 'PRIVACY_SETTINGS' | 'CHANGE_DISPLAY_NAME' | 'CHANGE_EMAIL' | 'CHANGE_PASSWORD' | 'DELETE_ACCOUNT';
+export type AccountProfileSection = 'privacySettings' | 'changeDisplayName' | 'changeEmail' | 'changePassword' | 'deleteAccount';
 
 export type AccountProfileContextType = {
   profileSection: AccountProfileSection | null;

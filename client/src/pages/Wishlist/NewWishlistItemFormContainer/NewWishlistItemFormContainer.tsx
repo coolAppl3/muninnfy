@@ -23,7 +23,7 @@ export default function NewWishlistItemFormContainer(): JSX.Element {
 
           {isExpanded && (
             <WishlistItemForm
-              formMode='NEW_ITEM'
+              formMode='newItem'
               onFinish={() => setIsExpanded(false)}
               className={isExpanded ? 'py-2' : ''}
             />

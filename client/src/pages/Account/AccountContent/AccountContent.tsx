@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { ComponentType, JSX } from 'react';
 import useAccountLocation from '../hooks/useAccountLocation';
 import AccountNotifications from '../AccountNotifications/AccountNotifications';
 import { AccountProfile } from '../AccountProfile/AccountProfile';
@@ -10,25 +10,33 @@ import AccountSocialProvider from '../providers/AccountSocialProvider';
 export default function AccountContent(): JSX.Element {
   const { accountLocation } = useAccountLocation();
 
+  const MappedComponent: ComponentType = componentRecord[accountLocation];
+
   return (
     <div className='p-2 bg-secondary rounded-sm col-span-12 md:col-span-9 shadow-simple-tiny min-h-full'>
-      {contentRecord[accountLocation]}
+      <MappedComponent />
     </div>
   );
 }
 
-const contentRecord: Record<AccountLocation, JSX.Element> = {
-  profile: (
+const componentRecord: Record<AccountLocation, ComponentType> = {
+  profile: ProfileContent,
+  social: SocialContent,
+  notifications: AccountNotifications,
+};
+
+function ProfileContent(): JSX.Element {
+  return (
     <AccountProfileProvider>
       <AccountProfile />
     </AccountProfileProvider>
-  ),
+  );
+}
 
-  social: (
+function SocialContent(): JSX.Element {
+  return (
     <AccountSocialProvider>
       <AccountSocial />
     </AccountSocialProvider>
-  ),
-
-  notifications: <AccountNotifications />,
-};
+  );
+}

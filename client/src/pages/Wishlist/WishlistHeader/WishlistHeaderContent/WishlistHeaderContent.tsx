@@ -23,7 +23,7 @@ export default function WishlistHeaderContent(): JSX.Element {
         setMenuIsOpen(false);
       }}
     >
-      <h3 className='text-title font-medium mb-1 leading-[1] wrap-anywhere'>{wishlistDetails.title}</h3>
+      <h3 className='text-title font-medium mb-1 leading-none wrap-anywhere'>{wishlistDetails.title}</h3>
 
       <button
         type='button'
@@ -41,7 +41,7 @@ export default function WishlistHeaderContent(): JSX.Element {
           className='context-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
-            setEditMode('PRIVACY_LEVEL');
+            setEditMode('privacyLevel');
           }}
         >
           Change privacy level
@@ -52,7 +52,7 @@ export default function WishlistHeaderContent(): JSX.Element {
           className='context-menu-btn'
           onClick={() => {
             setMenuIsOpen(false);
-            setEditMode('TITLE');
+            setEditMode('title');
           }}
         >
           Change title
@@ -80,7 +80,7 @@ export default function WishlistHeaderContent(): JSX.Element {
           className='context-menu-btn text-danger'
           onClick={() => {
             setMenuIsOpen(false);
-            setEditMode('DELETE_WISHLIST');
+            setEditMode('deleteWishlist');
           }}
         >
           Delete

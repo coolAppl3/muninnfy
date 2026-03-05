@@ -27,7 +27,7 @@ export default function LoadingOverlayProvider({ children }: LoadingOverlayProvi
       {children}
 
       {isVisible && (
-        <div className='fixed top-0 left-0 w-full h-[100vh] bg-overlay z-30 grid place-items-center'>
+        <div className='fixed top-0 left-0 w-full h-screen bg-overlay z-30 grid place-items-center'>
           <div className='spinner w-3 h-3'></div>
         </div>
       )}

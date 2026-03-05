@@ -18,7 +18,7 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
 
   return (
     <div className='relative p-2 bg-secondary rounded-sm shadow-simple-tiny'>
-      <h3 className='text-title font-medium leading-[1] wrap-anywhere'>{title}</h3>
+      <h3 className='text-title font-medium leading-none wrap-anywhere'>{title}</h3>
 
       <div className='h-line my-1'></div>
 

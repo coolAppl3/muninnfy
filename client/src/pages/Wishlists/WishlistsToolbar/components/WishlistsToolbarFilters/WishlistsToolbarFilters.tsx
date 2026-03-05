@@ -53,7 +53,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
 
   useEffect(() => {
     dispatch({
-      type: 'SET_CREATED_TIMESTAMP',
+      type: 'setCreatedTimestampRange',
       payload: {
         fromValue: startTimestampsMap.get(createdTimestampsKey) || null,
         toValue: endTimestampsMap.get(createdTimestampsKey) || null,
@@ -100,7 +100,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
   }
 
   function resetFilters(): void {
-    dispatch({ type: 'RESET_FILTERS' });
+    dispatch({ type: 'resetFilters' });
 
     setStartTimestampsMap(new Map<string, number>());
     setEndTimestampsMap(new Map<string, number>());
@@ -150,7 +150,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
       }
 
       if (status === 400) {
-        dispatch({ type: 'SET_ITEM_TITLE_QUERY_ERROR_MESSAGE', payload: { newValue: errMessage } });
+        dispatch({ type: 'setItemTitleQueryErrorMessage', payload: { newValue: errMessage } });
       }
     } finally {
       setIsFetchingSearchingQuery(false);
@@ -178,17 +178,17 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <WishlistsFilterToggler
           title='Favorited'
           isToggled={filters.isFavorited !== null}
-          onClick={() => dispatch({ type: 'SET_IS_FAVORITED', payload: { newValue: filters.isFavorited ? null : true } })}
+          onClick={() => dispatch({ type: 'setIsFavorited', payload: { newValue: filters.isFavorited ? null : true } })}
           children={
             <div className={`gap-[1.4rem] pl-1 mb-1 ${filters.isFavorited === null ? 'hidden' : 'grid'}`}>
               <FilterTogglerCheckboxBtn
-                onClick={() => dispatch({ type: 'SET_IS_FAVORITED', payload: { newValue: true } })}
+                onClick={() => dispatch({ type: 'setIsFavorited', payload: { newValue: true } })}
                 title='Favorited'
                 isChecked={filters.isFavorited === true}
               />
 
               <FilterTogglerCheckboxBtn
-                onClick={() => dispatch({ type: 'SET_IS_FAVORITED', payload: { newValue: false } })}
+                onClick={() => dispatch({ type: 'setIsFavorited', payload: { newValue: false } })}
                 title='Not favorited'
                 isChecked={filters.isFavorited === false}
               />
@@ -199,7 +199,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <WishlistsFilterToggler
           title='Items'
           isToggled={filterByItemsCount}
-          onClick={() => dispatch({ type: 'SET_FILTER_BY_ITEMS_COUNT', payload: { newValue: !filterByItemsCount } })}
+          onClick={() => dispatch({ type: 'setFilterByItemsCount', payload: { newValue: !filterByItemsCount } })}
           children={
             <WishlistsItemsCountRange
               dispatch={dispatch}
@@ -211,13 +211,13 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <WishlistsFilterToggler
           title='Worth'
           isToggled={filterByTotalItemsPrice}
-          onClick={() => dispatch({ type: 'SET_FILTER_BY_TOTAL_ITEMS_PRICE', payload: { newValue: !filterByTotalItemsPrice } })}
+          onClick={() => dispatch({ type: 'setFilterByTotalItemsPrice', payload: { newValue: !filterByTotalItemsPrice } })}
           children={
             <PriceRangeFormGroup
               setRangeValue={(newRange: { fromValue: number | null; toValue: number | null }) =>
-                dispatch({ type: 'SET_TOTAL_ITEMS_PRICE', payload: { ...newRange } })
+                dispatch({ type: 'setTotalItemsPriceRange', payload: { ...newRange } })
               }
-              setRangeIsValid={(newValue: boolean) => dispatch({ type: 'SET_TOTAL_ITEMS_PRICE_RANGE_VALID', payload: { newValue } })}
+              setRangeIsValid={(newValue: boolean) => dispatch({ type: 'setTotalItemsPriceRangeValid', payload: { newValue } })}
               maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
               className='mb-1'
             />
@@ -227,13 +227,13 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <WishlistsFilterToggler
           title='To complete'
           isToggled={filterByPriceToComplete}
-          onClick={() => dispatch({ type: 'SET_FILTER_BY_PRICE_TO_COMPLETE', payload: { newValue: !filterByPriceToComplete } })}
+          onClick={() => dispatch({ type: 'setFilterByPriceToComplete', payload: { newValue: !filterByPriceToComplete } })}
           children={
             <PriceRangeFormGroup
               setRangeValue={(newRange: { fromValue: number | null; toValue: number | null }) =>
-                dispatch({ type: 'SET_PRICE_TO_COMPLETE', payload: { ...newRange } })
+                dispatch({ type: 'setPriceToCompleteRange', payload: { ...newRange } })
               }
-              setRangeIsValid={(newValue: boolean) => dispatch({ type: 'SET_PRICE_TO_COMPLETE_RANGE_VALID', payload: { newValue } })}
+              setRangeIsValid={(newValue: boolean) => dispatch({ type: 'setPriceToCompleteRangeValid', payload: { newValue } })}
               maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
             />
           }
@@ -242,7 +242,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <WishlistsFilterToggler
           title='Specific item'
           isToggled={filterByItemTitle}
-          onClick={() => dispatch({ type: 'SET_FILTER_BY_ITEM_TITLE', payload: { newValue: !filterByItemTitle } })}
+          onClick={() => dispatch({ type: 'setFilterByItemTitle', payload: { newValue: !filterByItemTitle } })}
           children={
             <DefaultFormGroup
               id='cross-wishlists-search'
@@ -250,7 +250,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
               autoComplete='off'
               value={itemTitleQuery}
               errorMessage={itemTitleQueryErrorMessage}
-              onChange={(e) => dispatch({ type: 'SET_ITEM_TITLE_QUERY', payload: { newValue: e.target.value } })}
+              onChange={(e) => dispatch({ type: 'setItemTitleQuery', payload: { newValue: e.target.value } })}
             />
           }
         />

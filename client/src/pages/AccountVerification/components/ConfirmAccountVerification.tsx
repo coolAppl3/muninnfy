@@ -3,7 +3,7 @@ import useAuth from '../../../hooks/useAuth';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import usePopupMessage from '../../../hooks/usePopupMessage';
-import { verifyAccountService } from '../../../services/accountServices';
+import { confirmAccountVerificationService } from '../../../services/accountServices';
 import { CanceledError } from 'axios';
 import InstructionCard from '../../../components/InstructionCard/InstructionCard';
 
@@ -29,11 +29,11 @@ export default function ConfirmAccountVerification({
   const navigate: NavigateFunction = useNavigate();
   const { displayPopupMessage } = usePopupMessage();
 
-  const verifyAccount = useCallback(
+  const confirmAccountVerification = useCallback(
     async (abortSignal: AbortSignal = new AbortController().signal) => {
       try {
-        const authSessionCreated: boolean = (await verifyAccountService({ publicAccountId, verificationToken }, abortSignal)).data
-          .authSessionCreated;
+        const authSessionCreated: boolean = (await confirmAccountVerificationService({ publicAccountId, verificationToken }, abortSignal))
+          .data.authSessionCreated;
 
         displayPopupMessage('Account verified.', 'success');
 
@@ -119,10 +119,10 @@ export default function ConfirmAccountVerification({
 
   useEffect(() => {
     const abortController: AbortController = new AbortController();
-    verifyAccount(abortController.signal);
+    confirmAccountVerification(abortController.signal);
 
     return () => abortController.abort();
-  }, [verifyAccount]);
+  }, [confirmAccountVerification]);
 
   if (!verificationFailed) {
     return <div className='spinner w-3 h-3 mx-auto block'></div>;
@@ -141,7 +141,7 @@ export default function ConfirmAccountVerification({
         }
 
         setVerificationFailed(false);
-        await verifyAccount();
+        await confirmAccountVerification();
       }}
     />
   );

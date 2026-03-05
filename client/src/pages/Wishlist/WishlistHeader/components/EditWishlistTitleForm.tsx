@@ -15,8 +15,8 @@ export default function EditWishlistTitleForm(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
 
-  const [titleValue, setTitleValue] = useState<string>('');
-  const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
+  const [value, setValue] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
@@ -28,7 +28,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   useEffect(() => titleRef.current?.focus(), []);
 
   async function changeWishlistTitle(): Promise<void> {
-    const newTitle: string = titleValue;
+    const newTitle: string = value;
 
     try {
       await changeWishlistTitleService({ newTitle, wishlistId });
@@ -40,7 +40,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
           }
       );
 
-      setTitleValue('');
+      setValue('');
       setEditMode(null);
 
       displayPopupMessage('Title changed.', 'success');
@@ -58,13 +58,13 @@ export default function EditWishlistTitleForm(): JSX.Element {
       }
 
       if (status === 409) {
-        setTitleErrorMessage(errMessage);
+        setErrorMessage(errMessage);
         return;
       }
 
       if (errReason && status === 400) {
         if (errReason === 'invalidTitle') {
-          setTitleErrorMessage(errMessage);
+          setErrorMessage(errMessage);
           return;
         }
 
@@ -84,10 +84,10 @@ export default function EditWishlistTitleForm(): JSX.Element {
         }
 
         const newTitleErrorMessage: string | null =
-          validateWishlistTitle(titleValue) || (titleValue === wishlistDetails.title ? 'Wishlist already has this title.' : null);
+          validateWishlistTitle(value) || (value === wishlistDetails.title ? 'Wishlist already has this title.' : null);
 
         if (newTitleErrorMessage) {
-          setTitleErrorMessage(newTitleErrorMessage);
+          setErrorMessage(newTitleErrorMessage);
           displayPopupMessage(newTitleErrorMessage, 'error');
 
           return;
@@ -107,13 +107,13 @@ export default function EditWishlistTitleForm(): JSX.Element {
         id='wishlist-title'
         label='New wishlist title'
         autoComplete='name'
-        value={titleValue}
-        errorMessage={titleErrorMessage}
+        value={value}
+        errorMessage={errorMessage}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
-          setTitleValue(newValue);
-          setTitleErrorMessage(validateWishlistTitle(newValue));
+          setValue(newValue);
+          setErrorMessage(validateWishlistTitle(newValue));
         }}
       />
 

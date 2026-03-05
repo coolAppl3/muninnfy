@@ -7,7 +7,7 @@ import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_RENDER_BATCH_SIZE } from '../../../../.
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
 import DefaultFormGroup from '../../../../../components/DefaultFormGroup/DefaultFormGroup';
-import { validateSearchQuery } from '../../../../../utils/validation/socialValidation';
+import { validateSocialSearchQuery } from '../../../../../utils/validation/socialValidation';
 import { debounce } from '../../../../../utils/debounce';
 import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
@@ -132,7 +132,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
         errorMessage={errorMessage}
         onChange={async (e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
-          const newErrorMessage: string | null = validateSearchQuery(newValue);
+          const newErrorMessage: string | null = validateSocialSearchQuery(newValue);
 
           setValue(newValue);
           setErrorMessage(newErrorMessage);
@@ -163,7 +163,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
       ) : (
         <div className='grid gap-1 items-start'>
           {renderArray.length === 0 ? (
-            <p className='text-sm text-description w-fit mx-auto'>No users found</p>
+            <p className='text-sm text-description font-medium w-fit mx-auto'>No users found</p>
           ) : (
             renderArray.slice(0, renderLimit).map((followDetails: FollowRequest) => (
               <FollowRequestCard

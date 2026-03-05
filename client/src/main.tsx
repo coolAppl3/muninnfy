@@ -12,11 +12,11 @@ root &&
   createRoot(root).render(
     <StrictMode>
       <BrowserRouter>
-        <AuthProvider>
-          <HistoryProvider>
+        <HistoryProvider>
+          <AuthProvider>
             <Router />
-          </HistoryProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </HistoryProvider>
       </BrowserRouter>
     </StrictMode>
   );

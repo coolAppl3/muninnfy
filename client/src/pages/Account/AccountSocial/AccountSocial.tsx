@@ -1,4 +1,4 @@
-import { JSX, useCallback, useEffect } from 'react';
+import { ComponentType, JSX, useCallback, useEffect } from 'react';
 import AccountSocialHeader from './components/AccountSocialHeader/AccountSocialHeader';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import useAccountSocialDetails from '../hooks/useAccountSocialDetails';
@@ -63,7 +63,7 @@ export default function AccountSocial(): JSX.Element {
     (data: NotificationDetails) => {
       const { notification_type, notification_data } = data;
 
-      if (notification_type === 'NEW_FOLLOW_REQUEST') {
+      if (notification_type === 'new_follow_request') {
         setFollowRequests((prev) => [notification_data as FollowRequest, ...prev]);
         setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count + 1 }));
 
@@ -72,7 +72,7 @@ export default function AccountSocial(): JSX.Element {
 
       const followDetails = notification_data as FollowDetails;
 
-      if (notification_type === 'NEW_FOLLOWER') {
+      if (notification_type === 'new_follower') {
         setFollowers((prev) => [followDetails, ...prev]);
         setSocialCounts((prev) => ({ ...prev, followers_count: prev.followers_count + 1 }));
 
@@ -90,6 +90,8 @@ export default function AccountSocial(): JSX.Element {
     // unsubscribed when Account unmounts
   }, [notificationsHandler]);
 
+  const MappedComponent: ComponentType = componentRecord[socialSection];
+
   return (
     <>
       {!fetchDetails.initialFetchCompleted ? (
@@ -97,16 +99,16 @@ export default function AccountSocial(): JSX.Element {
       ) : (
         <>
           <AccountSocialHeader />
-          {contentRecord[socialSection]}
+          <MappedComponent />
         </>
       )}
     </>
   );
 }
 
-const contentRecord: Record<AccountSocialSection, JSX.Element> = {
-  FOLLOWERS: <AccountSocialFollowers />,
-  FOLLOWING: <AccountSocialFollowing />,
-  FOLLOW_REQUESTS: <AccountSocialFollowRequests />,
-  FIND_ACCOUNT: <AccountSocialFindAccount />,
+const componentRecord: Record<AccountSocialSection, ComponentType> = {
+  followers: AccountSocialFollowers,
+  following: AccountSocialFollowing,
+  followRequests: AccountSocialFollowRequests,
+  findAccount: AccountSocialFindAccount,
 };

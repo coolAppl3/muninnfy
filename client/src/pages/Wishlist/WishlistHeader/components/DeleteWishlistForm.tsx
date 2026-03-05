@@ -14,7 +14,7 @@ export default function DeleteWishlistForm(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();
   const { editMode, setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
 
-  const [confirmationTitleValue, setConfirmationTitleValue] = useState<string>('');
+  const [value, setValue] = useState<string>('');
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
@@ -47,7 +47,7 @@ export default function DeleteWishlistForm(): JSX.Element {
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
-        if (isSubmitting || confirmationTitleValue !== wishlistDetails.title) {
+        if (isSubmitting || value !== wishlistDetails.title) {
           return;
         }
 
@@ -71,17 +71,17 @@ export default function DeleteWishlistForm(): JSX.Element {
         id='confirm-wishlist-title'
         label={`Enter "${wishlistDetails.title}"`}
         autoComplete='name'
-        value={confirmationTitleValue}
+        value={value}
         errorMessage={null}
         className='mb-2'
-        onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmationTitleValue(e.target.value)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
       />
 
       <div className='flex flex-col justify-start items-center gap-1 sm:flex-row'>
         <Button
           isSubmitBtn
           className='bg-danger border-danger order-1 sm:order-2 w-full sm:w-fit'
-          disabled={editMode === 'DELETE_WISHLIST' ? confirmationTitleValue !== wishlistDetails.title : true}
+          disabled={editMode === 'deleteWishlist' ? value !== wishlistDetails.title : true}
         >
           Delete wishlist
         </Button>

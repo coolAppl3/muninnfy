@@ -1,11 +1,51 @@
 # Changelog
 
+## [0.3.2] (2026-03-05)
+
+### Improvements
+
+- Changed "Sign up" button in `TopNavbar` to not have a call-to-action color when in the sign in page.
+- Rework the handling of `alreadySignedIn` errReason in `SignIn`. It's now treated as a successful operation instead of an error to avoid user confusion.
+- Standardized how enums are used throughout the app, alongside other minor type-related improvements.
+- Implemented `InstructionCard` in `NotFound` for better consistency and efficiency.
+- Improved child component mapping in some components.
+- Added a search query length limit in `WishlistItemsToolbar` and `WishlistsToolbar`.
+- Added placeholders for a number of inputs..
+- Replaced positions of "Wishlists" and "New wishlists" buttons in both navigation bars.
+- Improved phrasing in a few components.
+
+
+### Bug Fixes
+
+- Fixed instances where the `kebab-case` standard for element ID's isn't followed.
+  - An exception is made in `SignUp` for the purposes of retaining the reducer's validation logic efficiency.
+- Fixed inconsistency in font weight in a few components.
+- Fixed implementation issues with `HistoryProvider` causing unnecessary rerenders on navigation.
+
+
+### Code Refactoring
+
+- rename PATCH `accounts/verification/verify` to PATCH `accounts/verification/confirm`, and renamed relevant functions accordingly, to improve consistency.
+- Improved consistency in naming input state when only one input is available in a component.
+- Removed non-null assertion from the port in `emailTransporter` under `initTransporter`.
+- Renamed `validateSearchQuery()` to `validateSocialSearchQuery()`.
+- Improved the usage of tailwind class names in a few components.
+- Swapped the hierarchy of `HistoryProvider` and `AuthProvider`.
+- Removed duplicate public route in `Router`.
+
+
+### Build Changes
+
+- Upgraded npm packages to address CVEs, mainly the `node-pre-gyp` vulnerability.
+  - No breaking changes for this app.
+
+
 ## [0.3.1] (2026-02-22)
 
 ### Features
 
 - Added `deleteStaleNotificationsCron()`.
-- rework `destroyStaleWebSocketsCron()` into `pingWebSocketsCron()` and improved overall logic.
+- Reworked `destroyStaleWebSocketsCron()` into `pingWebSocketsCron()` and improved overall logic.
 - Added and implemented`AccountNavMenuButton` component.
 - Removed `AccountWishlists` and rework the nav button to redirect the user to `Wishlists`.
 - Added `webSocketServerURL` to `accountNotificationsWebSocket`.

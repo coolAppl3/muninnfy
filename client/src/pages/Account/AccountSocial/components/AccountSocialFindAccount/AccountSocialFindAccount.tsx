@@ -12,8 +12,10 @@ import { BasicSocialData } from '../../../../../types/socialTypes';
 export default function AccountSocialFindAccount(): JSX.Element {
   const [results, setResults] = useState<BasicSocialData[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const [firstSearchCompleted, setFirstSearchCompleted] = useState<boolean>(false);
   const [lastSearchQuery, setLastSearchQuery] = useState<string>('');
 
@@ -106,7 +108,7 @@ export default function AccountSocialFindAccount(): JSX.Element {
           {firstSearchCompleted && (
             <>
               <div className='h-line my-2'></div>
-              {results.length === 0 && <p className='text-sm text-description w-fit mx-auto'>No users found</p>}
+              {results.length === 0 && <p className='text-sm text-description font-medium w-fit mx-auto'>No users found</p>}
             </>
           )}
           <div className='grid gap-1 sm:grid-cols-2'>

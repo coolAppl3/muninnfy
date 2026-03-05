@@ -50,32 +50,32 @@ export default function WishlistsToolbarSort(): JSX.Element {
 
         <button
           type='button'
-          className={`context-menu-btn ${wishlistsSortingMode === 'newest_first' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('newest_first')}
+          className={`context-menu-btn ${wishlistsSortingMode === 'newest' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('newest')}
         >
           Newest first
         </button>
 
         <button
           type='button'
-          className={`context-menu-btn ${wishlistsSortingMode === 'oldest_first' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('oldest_first')}
+          className={`context-menu-btn ${wishlistsSortingMode === 'oldest' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('oldest')}
         >
           Oldest first
         </button>
 
         <button
           type='button'
-          className={`context-menu-btn ${wishlistsSortingMode === 'largest_first' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('largest_first')}
+          className={`context-menu-btn ${wishlistsSortingMode === 'largest' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('largest')}
         >
           Largest first
         </button>
 
         <button
           type='button'
-          className={`context-menu-btn ${wishlistsSortingMode === 'smallest_first' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('smallest_first')}
+          className={`context-menu-btn ${wishlistsSortingMode === 'smallest' ? 'text-cta' : ''}`}
+          onClick={() => handleSortBtnClick('smallest')}
         >
           Smallest first
         </button>

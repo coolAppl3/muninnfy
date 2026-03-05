@@ -1,4 +1,4 @@
-import { JSX, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { JSX, ReactNode, useMemo, useRef, useState } from 'react';
 import HistoryContext, { HistoryContextType } from '../contexts/HistoryContext';
 import { useLocation } from 'react-router-dom';
 
@@ -7,35 +7,33 @@ type HistoryProviderProps = {
 };
 
 export default function HistoryProvider({ children }: HistoryProviderProps): JSX.Element {
-  const [referrerLocation, setReferrerLocation] = useState<string | null>(null);
   const [postAuthNavigate, setPostAuthNavigate] = useState<string | null>(null);
-
   const { pathname, search } = useLocation();
-  const locationRef = useRef<string>(pathname);
 
-  useEffect(() => {
-    if (pathname === '/wishlist/new') {
-      return;
-    }
+  const currentLocation: string = pathname + search;
 
-    const location: string = pathname + search;
+  const currentLocationRef = useRef<string>(currentLocation);
+  const referrerLocationRef = useRef<string | null>(null);
 
-    if (location === locationRef.current) {
-      return;
-    }
-
-    setReferrerLocation(locationRef.current);
-    locationRef.current = location;
-  }, [pathname, search]);
+  if (
+    currentLocation !== currentLocationRef.current &&
+    pathname !== '/wishlist/new' /** avoids awkward/confusing navigation post wishlist creation*/
+  ) {
+    referrerLocationRef.current = currentLocationRef.current;
+    currentLocationRef.current = currentLocation;
+  }
 
   const contextValue: HistoryContextType = useMemo(
     () => ({
-      referrerLocation,
-      setReferrerLocation,
+      referrerLocation: referrerLocationRef.current,
+      setReferrerLocation: (newReferrerLocation: string | null) => {
+        referrerLocationRef.current = newReferrerLocation;
+      },
       postAuthNavigate,
       setPostAuthNavigate,
     }),
-    [referrerLocation, postAuthNavigate]
+    // eslint-disable-next-line
+    [postAuthNavigate, currentLocation]
   );
 
   return <HistoryContext value={contextValue}>{children}</HistoryContext>;

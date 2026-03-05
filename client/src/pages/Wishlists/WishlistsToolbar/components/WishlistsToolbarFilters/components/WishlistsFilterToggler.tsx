@@ -16,7 +16,7 @@ export default function WishlistsFilterToggler({ title, isToggled, onClick, chil
           isToggled={isToggled}
           onClick={onClick}
         />
-        <p className='text-title text-sm leading-[1]'>{title}</p>
+        <p className='text-title text-sm leading-none'>{title}</p>
       </div>
 
       {isToggled && children}

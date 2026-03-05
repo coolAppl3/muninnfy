@@ -59,36 +59,37 @@ export const initialWishlistsToolbarFiltersState: WishlistsToolbarFiltersState =
 };
 
 export type WishlistsToolbarFiltersReducerAction =
-  | { type: 'RESET_FILTERS' }
+  | { type: 'resetFilters' }
   //
-  | { type: 'SET_CREATED_TIMESTAMP'; payload: { fromValue: number | null; toValue: number | null } }
-  | { type: 'SET_ITEMS_COUNT'; payload: { fromValue: number | null; toValue: number | null } }
-  | { type: 'SET_TOTAL_ITEMS_PRICE'; payload: { fromValue: number | null; toValue: number | null } }
-  | { type: 'SET_PRICE_TO_COMPLETE'; payload: { fromValue: number | null; toValue: number | null } }
-  | { type: 'SET_ITEM_TITLE_QUERY'; payload: { newValue: string } }
-  | { type: 'SET_IS_FAVORITED'; payload: { newValue: boolean | null } }
+  | { type: 'setCreatedTimestampRange'; payload: { fromValue: number | null; toValue: number | null } }
+  | { type: 'setItemsCountRange'; payload: { fromValue: number | null; toValue: number | null } }
+  | { type: 'setTotalItemsPriceRange'; payload: { fromValue: number | null; toValue: number | null } }
+  | { type: 'setPriceToCompleteRange'; payload: { fromValue: number | null; toValue: number | null } }
   //
-  | { type: 'SET_FILTER_BY_ITEMS_COUNT'; payload: { newValue: boolean } }
-  | { type: 'SET_FILTER_BY_TOTAL_ITEMS_PRICE'; payload: { newValue: boolean } }
-  | { type: 'SET_FILTER_BY_PRICE_TO_COMPLETE'; payload: { newValue: boolean } }
-  | { type: 'SET_FILTER_BY_ITEM_TITLE'; payload: { newValue: boolean } }
+  | { type: 'setItemTitleQuery'; payload: { newValue: string } }
+  | { type: 'setIsFavorited'; payload: { newValue: boolean | null } }
   //
-  | { type: 'SET_ITEMS_COUNT_RANGE_VALID'; payload: { newValue: boolean } }
-  | { type: 'SET_TOTAL_ITEMS_PRICE_RANGE_VALID'; payload: { newValue: boolean } }
-  | { type: 'SET_PRICE_TO_COMPLETE_RANGE_VALID'; payload: { newValue: boolean } }
-  | { type: 'SET_ITEM_TITLE_QUERY_ERROR_MESSAGE'; payload: { newValue: string | null } };
+  | { type: 'setFilterByItemsCount'; payload: { newValue: boolean } }
+  | { type: 'setFilterByTotalItemsPrice'; payload: { newValue: boolean } }
+  | { type: 'setFilterByPriceToComplete'; payload: { newValue: boolean } }
+  | { type: 'setFilterByItemTitle'; payload: { newValue: boolean } }
+  //
+  | { type: 'setItemsCountRangeValid'; payload: { newValue: boolean } }
+  | { type: 'setTotalItemsPriceRangeValid'; payload: { newValue: boolean } }
+  | { type: 'setPriceToCompleteRangeValid'; payload: { newValue: boolean } }
+  | { type: 'setItemTitleQueryErrorMessage'; payload: { newValue: string | null } };
 
 export default function wishlistsToolbarFiltersReducer(
   state: WishlistsToolbarFiltersState,
   action: WishlistsToolbarFiltersReducerAction
 ): WishlistsToolbarFiltersState {
-  if (action.type === 'RESET_FILTERS') {
+  if (action.type === 'resetFilters') {
     return { ...initialWishlistsToolbarFiltersState };
   }
 
   const { type, payload } = action;
 
-  if (type === 'SET_CREATED_TIMESTAMP') {
+  if (type === 'setCreatedTimestampRange') {
     const { fromValue, toValue } = payload;
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
@@ -99,7 +100,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_ITEMS_COUNT') {
+  if (type === 'setItemsCountRange') {
     const { fromValue, toValue } = payload;
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
@@ -110,7 +111,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_TOTAL_ITEMS_PRICE') {
+  if (type === 'setTotalItemsPriceRange') {
     const { fromValue, toValue } = payload;
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
@@ -121,7 +122,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_PRICE_TO_COMPLETE') {
+  if (type === 'setPriceToCompleteRange') {
     const { fromValue, toValue } = payload;
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
@@ -132,7 +133,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_ITEM_TITLE_QUERY') {
+  if (type === 'setItemTitleQuery') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       itemTitleQuery: payload.newValue,
@@ -142,7 +143,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_IS_FAVORITED') {
+  if (type === 'setIsFavorited') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       isFavorited: payload.newValue,
@@ -151,7 +152,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_FILTER_BY_ITEMS_COUNT') {
+  if (type === 'setFilterByItemsCount') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       filterByItemsCount: payload.newValue,
@@ -163,7 +164,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_FILTER_BY_TOTAL_ITEMS_PRICE') {
+  if (type === 'setFilterByTotalItemsPrice') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       filterByTotalItemsPrice: payload.newValue,
@@ -175,7 +176,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_FILTER_BY_PRICE_TO_COMPLETE') {
+  if (type === 'setFilterByPriceToComplete') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       filterByPriceToComplete: payload.newValue,
@@ -187,7 +188,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_FILTER_BY_ITEM_TITLE') {
+  if (type === 'setFilterByItemTitle') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       filterByItemTitle: payload.newValue,
@@ -198,7 +199,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_ITEMS_COUNT_RANGE_VALID') {
+  if (type === 'setItemsCountRangeValid') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       itemsCountRangeValid: payload.newValue,
@@ -207,7 +208,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_TOTAL_ITEMS_PRICE_RANGE_VALID') {
+  if (type === 'setTotalItemsPriceRangeValid') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       totalItemsPriceRangeValid: payload.newValue,
@@ -216,7 +217,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_PRICE_TO_COMPLETE_RANGE_VALID') {
+  if (type === 'setPriceToCompleteRangeValid') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       priceToCompleteRangeValid: payload.newValue,
@@ -225,7 +226,7 @@ export default function wishlistsToolbarFiltersReducer(
     return updatedState;
   }
 
-  if (type === 'SET_ITEM_TITLE_QUERY_ERROR_MESSAGE') {
+  if (type === 'setItemTitleQueryErrorMessage') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       itemTitleQueryErrorMessage: payload.newValue,

@@ -33,7 +33,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   useEffect(() => {
     if (calendarKey === addedTimestampsKey) {
       dispatch({
-        type: 'SET_ADDED_TIMESTAMP',
+        type: 'setAddedTimestampRange',
         payload: {
           fromValue: startTimestampsMap.get(addedTimestampsKey) || null,
           toValue: endTimestampsMap.get(addedTimestampsKey) || null,
@@ -44,7 +44,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
     }
 
     dispatch({
-      type: 'SET_PURCHASED_TIMESTAMP',
+      type: 'setPurchasedTimestampRange',
       payload: {
         fromValue: startTimestampsMap.get(purchasedTimestampsKey) || null,
         toValue: endTimestampsMap.get(purchasedTimestampsKey) || null,
@@ -93,7 +93,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
   }
 
   function resetFilter(): void {
-    dispatch({ type: 'RESET_FILTERS' });
+    dispatch({ type: 'resetFilters' });
     unselectAllWishlistItems();
 
     setStartTimestampsMap(new Map<string, number>());
@@ -139,7 +139,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       <div>
         <WishlistItemTagsFormGroup
           tagsSet={tagsSet}
-          setTagsSet={(newSet: Set<string>) => dispatch({ type: 'SET_TAGS_SET', payload: { newSet } })}
+          setTagsSet={(newSet: Set<string>) => dispatch({ type: 'setTagsSet', payload: { newSet } })}
           label='Tags'
         />
 
@@ -147,7 +147,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           id='require-all-tags'
           label='Require all tags'
           isChecked={state.requireAllFilterTags}
-          onClick={() => dispatch({ type: 'SET_REQUIRE_ALL_FILTER_TAGS', payload: { newValue: !state.requireAllFilterTags } })}
+          onClick={() => dispatch({ type: 'setRequireAllFilterTags', payload: { newValue: !state.requireAllFilterTags } })}
           className='mt-1'
         />
       </div>
@@ -155,7 +155,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       <div className='grid gap-1'>
         <WishlistItemsFilterToggler
           filterBy={state.filterByIsPurchased}
-          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'SET_FILTER_BY_IS_PURCHASED', payload: { newValue } })}
+          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'setFilterByIsPurchased', payload: { newValue } })}
           title='Purchase status'
           positiveFilterTitle='Purchased'
           negativeFilterTitle='Unpurchased'
@@ -172,7 +172,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
         <WishlistItemsFilterToggler
           filterBy={state.filterByPrice}
-          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'SET_FILTER_BY_PRICE', payload: { newValue } })}
+          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'setFilterByPrice', payload: { newValue } })}
           title='Price'
           positiveFilterTitle='Has a price'
           negativeFilterTitle={`Doesn't have a price`}
@@ -181,9 +181,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
         {state.filterByPrice && (
           <PriceRangeFormGroup
             setRangeValue={(mewRange: { fromValue: number | null; toValue: number | null }) =>
-              dispatch({ type: 'SET_ITEM_PRICE', payload: { ...mewRange } })
+              dispatch({ type: 'setItemPriceRange', payload: { ...mewRange } })
             }
-            setRangeIsValid={(newValue: boolean) => dispatch({ type: 'SET_ITEM_PRICE_RANGE_VALID', payload: { newValue } })}
+            setRangeIsValid={(newValue: boolean) => dispatch({ type: 'setItemPriceRangeValid', payload: { newValue } })}
             maxPrice={WISHLIST_ITEM_MAX_PRICE}
             className='mb-1'
           />
@@ -191,7 +191,7 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
         <WishlistItemsFilterToggler
           filterBy={state.filterByLink}
-          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'SET_FILTER_BY_LINK', payload: { newValue } })}
+          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'setFilterByLink', payload: { newValue } })}
           title='Link'
           positiveFilterTitle='Contains a link'
           negativeFilterTitle={`Doesn't contain a link`}
