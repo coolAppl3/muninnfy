@@ -878,6 +878,7 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
         title,
         created_on_timestamp,
         is_favorited,
+        
         EXISTS (SELECT 1 FROM followers WHERE account_id = wishlists.account_id AND follower_account_id = ?) AS is_follower
       FROM
         wishlists
