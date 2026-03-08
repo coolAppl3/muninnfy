@@ -41,7 +41,7 @@ export default function Router(): JSX.Element {
 
   const publicRoutes: RouteDetails[] = [
     { path: '/home', element: <Home /> },
-    { path: '/wishlist/view/:wishlistId', element: <ViewWishlist /> },
+    { path: '/view/wishlist/:wishlistId', element: <ViewWishlist /> },
     { path: '*', element: <NotFound /> },
   ];
 
