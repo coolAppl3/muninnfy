@@ -12,11 +12,12 @@ import useWishlistItemsSelectionStore from '../../stores/wishlistItemsSelectionS
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
   selectionModeActive: boolean;
+  inViewMode: boolean;
   setWishlistItems: Dispatch<SetStateAction<WishlistItemType[]>>;
 };
 
 export default memo(WishlistItem);
-function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: WishlistItemProps): JSX.Element {
+function WishlistItem({ wishlistItem, selectionModeActive, inViewMode, setWishlistItems }: WishlistItemProps): JSX.Element {
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const { toggleWishlistItemExpansion, isExpanded } = useWishlistItemsExpansionStore(
@@ -37,7 +38,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
     return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  if (isEditing) {
+  if (isEditing && !inViewMode) {
     return (
       <div className='py-2 bg-secondary rounded-sm shadow-simple-tiny'>
         <WishlistItemForm
@@ -136,11 +137,13 @@ function WishlistItem({ wishlistItem, selectionModeActive, setWishlistItems }: W
             )}
           </div>
 
-          <WishlistItemButtonContainer
-            wishlistItem={wishlistItem}
-            setIsEditing={setIsEditing}
-            setWishlistItems={setWishlistItems}
-          />
+          {inViewMode || (
+            <WishlistItemButtonContainer
+              wishlistItem={wishlistItem}
+              setIsEditing={setIsEditing}
+              setWishlistItems={setWishlistItems}
+            />
+          )}
         </div>
       )}
     </div>

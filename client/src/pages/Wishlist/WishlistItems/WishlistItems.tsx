@@ -4,7 +4,11 @@ import WishlistItem from './WishlistItem/WishlistItem';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import useWishlistItems from '../hooks/useWishlistItems';
 
-export default function WishlistItems(): JSX.Element {
+type WishlistItemsProps = {
+  inViewMode: boolean;
+};
+
+export default function WishlistItems({ inViewMode = false }: WishlistItemsProps): JSX.Element {
   const { wishlistItems, selectionModeActive, isSingleColumnView, itemsFilterConfig, itemMatchesFilterConfig, setWishlistItems } =
     useWishlistItems();
 
@@ -57,9 +61,10 @@ export default function WishlistItems(): JSX.Element {
           ) : (
             filteredItems.map((item: WishlistItemType) => (
               <WishlistItem
-                wishlistItem={item}
                 key={item.item_id}
+                wishlistItem={item}
                 selectionModeActive={selectionModeActive}
+                inViewMode={inViewMode}
                 setWishlistItems={setWishlistItems}
               />
             ))

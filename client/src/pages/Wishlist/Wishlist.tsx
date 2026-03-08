@@ -109,11 +109,11 @@ export default function Wishlist(): JSX.Element {
               <NewWishlistItemFormContainer />
 
               <CalendarProvider>
-                <WishlistItemsToolbar />
+                <WishlistItemsToolbar inViewMode={false} />
               </CalendarProvider>
 
               <WishlistItemsSelectionContainer />
-              <WishlistItems />
+              <WishlistItems inViewMode={false} />
             </WishlistItemsProvider>
           </main>
         </WishlistProvider>
