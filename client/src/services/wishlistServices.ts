@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { ExtendedWishlistDetailsType, WishlistDetailsType } from '../types/wishlistTypes';
+import { ExtendedWishlistDetailsType, ViewWishlistDetailsType, WishlistDetailsType } from '../types/wishlistTypes';
 import { WishlistItemType } from '../types/wishlistItemTypes';
 
 axios.defaults.withCredentials = true;
@@ -31,6 +31,18 @@ export async function getWishlistDetailsService(
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<GetWishlistDetailsData>> {
   return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
+}
+
+type GetViewWishlistDetailsData = {
+  viewWishlistDetails: ViewWishlistDetailsType;
+  wishlistItems: WishlistItemType[];
+};
+
+export async function getViewWishlistDetailsService(
+  wishlistId: string,
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<GetViewWishlistDetailsData>> {
+  return axios.get(`${wishlistsApiUrl}/view/${wishlistId}`, { signal: abortSignal });
 }
 
 export async function crossWishlistSearchService(itemTitleQuery: string): Promise<AxiosResponse<string[]>> {
