@@ -6,7 +6,14 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
-import { TOTAL_WISHLISTS_LIMIT, WISHLIST_INTERACTION_CREATE, WISHLIST_ITEMS_LIMIT } from '../util/constants/wishlistConstants';
+import {
+  FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+  PRIVATE_WISHLIST_PRIVACY_LEVEL,
+  PUBLIC_WISHLIST_PRIVACY_LEVEL,
+  TOTAL_WISHLISTS_LIMIT,
+  WISHLIST_INTERACTION_CREATE,
+  WISHLIST_ITEMS_LIMIT,
+} from '../util/constants/wishlistConstants';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { getAuthSessionId } from '../auth/authUtils';
@@ -14,6 +21,7 @@ import { MappedWishlistItem } from './wishlistItemsRouter';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
 import { WishlistItem } from '../db/helpers/wishlistItemsDbHelpers';
 import { isValidWishlistItemTitle } from '../util/validation/wishlistItemValidation';
+import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 
 export const wishlistsRouter: Router = express.Router();
 
@@ -829,6 +837,133 @@ wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
     }
 
     res.json({});
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = !authSessionId ? null : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+
+  const wishlistId: string | undefined = req.params.wishlistId;
+
+  if (!wishlistId || !isValidUuid(wishlistId)) {
+    res.status(400).json({ message: 'Invalid wishlist ID.', reason: 'invalidWishlistId' });
+    return;
+  }
+
+  try {
+    type WishlistDetails = {
+      account_id: number;
+      privacy_level: number;
+      title: string;
+      created_on_timestamp: number;
+      is_favorited: boolean;
+      is_follower: boolean;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        account_id,
+        privacy_level,
+        title,
+        created_on_timestamp,
+        is_favorited,
+        EXISTS (SELECT 1 FROM followers WHERE account_id = wishlists.account_id AND follower_account_id = ?) AS is_follower
+      FROM
+        wishlists
+      WHERE
+        wishlist_id = ?;`,
+      [accountId || 0, wishlistId]
+    );
+
+    const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
+
+    if (!wishlistDetails) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    if (wishlistDetails.account_id === accountId) {
+      res.status(409).json({ message: 'Wishlist owner.', reason: 'wishlistOwner' });
+      return;
+    }
+
+    if (wishlistDetails.privacy_level === PRIVATE_WISHLIST_PRIVACY_LEVEL) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    if (wishlistDetails.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL && !wishlistDetails.is_follower) {
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+      return;
+    }
+
+    const [wishlistItems] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        wishlist_items.item_id,
+        wishlist_items.added_on_timestamp,
+        wishlist_items.title,
+        wishlist_items.description,
+        wishlist_items.link,
+        wishlist_items.price,
+        wishlist_items.purchased_on_timestamp,
+        
+        wishlist_item_tags.tag_id,
+        wishlist_item_tags.tag_name
+      FROM 
+        wishlist_items
+      LEFT JOIN
+        wishlist_item_tags USING(item_id)
+      WHERE
+        wishlist_items.wishlist_id = ?
+      ORDER BY
+        wishlist_items.added_on_timestamp DESC,
+        wishlist_item_tags.tag_name ASC
+      LIMIT ?;`,
+      [wishlistId, WISHLIST_ITEMS_LIMIT * WISHLIST_ITEM_TAGS_LIMIT]
+    );
+
+    const mappedWishlistItems: MappedWishlistItem[] = [];
+    let currentItemId: number = 0;
+
+    for (const item of wishlistItems as WishlistItem[]) {
+      const { tag_id, tag_name, ...rest } = item;
+
+      if (item.item_id === currentItemId) {
+        const mappedWishlistItem: MappedWishlistItem | undefined = mappedWishlistItems[mappedWishlistItems.length - 1];
+        mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
+
+        continue;
+      }
+
+      currentItemId = item.item_id;
+      const mappedItem: MappedWishlistItem = {
+        ...rest,
+        tags: tag_id
+          ? [
+              {
+                id: tag_id,
+                name: tag_name,
+              },
+            ]
+          : [],
+      };
+
+      mappedWishlistItems.push(mappedItem);
+    }
+
+    const { title, created_on_timestamp } = wishlistDetails;
+    res.json({ viewWishlistDetails: { title, created_on_timestamp }, wishlistItems: mappedWishlistItems });
   } catch (err: unknown) {
     console.log(err);
 
