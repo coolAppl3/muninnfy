@@ -1,5 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
-import { ExtendedWishlistDetailsType, ViewWishlistDetailsType, WishlistDetailsType } from '../types/wishlistTypes';
+import {
+  ExtendedWishlistDetailsType,
+  ViewWishlistDetailsType,
+  ViewWishlistOwnerDetails,
+  WishlistDetailsType,
+} from '../types/wishlistTypes';
 import { WishlistItemType } from '../types/wishlistItemTypes';
 
 axios.defaults.withCredentials = true;
@@ -34,6 +39,7 @@ export async function getWishlistDetailsService(
 }
 
 type GetViewWishlistDetailsData = {
+  ownerDetails: ViewWishlistOwnerDetails;
   viewWishlistDetails: ViewWishlistDetailsType;
   wishlistItems: WishlistItemType[];
 };

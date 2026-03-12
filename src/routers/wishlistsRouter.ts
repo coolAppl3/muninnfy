@@ -868,22 +868,31 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       title: string;
       created_on_timestamp: number;
       is_favorited: boolean;
+      owner_public_account_id: string;
+      owner_username: string;
+      owner_display_name: string;
       is_follower: boolean;
     };
 
     const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        account_id,
-        privacy_level,
-        title,
-        created_on_timestamp,
-        is_favorited,
+        wishlists.account_id,
+        wishlists.privacy_level,
+        wishlists.title,
+        wishlists.created_on_timestamp,
+        wishlists.is_favorited,
+
+        accounts.public_account_id AS owner_public_account_id,
+        accounts.username AS owner_username,
+        accounts.display_name AS owner_display_name,
         
         EXISTS (SELECT 1 FROM followers WHERE account_id = wishlists.account_id AND follower_account_id = ?) AS is_follower
       FROM
         wishlists
+      LEFT JOIN
+        accounts USING(account_id)
       WHERE
-        wishlist_id = ?;`,
+        wishlists.wishlist_id = ?;`,
       [accountId || 0, wishlistId]
     );
 
@@ -963,8 +972,17 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       mappedWishlistItems.push(mappedItem);
     }
 
-    const { title, created_on_timestamp } = wishlistDetails;
-    res.json({ viewWishlistDetails: { title, created_on_timestamp }, wishlistItems: mappedWishlistItems });
+    const { owner_public_account_id, owner_display_name, owner_username, title, created_on_timestamp } = wishlistDetails;
+
+    res.json({
+      ownerDetails: {
+        owner_public_account_id,
+        owner_username,
+        owner_display_name,
+      },
+      viewWishlistDetails: { title, created_on_timestamp },
+      wishlistItems: mappedWishlistItems,
+    });
   } catch (err: unknown) {
     console.log(err);
 

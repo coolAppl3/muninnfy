@@ -20,3 +20,9 @@ export type ExtendedWishlistDetailsType = {
   total_items_price: number;
   price_to_complete: number;
 };
+
+export type ViewWishlistOwnerDetails = {
+  owner_public_account_id: string;
+  owner_username: string;
+  owner_display_name: string;
+};
