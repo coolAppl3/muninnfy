@@ -5,18 +5,31 @@ import { getFullDateString } from '../../../utils/globalUtils';
 import { getFormattedPrice } from '../../../utils/wishlistUtils';
 import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
-import { ViewWishlistDetailsType } from '../../../types/wishlistTypes';
+import { ViewWishlistDetailsType, ViewWishlistOwnerDetails } from '../../../types/wishlistTypes';
+import { Link } from 'react-router-dom';
 
 type ViewWishlistHeaderProps = {
+  ownerDetails: ViewWishlistOwnerDetails;
   viewWishlistDetails: ViewWishlistDetailsType;
 };
 
-export default function ViewWishlistHeader({ viewWishlistDetails }: ViewWishlistHeaderProps): JSX.Element {
+export default function ViewWishlistHeader({ ownerDetails, viewWishlistDetails }: ViewWishlistHeaderProps): JSX.Element {
   const { wishlistItems } = useWishlistItems();
+  const { owner_public_account_id, owner_username, owner_display_name } = ownerDetails;
 
   return (
     <header>
       <Container>
+        <p className='text-description text-xs font-medium mb-[4px]'>
+          Owned by <span className='text-title'>@{owner_username} Mohsen</span> (
+          <Link
+            to={`/view/account/${owner_public_account_id}`}
+            className='link break-all'
+          >
+            {owner_display_name}
+          </Link>
+          )
+        </p>
         <div className='bg-secondary p-2 rounded-sm shadow-simple-tiny'>
           <h3 className='text-title font-medium mb-1 leading-none wrap-anywhere'>{viewWishlistDetails.title}</h3>
 

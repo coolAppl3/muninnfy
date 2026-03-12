@@ -1,7 +1,7 @@
 import { JSX, useEffect, useState } from 'react';
 import Head from '../../components/Head/Head';
 import { WishlistItemType } from '../../types/wishlistItemTypes';
-import { ViewWishlistDetailsType } from '../../types/wishlistTypes';
+import { ViewWishlistDetailsType, ViewWishlistOwnerDetails } from '../../types/wishlistTypes';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import useHistory from '../../hooks/useHistory';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
@@ -20,6 +20,7 @@ import ViewWishlistHeader from './components/ViewWishlistHeader';
 export default function ViewWishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
+  const [ownerDetails, setOwnerDetails] = useState<ViewWishlistOwnerDetails | null>(null);
   const [initialViewWishlistProviderData, setInitialViewWishlistProviderData] = useState<{
     initialWishlistId: string;
     initialViewWishlistDetails: ViewWishlistDetailsType;
@@ -52,7 +53,9 @@ export default function ViewWishlist(): JSX.Element {
 
     const getWishlistDetails = async () => {
       try {
-        const { viewWishlistDetails, wishlistItems } = (await getViewWishlistDetailsService(wishlistId, abortController.signal)).data;
+        const { ownerDetails, viewWishlistDetails, wishlistItems } = (
+          await getViewWishlistDetailsService(wishlistId, abortController.signal)
+        ).data;
 
         if (abortController.signal.aborted) {
           return;
@@ -63,6 +66,7 @@ export default function ViewWishlist(): JSX.Element {
           return set;
         }, new Set<string>());
 
+        setOwnerDetails(ownerDetails);
         setInitialViewWishlistProviderData({
           initialWishlistId: wishlistId,
           initialViewWishlistDetails: viewWishlistDetails,
@@ -105,10 +109,13 @@ export default function ViewWishlist(): JSX.Element {
 
       {isLoaded || <LoadingSkeleton />}
 
-      {isLoaded && initialViewWishlistProviderData && (
+      {isLoaded && initialViewWishlistProviderData && ownerDetails && (
         <main className='py-4 grid gap-2'>
           <WishlistItemsProvider initialWishlistItems={initialViewWishlistProviderData.initialWishlistItems}>
-            <ViewWishlistHeader viewWishlistDetails={initialViewWishlistProviderData.initialViewWishlistDetails} />
+            <ViewWishlistHeader
+              ownerDetails={ownerDetails}
+              viewWishlistDetails={initialViewWishlistProviderData.initialViewWishlistDetails}
+            />
 
             <CalendarProvider>
               <WishlistItemsToolbar inViewMode={true} />
