@@ -21,12 +21,8 @@ export default function ViewWishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const [ownerDetails, setOwnerDetails] = useState<ViewWishlistOwnerDetails | null>(null);
-  const [initialViewWishlistProviderData, setInitialViewWishlistProviderData] = useState<{
-    initialWishlistId: string;
-    initialViewWishlistDetails: ViewWishlistDetailsType;
-    initialWishlistItems: WishlistItemType[];
-    initialWishlistItemsTitleSet: Set<string>;
-  } | null>(null);
+  const [viewWishlistDetails, setViewWishlistDetails] = useState<ViewWishlistDetailsType | null>(null);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>([]);
 
   const { authStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
@@ -61,18 +57,9 @@ export default function ViewWishlist(): JSX.Element {
           return;
         }
 
-        const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItemType) => {
-          set.add(item.title.toLowerCase());
-          return set;
-        }, new Set<string>());
-
         setOwnerDetails(ownerDetails);
-        setInitialViewWishlistProviderData({
-          initialWishlistId: wishlistId,
-          initialViewWishlistDetails: viewWishlistDetails,
-          initialWishlistItems: wishlistItems,
-          initialWishlistItemsTitleSet,
-        });
+        setViewWishlistDetails(viewWishlistDetails);
+        setWishlistItems(wishlistItems);
 
         setIsLoaded(true);
       } catch (err: unknown) {
@@ -109,12 +96,12 @@ export default function ViewWishlist(): JSX.Element {
 
       {isLoaded || <LoadingSkeleton />}
 
-      {isLoaded && initialViewWishlistProviderData && ownerDetails && (
+      {isLoaded && ownerDetails && viewWishlistDetails && (
         <main className='py-4 grid gap-2'>
-          <WishlistItemsProvider initialWishlistItems={initialViewWishlistProviderData.initialWishlistItems}>
+          <WishlistItemsProvider initialWishlistItems={wishlistItems}>
             <ViewWishlistHeader
               ownerDetails={ownerDetails}
-              viewWishlistDetails={initialViewWishlistProviderData.initialViewWishlistDetails}
+              viewWishlistDetails={viewWishlistDetails}
             />
 
             <CalendarProvider>
