@@ -21,14 +21,13 @@ export default function ViewWishlistHeader({ ownerDetails, viewWishlistDetails }
     <header>
       <Container>
         <p className='text-description text-xs font-medium mb-[4px]'>
-          Owned by <span className='text-title'>@{owner_username} Mohsen</span> (
+          Owned by <span className='text-title'>{owner_display_name}</span>{' '}
           <Link
             to={`/view/account/${owner_public_account_id}`}
             className='link break-all'
           >
-            {owner_display_name}
+            @{owner_username}
           </Link>
-          )
         </p>
         <div className='bg-secondary p-2 rounded-sm shadow-simple-tiny'>
           <h3 className='text-title font-medium mb-1 leading-none wrap-anywhere'>{viewWishlistDetails.title}</h3>
