@@ -49,7 +49,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Account verification</h1>
 
       <p className='text-description text-sm mb-1'>Enter the email address you used for signing up below.</p>
@@ -101,6 +101,6 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
           Continue
         </Button>
       </form>
-    </>
+    </section>
   );
 }

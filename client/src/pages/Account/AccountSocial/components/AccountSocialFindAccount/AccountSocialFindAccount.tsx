@@ -48,7 +48,7 @@ export default function AccountSocialFindAccount(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <div className='h-line my-1'></div>
 
       <form
@@ -121,6 +121,6 @@ export default function AccountSocialFindAccount(): JSX.Element {
           </div>
         </>
       )}
-    </>
+    </section>
   );
 }

@@ -10,7 +10,7 @@ export default function AccountNavMenu(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <div
+    <nav
       className='fixed bottom-0 z-10'
       onBlur={(e: FocusEvent) => {
         if (e.relatedTarget?.classList.contains('nav-menu-btn')) {
@@ -70,6 +70,6 @@ export default function AccountNavMenu(): JSX.Element {
           Wishlists
         </Link>
       </nav>
-    </div>
+    </nav>
   );
 }

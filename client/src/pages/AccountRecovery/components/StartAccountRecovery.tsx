@@ -92,7 +92,7 @@ export default function StartAccountRecovery(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Account recovery</h1>
       <p className='text-description text-sm mb-[1.6rem]'>Enter your account's email address to start the recovery process.</p>
 
@@ -142,6 +142,6 @@ export default function StartAccountRecovery(): JSX.Element {
           Continue
         </Button>
       </form>
-    </>
+    </section>
   );
 }

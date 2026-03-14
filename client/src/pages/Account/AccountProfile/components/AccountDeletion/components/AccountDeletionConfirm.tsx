@@ -117,7 +117,7 @@ export default function AccountDeletionConfirm(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <header className='mb-1'>
         <p className='text-description font-medium text-sm break-words'>
           Confirmation email sent to <span className='text-title'>{accountDetails?.email}</span>.
@@ -202,6 +202,6 @@ export default function AccountDeletionConfirm(): JSX.Element {
           </Button>
         </div>
       </form>
-    </>
+    </section>
   );
 }

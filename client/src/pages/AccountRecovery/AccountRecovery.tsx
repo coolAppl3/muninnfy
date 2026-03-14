@@ -22,7 +22,7 @@ export default function AccountRecovery(): JSX.Element {
     <>
       <Head title='Account Recovery - Muninnfy' />
 
-      <section className='py-4 h-available flex justify-center items-center'>
+      <main className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
             <AccountRecoveryChildren
@@ -33,7 +33,7 @@ export default function AccountRecovery(): JSX.Element {
             />
           </div>
         </Container>
-      </section>
+      </main>
     </>
   );
 }

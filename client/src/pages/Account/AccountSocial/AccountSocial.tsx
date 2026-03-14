@@ -93,7 +93,7 @@ export default function AccountSocial(): JSX.Element {
   const MappedComponent: ComponentType = componentRecord[socialSection];
 
   return (
-    <>
+    <section>
       {!fetchDetails.initialFetchCompleted ? (
         <ContentLoadingSkeleton />
       ) : (
@@ -102,7 +102,7 @@ export default function AccountSocial(): JSX.Element {
           <MappedComponent />
         </>
       )}
-    </>
+    </section>
   );
 }
 

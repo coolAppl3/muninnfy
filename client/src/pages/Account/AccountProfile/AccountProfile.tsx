@@ -20,7 +20,7 @@ export function AccountProfile(): JSX.Element {
   const MappedComponent: ComponentType | null = profileSection && componentRecord[profileSection];
 
   return (
-    <>
+    <section>
       <AccountProfileHeader />
 
       <div className='text-description/50 text-xs mb-[1.2rem]'>
@@ -54,7 +54,7 @@ export function AccountProfile(): JSX.Element {
       </div>
 
       {profileSection ? null : <AccountOngoingRequests />}
-    </>
+    </section>
   );
 }
 

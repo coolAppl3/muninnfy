@@ -66,7 +66,7 @@ export default function NewWishlist(): JSX.Element {
     <>
       <Head title='New Wishlist - Muninnfy' />
 
-      <section className='py-4 h-available flex justify-center items-center'>
+      <main className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
             <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>New wishlist</h1>
@@ -156,7 +156,7 @@ export default function NewWishlist(): JSX.Element {
             </form>
           </div>
         </Container>
-      </section>
+      </main>
     </>
   );
 }

@@ -133,7 +133,7 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <header className='mb-1'>
         <p className='text-description font-medium text-sm break-words'>
           Confirmation email sent to <span className='text-title'>{ongoingEmailUpdateRequest?.new_email}</span>.
@@ -214,6 +214,6 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
           </Button>
         </div>
       </form>
-    </>
+    </section>
   );
 }
