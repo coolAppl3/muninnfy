@@ -27,7 +27,6 @@ export default function Wishlist(): JSX.Element {
     initialWishlistId: string;
     initialWishlistDetails: WishlistDetailsType;
     initialWishlistItems: WishlistItemType[];
-    initialWishlistItemsTitleSet: Set<string>;
   } | null>(null);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
@@ -60,16 +59,10 @@ export default function Wishlist(): JSX.Element {
           return;
         }
 
-        const initialWishlistItemsTitleSet = wishlistItems.reduce((set: Set<string>, item: WishlistItemType) => {
-          set.add(item.title.toLowerCase());
-          return set;
-        }, new Set<string>());
-
         setInitialWishlistProviderData({
           initialWishlistId: wishlistId,
           initialWishlistDetails: wishlistDetails,
           initialWishlistItems: wishlistItems,
-          initialWishlistItemsTitleSet,
         });
 
         setIsLoaded(true);
