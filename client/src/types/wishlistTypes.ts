@@ -5,6 +5,8 @@ export type WishlistDetailsType = {
   is_favorited: boolean;
 };
 
+export type ViewWishlistDetailsType = Omit<WishlistDetailsType, 'privacy_level' | 'is_favorited'>;
+
 export type ExtendedWishlistDetailsType = {
   wishlist_id: string;
   privacy_level: number;
@@ -17,4 +19,10 @@ export type ExtendedWishlistDetailsType = {
   purchased_items_count: number;
   total_items_price: number;
   price_to_complete: number;
+};
+
+export type ViewWishlistOwnerDetails = {
+  owner_public_account_id: string;
+  owner_username: string;
+  owner_display_name: string;
 };

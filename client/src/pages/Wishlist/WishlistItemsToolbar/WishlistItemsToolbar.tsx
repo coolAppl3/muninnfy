@@ -9,7 +9,11 @@ import WishlistItemsToolbarFilters from './components/WishlistItemsToolbarFilter
 import { debounce } from '../../../utils/debounce';
 import useWishlistItems from '../hooks/useWishlistItems';
 
-export default function WishlistItemsToolbar(): JSX.Element {
+type WishlistItemsToolbarProps = {
+  inViewMode: boolean;
+};
+
+export default function WishlistItemsToolbar({ inViewMode }: WishlistItemsToolbarProps): JSX.Element {
   const { setItemsFilterConfig } = useWishlistItems();
 
   const [value, setValue] = useState<string>('');
@@ -44,7 +48,7 @@ export default function WishlistItemsToolbar(): JSX.Element {
             </button>
 
             <WishlistItemsToolbarSort />
-            <WishlistItemsToolbarOptions />
+            <WishlistItemsToolbarOptions inViewMode={inViewMode} />
           </header>
 
           <WishlistItemsToolbarFilters

@@ -6,7 +6,11 @@ import useWishlistItems from '../../hooks/useWishlistItems';
 import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionStore';
 import { useShallow } from 'zustand/react/shallow';
 
-export default function WishlistItemsToolbarOptions(): JSX.Element {
+type WishlistItemsToolbarOptionsProps = {
+  inViewMode: boolean;
+};
+
+export default function WishlistItemsToolbarOptions({ inViewMode }: WishlistItemsToolbarOptionsProps): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { expandedItemsIdsSet, expandAllWishlistItems, collapseAllWishlistItems } = useWishlistItemsExpansionStore(
@@ -44,23 +48,25 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
       </button>
 
       <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
-        <button
-          type='button'
-          className='context-menu-btn'
-          onClick={() => {
-            setIsOpen(false);
+        {inViewMode || (
+          <button
+            type='button'
+            className='context-menu-btn'
+            onClick={() => {
+              setIsOpen(false);
 
-            if (!selectionModeActive) {
-              setSelectionModeActive(true);
-              return;
-            }
+              if (!selectionModeActive) {
+                setSelectionModeActive(true);
+                return;
+              }
 
-            setSelectionModeActive(false);
-            collapseAllWishlistItems();
-          }}
-        >
-          {selectionModeActive ? 'Cancel item selection' : 'Select items'}
-        </button>
+              setSelectionModeActive(false);
+              collapseAllWishlistItems();
+            }}
+          >
+            {selectionModeActive ? 'Cancel item selection' : 'Select items'}
+          </button>
+        )}
 
         <button
           type='button'

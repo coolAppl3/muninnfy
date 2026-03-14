@@ -105,21 +105,25 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
     setStartTimestampsMap(new Map<string, number>());
     setEndTimestampsMap(new Map<string, number>());
 
-    setWishlistsFilterConfig((prev) => ({
-      ...prev,
-
+    setWishlistsFilterConfig({
       createdAfterTimestamp: null,
       createdBeforeTimestamp: null,
+
       itemsCountFrom: null,
       itemsCountTo: null,
+
       totalItemsPriceFrom: null,
       totalItemsPriceTo: null,
+
       priceToCompleteFrom: null,
       priceToCompleteTo: null,
 
+      isFavorited: null,
+      titleQuery: '',
+
       itemTitleQuery: '',
       crossWishlistQueryIdSet: null,
-    }));
+    });
 
     displayPopupMessage('Filters reset.', 'success');
   }

@@ -15,7 +15,11 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
 
   const wishlistItemsTitleSet: Set<string> = useMemo(
-    () => new Set<string>(wishlistItems.map(({ title }: WishlistItemType) => title.toLowerCase())),
+    () =>
+      wishlistItems.reduce((set: Set<string>, item: WishlistItemType) => {
+        set.add(item.title.toLowerCase());
+        return set;
+      }, new Set<string>()),
     [wishlistItems]
   );
 

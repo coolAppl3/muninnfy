@@ -55,7 +55,12 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   const [descriptionErrorMessage, setDescriptionErrorMessage] = useState<string | null>(null);
 
   const [tagsSet, setTagsSet] = useState<Set<string>>(
-    new Set<string>(wishlistItem?.tags.map(({ name }: { id: number; name: string }) => name) || [])
+    !wishlistItem
+      ? new Set<string>()
+      : wishlistItem.tags.reduce((set: Set<string>, { name }: { id: number; name: string }) => {
+          set.add(name);
+          return set;
+        }, new Set())
   );
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
