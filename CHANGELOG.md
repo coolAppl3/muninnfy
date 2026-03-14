@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.3.3] (2026-03-14)
+
+### Features
+
+- Implemented `ViewWishlist`.
+  - Adjusted path for `ViewWishlist` in `Router`.
+  - Added `ViewWishlistDetailsType`.
+  - Added option to not send a response for `getAuthSessionId()` and `getAccountIdByAuthSessionId()`.
+  - Added GET `wishlists/view/:wishlistId`.
+  - Added `getViewWishlistDetailsService()`.
+  - Added `ViewWishlistHeader` component.
+
+
+### Bug Fixes
+
+- Removed unused `initialWishlistItemsTitleSet` from `Wishlist`.
+- Fixed favorited filter not resetting correctly under `Wishlists`.
+
+
+### Improvements
+
+- reduce time complexity to O(n) for creating sets in `WishlistItemForm` and `WishlistItemsProvider`.
+
+
 ## [0.3.2] (2026-03-05)
 
 ### Improvements
