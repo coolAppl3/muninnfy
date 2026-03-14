@@ -47,7 +47,7 @@ export default function ViewWishlist(): JSX.Element {
 
     const abortController: AbortController = new AbortController();
 
-    const getWishlistDetails = async () => {
+    const getViewWishlistDetails = async () => {
       try {
         const { ownerDetails, viewWishlistDetails, wishlistItems } = (
           await getViewWishlistDetailsService(wishlistId, abortController.signal)
@@ -85,7 +85,7 @@ export default function ViewWishlist(): JSX.Element {
       }
     };
 
-    getWishlistDetails();
+    getViewWishlistDetails();
 
     return () => abortController.abort();
   }, [isLoaded, referrerLocation, authStatus, urlParams, displayPopupMessage, navigate, handleAsyncError]);
