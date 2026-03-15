@@ -1,16 +1,14 @@
-import axios, { AxiosResponse } from 'axios';
-
-axios.defaults.withCredentials = true;
-const authApiUrl: string = location.hostname === 'localhost' ? `http://localhost:5000/api/auth` : `https://muninnfy/api/auth`;
+import { AxiosResponse } from 'axios';
+import axiosInstance from './axiosInstance';
 
 type CheckForAuthSessionServiceData = {
   isValidAuthSession: boolean;
 };
 
 export function checkForAuthSessionService(abortSignal: AbortSignal): Promise<AxiosResponse<CheckForAuthSessionServiceData>> {
-  return axios.get(`${authApiUrl}/session`, { signal: abortSignal });
+  return axiosInstance.get('/auth/session', { signal: abortSignal });
 }
 
 export function signOutService(): Promise<AxiosResponse> {
-  return axios.delete(`${authApiUrl}/session`);
+  return axiosInstance.delete('/auth/session');
 }

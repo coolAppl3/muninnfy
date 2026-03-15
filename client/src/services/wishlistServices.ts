@@ -1,4 +1,6 @@
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
+import axiosInstance from './axiosInstance';
+
 import {
   ExtendedWishlistDetailsType,
   ViewWishlistDetailsType,
@@ -6,10 +8,6 @@ import {
   WishlistDetailsType,
 } from '../types/wishlistTypes';
 import { WishlistItemType } from '../types/wishlistItemTypes';
-
-axios.defaults.withCredentials = true;
-const wishlistsApiUrl: string =
-  location.hostname === 'localhost' ? `http://localhost:5000/api/wishlists` : `https://muninnfy/api/wishlists`;
 
 type CreateWishListAsAccountServicePayload = {
   privacyLevel: number;
@@ -23,7 +21,7 @@ type CreateWishListAsAccountServiceData = {
 export async function createWishlistAsAccountService(
   body: CreateWishListAsAccountServicePayload
 ): Promise<AxiosResponse<CreateWishListAsAccountServiceData>> {
-  return axios.post(wishlistsApiUrl, body);
+  return axiosInstance.post('/wishlists', body);
 }
 
 type GetWishlistDetailsData = {
@@ -35,7 +33,7 @@ export async function getWishlistDetailsService(
   wishlistId: string,
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<GetWishlistDetailsData>> {
-  return axios.get(`${wishlistsApiUrl}/${wishlistId}`, { signal: abortSignal });
+  return axiosInstance.get(`/wishlists/${wishlistId}`, { signal: abortSignal });
 }
 
 type GetViewWishlistDetailsData = {
@@ -48,11 +46,11 @@ export async function getViewWishlistDetailsService(
   wishlistId: string,
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<GetViewWishlistDetailsData>> {
-  return axios.get(`${wishlistsApiUrl}/view/${wishlistId}`, { signal: abortSignal });
+  return axiosInstance.get(`/wishlists/view/${wishlistId}`, { signal: abortSignal });
 }
 
 export async function crossWishlistSearchService(itemTitleQuery: string): Promise<AxiosResponse<string[]>> {
-  return axios.get(`${wishlistsApiUrl}/crossWishlistSearch/${itemTitleQuery}`);
+  return axiosInstance.get(`/wishlists/crossWishlistSearch/${itemTitleQuery}`);
 }
 
 export type CombinedWishlistsStatistics = {
@@ -69,7 +67,7 @@ type GetAllWishlistsServiceData = {
 };
 
 export async function getAllWishlistsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAllWishlistsServiceData>> {
-  return axios.get(`${wishlistsApiUrl}/all`, { signal: abortSignal });
+  return axiosInstance.get('/wishlists/all', { signal: abortSignal });
 }
 
 type ChangeWishlistTitleServicePayload = {
@@ -78,7 +76,7 @@ type ChangeWishlistTitleServicePayload = {
 };
 
 export async function changeWishlistTitleService(body: ChangeWishlistTitleServicePayload): Promise<AxiosResponse> {
-  return axios.patch(`${wishlistsApiUrl}/change/title`, body);
+  return axiosInstance.patch('/wishlists/change/title', body);
 }
 
 type ChangeWishlistPrivacyLevelServicePayload = {
@@ -87,7 +85,7 @@ type ChangeWishlistPrivacyLevelServicePayload = {
 };
 
 export async function changeWishlistPrivacyLevelService(body: ChangeWishlistPrivacyLevelServicePayload): Promise<AxiosResponse> {
-  return axios.patch(`${wishlistsApiUrl}/change/privacyLevel`, body);
+  return axiosInstance.patch('/wishlists/change/privacyLevel', body);
 }
 
 type SetWishlistFavoriteServicePayload = {
@@ -98,13 +96,13 @@ type SetWishlistFavoriteServicePayload = {
 export async function setWishlistFavoriteService(
   body: SetWishlistFavoriteServicePayload
 ): Promise<AxiosResponse<SetWishlistFavoriteServicePayload>> {
-  return axios.patch(`${wishlistsApiUrl}/change/favorite`, body);
+  return axiosInstance.patch('/wishlists/change/favorite', body);
 }
 
 export async function deleteEmptyWishlistsService(): Promise<AxiosResponse> {
-  return axios.delete(`${wishlistsApiUrl}/empty`);
+  return axiosInstance.delete('/wishlists/empty');
 }
 
 export async function deleteWishlistService(wishlistId: string): Promise<AxiosResponse> {
-  return axios.delete(`${wishlistsApiUrl}/${wishlistId}`);
+  return axiosInstance.delete(`/wishlists/${wishlistId}`);
 }
