@@ -29,8 +29,6 @@ if (process.env.NODE_ENV?.toLowerCase() === 'development') {
   app.use(
     cors({
       origin: (origin: string | undefined, callback) => {
-        console.log(process.env.NODE_ENV);
-
         if (!origin) {
           return callback(null, false);
         }
