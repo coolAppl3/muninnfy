@@ -9,7 +9,6 @@ import { dbPool } from '../db/db';
 import {
   FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
-  PUBLIC_WISHLIST_PRIVACY_LEVEL,
   TOTAL_WISHLISTS_LIMIT,
   WISHLIST_INTERACTION_CREATE,
   WISHLIST_ITEMS_LIMIT,
@@ -21,7 +20,6 @@ import { MappedWishlistItem } from './wishlistItemsRouter';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../util/constants/wishlistItemConstants';
 import { WishlistItem } from '../db/helpers/wishlistItemsDbHelpers';
 import { isValidWishlistItemTitle } from '../util/validation/wishlistItemValidation';
-import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 
 export const wishlistsRouter: Router = express.Router();
 
