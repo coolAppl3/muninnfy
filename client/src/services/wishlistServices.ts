@@ -1,13 +1,12 @@
 import { AxiosResponse } from 'axios';
 import axiosInstance from './axiosInstance';
-
+import { WishlistItemType } from '../types/wishlistItemTypes';
 import {
   ExtendedWishlistDetailsType,
   ViewWishlistDetailsType,
   ViewWishlistOwnerDetails,
   WishlistDetailsType,
 } from '../types/wishlistTypes';
-import { WishlistItemType } from '../types/wishlistItemTypes';
 
 type CreateWishListAsAccountServicePayload = {
   privacyLevel: number;
