@@ -27,7 +27,7 @@ export default function AccountDeletionStart(): JSX.Element {
     const password: string = value;
 
     try {
-      const expiryTimestamp: number = await (await startAccountDeletionService({ password })).data.expiryTimestamp;
+      const expiryTimestamp: number = (await startAccountDeletionService({ password })).data.expiryTimestamp;
       setOngoingAccountDeletionRequest({ expiry_timestamp: expiryTimestamp, is_suspended: false });
 
       displayPopupMessage('Confirmation email sent.', 'success');

@@ -25,7 +25,7 @@ export default function StartAccountRecovery(): JSX.Element {
     const email: string = value;
 
     try {
-      const publicAccountId: string = await (await startAccountRecoveryService({ email })).data.publicAccountId;
+      const publicAccountId: string = (await startAccountRecoveryService({ email })).data.publicAccountId;
 
       navigate(`/account/recovery?publicAccountId=${publicAccountId}`);
       displayPopupMessage('Recovery email sent.', 'success');
