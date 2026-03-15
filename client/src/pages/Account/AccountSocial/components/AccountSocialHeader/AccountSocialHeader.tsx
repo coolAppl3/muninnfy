@@ -48,7 +48,9 @@ export default function AccountSocialHeader(): JSX.Element {
               const successfullyCopied: boolean = await copyToClipboard(
                 `${window.location.origin}/accounts/view/${accountDetails.public_account_id}`
               );
-              successfullyCopied ? displayPopupMessage('Copied to clipboard.', 'success') : displayPopupMessage('Failed to copy.', 'error');
+              successfullyCopied
+                ? displayPopupMessage('Copied to clipboard.', 'success')
+                : displayPopupMessage('Failed to copy to clipboard.', 'error');
             }}
           >
             Copy account link
