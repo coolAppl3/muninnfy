@@ -29,12 +29,10 @@ if (process.env.NODE_ENV?.toLowerCase() === 'development') {
   app.use(
     cors({
       origin: (origin: string | undefined, callback) => {
-        if (!origin) {
-          return callback(null, true);
-        }
+        console.log(process.env.NODE_ENV);
 
-        if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
-          return callback(null, true);
+        if (!origin) {
+          return callback(null, false);
         }
 
         if (/^http:\/\/192\.168\.0\.\d{2}:(3000|5000)$/.test(origin)) {
