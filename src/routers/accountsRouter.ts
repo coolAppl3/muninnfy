@@ -1222,6 +1222,13 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
+    if (accountDetails.email_taken || accountDetails.email_temporarily_taken) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
+
+      return;
+    }
+
     const confirmationCode: string = generateHexCode();
     const expiryTimestamp: number = Date.now() + ACCOUNT_EMAIL_UPDATE_WINDOW;
 
