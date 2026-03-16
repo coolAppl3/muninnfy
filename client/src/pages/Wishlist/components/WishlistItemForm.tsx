@@ -118,6 +118,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       allItemsExpanded && toggleWishlistItemExpansion(newWishlistItem.item_id);
 
       displayPopupMessage('Item added.', 'success');
+      onFinish();
       clearForm();
 
       titleInputRef.current?.focus();
