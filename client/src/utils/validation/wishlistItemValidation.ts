@@ -55,7 +55,11 @@ export function validateWishlistItemLink(value: string): string | null {
     return `Link can't exceed 2000 characters.`;
   }
 
-  const regex: RegExp = /^(https?:\/\/)?[^\s]{1,2000}$/i;
+  if (!value.startsWith('https://')) {
+    return 'Link must start with `https://`.';
+  }
+
+  const regex: RegExp = /^https:\/\/[^\s]{1,1992}$/;
   if (!regex.test(value)) {
     return 'Invalid link.';
   }

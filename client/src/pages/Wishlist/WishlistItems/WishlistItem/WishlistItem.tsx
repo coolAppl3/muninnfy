@@ -118,7 +118,7 @@ function WishlistItem({ wishlistItem, selectionModeActive, inViewMode, setWishli
                     title='Link'
                     value={
                       <a
-                        href={/^https?:\/\//.test(wishlistItem.link) ? wishlistItem.link : `https://${wishlistItem.link}`}
+                        href={wishlistItem.link}
                         target='_blank'
                         className='link block'
                       >
