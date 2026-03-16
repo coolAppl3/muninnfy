@@ -15,7 +15,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
 
-  const [value, setValue] = useState<string>('');
+  const [value, setValue] = useState<string>(wishlistDetails.title);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
