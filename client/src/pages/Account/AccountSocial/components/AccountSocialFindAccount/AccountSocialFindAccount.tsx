@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import DefaultFormGroup from '../../../../../components/DefaultFormGroup/DefaultFormGroup';
 import { validateSocialFindQuery } from '../../../../../utils/validation/socialValidation';
 import Button from '../../../../../components/Button/Button';
@@ -53,7 +53,7 @@ export default function AccountSocialFindAccount(): JSX.Element {
 
       <form
         className='grid gap-2'
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting || isIdenticalSearchQuery) {

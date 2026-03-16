@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, FormEvent, JSX, SetStateAction, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, Dispatch, JSX, SetStateAction, SubmitEvent, useEffect, useRef, useState } from 'react';
 import TextareaFormGroup from '../../../components/TextareaFormGroup/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
 import WishlistItemTagsFormGroup from '../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
@@ -316,7 +316,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   return (
     <form
       className={`px-2 grid gap-2 overflow-hidden relative z-0 ${className || ''}`}
-      onSubmit={async (e: FormEvent) => {
+      onSubmit={async (e: SubmitEvent) => {
         e.preventDefault();
 
         if (isSubmitting || !allFieldsValid()) {

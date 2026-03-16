@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import useAuth from '../../../hooks/useAuth';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -56,7 +56,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
       <p className='text-description text-sm mb-2'>Unverified accounts are automatically deleted after 20 minutes.</p>
 
       <form
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting) {

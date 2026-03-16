@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useEffect, useRef, useState } from 'react';
 import { changeWishlistTitleService } from '../../../../services/wishlistServices';
 import useWishlistHeader from '../context/useWishlistHeader';
 import useHistory from '../../../../hooks/useHistory';
@@ -76,7 +76,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   return (
     <form
       className='grid gap-2 w-full'
-      onSubmit={async (e: FormEvent) => {
+      onSubmit={async (e: SubmitEvent) => {
         e.preventDefault();
 
         if (isSubmitting) {

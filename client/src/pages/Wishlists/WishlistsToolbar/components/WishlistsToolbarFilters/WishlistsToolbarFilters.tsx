@@ -1,4 +1,4 @@
-import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useReducer, useState } from 'react';
+import { Dispatch, SubmitEvent, JSX, SetStateAction, useEffect, useReducer, useState } from 'react';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 import Button from '../../../../../components/Button/Button';
 import useWishlists from '../../../hooks/useWishlists';
@@ -165,7 +165,7 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
   return (
     <form
       className={`grid gap-2 bg-secondary p-2 rounded-sm shadow-simple-tiny mb-2 ${isOpen ? 'block' : 'hidden'}`}
-      onSubmit={(e: FormEvent) => {
+      onSubmit={(e: SubmitEvent) => {
         e.preventDefault();
         changesDetected() && applyFilters();
       }}

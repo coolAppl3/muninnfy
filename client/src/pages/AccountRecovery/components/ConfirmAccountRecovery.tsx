@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, FormEvent, JSX, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, SubmitEvent, JSX, SetStateAction, useState } from 'react';
 import Button from '../../../components/Button/Button';
 import PasswordFormGroup from '../../../components/PasswordFormGroup/PasswordFormGroup';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
@@ -168,7 +168,7 @@ export default function ConfirmAccountRecovery({
       <form
         id='sign-up-form'
         className='grid grid-cols-1 gap-2'
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting || !allFieldsValid()) {

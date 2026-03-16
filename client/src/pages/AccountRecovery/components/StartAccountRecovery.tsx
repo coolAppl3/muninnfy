@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import { validateEmail } from '../../../utils/validation/userValidation';
 import Button from '../../../components/Button/Button';
 import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
@@ -97,7 +97,7 @@ export default function StartAccountRecovery(): JSX.Element {
       <p className='text-description text-sm mb-[1.6rem]'>Enter your account's email address to start the recovery process.</p>
 
       <form
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting) {

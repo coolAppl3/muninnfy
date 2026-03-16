@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useReducer, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useReducer, useState } from 'react';
 import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
@@ -75,7 +75,7 @@ export default function SignUp(): JSX.Element {
             <form
               id='sign-up-form'
               className='grid grid-cols-1 gap-2 mb-2'
-              onSubmit={async (e: FormEvent) => {
+              onSubmit={async (e: SubmitEvent) => {
                 e.preventDefault();
 
                 if (isSubmitting || !allFieldsValid()) {

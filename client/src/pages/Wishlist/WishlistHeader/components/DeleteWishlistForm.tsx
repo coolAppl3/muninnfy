@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import { deleteWishlistService } from '../../../../services/wishlistServices';
 import useWishlistHeader from '../context/useWishlistHeader';
 import useHistory from '../../../../hooks/useHistory';
@@ -44,7 +44,7 @@ export default function DeleteWishlistForm(): JSX.Element {
 
   return (
     <form
-      onSubmit={async (e: FormEvent) => {
+      onSubmit={async (e: SubmitEvent) => {
         e.preventDefault();
 
         if (isSubmitting || value !== wishlistDetails.title) {
