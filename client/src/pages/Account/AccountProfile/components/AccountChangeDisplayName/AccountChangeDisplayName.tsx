@@ -14,7 +14,7 @@ export default function AccountChangeDisplayName(): JSX.Element {
   const { accountDetails, setAccountDetails } = useAccountDetails();
   const { setProfileSection, setIsSubmitting, isSubmitting } = useAccountProfile();
 
-  const [value, setValue] = useState<string>('');
+  const [value, setValue] = useState<string>(accountDetails.display_name);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { setAuthStatus } = useAuth();
