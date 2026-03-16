@@ -28,7 +28,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   useEffect(() => titleRef.current?.focus(), []);
 
   async function changeWishlistTitle(): Promise<void> {
-    const newTitle: string = value;
+    const newTitle: string = value.trimEnd();
 
     try {
       await changeWishlistTitleService({ newTitle, wishlistId });
@@ -84,7 +84,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
         }
 
         const newTitleErrorMessage: string | null =
-          validateWishlistTitle(value) || (value === wishlistDetails.title ? 'Wishlist already has this title.' : null);
+          validateWishlistTitle(value) || (value.trimEnd() === wishlistDetails.title ? 'Wishlist already has this title.' : null);
 
         if (newTitleErrorMessage) {
           setErrorMessage(newTitleErrorMessage);

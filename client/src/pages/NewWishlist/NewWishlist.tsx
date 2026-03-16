@@ -28,7 +28,7 @@ export default function NewWishlist(): JSX.Element {
   const { displayPopupMessage } = usePopupMessage();
 
   async function handleSubmit(): Promise<void> {
-    const title: string = titleValue;
+    const title: string = titleValue.trimEnd();
     const privacyLevel: number = privacyLevelValue;
 
     try {

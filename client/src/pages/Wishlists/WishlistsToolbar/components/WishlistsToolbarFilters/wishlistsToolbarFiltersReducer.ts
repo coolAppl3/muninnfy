@@ -136,7 +136,7 @@ export default function wishlistsToolbarFiltersReducer(
   if (type === 'setItemTitleQuery') {
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
-      itemTitleQuery: payload.newValue,
+      itemTitleQuery: payload.newValue.trimEnd(),
       itemTitleQueryErrorMessage: payload.newValue === '' ? null : validateWishlistItemTitle(payload.newValue),
     };
 

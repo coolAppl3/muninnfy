@@ -94,7 +94,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       return;
     }
 
-    if (titleValue !== wishlistItem.title && itemAlreadyInWishlist()) {
+    if (titleValue.trimEnd() !== wishlistItem.title && itemAlreadyInWishlist()) {
       return;
     }
 
@@ -102,9 +102,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   }
 
   async function addWishlistItem(): Promise<void> {
-    const title: string = titleValue;
-    const description: string | null = descriptionValue || null;
-    const link: string | null = linkValue || null;
+    const title: string = titleValue.trimEnd();
+    const description: string | null = descriptionValue.trimEnd() || null;
+    const link: string | null = linkValue.trimEnd() || null;
     const price: number | null = priceValue.length === 0 ? null : +priceValue;
     const tags: string[] = [...tagsSet];
 
@@ -157,9 +157,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
     const itemId: number | undefined = wishlistItem.item_id;
 
-    const title: string = titleValue;
-    const description: string | null = descriptionValue || null;
-    const link: string | null = linkValue || null;
+    const title: string = titleValue.trimEnd();
+    const description: string | null = descriptionValue.trimEnd() || null;
+    const link: string | null = linkValue.trimEnd() || null;
     const price: number | null = priceValue.length === 0 ? null : +priceValue;
     const tags: string[] = [...tagsSet];
 
@@ -247,7 +247,7 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   }
 
   function itemAlreadyInWishlist(): boolean {
-    const itemExists: boolean = wishlistItemsTitleSet.has(titleValue.toLowerCase());
+    const itemExists: boolean = wishlistItemsTitleSet.has(titleValue.trimEnd().toLowerCase());
 
     if (itemExists) {
       displayPopupMessage('Wishlist already contains this item.', 'error');
@@ -262,15 +262,15 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       return false;
     }
 
-    if (titleValue !== wishlistItem.title) {
+    if (titleValue.trimEnd() !== wishlistItem.title) {
       return true;
     }
 
-    if (linkValue !== wishlistItem.link) {
+    if (linkValue.trimEnd() !== wishlistItem.link) {
       return true;
     }
 
-    if (descriptionValue !== wishlistItem.description) {
+    if (descriptionValue.trimEnd() !== wishlistItem.description) {
       return true;
     }
 
