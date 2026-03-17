@@ -16,6 +16,7 @@ import useAuth from '../hooks/useAuth';
 import useHistory from '../hooks/useHistory';
 import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
 import AccountRecovery from '../pages/AccountRecovery/AccountRecovery';
+import ViewAccount from '../pages/ViewAccount/ViewAccount';
 
 type RouteDetails = {
   path: string;
@@ -42,6 +43,7 @@ export default function Router(): JSX.Element {
   const publicRoutes: RouteDetails[] = [
     { path: '/home', element: <Home /> },
     { path: '/view/wishlist/:wishlistId', element: <ViewWishlist /> },
+    { path: '/view/account/:publicAccountId', element: <ViewAccount /> },
     { path: '*', element: <NotFound /> },
   ];
 
