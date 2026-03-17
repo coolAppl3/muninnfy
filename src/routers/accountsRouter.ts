@@ -792,6 +792,67 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
   }
 });
 
+accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = !authSessionId ? null : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+
+  const publicAccountId: string | undefined = req.params.publicAccountId;
+
+  if (!publicAccountId || !isValidUuid(publicAccountId)) {
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
+    return;
+  }
+
+  try {
+    type ViewAccountDetails = {
+      username: string;
+      display_name: string;
+      created_on_timestamp: number;
+      is_private: boolean;
+      approve_follow_requests: boolean;
+      is_following: boolean;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.username,
+        accounts.display_name,
+        accounts.created_on_timestamp,
+
+        account_preferences.is_private,
+        account_preferences.approve_follow_requests,
+
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
+      FROM
+        accounts
+      LEFT JOIN
+        account_preferences USING(account_id)
+      WHERE
+        accounts.public_account_id = ?;`,
+      [accountId, publicAccountId]
+    );
+
+    const accountDetails = accountRows[0] as ViewAccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    res.json({ accountDetails });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
