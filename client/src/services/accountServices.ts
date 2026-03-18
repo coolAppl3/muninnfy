@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import axiosInstance from './axiosInstance';
-import { AccountDetailsType, OngoingAccountRequest } from '../types/accountTypes';
+import { AccountDetailsType, OngoingAccountRequest, ViewAccountDetailsType } from '../types/accountTypes';
 
 type SignUpServicePayload = {
   email: string;
@@ -73,6 +73,17 @@ type GetAccountDetailsServiceData = {
 
 export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
   return axiosInstance.get('/accounts', { signal: abortSignal });
+}
+
+type GetViewAccountDetailsServiceData = {
+  viewAccountDetails: ViewAccountDetailsType;
+};
+
+export function getViewAccountDetailsService(
+  publicAccountId: string,
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<GetViewAccountDetailsServiceData>> {
+  return axiosInstance.get(`/accounts/${publicAccountId}`, { signal: abortSignal });
 }
 
 type UpdateAccountPrivacyServicePayload = {
