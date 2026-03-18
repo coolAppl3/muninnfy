@@ -805,6 +805,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
 
   try {
     type ViewAccountDetails = {
+      public_account_id: string;
       username: string;
       display_name: string;
       created_on_timestamp: number;
@@ -815,6 +816,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
+        accounts.public_account_id,
         accounts.username,
         accounts.display_name,
         accounts.created_on_timestamp,
@@ -832,14 +834,14 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       [accountId, publicAccountId]
     );
 
-    const accountDetails = accountRows[0] as ViewAccountDetails | undefined;
+    const viewAccountDetails = accountRows[0] as ViewAccountDetails | undefined;
 
-    if (!accountDetails) {
+    if (!viewAccountDetails) {
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
       return;
     }
 
-    res.json({ accountDetails });
+    res.json({ viewAccountDetails });
   } catch (err: unknown) {
     console.log(err);
 
