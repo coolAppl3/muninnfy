@@ -5,7 +5,12 @@ import useAccountLocation from '../hooks/useAccountLocation';
 import AccountNavMenuButton from './components/AccountNavMenuButton';
 import { Link } from 'react-router-dom';
 
-export default function AccountNavMenu(): JSX.Element {
+type AccountNavMenuProps = {
+  inViewMode: boolean;
+  publicAccountId?: string;
+};
+
+export default function AccountNavMenu({ inViewMode, publicAccountId }: AccountNavMenuProps): JSX.Element {
   const { accountLocation, setAccountLocation } = useAccountLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -53,18 +58,20 @@ export default function AccountNavMenu(): JSX.Element {
           Social
         </AccountNavMenuButton>
 
-        <AccountNavMenuButton
-          isSelected={accountLocation === 'notifications'}
-          onClick={() => {
-            setAccountLocation('notifications');
-            setIsOpen(false);
-          }}
-        >
-          Notifications
-        </AccountNavMenuButton>
+        {inViewMode || (
+          <AccountNavMenuButton
+            isSelected={accountLocation === 'notifications'}
+            onClick={() => {
+              setAccountLocation('notifications');
+              setIsOpen(false);
+            }}
+          >
+            Notifications
+          </AccountNavMenuButton>
+        )}
 
         <Link
-          to='/account/wishlists'
+          to={inViewMode && publicAccountId ? `/view/wishlists/${publicAccountId}` : '/account/wishlists'}
           className='nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-secondary'
         >
           Wishlists

@@ -78,8 +78,8 @@ export default function Account(): JSX.Element {
         {isLoaded && initialAccountDetails ? (
           <main className='py-4'>
             <Container className='grid grid-cols-12 items-start gap-1'>
-              <AccountSidebar />
-              <AccountNavMenu />
+              <AccountSidebar inViewMode={false} />
+              <AccountNavMenu inViewMode={false} />
 
               <AccountDetailsProvider initialAccountDetails={initialAccountDetails}>
                 <AccountOngoingRequestsProvider
