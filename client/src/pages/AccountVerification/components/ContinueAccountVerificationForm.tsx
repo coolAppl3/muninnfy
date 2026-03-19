@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import useAuth from '../../../hooks/useAuth';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -49,14 +49,14 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Account verification</h1>
 
       <p className='text-description text-sm mb-1'>Enter the email address you used for signing up below.</p>
       <p className='text-description text-sm mb-2'>Unverified accounts are automatically deleted after 20 minutes.</p>
 
       <form
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting) {
@@ -101,6 +101,6 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
           Continue
         </Button>
       </form>
-    </>
+    </section>
   );
 }

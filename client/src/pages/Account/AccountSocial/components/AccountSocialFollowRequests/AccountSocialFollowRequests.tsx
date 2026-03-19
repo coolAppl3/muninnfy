@@ -119,7 +119,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
   const debouncedSetSearchQuery = useMemo(() => debounce((searchQuery: string) => setSearchQuery(searchQuery), 300), []);
 
   return (
-    <>
+    <section>
       <div className='h-line my-1'></div>
 
       <DefaultFormGroup
@@ -215,6 +215,6 @@ export default function AccountSocialFollowRequests(): JSX.Element {
           )}
         </div>
       )}
-    </>
+    </section>
   );
 }

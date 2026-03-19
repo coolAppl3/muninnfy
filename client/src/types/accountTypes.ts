@@ -12,3 +12,5 @@ export type OngoingAccountRequest = {
   expiry_timestamp: number;
   is_suspended: boolean;
 };
+
+export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & { is_following: boolean };

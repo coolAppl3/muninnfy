@@ -30,11 +30,7 @@ if (process.env.NODE_ENV?.toLowerCase() === 'development') {
     cors({
       origin: (origin: string | undefined, callback) => {
         if (!origin) {
-          return callback(null, true);
-        }
-
-        if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
-          return callback(null, true);
+          return callback(null, false);
         }
 
         if (/^http:\/\/192\.168\.0\.\d{2}:(3000|5000)$/.test(origin)) {

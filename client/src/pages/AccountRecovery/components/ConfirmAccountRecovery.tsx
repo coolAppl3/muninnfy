@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, FormEvent, JSX, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, SubmitEvent, JSX, SetStateAction, useState } from 'react';
 import Button from '../../../components/Button/Button';
 import PasswordFormGroup from '../../../components/PasswordFormGroup/PasswordFormGroup';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
@@ -161,14 +161,14 @@ export default function ConfirmAccountRecovery({
   }
 
   return (
-    <>
+    <section>
       <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Update your details</h1>
       <p className='text-description text-sm mb-[1.6rem]'>Set your account's new password before proceeding.</p>
 
       <form
         id='sign-up-form'
         className='grid grid-cols-1 gap-2'
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting || !allFieldsValid()) {
@@ -219,6 +219,6 @@ export default function ConfirmAccountRecovery({
           Submit
         </Button>
       </form>
-    </>
+    </section>
   );
 }

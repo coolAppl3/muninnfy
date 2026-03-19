@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup';
@@ -28,7 +28,7 @@ export default function NewWishlist(): JSX.Element {
   const { displayPopupMessage } = usePopupMessage();
 
   async function handleSubmit(): Promise<void> {
-    const title: string = titleValue;
+    const title: string = titleValue.trimEnd();
     const privacyLevel: number = privacyLevelValue;
 
     try {
@@ -66,14 +66,14 @@ export default function NewWishlist(): JSX.Element {
     <>
       <Head title='New Wishlist - Muninnfy' />
 
-      <section className='py-4 h-available flex justify-center items-center'>
+      <main className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
             <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>New wishlist</h1>
 
             <form
               className='grid grid-cols-1 gap-2'
-              onSubmit={async (e: FormEvent) => {
+              onSubmit={async (e: SubmitEvent) => {
                 e.preventDefault();
 
                 if (isSubmitting || !allFieldsValid()) {
@@ -156,7 +156,7 @@ export default function NewWishlist(): JSX.Element {
             </form>
           </div>
         </Container>
-      </section>
+      </main>
     </>
   );
 }

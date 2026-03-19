@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import { validatePassword } from '../../../../../../utils/validation/userValidation';
 import Button from '../../../../../../components/Button/Button';
 import useAccountProfile from '../../../../hooks/useAccountProfile';
@@ -27,7 +27,7 @@ export default function AccountDeletionStart(): JSX.Element {
     const password: string = value;
 
     try {
-      const expiryTimestamp: number = await (await startAccountDeletionService({ password })).data.expiryTimestamp;
+      const expiryTimestamp: number = (await startAccountDeletionService({ password })).data.expiryTimestamp;
       setOngoingAccountDeletionRequest({ expiry_timestamp: expiryTimestamp, is_suspended: false });
 
       displayPopupMessage('Confirmation email sent.', 'success');
@@ -75,7 +75,7 @@ export default function AccountDeletionStart(): JSX.Element {
 
       <form
         className='grid gap-2'
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting) {

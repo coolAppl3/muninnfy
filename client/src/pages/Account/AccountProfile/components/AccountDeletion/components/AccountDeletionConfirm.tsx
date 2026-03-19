@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import DefaultFormGroup from '../../../../../../components/DefaultFormGroup/DefaultFormGroup';
 import Button from '../../../../../../components/Button/Button';
 import useAccountProfile from '../../../../hooks/useAccountProfile';
@@ -117,7 +117,7 @@ export default function AccountDeletionConfirm(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <header className='mb-1'>
         <p className='text-description font-medium text-sm break-words'>
           Confirmation email sent to <span className='text-title'>{accountDetails?.email}</span>.
@@ -148,7 +148,7 @@ export default function AccountDeletionConfirm(): JSX.Element {
 
       <form
         className='grid gap-2'
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting) {
@@ -202,6 +202,6 @@ export default function AccountDeletionConfirm(): JSX.Element {
           </Button>
         </div>
       </form>
-    </>
+    </section>
   );
 }

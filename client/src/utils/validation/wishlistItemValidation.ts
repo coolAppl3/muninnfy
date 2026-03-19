@@ -1,12 +1,14 @@
 import { containsInvalidWhitespace } from '../globalUtils';
 
 export function validateWishlistItemTitle(value: string): string | null {
+  value = value.trimEnd();
+
   if (value === '') {
     return 'A valid item title is required.';
   }
 
-  if (value !== value.trim()) {
-    return 'Title must not contain leading or trailing whitespace.';
+  if (value !== value.trimStart()) {
+    return 'Title must not contain leading whitespace.';
   }
 
   if (containsInvalidWhitespace(value)) {
@@ -26,12 +28,14 @@ export function validateWishlistItemTitle(value: string): string | null {
 }
 
 export function validateWishlistItemDescription(value: string): string | null {
+  value = value.trimEnd();
+
   if (value === '') {
     return null;
   }
 
-  if (value !== value.trim()) {
-    return 'Description must not contain leading or trailing whitespace.';
+  if (value !== value.trimStart()) {
+    return 'Description must not contain leading whitespace.';
   }
 
   if (value.length > 500) {
@@ -47,6 +51,8 @@ export function validateWishlistItemDescription(value: string): string | null {
 }
 
 export function validateWishlistItemLink(value: string): string | null {
+  value = value.trimEnd();
+
   if (value === '') {
     return null;
   }
@@ -55,7 +61,11 @@ export function validateWishlistItemLink(value: string): string | null {
     return `Link can't exceed 2000 characters.`;
   }
 
-  const regex: RegExp = /^(https?:\/\/)?[^\s]{1,2000}$/i;
+  if (!value.startsWith('https://')) {
+    return 'Link must start with `https://`.';
+  }
+
+  const regex: RegExp = /^https:\/\/[^\s]{1,1992}$/;
   if (!regex.test(value)) {
     return 'Invalid link.';
   }

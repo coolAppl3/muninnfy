@@ -82,7 +82,7 @@ export default function AccountNotifications(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <h3 className='text-title text-md font-normal leading-[3.6rem]'>Notifications</h3>
       <div className='h-line my-1'></div>
 
@@ -123,6 +123,6 @@ export default function AccountNotifications(): JSX.Element {
           )
         )}
       </div>
-    </>
+    </section>
   );
 }

@@ -792,6 +792,69 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
   }
 });
 
+accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = !authSessionId ? null : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+
+  const publicAccountId: string | undefined = req.params.publicAccountId;
+
+  if (!publicAccountId || !isValidUuid(publicAccountId)) {
+    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
+    return;
+  }
+
+  try {
+    type ViewAccountDetails = {
+      public_account_id: string;
+      username: string;
+      display_name: string;
+      created_on_timestamp: number;
+      is_private: boolean;
+      approve_follow_requests: boolean;
+      is_following: boolean;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        accounts.public_account_id,
+        accounts.username,
+        accounts.display_name,
+        accounts.created_on_timestamp,
+
+        account_preferences.is_private,
+        account_preferences.approve_follow_requests,
+
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
+      FROM
+        accounts
+      LEFT JOIN
+        account_preferences USING(account_id)
+      WHERE
+        accounts.public_account_id = ?;`,
+      [accountId, publicAccountId]
+    );
+
+    const viewAccountDetails = accountRows[0] as ViewAccountDetails | undefined;
+
+    if (!viewAccountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    res.json({ viewAccountDetails });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
@@ -1218,6 +1281,13 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     if (newEmail === accountDetails.email) {
       await connection.rollback();
       res.status(409).json({ message: 'Email already linked to this account.', reason: 'duplicateEmail' });
+
+      return;
+    }
+
+    if (accountDetails.email_taken || accountDetails.email_temporarily_taken) {
+      await connection.rollback();
+      res.status(409).json({ message: 'Email is taken.', reason: 'emailTaken' });
 
       return;
     }

@@ -1,12 +1,14 @@
 import { containsInvalidWhitespace } from '../globalUtils';
 
 export function validateWishlistTitle(value: string): string | null {
+  value = value.trimEnd();
+
   if (value === '') {
     return 'A valid wishlist title is required.';
   }
 
-  if (value !== value.trim()) {
-    return 'Title must not contain leading or trailing whitespace.';
+  if (value !== value.trimStart()) {
+    return 'Title must not contain leading whitespace.';
   }
 
   if (containsInvalidWhitespace(value)) {

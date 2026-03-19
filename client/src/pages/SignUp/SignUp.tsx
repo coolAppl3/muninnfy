@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useReducer, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useReducer, useState } from 'react';
 import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
@@ -67,7 +67,7 @@ export default function SignUp(): JSX.Element {
     <>
       <Head title='Sign Up - Muninnfy' />
 
-      <section className='py-4 h-available flex justify-center items-center'>
+      <main className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
             <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>Sign up to Muninnfy</h1>
@@ -75,7 +75,7 @@ export default function SignUp(): JSX.Element {
             <form
               id='sign-up-form'
               className='grid grid-cols-1 gap-2 mb-2'
-              onSubmit={async (e: FormEvent) => {
+              onSubmit={async (e: SubmitEvent) => {
                 e.preventDefault();
 
                 if (isSubmitting || !allFieldsValid()) {
@@ -166,7 +166,7 @@ export default function SignUp(): JSX.Element {
             </div>
           </div>
         </Container>
-      </section>
+      </main>
     </>
   );
 }

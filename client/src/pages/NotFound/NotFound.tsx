@@ -13,7 +13,7 @@ export default function NotFound(): JSX.Element {
     <>
       <Head title='Not Found - Muninnfy' />
 
-      <section className='py-4 h-available flex justify-center items-center'>
+      <main className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
             <InstructionCard
@@ -25,7 +25,7 @@ export default function NotFound(): JSX.Element {
             />
           </div>
         </Container>
-      </section>
+      </main>
     </>
   );
 }

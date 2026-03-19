@@ -28,7 +28,7 @@ export function isValidWishlistItemLink(value: any): boolean {
     return false;
   }
 
-  const regex: RegExp = /^(https?:\/\/)?[^\s]{1,2000}$/i;
+  const regex: RegExp = /^https:\/\/[^\s]{1,1992}$/;
   return regex.test(value);
 }
 

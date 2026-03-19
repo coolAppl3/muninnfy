@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useEffect, useRef, useState } from 'react';
 import { changeWishlistTitleService } from '../../../../services/wishlistServices';
 import useWishlistHeader from '../context/useWishlistHeader';
 import useHistory from '../../../../hooks/useHistory';
@@ -15,7 +15,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const { setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
 
-  const [value, setValue] = useState<string>('');
+  const [value, setValue] = useState<string>(wishlistDetails.title);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
@@ -28,7 +28,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   useEffect(() => titleRef.current?.focus(), []);
 
   async function changeWishlistTitle(): Promise<void> {
-    const newTitle: string = value;
+    const newTitle: string = value.trimEnd();
 
     try {
       await changeWishlistTitleService({ newTitle, wishlistId });
@@ -76,7 +76,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   return (
     <form
       className='grid gap-2 w-full'
-      onSubmit={async (e: FormEvent) => {
+      onSubmit={async (e: SubmitEvent) => {
         e.preventDefault();
 
         if (isSubmitting) {
@@ -84,7 +84,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
         }
 
         const newTitleErrorMessage: string | null =
-          validateWishlistTitle(value) || (value === wishlistDetails.title ? 'Wishlist already has this title.' : null);
+          validateWishlistTitle(value) || (value.trimEnd() === wishlistDetails.title ? 'Wishlist already has this title.' : null);
 
         if (newTitleErrorMessage) {
           setErrorMessage(newTitleErrorMessage);

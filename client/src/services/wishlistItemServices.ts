@@ -1,9 +1,6 @@
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
+import axiosInstance from './axiosInstance';
 import { WishlistItemType } from '../types/wishlistItemTypes';
-
-axios.defaults.withCredentials = true;
-const wishlistItemsApiUrl: string =
-  location.hostname === 'localhost' ? `http://localhost:5000/api/wishlistItems` : `https://muninnfy/api/wishlistItems`;
 
 type AddWishlistItemServicePayload = {
   wishlistId: string;
@@ -15,7 +12,7 @@ type AddWishlistItemServicePayload = {
 };
 
 export async function addWishlistItemService(body: AddWishlistItemServicePayload): Promise<AxiosResponse<WishlistItemType>> {
-  return axios.post(wishlistItemsApiUrl, body);
+  return axiosInstance.post('/wishlistItems', body);
 }
 
 type EditWishlistItemServicePayload = {
@@ -29,11 +26,11 @@ type EditWishlistItemServicePayload = {
 };
 
 export async function editWishlistItemService(body: EditWishlistItemServicePayload): Promise<AxiosResponse<WishlistItemType>> {
-  return axios.patch(wishlistItemsApiUrl, body);
+  return axiosInstance.patch('/wishlistItems', body);
 }
 
 export async function deleteWishlistItemService(wishlistId: string, itemId: number): Promise<AxiosResponse> {
-  return axios.delete(wishlistItemsApiUrl, { params: { wishlistId, itemId } });
+  return axiosInstance.delete('/wishlistItems', { params: { wishlistId, itemId } });
 }
 
 type BulkDeleteWishlistItemsServicePayload = {
@@ -48,7 +45,7 @@ type BulkDeleteWishlistItemsServiceData = {
 export async function bulkDeleteWishlistItemsService(
   body: BulkDeleteWishlistItemsServicePayload
 ): Promise<AxiosResponse<BulkDeleteWishlistItemsServiceData>> {
-  return axios.delete(`${wishlistItemsApiUrl}/bulk`, { data: body });
+  return axiosInstance.delete('/wishlistItems/bulk', { data: body });
 }
 
 type SetWishlistItemIsPurchasedServicePayload = {
@@ -64,7 +61,7 @@ type SetWishlistItemIsPurchasedServiceData = {
 export async function setWishlistItemIsPurchasedService(
   body: SetWishlistItemIsPurchasedServicePayload
 ): Promise<AxiosResponse<SetWishlistItemIsPurchasedServiceData>> {
-  return axios.patch(`${wishlistItemsApiUrl}/purchaseStatus`, body);
+  return axiosInstance.patch('/wishlistItems/purchaseStatus', body);
 }
 
 type BulkSetWishlistItemIsPurchasedService = {
@@ -81,5 +78,5 @@ type BulkSetWishlistItemIsPurchasedData = {
 export async function bulkSetWishlistItemIsPurchasedService(
   body: BulkSetWishlistItemIsPurchasedService
 ): Promise<AxiosResponse<BulkSetWishlistItemIsPurchasedData>> {
-  return axios.patch(`${wishlistItemsApiUrl}/purchaseStatus/bulk`, body);
+  return axiosInstance.patch('/wishlistItems/purchaseStatus/bulk', body);
 }

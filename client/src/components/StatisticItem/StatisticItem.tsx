@@ -1,12 +1,13 @@
-import { JSX } from 'react';
+import { JSX, memo, ReactNode } from 'react';
 
 type StatisticItemProps = {
   title: string;
-  value: string;
+  value: ReactNode;
   className?: string;
 };
 
-export default function StatisticItem({ title, value, className }: StatisticItemProps): JSX.Element {
+export default memo(StatisticItem);
+function StatisticItem({ title, value, className }: StatisticItemProps): JSX.Element {
   return (
     <div className={`grid ${className || ''}`}>
       <span className='font-medium text-title'>{value}</span>

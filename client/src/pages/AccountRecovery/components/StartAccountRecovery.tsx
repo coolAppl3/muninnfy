@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import { validateEmail } from '../../../utils/validation/userValidation';
 import Button from '../../../components/Button/Button';
 import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
@@ -25,7 +25,7 @@ export default function StartAccountRecovery(): JSX.Element {
     const email: string = value;
 
     try {
-      const publicAccountId: string = await (await startAccountRecoveryService({ email })).data.publicAccountId;
+      const publicAccountId: string = (await startAccountRecoveryService({ email })).data.publicAccountId;
 
       navigate(`/account/recovery?publicAccountId=${publicAccountId}`);
       displayPopupMessage('Recovery email sent.', 'success');
@@ -92,12 +92,12 @@ export default function StartAccountRecovery(): JSX.Element {
   }
 
   return (
-    <>
+    <section>
       <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Account recovery</h1>
       <p className='text-description text-sm mb-[1.6rem]'>Enter your account's email address to start the recovery process.</p>
 
       <form
-        onSubmit={async (e: FormEvent) => {
+        onSubmit={async (e: SubmitEvent) => {
           e.preventDefault();
 
           if (isSubmitting) {
@@ -142,6 +142,6 @@ export default function StartAccountRecovery(): JSX.Element {
           Continue
         </Button>
       </form>
-    </>
+    </section>
   );
 }

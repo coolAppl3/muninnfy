@@ -13,7 +13,7 @@ export default function AccountContent(): JSX.Element {
   const MappedComponent: ComponentType = componentRecord[accountLocation];
 
   return (
-    <div className='p-2 bg-secondary rounded-sm col-span-12 md:col-span-9 shadow-simple-tiny min-h-full'>
+    <div className='p-2 bg-secondary rounded-sm col-span-12 md:col-span-9 shadow-simple-tiny md:min-h-full'>
       <MappedComponent />
     </div>
   );

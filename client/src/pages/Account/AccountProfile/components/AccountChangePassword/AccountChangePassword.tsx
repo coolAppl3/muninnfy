@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, JSX, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import Button from '../../../../../components/Button/Button';
 import { validateNewPassword, validatePassword } from '../../../../../utils/validation/userValidation';
 import useAccountProfile from '../../../hooks/useAccountProfile';
@@ -92,7 +92,7 @@ export default function AccountChangePassword(): JSX.Element {
   return (
     <form
       className='grid gap-2'
-      onSubmit={async (e: FormEvent) => {
+      onSubmit={async (e: SubmitEvent) => {
         e.preventDefault();
 
         if (isSubmitting || !allFieldsValid()) {

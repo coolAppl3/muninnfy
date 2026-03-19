@@ -11,7 +11,7 @@ export function setResponseCookie(
 ): void {
   const cookieOptions: CookieOptions = {
     httpOnly,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
     maxAge,
@@ -33,7 +33,7 @@ export function getRequestCookie(req: Request, cookieName: AllowedCookieNames): 
 export function removeRequestCookie(res: Response, cookieName: AllowedCookieNames, httpOnly: boolean = true): void {
   res.clearCookie(cookieName, {
     httpOnly,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
   });

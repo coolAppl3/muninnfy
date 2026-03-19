@@ -1,7 +1,9 @@
 import { NotificationDetails, NotificationType } from '../../types/notificationTypes';
 import { FollowDetails, FollowRequest } from '../../types/socialTypes';
 
-const webSocketServerURL: string = window.location.hostname === 'localhost' ? 'ws://localhost:5000' : `wss://${window.location.hostname}`;
+const { VITE_WS_DEV_URL, VITE_WS_PROD_URL, MODE } = import.meta.env;
+
+const webSocketServerURL: string = MODE === 'development' ? VITE_WS_DEV_URL : VITE_WS_PROD_URL;
 
 type HandlerType = 'social' | 'notifications';
 

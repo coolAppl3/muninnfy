@@ -8,6 +8,7 @@ import CheckIcon from '../../../../assets/svg/CheckIcon.svg?react';
 import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionStore';
 import { useShallow } from 'zustand/react/shallow';
 import useWishlistItemsSelectionStore from '../../stores/wishlistItemsSelectionStore';
+import StatisticItem from '../../../../components/StatisticItem/StatisticItem';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
@@ -88,63 +89,78 @@ function WishlistItem({ wishlistItem, selectionModeActive, inViewMode, setWishli
       </div>
 
       {isExpanded && (
-        <div className='flex justify-between items-start gap-1 p-2 pt-1'>
-          <div className='w-full text-sm text-description grid gap-1'>
-            <div className='pr-1 whitespace-nowrap overflow-hidden'>
-              <p>Added: {getShortenedDateString(wishlistItem.added_on_timestamp)}</p>
+        <>
+          <div className='flex justify-between items-start gap-1 p-2 pt-1'>
+            <div className='w-full text-sm text-description grid gap-1'>
+              <div className='pr-1 whitespace-nowrap overflow-hidden grid grid-cols-1 3xs:grid-cols-2 gap-[10px]'>
+                <StatisticItem
+                  title='Added'
+                  value={getShortenedDateString(wishlistItem.added_on_timestamp)}
+                />
 
-              {wishlistItem.purchased_on_timestamp && <p>Purchased: {getShortenedDateString(wishlistItem.purchased_on_timestamp)}</p>}
+                {wishlistItem.purchased_on_timestamp && (
+                  <StatisticItem
+                    title='Purchased'
+                    value={getShortenedDateString(wishlistItem.purchased_on_timestamp)}
+                  />
+                )}
 
-              {wishlistItem.price === null ? null : <p> Price: {getCurrencyFormatting(wishlistItem.price)}</p>}
+                {wishlistItem.price && (
+                  <StatisticItem
+                    title='Price'
+                    value={getCurrencyFormatting(wishlistItem.price)}
+                  />
+                )}
 
-              {wishlistItem.link && (
-                <p className='block max-w-full overflow-hidden text-ellipsis'>
-                  Link:{' '}
-                  <a
-                    href={/^https?:\/\//.test(wishlistItem.link) ? wishlistItem.link : `https://${wishlistItem.link}`}
-                    target='_blank'
-                    className='link'
-                  >
-                    {wishlistItem.link}
-                  </a>
-                </p>
+                {wishlistItem.link && (
+                  <StatisticItem
+                    className='overflow-hidden'
+                    title='Link'
+                    value={
+                      <a
+                        href={wishlistItem.link}
+                        target='_blank'
+                        className='link block'
+                      >
+                        {wishlistItem.link}
+                      </a>
+                    }
+                  />
+                )}
+              </div>
+
+              {wishlistItem.tags.length > 0 && (
+                <div>
+                  {wishlistItem.tags.map(({ id, name }: { id: number; name: string }) => (
+                    <span
+                      key={id}
+                      className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-none break-words max-w-[20rem] font-medium'
+                    >
+                      {name}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
 
-            {wishlistItem.tags.length > 0 && (
-              <div>
-                {wishlistItem.tags.map(({ id, name }: { id: number; name: string }) => (
-                  <span
-                    key={id}
-                    className='inline-block p-[4px] m-[2px] bg-light text-dark rounded leading-none break-words max-w-[20rem] font-medium'
-                  >
-                    {name}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {wishlistItem.description && (
-              <>
-                <div className='h-line'></div>
-                <p
-                  className='whitespace-break-spaces'
-                  style={{ wordBreak: 'break-word' }}
-                >
-                  {wishlistItem.description}
-                </p>
-              </>
+            {inViewMode || (
+              <WishlistItemButtonContainer
+                wishlistItem={wishlistItem}
+                setIsEditing={setIsEditing}
+                setWishlistItems={setWishlistItems}
+              />
             )}
           </div>
 
-          {inViewMode || (
-            <WishlistItemButtonContainer
-              wishlistItem={wishlistItem}
-              setIsEditing={setIsEditing}
-              setWishlistItems={setWishlistItems}
-            />
+          {wishlistItem.description && (
+            <p
+              className='whitespace-break-spaces text-sm text-description p-2 pt-0'
+              style={{ wordBreak: 'break-word' }}
+            >
+              {wishlistItem.description}
+            </p>
           )}
-        </div>
+        </>
       )}
     </div>
   );

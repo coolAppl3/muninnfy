@@ -6,11 +6,11 @@ import JoinMuninnfy from './components/JoinMuninnfy';
 
 export default function Home(): JSX.Element {
   return (
-    <>
+    <main>
       <Head title='Home - Muninnfy' />
       <Hero />
       <Features />
       <JoinMuninnfy />
-    </>
+    </main>
   );
 }
