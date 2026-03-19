@@ -1,16 +1,53 @@
 # Changelog
 
+## [0.3.4] (2026-03-19)
+
+### Features
+
+- Added stubs, and partially implemented `ViewAccount` and `ViewAccountProfile` components.
+- Added and implement ViewAccountContent component.
+- Added GET `accounts/:publicAccountId`.
+- Added `ViewAccountDetailsType`.
+- Added `getViewAccountDetailsService()`.
+- Added view mode support to `AccountNavMenu` and `AccountSidebar`.
+
+
+### Improvements
+
+- Improved the use of semantic HTML throughout the app.
+- Implemented an `axiosInstance` and improved overall services structure.
+- Changed value prop in `StatisticItem` to accept `ReactNode`, and memoized the component.
+- Refreshed the look of `WishlistItem` to better align with the rest of the app.
+- Adding a wishlist item now collapses the form container for a smoother user experience.
+- Improved wishlist item link validation to only accept HTTPS links for better security.
+- Streamlined user experience by auto-trimming the end of some input values to avoid verbose error messages.
+- Prefilled wishlist title and display name when triggering the change form for a more streamlined user experience.
+
+
+### Bug Fixes
+
+- Fixed POST `accounts/details/email/start` not correctly rejecting requests attempting to use taken emails.
+- Fixed `AccountContent` not retracting after being expanded on smaller devices.
+
+
+### Code Refactoring
+
+- Minor local dev environment changes.
+- Implement vite environment variables.
+- Replace `SubmitEvent` instead of now-deprecated `FormEvent` throughout the app.
+
+
 ## [0.3.3] (2026-03-14)
 
 ### Features
 
 - Implemented `ViewWishlist`.
-  - Adjusted path for `ViewWishlist` in `Router`.
-  - Added `ViewWishlistDetailsType`.
-  - Added option to not send a response for `getAuthSessionId()` and `getAccountIdByAuthSessionId()`.
-  - Added GET `wishlists/view/:wishlistId`.
-  - Added `getViewWishlistDetailsService()`.
-  - Added `ViewWishlistHeader` component.
+- Adjusted path for `ViewWishlist` in `Router`.
+- Added `ViewWishlistDetailsType`.
+- Added option to not send a response for `getAuthSessionId()` and `getAccountIdByAuthSessionId()`.
+- Added GET `wishlists/view/:wishlistId`.
+- Added `getViewWishlistDetailsService()`.
+- Added `ViewWishlistHeader` component.
 
 
 ### Bug Fixes
