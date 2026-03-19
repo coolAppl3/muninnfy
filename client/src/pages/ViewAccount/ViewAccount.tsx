@@ -13,6 +13,10 @@ import useAuth from '../../hooks/useAuth';
 import { getViewAccountDetailsService } from '../../services/accountServices';
 import { CanceledError } from 'axios';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
+import ViewAccountProfile from './components/ViewAccountProfile/ViewAccountProfile';
+import AccountSocialProvider from '../Account/providers/AccountSocialProvider';
+import ViewAccountContent from './components/ViewAccountContent/ViewAccountContent';
+import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDetailsProvider';
 
 export default function ViewAccount(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -37,7 +41,6 @@ export default function ViewAccount(): JSX.Element {
         const { viewAccountDetails } = (await getViewAccountDetailsService(publicAccountId, abortController.signal)).data;
 
         setViewAccountDetails(viewAccountDetails);
-
         setIsLoaded(true);
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
@@ -79,6 +82,12 @@ export default function ViewAccount(): JSX.Element {
                 inViewMode={true}
                 publicAccountId={viewAccountDetails.public_account_id}
               />
+
+              <AccountSocialDetailsProvider>
+                <AccountSocialProvider>
+                  <ViewAccountContent viewAccountDetails={viewAccountDetails} />
+                </AccountSocialProvider>
+              </AccountSocialDetailsProvider>
 
               {/* TODO: continue implementation */}
             </Container>
