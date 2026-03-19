@@ -19,13 +19,13 @@ export default function ViewAccountProfile({ viewAccountDetails }: ViewAccountPr
   const navigate: NavigateFunction = useNavigate();
 
   return (
-    <section className='p-2 bg-secondary rounded-sm col-span-12 md:col-span-9 grid gap-[1.6rem] shadow-simple-tiny md:min-h-full'>
-      <div className=''>
-        <h3 className='text-title font-normal mb-[0px]'>{display_name}</h3>
-        <h3 className='text-description text-sm font-normal'>@{username}</h3>
+    <section>
+      <div className='mb-1'>
+        <h3 className='text-title font-normal wrap-break-word'>{display_name}</h3>
+        <h3 className='text-description text-sm font-normal wrap-break-word'>@{username}</h3>
       </div>
 
-      <div className='grid grid-cols-3 gap-1 text-sm text-description relative z-0 h-fit '>
+      <div className='grid grid-cols-3 gap-1 text-sm text-description relative z-0 h-fit mb-2'>
         <button
           className='w-fit text-start cursor-pointer hover:text-cta'
           onClick={() => navigate(`/view/wishlists/${public_account_id}`)}
@@ -60,14 +60,9 @@ export default function ViewAccountProfile({ viewAccountDetails }: ViewAccountPr
         </button>
       </div>
 
-      <div className='text-description/50 text-xs'>
-        <p className='leading-none mb-[4px]'>Created on {getFullDateString(created_on_timestamp)}</p>
-        <p className='leading-none'>{public_account_id}</p>
-      </div>
-
       {is_following ? (
         <Button
-          className='bg-secondary border-title text-title w-full sm:w-fit'
+          className='bg-secondary border-title text-title w-full sm:w-fit mb-1'
           onClick={() => {
             /** TODO: continue implementation */
           }}
@@ -76,7 +71,7 @@ export default function ViewAccountProfile({ viewAccountDetails }: ViewAccountPr
         </Button>
       ) : (
         <Button
-          className='bg-cta border-cta text-dark w-full sm:w-fit'
+          className='bg-cta border-cta text-dark w-full sm:w-fit mb-1'
           onClick={() => {
             /** TODO: continue implementation */
           }}
@@ -84,6 +79,11 @@ export default function ViewAccountProfile({ viewAccountDetails }: ViewAccountPr
           Follow
         </Button>
       )}
+
+      <div className='text-description/50 text-xs'>
+        <p className='leading-none mb-[4px]'>Created on {getFullDateString(created_on_timestamp)}</p>
+        <p className='leading-none'>{public_account_id}</p>
+      </div>
     </section>
   );
 }
