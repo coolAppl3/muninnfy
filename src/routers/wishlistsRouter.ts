@@ -100,12 +100,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (accountWishlistsDetails.title_already_used) {
-      res
-        .status(409)
-        .json({
-          message: 'You already have a wishlist with this title.',
-          reason: 'duplicateTitle',
-        });
+      res.status(409).json({
+        message: 'You already have a wishlist with this title.',
+        reason: 'duplicateTitle',
+      });
       return;
     }
 
@@ -152,12 +150,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
-      res
-        .status(409)
-        .json({
-          message: 'You already have a wishlist with this title.',
-          reason: 'duplicateTitle',
-        });
+      res.status(409).json({
+        message: 'You already have a wishlist with this title.',
+        reason: 'duplicateTitle',
+      });
       return;
     }
 
@@ -536,12 +532,10 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     }
 
     if (wishlistDetails.new_title_used_elsewhere) {
-      res
-        .status(409)
-        .json({
-          message: 'You already have a wishlist with this title.',
-          reason: 'duplicateTitle',
-        });
+      res.status(409).json({
+        message: 'You already have a wishlist with this title.',
+        reason: 'duplicateTitle',
+      });
       return;
     }
 
@@ -579,12 +573,10 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
-      res
-        .status(409)
-        .json({
-          message: 'You already have a wishlist with this title.',
-          reason: 'duplicateTitle',
-        });
+      res.status(409).json({
+        message: 'You already have a wishlist with this title.',
+        reason: 'duplicateTitle',
+      });
       return;
     }
 
