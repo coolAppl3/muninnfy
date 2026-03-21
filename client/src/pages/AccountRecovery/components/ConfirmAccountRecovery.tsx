@@ -4,7 +4,9 @@ import PasswordFormGroup from '../../../components/PasswordFormGroup/PasswordFor
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import { validateNewPassword } from '../../../utils/validation/userValidation';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import { confirmAccountRecoveryService } from '../../../services/accountServices';
 import { getDateAndTimeString } from '../../../utils/globalUtils';
 import useAuth from '../../../hooks/useAuth';
@@ -23,8 +25,12 @@ export default function ConfirmAccountRecovery({
   recoveryToken,
   setIsValidRecoveryLink,
 }: ConfirmAccountRecoveryProps): JSX.Element {
-  const [renderMode, setRenderMode] = useState<'form' | 'incorrectToken' | 'requestSuspended'>('form');
-  const [suspensionRecoveryTimestamp, setSuspensionRecoveryTimestamp] = useState<number | null>(null);
+  const [renderMode, setRenderMode] = useState<'form' | 'incorrectToken' | 'requestSuspended'>(
+    'form'
+  );
+  const [suspensionRecoveryTimestamp, setSuspensionRecoveryTimestamp] = useState<number | null>(
+    null
+  );
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -32,7 +38,9 @@ export default function ConfirmAccountRecovery({
   const [confirmPassword, setConfirmPassword] = useState<string>('');
 
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | null>(null);
-  const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = useState<string | null>(null);
+  const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = useState<string | null>(
+    null
+  );
 
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
@@ -44,8 +52,9 @@ export default function ConfirmAccountRecovery({
     const newPassword: string = password;
 
     try {
-      const authSessionCreated: boolean = (await confirmAccountRecoveryService({ publicAccountId, recoveryToken, newPassword })).data
-        .authSessionCreated;
+      const authSessionCreated: boolean = (
+        await confirmAccountRecoveryService({ publicAccountId, recoveryToken, newPassword })
+      ).data.authSessionCreated;
 
       displayPopupMessage('Recovery successful.', 'success');
 
@@ -65,7 +74,9 @@ export default function ConfirmAccountRecovery({
       }
 
       if (status === 401) {
-        errReason === 'incorrectToken_suspended' ? handleRequestSuspended(errResData) : setRenderMode('incorrectToken');
+        errReason === 'incorrectToken_suspended'
+          ? handleRequestSuspended(errResData)
+          : setRenderMode('incorrectToken');
         return;
       }
 
@@ -111,7 +122,10 @@ export default function ConfirmAccountRecovery({
       return;
     }
 
-    if (typeof errResData.expiryTimestamp !== 'number' || !Number.isInteger(errResData.expiryTimestamp)) {
+    if (
+      typeof errResData.expiryTimestamp !== 'number' ||
+      !Number.isInteger(errResData.expiryTimestamp)
+    ) {
       return;
     }
 
@@ -121,7 +135,8 @@ export default function ConfirmAccountRecovery({
 
   function allFieldsValid(): boolean {
     const newPasswordErrorMessage: string | null = validateNewPassword(password);
-    const newConfirmPasswordErrorMessage: string | null = password === confirmPassword ? null : `Passwords don't match.`;
+    const newConfirmPasswordErrorMessage: string | null =
+      password === confirmPassword ? null : `Passwords don't match.`;
 
     setPasswordErrorMessage(newPasswordErrorMessage);
     setConfirmPasswordErrorMessage(newConfirmPasswordErrorMessage);
@@ -163,7 +178,9 @@ export default function ConfirmAccountRecovery({
   return (
     <section>
       <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Update your details</h1>
-      <p className='text-description text-sm mb-[1.6rem]'>Set your account's new password before proceeding.</p>
+      <p className='text-description text-sm mb-[1.6rem]'>
+        Set your account's new password before proceeding.
+      </p>
 
       <form
         id='sign-up-form'
@@ -195,7 +212,9 @@ export default function ConfirmAccountRecovery({
             setPassword(newValue);
             setPasswordErrorMessage(validateNewPassword(newValue));
 
-            setConfirmPasswordErrorMessage(newValue === confirmPassword ? null : `Passwords don't match.`);
+            setConfirmPasswordErrorMessage(
+              newValue === confirmPassword ? null : `Passwords don't match.`
+            );
           }}
         />
 
@@ -208,7 +227,9 @@ export default function ConfirmAccountRecovery({
             const newValue: string = e.target.value;
 
             setConfirmPassword(newValue);
-            setConfirmPasswordErrorMessage(newValue === password ? null : `Passwords don't match.`);
+            setConfirmPasswordErrorMessage(
+              newValue === password ? null : `Passwords don't match.`
+            );
           }}
         />
 

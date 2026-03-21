@@ -13,7 +13,9 @@ import {
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../../../utils/constants/wishlistConstants';
 import useWishlist from '../../hooks/useWishlist';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../hooks/useHandleAsyncError';
 import Button from '../../../../components/Button/Button';
 
 export default function EditPrivacyLevelContainer(): JSX.Element {
@@ -39,7 +41,10 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
       );
 
       setEditMode(null);
-      displayPopupMessage(`Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}.`, 'success');
+      displayPopupMessage(
+        `Privacy level changed to ${getWishlistPrivacyLevelName(newPrivacyLevel).toLowerCase()}.`,
+        'success'
+      );
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errReason } = handleAsyncError(err);

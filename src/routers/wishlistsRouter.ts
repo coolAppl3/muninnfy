@@ -1,7 +1,10 @@
 import express, { Router, Request, Response } from 'express';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
-import { isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
+import {
+  isValidWishlistPrivacyLevel,
+  isValidWishlistTitle,
+} from '../util/validation/wishlistValidation';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
@@ -78,7 +81,9 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
       { accountId, title: title }
     );
 
-    const accountWishlistsDetails = accountWishlistsRows[0] as AccountWishlistsDetails | undefined;
+    const accountWishlistsDetails = accountWishlistsRows[0] as
+      | AccountWishlistsDetails
+      | undefined;
 
     if (!accountWishlistsDetails) {
       res.status(500).json({ message: 'Internal server error.' });
@@ -88,12 +93,19 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (accountWishlistsDetails.wishlists_created_count >= TOTAL_WISHLISTS_LIMIT) {
-      res.status(403).json({ message: 'Wishlists limit reached.', reason: 'wishlistLimitReached' });
+      res
+        .status(403)
+        .json({ message: 'Wishlists limit reached.', reason: 'wishlistLimitReached' });
       return;
     }
 
     if (accountWishlistsDetails.title_already_used) {
-      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      res
+        .status(409)
+        .json({
+          message: 'You already have a wishlist with this title.',
+          reason: 'duplicateTitle',
+        });
       return;
     }
 
@@ -111,7 +123,16 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         interactivity_index,
         is_favorited
       ) VALUES (${generatePlaceHolders(8)});`,
-      [wishlistId, accountId, privacyLevel, title, currentTimestamp, currentTimestamp, WISHLIST_INTERACTION_CREATE, false]
+      [
+        wishlistId,
+        accountId,
+        privacyLevel,
+        title,
+        currentTimestamp,
+        currentTimestamp,
+        WISHLIST_INTERACTION_CREATE,
+        false,
+      ]
     );
 
     res.status(201).json({ wishlistId });
@@ -131,7 +152,12 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
-      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      res
+        .status(409)
+        .json({
+          message: 'You already have a wishlist with this title.',
+          reason: 'duplicateTitle',
+        });
       return;
     }
 
@@ -140,33 +166,35 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   }
 });
 
-wishlistsRouter.get('/crossWishlistSearch/:itemTitleQuery', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+wishlistsRouter.get(
+  '/crossWishlistSearch/:itemTitleQuery',
+  async (req: Request, res: Response) => {
+    const authSessionId: string | null = getAuthSessionId(req, res);
 
-  if (!authSessionId) {
-    return;
-  }
+    if (!authSessionId) {
+      return;
+    }
 
-  const itemTitleQuery: string | undefined = req.params.itemTitleQuery;
+    const itemTitleQuery: string | undefined = req.params.itemTitleQuery;
 
-  if (!itemTitleQuery || !isValidWishlistItemTitle(itemTitleQuery)) {
-    res.status(400).json({ message: 'Invalid search query.', reason: 'invalidQuery' });
-    return;
-  }
+    if (!itemTitleQuery || !isValidWishlistItemTitle(itemTitleQuery)) {
+      res.status(400).json({ message: 'Invalid search query.', reason: 'invalidQuery' });
+      return;
+    }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
-  if (!accountId) {
-    return;
-  }
+    if (!accountId) {
+      return;
+    }
 
-  try {
-    type WishlistDetails = {
-      wishlist_id: string;
-    };
+    try {
+      type WishlistDetails = {
+        wishlist_id: string;
+      };
 
-    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
-      `SELECT
+      const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+        `SELECT
         wishlist_id
       FROM
         wishlists
@@ -182,24 +210,27 @@ wishlistsRouter.get('/crossWishlistSearch/:itemTitleQuery', async (req: Request,
             title LIKE ?
         )
       LIMIT ?;`,
-      [accountId, `%${itemTitleQuery}%`, TOTAL_WISHLISTS_LIMIT]
-    );
+        [accountId, `%${itemTitleQuery}%`, TOTAL_WISHLISTS_LIMIT]
+      );
 
-    const wishlistIdsArr: string[] = (wishlistRows as WishlistDetails[]).map(({ wishlist_id }: WishlistDetails) => wishlist_id);
+      const wishlistIdsArr: string[] = (wishlistRows as WishlistDetails[]).map(
+        ({ wishlist_id }: WishlistDetails) => wishlist_id
+      );
 
-    res.json(wishlistIdsArr);
-  } catch (err: unknown) {
-    console.log(err);
+      res.json(wishlistIdsArr);
+    } catch (err: unknown) {
+      console.log(err);
 
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
+      if (res.headersSent) {
+        await logUnexpectedError(req, err, 'Attempted to send two responses.');
+        return;
+      }
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
     }
-
-    res.status(500).json({ message: 'Internal server error.' });
-    await logUnexpectedError(req, err);
   }
-});
+);
 
 wishlistsRouter.get('/all', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
@@ -288,7 +319,8 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       combinedWishlistsStatistics.totalItemsCount += wishlist.items_count;
       combinedWishlistsStatistics.totalPurchasedItemsCount += wishlist.purchased_items_count;
       combinedWishlistsStatistics.totalWishlistsWorth += wishlist.total_items_price;
-      combinedWishlistsStatistics.totalWishlistsSpent += wishlist.total_items_price - wishlist.price_to_complete;
+      combinedWishlistsStatistics.totalWishlistsSpent +=
+        wishlist.total_items_price - wishlist.price_to_complete;
       combinedWishlistsStatistics.totalWishlistsToComplete += wishlist.price_to_complete;
     }
 
@@ -387,7 +419,8 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       const { tag_id, tag_name, ...rest } = item;
 
       if (item.item_id === currentItemId) {
-        const mappedWishlistItem: MappedWishlistItem | undefined = mappedWishlistItems[mappedWishlistItems.length - 1];
+        const mappedWishlistItem: MappedWishlistItem | undefined =
+          mappedWishlistItems[mappedWishlistItems.length - 1];
         mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
 
         continue;
@@ -496,12 +529,19 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     }
 
     if (wishlistDetails.title === newTitle) {
-      res.status(409).json({ message: 'Wishlist already has this title.', reason: 'identicalTitle' });
+      res
+        .status(409)
+        .json({ message: 'Wishlist already has this title.', reason: 'identicalTitle' });
       return;
     }
 
     if (wishlistDetails.new_title_used_elsewhere) {
-      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      res
+        .status(409)
+        .json({
+          message: 'You already have a wishlist with this title.',
+          reason: 'duplicateTitle',
+        });
       return;
     }
 
@@ -539,7 +579,12 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
-      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      res
+        .status(409)
+        .json({
+          message: 'You already have a wishlist with this title.',
+          reason: 'duplicateTitle',
+        });
       return;
     }
 
@@ -673,7 +718,9 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
   }
 
   if (typeof newIsFavorited !== 'boolean') {
-    res.status(400).json({ message: 'Invalid favorite value.', reason: 'invalidFavoriteValue' });
+    res
+      .status(400)
+      .json({ message: 'Invalid favorite value.', reason: 'invalidFavoriteValue' });
     return;
   }
 
@@ -850,7 +897,9 @@ wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
 
 wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res, false);
-  const accountId: number | null = !authSessionId ? null : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+  const accountId: number | null = !authSessionId
+    ? null
+    : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
 
   const wishlistId: string | undefined = req.params.wishlistId;
 
@@ -911,7 +960,10 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       return;
     }
 
-    if (wishlistDetails.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL && !wishlistDetails.is_follower) {
+    if (
+      wishlistDetails.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL &&
+      !wishlistDetails.is_follower
+    ) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
@@ -948,7 +1000,8 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       const { tag_id, tag_name, ...rest } = item;
 
       if (item.item_id === currentItemId) {
-        const mappedWishlistItem: MappedWishlistItem | undefined = mappedWishlistItems[mappedWishlistItems.length - 1];
+        const mappedWishlistItem: MappedWishlistItem | undefined =
+          mappedWishlistItems[mappedWishlistItems.length - 1];
         mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
 
         continue;
@@ -970,7 +1023,13 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       mappedWishlistItems.push(mappedItem);
     }
 
-    const { owner_public_account_id, owner_display_name, owner_username, title, created_on_timestamp } = wishlistDetails;
+    const {
+      owner_public_account_id,
+      owner_display_name,
+      owner_username,
+      title,
+      created_on_timestamp,
+    } = wishlistDetails;
 
     res.json({
       ownerDetails: {

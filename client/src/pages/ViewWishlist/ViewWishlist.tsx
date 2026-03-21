@@ -21,7 +21,8 @@ export default function ViewWishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const [ownerDetails, setOwnerDetails] = useState<ViewWishlistOwnerDetails | null>(null);
-  const [viewWishlistDetails, setViewWishlistDetails] = useState<ViewWishlistDetailsType | null>(null);
+  const [viewWishlistDetails, setViewWishlistDetails] =
+    useState<ViewWishlistDetailsType | null>(null);
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>([]);
 
   const { authStatus } = useAuth();
@@ -88,7 +89,15 @@ export default function ViewWishlist(): JSX.Element {
     getViewWishlistDetails();
 
     return () => abortController.abort();
-  }, [isLoaded, referrerLocation, authStatus, urlParams, displayPopupMessage, navigate, handleAsyncError]);
+  }, [
+    isLoaded,
+    referrerLocation,
+    authStatus,
+    urlParams,
+    displayPopupMessage,
+    navigate,
+    handleAsyncError,
+  ]);
 
   return (
     <>

@@ -16,7 +16,9 @@ export async function deleteUnverifiedAccountsCron(currentTimestamp: number): Pr
   }
 }
 
-export async function deleteStaleAccountVerificationRequestsCron(currentTimestamp: number): Promise<void> {
+export async function deleteStaleAccountVerificationRequestsCron(
+  currentTimestamp: number
+): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
@@ -30,7 +32,9 @@ export async function deleteStaleAccountVerificationRequestsCron(currentTimestam
   }
 }
 
-export async function deleteStaleEmailUpdateRequestsCron(currentTimestamp: number): Promise<void> {
+export async function deleteStaleEmailUpdateRequestsCron(
+  currentTimestamp: number
+): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
@@ -44,7 +48,9 @@ export async function deleteStaleEmailUpdateRequestsCron(currentTimestamp: numbe
   }
 }
 
-export async function deleteStaleAccountRecoveryRequestsCron(currentTimestamp: number): Promise<void> {
+export async function deleteStaleAccountRecoveryRequestsCron(
+  currentTimestamp: number
+): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM
@@ -58,7 +64,9 @@ export async function deleteStaleAccountRecoveryRequestsCron(currentTimestamp: n
   }
 }
 
-export async function deleteStaleAccountDeletionRequestsCron(currentTimestamp: number): Promise<void> {
+export async function deleteStaleAccountDeletionRequestsCron(
+  currentTimestamp: number
+): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM

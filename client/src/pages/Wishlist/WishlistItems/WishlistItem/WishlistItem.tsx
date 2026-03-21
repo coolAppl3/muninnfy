@@ -18,7 +18,12 @@ type WishlistItemProps = {
 };
 
 export default memo(WishlistItem);
-function WishlistItem({ wishlistItem, selectionModeActive, inViewMode, setWishlistItems }: WishlistItemProps): JSX.Element {
+function WishlistItem({
+  wishlistItem,
+  selectionModeActive,
+  inViewMode,
+  setWishlistItems,
+}: WishlistItemProps): JSX.Element {
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const { toggleWishlistItemExpansion, isExpanded } = useWishlistItemsExpansionStore(
@@ -36,7 +41,10 @@ function WishlistItem({ wishlistItem, selectionModeActive, inViewMode, setWishli
   );
 
   function getCurrencyFormatting(price: number): string {
-    return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return price.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   }
 
   if (isEditing && !inViewMode) {
@@ -74,7 +82,9 @@ function WishlistItem({ wishlistItem, selectionModeActive, inViewMode, setWishli
           title={`${isExpanded ? 'Collapse' : 'Expand'} item`}
           aria-label={`${isExpanded ? 'Collapse' : 'Expand'} item`}
           className={`relative bg-secondary w-full flex justify-between items-start gap-1 px-2 py-1 transition-all hover:brightness-110 cursor-pointer border-b-1 rounded-sm overflow-hidden wrap-anywhere text-ellipsis ${
-            isExpanded ? 'rounded-bl-none rounded-br-none border-b-light-gray' : 'border-b-secondary'
+            isExpanded
+              ? 'rounded-bl-none rounded-br-none border-b-light-gray'
+              : 'border-b-secondary'
           } ${
             wishlistItem.purchased_on_timestamp
               ? 'after:absolute after:top-[-1rem] after:right-[-1rem] after:w-2 after:h-2 after:bg-cta after:rotate-45 after:z-1'
@@ -83,7 +93,9 @@ function WishlistItem({ wishlistItem, selectionModeActive, inViewMode, setWishli
         >
           <h4 className='text-title py-[8.4px] text-start'>{wishlistItem.title}</h4>
           <span className='p-1 mr-[-1rem]'>
-            <ChevronIcon className={`text-title w-[1.6rem] h-[1.6rem] ${isExpanded ? 'rotate-180' : ''}`} />
+            <ChevronIcon
+              className={`text-title w-[1.6rem] h-[1.6rem] ${isExpanded ? 'rotate-180' : ''}`}
+            />
           </span>
         </button>
       </div>

@@ -15,20 +15,26 @@ import AccountDeletion from './components/AccountDeletion/AccountDeletion';
 export function AccountProfile(): JSX.Element {
   const { profileSection } = useAccountProfile();
   const { accountDetails } = useAccountDetails();
-  const { public_account_id, created_on_timestamp, display_name, username, email } = accountDetails;
+  const { public_account_id, created_on_timestamp, display_name, username, email } =
+    accountDetails;
 
-  const MappedComponent: ComponentType | null = profileSection && componentRecord[profileSection];
+  const MappedComponent: ComponentType | null =
+    profileSection && componentRecord[profileSection];
 
   return (
     <section>
       <AccountProfileHeader />
 
       <div className='text-description/50 text-xs mb-[1.2rem]'>
-        <p className='leading-none mb-[4px]'>Created on {getFullDateString(created_on_timestamp)}</p>
+        <p className='leading-none mb-[4px]'>
+          Created on {getFullDateString(created_on_timestamp)}
+        </p>
         <p className='leading-none'>{public_account_id}</p>
       </div>
 
-      <div className={`grid transition-[grid] ${profileSection ? 'grid-rows-[auto_1fr]' : 'grid-rows-[auto_0fr]'}`}>
+      <div
+        className={`grid transition-[grid] ${profileSection ? 'grid-rows-[auto_1fr]' : 'grid-rows-[auto_0fr]'}`}
+      >
         <div className='grid md:grid-cols-2 gap-1 text-sm text-description relative z-0 h-fit'>
           <StatisticItem
             title='Display name'

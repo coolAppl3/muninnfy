@@ -3,7 +3,9 @@ import DefaultFormGroup from '../../../../../components/DefaultFormGroup/Default
 import { validateSocialFindQuery } from '../../../../../utils/validation/socialValidation';
 import Button from '../../../../../components/Button/Button';
 import { findAccountsService } from '../../../../../services/socialServices';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import AccountLinkCard from './components/AccountLinkCard';
@@ -108,7 +110,11 @@ export default function AccountSocialFindAccount(): JSX.Element {
           {firstSearchCompleted && (
             <>
               <div className='h-line my-2'></div>
-              {results.length === 0 && <p className='text-sm text-description font-medium w-fit mx-auto'>No users found</p>}
+              {results.length === 0 && (
+                <p className='text-sm text-description font-medium w-fit mx-auto'>
+                  No users found
+                </p>
+              )}
             </>
           )}
           <div className='grid gap-1 sm:grid-cols-2'>

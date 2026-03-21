@@ -1,5 +1,7 @@
 import { useContext } from 'react';
-import AccountSocialContext, { AccountSocialContextType } from '../contexts/AccountSocialContext';
+import AccountSocialContext, {
+  AccountSocialContextType,
+} from '../contexts/AccountSocialContext';
 
 export default function useAccountSocial(): AccountSocialContextType {
   const context = useContext<AccountSocialContextType | null>(AccountSocialContext);

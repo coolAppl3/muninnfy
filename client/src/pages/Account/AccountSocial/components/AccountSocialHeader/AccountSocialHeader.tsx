@@ -35,10 +35,14 @@ export default function AccountSocialHeader(): JSX.Element {
           title={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
           aria-label={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
         >
-          <TripleDotMenuIcon className={`w-[1.6rem] h-[1.6rem] transition-colors ${menuIsOpen ? 'text-cta' : ''}`} />
+          <TripleDotMenuIcon
+            className={`w-[1.6rem] h-[1.6rem] transition-colors ${menuIsOpen ? 'text-cta' : ''}`}
+          />
         </button>
 
-        <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
+        <div
+          className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}
+        >
           <button
             type='button'
             className='context-menu-btn bg-primary'

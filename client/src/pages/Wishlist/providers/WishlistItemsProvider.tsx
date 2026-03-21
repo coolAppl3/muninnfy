@@ -1,5 +1,9 @@
 import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
-import WishlistItemsContext, { ItemsFilterConfigType, ItemsSortingMode, WishlistItemsContextType } from '../contexts/WishlistItemsContext';
+import WishlistItemsContext, {
+  ItemsFilterConfigType,
+  ItemsSortingMode,
+  WishlistItemsContextType,
+} from '../contexts/WishlistItemsContext';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 
 type WishlistItemsProviderProps = {
@@ -7,9 +11,13 @@ type WishlistItemsProviderProps = {
   children: ReactNode;
 };
 
-export default function WishlistItemsProvider({ initialWishlistItems, children }: WishlistItemsProviderProps): JSX.Element {
+export default function WishlistItemsProvider({
+  initialWishlistItems,
+  children,
+}: WishlistItemsProviderProps): JSX.Element {
   const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>(initialWishlistItems);
-  const [itemsFilterConfig, setItemsFilterConfig] = useState<ItemsFilterConfigType>(defaultItemsFilterConfig);
+  const [itemsFilterConfig, setItemsFilterConfig] =
+    useState<ItemsFilterConfigType>(defaultItemsFilterConfig);
   const [itemsSortingMode, setItemsSortingMode] = useState<ItemsSortingMode>('newest');
   const [selectionModeActive, setSelectionModeActive] = useState<boolean>(false);
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
@@ -48,11 +56,19 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return false;
       }
 
-      if (purchasedAfterTimestamp !== null && item.purchased_on_timestamp && item.purchased_on_timestamp < purchasedAfterTimestamp) {
+      if (
+        purchasedAfterTimestamp !== null &&
+        item.purchased_on_timestamp &&
+        item.purchased_on_timestamp < purchasedAfterTimestamp
+      ) {
         return false;
       }
 
-      if (purchasedBeforeTimestamp !== null && item.purchased_on_timestamp && item.purchased_on_timestamp > purchasedBeforeTimestamp) {
+      if (
+        purchasedBeforeTimestamp !== null &&
+        item.purchased_on_timestamp &&
+        item.purchased_on_timestamp > purchasedBeforeTimestamp
+      ) {
         return false;
       }
 
@@ -64,11 +80,17 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return false;
       }
 
-      if (filterByIsPurchased !== null && Boolean(item.purchased_on_timestamp) !== filterByIsPurchased) {
+      if (
+        filterByIsPurchased !== null &&
+        Boolean(item.purchased_on_timestamp) !== filterByIsPurchased
+      ) {
         return false;
       }
 
-      if (filterByPrice !== null && Boolean(item.price === 0 ? true : item.price) !== filterByPrice) {
+      if (
+        filterByPrice !== null &&
+        Boolean(item.price === 0 ? true : item.price) !== filterByPrice
+      ) {
         return false;
       }
 
@@ -88,7 +110,9 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return item.tags.some(({ name }) => tagsSet.has(name));
       }
 
-      const itemTagsSet = new Set<string>(item.tags.map(({ name }: { id: number; name: string }) => name));
+      const itemTagsSet = new Set<string>(
+        item.tags.map(({ name }: { id: number; name: string }) => name)
+      );
       for (const tag of tagsSet) {
         if (!itemTagsSet.has(tag)) {
           return false;
@@ -105,12 +129,16 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
       const sortingMode: ItemsSortingMode = explicitSortingMode || itemsSortingMode;
 
       if (sortingMode === 'newest') {
-        setWishlistItems((prev) => prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp));
+        setWishlistItems((prev) =>
+          prev.toSorted((a, b) => b.added_on_timestamp - a.added_on_timestamp)
+        );
         return;
       }
 
       if (sortingMode === 'oldest') {
-        setWishlistItems((prev) => prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp));
+        setWishlistItems((prev) =>
+          prev.toSorted((a, b) => a.added_on_timestamp - b.added_on_timestamp)
+        );
         return;
       }
 
@@ -124,7 +152,9 @@ export default function WishlistItemsProvider({ initialWishlistItems, children }
         return;
       }
 
-      setWishlistItems((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' })));
+      setWishlistItems((prev) =>
+        prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }))
+      );
     },
     [itemsSortingMode]
   );

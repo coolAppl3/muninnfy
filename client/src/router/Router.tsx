@@ -93,7 +93,13 @@ export default function Router(): JSX.Element {
   );
 }
 
-function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: AuthStatus; redirectTo?: string }): JSX.Element {
+function AuthOnlyRoute({
+  authStatus,
+  redirectTo = '/sign-in',
+}: {
+  authStatus: AuthStatus;
+  redirectTo?: string;
+}): JSX.Element {
   const { postAuthNavigate, setPostAuthNavigate } = useHistory();
   const { pathname, search } = useLocation();
 
@@ -121,7 +127,13 @@ function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: Au
   );
 }
 
-function NonAuthOnlyRoute({ authStatus, redirectTo = '/account' }: { authStatus: AuthStatus; redirectTo?: string }): JSX.Element {
+function NonAuthOnlyRoute({
+  authStatus,
+  redirectTo = '/account',
+}: {
+  authStatus: AuthStatus;
+  redirectTo?: string;
+}): JSX.Element {
   const { postAuthNavigate } = useHistory();
 
   if (authStatus === 'loading') {

@@ -4,13 +4,20 @@ import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isValidUuid } from '../util/tokenGenerator';
-import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_MAX_FOLLOWING_LIMIT, SOCIAL_MAX_FOLLOWERS_LIMIT } from '../util/constants/socialConstants';
+import {
+  SOCIAL_FETCH_BATCH_SIZE,
+  SOCIAL_MAX_FOLLOWING_LIMIT,
+  SOCIAL_MAX_FOLLOWERS_LIMIT,
+} from '../util/constants/socialConstants';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { deleteFollowRequest } from '../db/helpers/socialDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
-import { isValidSocialFindQuery, isValidSocialQuery } from '../util/validation/socialValidation';
+import {
+  isValidSocialFindQuery,
+  isValidSocialQuery,
+} from '../util/validation/socialValidation';
 import { addNotification } from '../db/helpers/notificationsDbHelpers';
 
 export const socialRouter: Router = express.Router();
@@ -110,7 +117,9 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       { accountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    const socialCounts = (socialRows[0] ? socialRows[0][0] : undefined) as SocialCounts | undefined;
+    const socialCounts = (socialRows[0] ? socialRows[0][0] : undefined) as
+      | SocialCounts
+      | undefined;
     const followers = socialRows[1] as FollowDetails[] | undefined;
     const following = socialRows[2] as FollowDetails[] | undefined;
     const followRequests = socialRows[3] as FollowRequest[] | undefined;
@@ -594,7 +603,9 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
 
     if (!followDetails || !followDetails.requestee_is_verified) {
       await connection.rollback();
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
@@ -608,7 +619,9 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
 
     if (followDetails.already_following) {
       await connection.rollback();
-      res.status(409).json({ message: 'Already following this user.', reason: 'alreadyFollowing' });
+      res
+        .status(409)
+        .json({ message: 'Already following this user.', reason: 'alreadyFollowing' });
 
       return;
     }
@@ -620,16 +633,26 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       return;
     }
 
-    if (followDetails.requester_following_count + followDetails.requester_follow_requests_count >= SOCIAL_MAX_FOLLOWING_LIMIT) {
+    if (
+      followDetails.requester_following_count + followDetails.requester_follow_requests_count >=
+      SOCIAL_MAX_FOLLOWING_LIMIT
+    ) {
       await connection.rollback();
-      res.status(409).json({ message: 'Following limit reached.', reason: 'followingLimitReached' });
+      res
+        .status(409)
+        .json({ message: 'Following limit reached.', reason: 'followingLimitReached' });
 
       return;
     }
 
     if (followDetails.requestee_followers_count >= SOCIAL_MAX_FOLLOWERS_LIMIT) {
       await connection.rollback();
-      res.status(409).json({ message: `User can't accept followers at this time.`, reason: 'requesteeFollowersLimitReached' });
+      res
+        .status(409)
+        .json({
+          message: `User can't accept followers at this time.`,
+          reason: 'requesteeFollowersLimitReached',
+        });
 
       return;
     }
@@ -649,7 +672,13 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       await connection.commit();
       res.json({ followId: resultSetHeader.insertId, followTimestamp: currentTimestamp });
 
-      await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'new_follower', resultSetHeader.insertId);
+      await addNotification(
+        followDetails.requestee_account_id,
+        accountId,
+        currentTimestamp,
+        'new_follower',
+        resultSetHeader.insertId
+      );
       return;
     }
 
@@ -665,7 +694,13 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     await connection.commit();
     res.json({ requestId: resultSetHeader.insertId, requestTimestamp: currentTimestamp });
 
-    await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'new_follow_request', resultSetHeader.insertId);
+    await addNotification(
+      followDetails.requestee_account_id,
+      accountId,
+      currentTimestamp,
+      'new_follow_request',
+      resultSetHeader.insertId
+    );
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -694,49 +729,54 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
   }
 });
 
-socialRouter.delete('/followRequests/cancel/:requestId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+socialRouter.delete(
+  '/followRequests/cancel/:requestId',
+  async (req: Request, res: Response) => {
+    const authSessionId: string | null = getAuthSessionId(req, res);
 
-  if (!authSessionId) {
-    return;
-  }
+    if (!authSessionId) {
+      return;
+    }
 
-  const requestId: number | undefined = req.params.requestId ? +req.params.requestId : undefined;
+    const requestId: number | undefined = req.params.requestId
+      ? +req.params.requestId
+      : undefined;
 
-  if (!requestId || !Number.isInteger(requestId)) {
-    res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
-    return;
-  }
+    if (!requestId || !Number.isInteger(requestId)) {
+      res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+      return;
+    }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
-  if (!accountId) {
-    return;
-  }
+    if (!accountId) {
+      return;
+    }
 
-  try {
-    await dbPool.execute<ResultSetHeader>(
-      `DELETE FROM
+    try {
+      await dbPool.execute<ResultSetHeader>(
+        `DELETE FROM
         follow_requests
       WHERE
         request_id = ? AND
         requester_account_id = ?;`,
-      [requestId, accountId]
-    );
+        [requestId, accountId]
+      );
 
-    res.json({});
-  } catch (err: unknown) {
-    console.log(err);
+      res.json({});
+    } catch (err: unknown) {
+      console.log(err);
 
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
+      if (res.headersSent) {
+        await logUnexpectedError(req, err, 'Attempted to send two responses.');
+        return;
+      }
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
     }
-
-    res.status(500).json({ message: 'Internal server error.' });
-    await logUnexpectedError(req, err);
   }
-});
+);
 
 socialRouter.post('/followRequests/accept', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
@@ -822,7 +862,9 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
 
     if (followDetails.followers_count >= SOCIAL_MAX_FOLLOWERS_LIMIT) {
       await connection.rollback();
-      res.status(409).json({ message: 'Followers limit reached.', reason: 'followersLimitReached' });
+      res
+        .status(409)
+        .json({ message: 'Followers limit reached.', reason: 'followersLimitReached' });
 
       return;
     }
@@ -872,49 +914,54 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
   }
 });
 
-socialRouter.delete('/followRequests/decline/:requestId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+socialRouter.delete(
+  '/followRequests/decline/:requestId',
+  async (req: Request, res: Response) => {
+    const authSessionId: string | null = getAuthSessionId(req, res);
 
-  if (!authSessionId) {
-    return;
-  }
+    if (!authSessionId) {
+      return;
+    }
 
-  const requestId: number | undefined = req.params.requestId ? +req.params.requestId : undefined;
+    const requestId: number | undefined = req.params.requestId
+      ? +req.params.requestId
+      : undefined;
 
-  if (!requestId || !Number.isInteger(requestId)) {
-    res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
-    return;
-  }
+    if (!requestId || !Number.isInteger(requestId)) {
+      res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+      return;
+    }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
-  if (!accountId) {
-    return;
-  }
+    if (!accountId) {
+      return;
+    }
 
-  try {
-    await dbPool.execute<ResultSetHeader>(
-      `DELETE FROM
+    try {
+      await dbPool.execute<ResultSetHeader>(
+        `DELETE FROM
         follow_requests
       WHERE
         request_id = ? AND
         requestee_account_id = ?;`,
-      [requestId, accountId]
-    );
+        [requestId, accountId]
+      );
 
-    res.json({});
-  } catch (err: unknown) {
-    console.log(err);
+      res.json({});
+    } catch (err: unknown) {
+      console.log(err);
 
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
+      if (res.headersSent) {
+        await logUnexpectedError(req, err, 'Attempted to send two responses.');
+        return;
+      }
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
     }
-
-    res.status(500).json({ message: 'Internal server error.' });
-    await logUnexpectedError(req, err);
   }
-});
+);
 
 socialRouter.delete('/followers/unfollow/:followId', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);

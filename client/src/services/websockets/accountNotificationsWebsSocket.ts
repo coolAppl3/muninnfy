@@ -27,7 +27,9 @@ export function connectAccountNotificationsWebSocket(): void {
       return;
     }
 
-    wsListenersMap.forEach((listener: (data: NotificationDetails) => void) => listener(notificationDetails));
+    wsListenersMap.forEach((listener: (data: NotificationDetails) => void) =>
+      listener(notificationDetails)
+    );
   });
 
   ws.addEventListener('close', (e: CloseEvent) => {
@@ -36,7 +38,10 @@ export function connectAccountNotificationsWebSocket(): void {
     }
 
     setTimeout(connectAccountNotificationsWebSocket, reconnectionDelayMilliseconds);
-    reconnectionDelayMilliseconds = Math.min(reconnectionDelayMilliseconds * 2, maxReconnectionDelayMilliseconds);
+    reconnectionDelayMilliseconds = Math.min(
+      reconnectionDelayMilliseconds * 2,
+      maxReconnectionDelayMilliseconds
+    );
   });
 
   ws.addEventListener('error', () => {
@@ -44,7 +49,10 @@ export function connectAccountNotificationsWebSocket(): void {
   });
 }
 
-export function subscribeToAccountNotifications(handlerType: HandlerType, handler: (data: NotificationDetails) => void): void {
+export function subscribeToAccountNotifications(
+  handlerType: HandlerType,
+  handler: (data: NotificationDetails) => void
+): void {
   wsListenersMap.set(handlerType, handler);
 }
 
@@ -71,12 +79,18 @@ function parseWebSocketMessageData(data: any): NotificationDetails | null {
   }
 }
 
-function isValidNotificationType(notificationType: unknown): notificationType is NotificationType {
+function isValidNotificationType(
+  notificationType: unknown
+): notificationType is NotificationType {
   if (typeof notificationType !== 'string') {
     return false;
   }
 
-  const validNotificationTypes: string[] = ['new_follower', 'new_follow_request', 'follow_request_accepted'];
+  const validNotificationTypes: string[] = [
+    'new_follower',
+    'new_follow_request',
+    'follow_request_accepted',
+  ];
   return validNotificationTypes.includes(notificationType);
 }
 
@@ -116,7 +130,11 @@ function isValidNotificationDetails(data: unknown): data is NotificationDetails 
     return false;
   }
 
-  if (typeof sender_public_account_id !== 'string' || typeof sender_username !== 'string' || typeof sender_display_name !== 'string') {
+  if (
+    typeof sender_public_account_id !== 'string' ||
+    typeof sender_username !== 'string' ||
+    typeof sender_display_name !== 'string'
+  ) {
     return false;
   }
 
@@ -139,13 +157,21 @@ function isValidNotificationData(
     return false;
   }
 
-  if (!('public_account_id' in notificationData) || !('username' in notificationData) || !('display_name' in notificationData)) {
+  if (
+    !('public_account_id' in notificationData) ||
+    !('username' in notificationData) ||
+    !('display_name' in notificationData)
+  ) {
     return false;
   }
 
   const { public_account_id, username, display_name } = notificationData;
 
-  if (typeof public_account_id !== 'string' || typeof username !== 'string' || typeof display_name !== 'string') {
+  if (
+    typeof public_account_id !== 'string' ||
+    typeof username !== 'string' ||
+    typeof display_name !== 'string'
+  ) {
     return false;
   }
 
@@ -154,7 +180,10 @@ function isValidNotificationData(
       return false;
     }
 
-    if (!Number.isInteger(notificationData.request_id) || !Number.isInteger(notificationData.request_timestamp)) {
+    if (
+      !Number.isInteger(notificationData.request_id) ||
+      !Number.isInteger(notificationData.request_timestamp)
+    ) {
       return false;
     }
 
@@ -165,7 +194,10 @@ function isValidNotificationData(
     return false;
   }
 
-  if (!Number.isInteger(notificationData.follow_id) || !Number.isInteger(notificationData.follow_timestamp)) {
+  if (
+    !Number.isInteger(notificationData.follow_id) ||
+    !Number.isInteger(notificationData.follow_timestamp)
+  ) {
     return false;
   }
 

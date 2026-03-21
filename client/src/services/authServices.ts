@@ -5,7 +5,9 @@ type CheckForAuthSessionServiceData = {
   isValidAuthSession: boolean;
 };
 
-export function checkForAuthSessionService(abortSignal: AbortSignal): Promise<AxiosResponse<CheckForAuthSessionServiceData>> {
+export function checkForAuthSessionService(
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<CheckForAuthSessionServiceData>> {
   return axiosInstance.get('/auth/session', { signal: abortSignal });
 }
 

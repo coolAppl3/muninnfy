@@ -1,5 +1,7 @@
 import { useContext } from 'react';
-import AccountDetailsContext, { AccountDetailsContextType } from '../contexts/AccountDetailsContext';
+import AccountDetailsContext, {
+  AccountDetailsContextType,
+} from '../contexts/AccountDetailsContext';
 
 export default function useAccountDetails(): AccountDetailsContextType {
   const context = useContext<AccountDetailsContextType | null>(AccountDetailsContext);

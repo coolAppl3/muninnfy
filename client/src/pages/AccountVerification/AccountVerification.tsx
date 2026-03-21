@@ -15,7 +15,8 @@ export default function AccountVerification(): JSX.Element {
   const verificationToken: string | null = urlSearchParams.get('verificationToken');
 
   const [isValidVerificationLink, setIsValidVerificationLink] = useState<boolean>(
-    (publicAccountId ? isValidUuid(publicAccountId) : true) && (verificationToken ? isValidUuid(verificationToken) : true)
+    (publicAccountId ? isValidUuid(publicAccountId) : true) &&
+      (verificationToken ? isValidUuid(verificationToken) : true)
   );
 
   return (

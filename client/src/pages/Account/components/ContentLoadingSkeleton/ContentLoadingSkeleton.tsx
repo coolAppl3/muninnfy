@@ -5,7 +5,10 @@ type ContentLoadingSkeletonProps = {
   className?: string;
 };
 
-export default function ContentLoadingSkeleton({ cardsCount, className }: ContentLoadingSkeletonProps): JSX.Element {
+export default function ContentLoadingSkeleton({
+  cardsCount,
+  className,
+}: ContentLoadingSkeletonProps): JSX.Element {
   return (
     <div className={`grid gap-1 ${className || ''}`}>
       {Array.from({ length: cardsCount || 4 }).map((_, index: number) => (

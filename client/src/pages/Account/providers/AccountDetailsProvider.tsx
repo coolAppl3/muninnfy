@@ -1,5 +1,7 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
-import AccountDetailsContext, { AccountDetailsContextType } from '../contexts/AccountDetailsContext';
+import AccountDetailsContext, {
+  AccountDetailsContextType,
+} from '../contexts/AccountDetailsContext';
 import { AccountDetailsType } from '../../../types/accountTypes';
 
 type AccountDetailsProviderProps = {
@@ -7,8 +9,12 @@ type AccountDetailsProviderProps = {
   children: ReactNode;
 };
 
-export default function AccountDetailsProvider({ initialAccountDetails, children }: AccountDetailsProviderProps): JSX.Element {
-  const [accountDetails, setAccountDetails] = useState<AccountDetailsType>(initialAccountDetails);
+export default function AccountDetailsProvider({
+  initialAccountDetails,
+  children,
+}: AccountDetailsProviderProps): JSX.Element {
+  const [accountDetails, setAccountDetails] =
+    useState<AccountDetailsType>(initialAccountDetails);
 
   const contextValue: AccountDetailsContextType = useMemo(
     () => ({

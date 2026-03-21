@@ -6,7 +6,9 @@ type PopupMessageProviderProps = {
   children: ReactNode;
 };
 
-export default function PopupMessageProvider({ children }: PopupMessageProviderProps): JSX.Element {
+export default function PopupMessageProvider({
+  children,
+}: PopupMessageProviderProps): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [type, setType] = useState<'success' | 'error'>('success');
@@ -33,7 +35,10 @@ export default function PopupMessageProvider({ children }: PopupMessageProviderP
     return () => clearTimeout(timeoutId);
   });
 
-  const contextValue: PopupMessageContextType = useMemo(() => ({ displayPopupMessage }), [displayPopupMessage]);
+  const contextValue: PopupMessageContextType = useMemo(
+    () => ({ displayPopupMessage }),
+    [displayPopupMessage]
+  );
 
   return (
     <PopupMessageContext value={contextValue}>

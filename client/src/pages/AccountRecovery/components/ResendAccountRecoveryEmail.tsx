@@ -1,6 +1,8 @@
 import { Dispatch, JSX, SetStateAction, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import { resendAccountRecoveryEmailService } from '../../../services/accountServices';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
@@ -18,7 +20,9 @@ export default function ResendAccountRecoveryEmail({
   setIsValidRecoveryLink,
 }: ResendAccountRecoveryEmailProps): JSX.Element {
   const [title, setTitle] = useState<string>('Account recovery in progress.');
-  const [description, setDescription] = useState<string>('Check your inbox for a recovery email and click the link to continue.');
+  const [description, setDescription] = useState<string>(
+    'Check your inbox for a recovery email and click the link to continue.'
+  );
 
   const [btnDisabled, setBtnDisabled] = useState<boolean>(false);
   const [btnTitle, setBtnTitle] = useState<string>('Resend email');
@@ -55,7 +59,9 @@ export default function ResendAccountRecoveryEmail({
 
       if (status === 404) {
         setDescription(
-          errReason === 'accountNotFound' ? 'You can sign up to Muninnfy any time.' : 'You can initiate a new recovery request if needed.'
+          errReason === 'accountNotFound'
+            ? 'You can sign up to Muninnfy any time.'
+            : 'You can initiate a new recovery request if needed.'
         );
 
         return;
@@ -75,7 +81,9 @@ export default function ResendAccountRecoveryEmail({
         return;
       }
 
-      setDescription(`If you still can't find any recovery emails, you can reinitiate the recovery process in an hour.`);
+      setDescription(
+        `If you still can't find any recovery emails, you can reinitiate the recovery process in an hour.`
+      );
     }
   }
 
@@ -88,11 +96,16 @@ export default function ResendAccountRecoveryEmail({
       return;
     }
 
-    if (typeof errResData.expiryTimestamp !== 'number' || !Number.isInteger(errResData.expiryTimestamp)) {
+    if (
+      typeof errResData.expiryTimestamp !== 'number' ||
+      !Number.isInteger(errResData.expiryTimestamp)
+    ) {
       return;
     }
 
-    setDescription(`Recovery request suspended until ${getDateAndTimeString(errResData.expiryTimestamp)}.`);
+    setDescription(
+      `Recovery request suspended until ${getDateAndTimeString(errResData.expiryTimestamp)}.`
+    );
   }
 
   return (

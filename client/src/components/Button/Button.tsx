@@ -8,7 +8,13 @@ type ButtonProps = {
   onClick?: MouseEventHandler<HTMLButtonElement>;
 };
 
-export default function Button({ children, className, disabled = false, isSubmitBtn = false, onClick }: ButtonProps): JSX.Element {
+export default function Button({
+  children,
+  className,
+  disabled = false,
+  isSubmitBtn = false,
+  onClick,
+}: ButtonProps): JSX.Element {
   return (
     <button
       type={isSubmitBtn ? 'submit' : 'button'}

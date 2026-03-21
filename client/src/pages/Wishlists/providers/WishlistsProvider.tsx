@@ -1,5 +1,9 @@
 import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
-import WishlistsContext, { WishlistsContextType, WishlistsFilterConfigType, WishlistsSortingMode } from '../contexts/WishlistsContext';
+import WishlistsContext, {
+  WishlistsContextType,
+  WishlistsFilterConfigType,
+  WishlistsSortingMode,
+} from '../contexts/WishlistsContext';
 import { ExtendedWishlistDetailsType } from '../../../types/wishlistTypes';
 
 type WishlistsProviderProps = {
@@ -7,10 +11,16 @@ type WishlistsProviderProps = {
   children: ReactNode;
 };
 
-export default function WishlistsProvider({ initialWishlists, children }: WishlistsProviderProps): JSX.Element {
+export default function WishlistsProvider({
+  initialWishlists,
+  children,
+}: WishlistsProviderProps): JSX.Element {
   const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>(initialWishlists);
-  const [wishlistsFilterConfig, setWishlistsFilterConfig] = useState<WishlistsFilterConfigType>(defaultWishlistsFilterConfig);
-  const [wishlistsSortingMode, setWishlistsSortingMode] = useState<WishlistsSortingMode>('interactivity');
+  const [wishlistsFilterConfig, setWishlistsFilterConfig] = useState<WishlistsFilterConfigType>(
+    defaultWishlistsFilterConfig
+  );
+  const [wishlistsSortingMode, setWishlistsSortingMode] =
+    useState<WishlistsSortingMode>('interactivity');
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
 
   const wishlistMatchesFilterConfig = useCallback(
@@ -33,11 +43,17 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
         return false;
       }
 
-      if (createdAfterTimestamp !== null && wishlist.created_on_timestamp < createdAfterTimestamp) {
+      if (
+        createdAfterTimestamp !== null &&
+        wishlist.created_on_timestamp < createdAfterTimestamp
+      ) {
         return false;
       }
 
-      if (createdBeforeTimestamp !== null && wishlist.created_on_timestamp > createdBeforeTimestamp) {
+      if (
+        createdBeforeTimestamp !== null &&
+        wishlist.created_on_timestamp > createdBeforeTimestamp
+      ) {
         return false;
       }
 
@@ -83,12 +99,16 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       const sortingMode: WishlistsSortingMode = explicitSortingMode || wishlistsSortingMode;
 
       if (sortingMode === 'newest') {
-        setWishlists((prev) => prev.toSorted((a, b) => b.created_on_timestamp - a.created_on_timestamp));
+        setWishlists((prev) =>
+          prev.toSorted((a, b) => b.created_on_timestamp - a.created_on_timestamp)
+        );
         return;
       }
 
       if (sortingMode === 'oldest') {
-        setWishlists((prev) => prev.toSorted((a, b) => a.created_on_timestamp - b.created_on_timestamp));
+        setWishlists((prev) =>
+          prev.toSorted((a, b) => a.created_on_timestamp - b.created_on_timestamp)
+        );
         return;
       }
 
@@ -103,7 +123,9 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       }
 
       if (sortingMode === 'lexicographical') {
-        setWishlists((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' })));
+        setWishlists((prev) =>
+          prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }))
+        );
         return;
       }
 
@@ -137,7 +159,14 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       isSingleColumnView,
       setIsSingleColumnView,
     }),
-    [wishlists, wishlistsFilterConfig, wishlistsSortingMode, isSingleColumnView, sortWishlists, wishlistMatchesFilterConfig]
+    [
+      wishlists,
+      wishlistsFilterConfig,
+      wishlistsSortingMode,
+      isSingleColumnView,
+      sortWishlists,
+      wishlistMatchesFilterConfig,
+    ]
   );
 
   return <WishlistsContext value={contextValue}>{children}</WishlistsContext>;

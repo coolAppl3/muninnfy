@@ -1,5 +1,7 @@
 import { useContext } from 'react';
-import AccountLocationContext, { AccountLocationContextType } from '../contexts/AccountLocationContext';
+import AccountLocationContext, {
+  AccountLocationContextType,
+} from '../contexts/AccountLocationContext';
 
 export default function useAccountLocation(): AccountLocationContextType {
   const context = useContext<AccountLocationContextType | null>(AccountLocationContext);

@@ -3,7 +3,10 @@ export type EmailUpdateStartEmailTemplate = {
   confirmationCode: string;
 };
 
-export default function emailUpdateStartEmailTemplate({ displayName, confirmationCode }: EmailUpdateStartEmailTemplate): string {
+export default function emailUpdateStartEmailTemplate({
+  displayName,
+  confirmationCode,
+}: EmailUpdateStartEmailTemplate): string {
   return `
     <!DOCTYPE html>
     <html lang="en">

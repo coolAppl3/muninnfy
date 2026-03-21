@@ -9,7 +9,9 @@ type AuthSessionProviderProps = {
   children: ReactNode;
 };
 
-export default function AuthSessionProvider({ children }: AuthSessionProviderProps): JSX.Element {
+export default function AuthSessionProvider({
+  children,
+}: AuthSessionProviderProps): JSX.Element {
   const { setAuthStatus } = useAuth();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();

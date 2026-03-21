@@ -5,7 +5,9 @@ import useAccountProfile from '../../../../hooks/useAccountProfile';
 import useLoadingOverlay from '../../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../../hooks/usePopupMessage';
 import useAuth from '../../../../../../hooks/useAuth';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../../hooks/useHandleAsyncError';
 import PasswordFormGroup from '../../../../../../components/PasswordFormGroup/PasswordFormGroup';
 import { startAccountDeletionService } from '../../../../../../services/accountServices';
 import useAccountOngoingRequests from '../../../../hooks/useAccountOngoingRequests';
@@ -27,8 +29,12 @@ export default function AccountDeletionStart(): JSX.Element {
     const password: string = value;
 
     try {
-      const expiryTimestamp: number = (await startAccountDeletionService({ password })).data.expiryTimestamp;
-      setOngoingAccountDeletionRequest({ expiry_timestamp: expiryTimestamp, is_suspended: false });
+      const expiryTimestamp: number = (await startAccountDeletionService({ password })).data
+        .expiryTimestamp;
+      setOngoingAccountDeletionRequest({
+        expiry_timestamp: expiryTimestamp,
+        is_suspended: false,
+      });
 
       displayPopupMessage('Confirmation email sent.', 'success');
     } catch (err: unknown) {

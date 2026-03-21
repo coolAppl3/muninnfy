@@ -1,6 +1,8 @@
 import { OngoingAccountRequest } from '../../../../types/accountTypes';
 
-export function isValidOngoingRequestData(errResData: unknown): errResData is OngoingAccountRequest {
+export function isValidOngoingRequestData(
+  errResData: unknown
+): errResData is OngoingAccountRequest {
   if (typeof errResData !== 'object' || errResData === null) {
     return false;
   }
@@ -20,7 +22,9 @@ export function isValidOngoingRequestData(errResData: unknown): errResData is On
   return true;
 }
 
-export function resDataContainsExpiryTimestamp(errResData: unknown): errResData is { expiryTimestamp: number } {
+export function resDataContainsExpiryTimestamp(
+  errResData: unknown
+): errResData is { expiryTimestamp: number } {
   if (typeof errResData !== 'object' || errResData === null) {
     return false;
   }

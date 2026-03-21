@@ -15,7 +15,8 @@ export default function AccountRecovery(): JSX.Element {
   const recoveryToken: string | null = urlSearchParams.get('recoveryToken');
 
   const [isValidRecoveryLink, setIsValidRecoveryLink] = useState<boolean>(
-    (publicAccountId ? isValidUuid(publicAccountId) : true) && (recoveryToken ? isValidUuid(recoveryToken) : true)
+    (publicAccountId ? isValidUuid(publicAccountId) : true) &&
+      (recoveryToken ? isValidUuid(recoveryToken) : true)
   );
 
   return (

@@ -8,7 +8,12 @@ export type InfoModalProps = {
   onClick: MouseEventHandler<HTMLButtonElement>;
 };
 
-export default function InfoModal({ title, description, btnTitle, onClick }: InfoModalProps): JSX.Element {
+export default function InfoModal({
+  title,
+  description,
+  btnTitle,
+  onClick,
+}: InfoModalProps): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement | null>(null);
 

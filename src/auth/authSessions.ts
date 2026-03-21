@@ -62,17 +62,20 @@ export async function createAuthSession(
       return true;
     }
 
-    const oldestAuthSession = (sessionRows as SessionDetails[]).reduce((oldest: SessionDetails | null, current: SessionDetails) => {
-      if (!oldest) {
-        return current;
-      }
+    const oldestAuthSession = (sessionRows as SessionDetails[]).reduce(
+      (oldest: SessionDetails | null, current: SessionDetails) => {
+        if (!oldest) {
+          return current;
+        }
 
-      if (current.created_on_timestamp < oldest.created_on_timestamp) {
-        return current;
-      }
+        if (current.created_on_timestamp < oldest.created_on_timestamp) {
+          return current;
+        }
 
-      return oldest;
-    }, null);
+        return oldest;
+      },
+      null
+    );
 
     if (!oldestAuthSession) {
       return false;
@@ -126,7 +129,10 @@ export async function destroyAuthSession(authSessionId: string): Promise<void> {
   }
 }
 
-export async function purgeAuthSessions(accountId: number, authSessionIdToExclude?: string): Promise<void> {
+export async function purgeAuthSessions(
+  accountId: number,
+  authSessionIdToExclude?: string
+): Promise<void> {
   try {
     await dbPool.execute(
       `DELETE FROM

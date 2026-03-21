@@ -8,11 +8,14 @@ import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 import DefaultFormGroup from '../../../../components/DefaultFormGroup/DefaultFormGroup';
 import Button from '../../../../components/Button/Button';
 import useWishlist from '../../hooks/useWishlist';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../hooks/useHandleAsyncError';
 
 export default function DeleteWishlistForm(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();
-  const { editMode, setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } = useWishlistHeader();
+  const { editMode, setEditMode, setMenuIsOpen, isSubmitting, setIsSubmitting } =
+    useWishlistHeader();
 
   const [value, setValue] = useState<string>('');
 
@@ -63,7 +66,8 @@ export default function DeleteWishlistForm(): JSX.Element {
       <div className='text-description mb-1'>
         <p className='font-medium mb-[6px]'>Are you sure you want to delete this wishlist?</p>
         <p className='text-sm'>
-          <span className='text-danger'>This action is irreversible.</span> To proceed, confirm your wishlist title below:
+          <span className='text-danger'>This action is irreversible.</span> To proceed, confirm
+          your wishlist title below:
         </p>
       </div>
 

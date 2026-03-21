@@ -3,7 +3,10 @@ import { dbPool } from '../db/db';
 import { WebSocketDetails, wsMap } from './webSocketServer';
 import { FollowDetails, FollowRequest } from '../routers/socialRouter';
 
-export type NotificationType = 'new_follower' | 'new_follow_request' | 'follow_request_accepted';
+export type NotificationType =
+  | 'new_follower'
+  | 'new_follow_request'
+  | 'follow_request_accepted';
 
 export type NotificationDetails = {
   notification_id: number;
@@ -15,7 +18,10 @@ export type NotificationDetails = {
   notification_data: FollowDetails | FollowRequest;
 };
 
-export async function sendWebSocketNotification(accountId: number, notificationDetails: NotificationDetails): Promise<void> {
+export async function sendWebSocketNotification(
+  accountId: number,
+  notificationDetails: NotificationDetails
+): Promise<void> {
   try {
     type AuthSessionDetails = {
       session_id: string;
@@ -38,7 +44,10 @@ export async function sendWebSocketNotification(accountId: number, notificationD
         return;
       }
 
-      wsDetails.ws.send(JSON.stringify(notificationDetails), (err: Error | undefined) => err && console.log(err));
+      wsDetails.ws.send(
+        JSON.stringify(notificationDetails),
+        (err: Error | undefined) => err && console.log(err)
+      );
     }
   } catch (err: unknown) {
     console.log(err);

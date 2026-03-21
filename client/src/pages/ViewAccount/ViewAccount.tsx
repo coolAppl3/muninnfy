@@ -20,7 +20,9 @@ import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDeta
 
 export default function ViewAccount(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [viewAccountDetails, setViewAccountDetails] = useState<ViewAccountDetailsType | null>(null);
+  const [viewAccountDetails, setViewAccountDetails] = useState<ViewAccountDetailsType | null>(
+    null
+  );
 
   const { authStatus, setAuthStatus } = useAuth();
   const { referrerLocation } = useHistory();
@@ -38,7 +40,9 @@ export default function ViewAccount(): JSX.Element {
 
     const getViewAccountDetails = async () => {
       try {
-        const { viewAccountDetails } = (await getViewAccountDetailsService(publicAccountId, abortController.signal)).data;
+        const { viewAccountDetails } = (
+          await getViewAccountDetailsService(publicAccountId, abortController.signal)
+        ).data;
 
         setViewAccountDetails(viewAccountDetails);
         setIsLoaded(true);
@@ -63,7 +67,14 @@ export default function ViewAccount(): JSX.Element {
     getViewAccountDetails();
 
     return () => abortController.abort();
-  }, [publicAccountId, referrerLocation, authStatus, navigate, setAuthStatus, handleAsyncError]);
+  }, [
+    publicAccountId,
+    referrerLocation,
+    authStatus,
+    navigate,
+    setAuthStatus,
+    handleAsyncError,
+  ]);
 
   return (
     <>

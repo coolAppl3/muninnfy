@@ -1,4 +1,8 @@
-import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_ATTEMPTS_LIMIT, ACCOUNT_FAILED_SIGN_IN_LIMIT } from '../util/constants/accountConstants';
+import {
+  ACCOUNT_EMAILS_SENT_LIMIT,
+  ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+  ACCOUNT_FAILED_SIGN_IN_LIMIT,
+} from '../util/constants/accountConstants';
 import { AUTH_EXTENSIONS_LIMIT } from '../util/constants/authConstants';
 import {
   FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
@@ -235,7 +239,12 @@ async function createWishlistsTable(): Promise<void> {
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         UNIQUE(account_id, title)
       );`,
-      [PRIVATE_WISHLIST_PRIVACY_LEVEL, FOLLOWERS_WISHLIST_PRIVACY_LEVEL, PUBLIC_WISHLIST_PRIVACY_LEVEL, WISHLIST_INTERACTIVITY_MAX_VALUE]
+      [
+        PRIVATE_WISHLIST_PRIVACY_LEVEL,
+        FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+        PUBLIC_WISHLIST_PRIVACY_LEVEL,
+        WISHLIST_INTERACTIVITY_MAX_VALUE,
+      ]
     );
   } catch (err: unknown) {
     console.log(err);

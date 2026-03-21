@@ -1,6 +1,8 @@
 import { ComponentType, JSX, useCallback, useEffect } from 'react';
 import AccountSocialHeader from './components/AccountSocialHeader/AccountSocialHeader';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import useAccountSocialDetails from '../hooks/useAccountSocialDetails';
 import { getAccountSocialDetailsService } from '../../../services/socialServices';
 import { CanceledError } from 'axios';
@@ -18,7 +20,14 @@ import { subscribeToAccountNotifications } from '../../../services/websockets/ac
 
 export default function AccountSocial(): JSX.Element {
   const { socialSection } = useAccountSocial();
-  const { fetchDetails, setFetchDetails, setSocialCounts, setFollowers, setFollowing, setFollowRequests } = useAccountSocialDetails();
+  const {
+    fetchDetails,
+    setFetchDetails,
+    setSocialCounts,
+    setFollowers,
+    setFollowing,
+    setFollowRequests,
+  } = useAccountSocialDetails();
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
@@ -31,7 +40,9 @@ export default function AccountSocial(): JSX.Element {
 
     const getSocialDetails = async () => {
       try {
-        const { socialCounts, followers, following, followRequests } = (await getAccountSocialDetailsService(abortController.signal)).data;
+        const { socialCounts, followers, following, followRequests } = (
+          await getAccountSocialDetailsService(abortController.signal)
+        ).data;
 
         setSocialCounts({ ...socialCounts });
         setFollowers(followers);
@@ -57,7 +68,15 @@ export default function AccountSocial(): JSX.Element {
 
     getSocialDetails();
     return () => abortController.abort();
-  }, [fetchDetails, setFetchDetails, setSocialCounts, setFollowers, setFollowing, setFollowRequests, handleAsyncError]);
+  }, [
+    fetchDetails,
+    setFetchDetails,
+    setSocialCounts,
+    setFollowers,
+    setFollowing,
+    setFollowRequests,
+    handleAsyncError,
+  ]);
 
   const notificationsHandler = useCallback(
     (data: NotificationDetails) => {
@@ -65,7 +84,10 @@ export default function AccountSocial(): JSX.Element {
 
       if (notification_type === 'new_follow_request') {
         setFollowRequests((prev) => [notification_data as FollowRequest, ...prev]);
-        setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count + 1 }));
+        setSocialCounts((prev) => ({
+          ...prev,
+          follow_requests_count: prev.follow_requests_count + 1,
+        }));
 
         return;
       }

@@ -5,7 +5,10 @@ export type WishlistDetailsType = {
   is_favorited: boolean;
 };
 
-export type ViewWishlistDetailsType = Omit<WishlistDetailsType, 'privacy_level' | 'is_favorited'>;
+export type ViewWishlistDetailsType = Omit<
+  WishlistDetailsType,
+  'privacy_level' | 'is_favorited'
+>;
 
 export type ExtendedWishlistDetailsType = {
   wishlist_id: string;

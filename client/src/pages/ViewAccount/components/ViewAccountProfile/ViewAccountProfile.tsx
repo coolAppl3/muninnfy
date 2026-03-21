@@ -11,8 +11,11 @@ type ViewAccountProfileProps = {
   viewAccountDetails: ViewAccountDetailsType;
 };
 
-export default function ViewAccountProfile({ viewAccountDetails }: ViewAccountProfileProps): JSX.Element {
-  const { public_account_id, username, display_name, created_on_timestamp, is_following } = viewAccountDetails;
+export default function ViewAccountProfile({
+  viewAccountDetails,
+}: ViewAccountProfileProps): JSX.Element {
+  const { public_account_id, username, display_name, created_on_timestamp, is_following } =
+    viewAccountDetails;
 
   const { setAccountLocation } = useAccountLocation();
   const { setSocialSection } = useAccountSocial();
@@ -81,7 +84,9 @@ export default function ViewAccountProfile({ viewAccountDetails }: ViewAccountPr
       )}
 
       <div className='text-description/50 text-xs'>
-        <p className='leading-none mb-[4px]'>Created on {getFullDateString(created_on_timestamp)}</p>
+        <p className='leading-none mb-[4px]'>
+          Created on {getFullDateString(created_on_timestamp)}
+        </p>
         <p className='leading-none'>{public_account_id}</p>
       </div>
     </section>

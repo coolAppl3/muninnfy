@@ -1,4 +1,7 @@
-import { PRIVATE_WISHLIST_PRIVACY_LEVEL, PUBLIC_WISHLIST_PRIVACY_LEVEL } from '../constants/wishlistConstants';
+import {
+  PRIVATE_WISHLIST_PRIVACY_LEVEL,
+  PUBLIC_WISHLIST_PRIVACY_LEVEL,
+} from '../constants/wishlistConstants';
 import { containsInvalidWhitespace } from '../globalUtils';
 
 export function isValidWishlistPrivacyLevel(value: any): boolean {

@@ -6,7 +6,11 @@ import { RowDataPacket } from 'mysql2/promise';
 import { WebSocketDetails, wsMap, wss } from './webSocketServer';
 import { WebSocket } from 'ws';
 
-export async function handleWebSocketUpgrade(req: IncomingMessage, socket: Socket, head: Buffer): Promise<void> {
+export async function handleWebSocketUpgrade(
+  req: IncomingMessage,
+  socket: Socket,
+  head: Buffer
+): Promise<void> {
   socket.on('error', (err) => {
     if ('errno' in err && err.errno === -4077) {
       socket.end();

@@ -21,7 +21,13 @@ export type WishlistsFilterConfigType = {
   crossWishlistQueryIdSet: Set<string> | null;
 };
 
-export type WishlistsSortingMode = 'interactivity' | 'newest' | 'oldest' | 'largest' | 'smallest' | 'lexicographical';
+export type WishlistsSortingMode =
+  | 'interactivity'
+  | 'newest'
+  | 'oldest'
+  | 'largest'
+  | 'smallest'
+  | 'lexicographical';
 
 export type WishlistsContextType = {
   wishlists: ExtendedWishlistDetailsType[];

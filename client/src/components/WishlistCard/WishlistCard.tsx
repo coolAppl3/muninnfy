@@ -14,7 +14,15 @@ type WishlistCardProps = {
 
 export default memo(WishlistCard);
 function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
-  const { wishlist_id, title, privacy_level, created_on_timestamp, items_count, total_items_price, price_to_complete } = wishlist;
+  const {
+    wishlist_id,
+    title,
+    privacy_level,
+    created_on_timestamp,
+    items_count,
+    total_items_price,
+    price_to_complete,
+  } = wishlist;
 
   return (
     <div className='relative p-2 bg-secondary rounded-sm shadow-simple-tiny'>

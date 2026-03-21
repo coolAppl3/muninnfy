@@ -46,7 +46,10 @@ if (process.env.NODE_ENV?.toLowerCase() === 'development') {
 
 // CSP
 app.use((req, res, next) => {
-  res.set('Content-Security-Policy', `default-src 'self'; script-src 'self'; connect-src 'self';`);
+  res.set(
+    'Content-Security-Policy',
+    `default-src 'self'; script-src 'self'; connect-src 'self';`
+  );
   next();
 });
 

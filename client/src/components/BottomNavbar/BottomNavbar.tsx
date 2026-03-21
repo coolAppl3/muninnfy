@@ -17,7 +17,9 @@ export default function BottomNavbar(): JSX.Element {
       <div className='h-full w-full grid grid-cols-3'>
         <NavLink
           to='/home'
-          className={({ isActive }) => (isActive || pathname === '/' ? `text-cta ${navLinkClassname}` : navLinkClassname)}
+          className={({ isActive }) =>
+            isActive || pathname === '/' ? `text-cta ${navLinkClassname}` : navLinkClassname
+          }
         >
           <HomeIcon className='w-[2.4rem] h-[2.4rem]' />
           <span>Home</span>
@@ -25,7 +27,9 @@ export default function BottomNavbar(): JSX.Element {
 
         <NavLink
           to='/account/wishlists'
-          className={({ isActive }) => (isActive ? `text-cta ${navLinkClassname}` : navLinkClassname)}
+          className={({ isActive }) =>
+            isActive ? `text-cta ${navLinkClassname}` : navLinkClassname
+          }
         >
           <MultipleWishlistsIcon className='w-[2.4rem] h-[2.4rem]' />
           <span>Wishlists</span>
@@ -51,7 +55,9 @@ function AdditionalLinks(): JSX.Element {
   return (
     <NavLink
       to='/sign-in'
-      className={({ isActive }) => (isActive ? `text-cta ${navLinkClassname}` : navLinkClassname)}
+      className={({ isActive }) =>
+        isActive ? `text-cta ${navLinkClassname}` : navLinkClassname
+      }
     >
       <SignInIcon className='w-[2.4rem] h-[2.4rem]' />
       <span>Sign in</span>

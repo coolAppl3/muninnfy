@@ -10,7 +10,10 @@ type AccountNavMenuProps = {
   publicAccountId?: string;
 };
 
-export default function AccountNavMenu({ inViewMode, publicAccountId }: AccountNavMenuProps): JSX.Element {
+export default function AccountNavMenu({
+  inViewMode,
+  publicAccountId,
+}: AccountNavMenuProps): JSX.Element {
   const { accountLocation, setAccountLocation } = useAccountLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -30,7 +33,11 @@ export default function AccountNavMenu({ inViewMode, publicAccountId }: AccountN
         className='nav-menu-btn md:hidden fixed bottom-7 right-1 z-11 text-title p-1 bg-cta/20 shadow-simple-tiny rounded-[50%]'
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        {isOpen ? <CrossIcon className='rotate-45 w-2 h-2 scale-85' /> : <HamMenuIcon className='w-2 h-2' />}
+        {isOpen ? (
+          <CrossIcon className='rotate-45 w-2 h-2 scale-85' />
+        ) : (
+          <HamMenuIcon className='w-2 h-2' />
+        )}
       </button>
 
       <nav
@@ -71,7 +78,11 @@ export default function AccountNavMenu({ inViewMode, publicAccountId }: AccountN
         )}
 
         <Link
-          to={inViewMode && publicAccountId ? `/view/wishlists/${publicAccountId}` : '/account/wishlists'}
+          to={
+            inViewMode && publicAccountId
+              ? `/view/wishlists/${publicAccountId}`
+              : '/account/wishlists'
+          }
           className='nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-secondary'
         >
           Wishlists

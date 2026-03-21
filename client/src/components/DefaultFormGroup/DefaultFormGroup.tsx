@@ -46,7 +46,9 @@ export default function DefaultFormGroup({
         }`}
       />
 
-      <span className={`text-[12px] font-medium text-danger leading-[1.2] break-words ${errorMessage ? 'block' : 'hidden'}`}>
+      <span
+        className={`text-[12px] font-medium text-danger leading-[1.2] break-words ${errorMessage ? 'block' : 'hidden'}`}
+      >
         {errorMessage}
       </span>
     </div>

@@ -1,8 +1,16 @@
 import { emailTransporter } from './initTransporter';
-import accountVerificationEmailTemplate, { AccountVerificationEmailTemplate } from './emailTemplates/accountVerificationEmailTemplate';
-import emailUpdateStartEmailTemplate, { EmailUpdateStartEmailTemplate } from './emailTemplates/emailChangeStartEmailTemplate';
-import accountRecoveryEmailTemplate, { AccountRecoveryEmailTemplate } from './emailTemplates/accountRecoveryEmailTemplate';
-import accountDeletionEmailTemplate, { AccountDeletionEmailTemplate } from './emailTemplates/accountDeletionEmailTemplate';
+import accountVerificationEmailTemplate, {
+  AccountVerificationEmailTemplate,
+} from './emailTemplates/accountVerificationEmailTemplate';
+import emailUpdateStartEmailTemplate, {
+  EmailUpdateStartEmailTemplate,
+} from './emailTemplates/emailChangeStartEmailTemplate';
+import accountRecoveryEmailTemplate, {
+  AccountRecoveryEmailTemplate,
+} from './emailTemplates/accountRecoveryEmailTemplate';
+import accountDeletionEmailTemplate, {
+  AccountDeletionEmailTemplate,
+} from './emailTemplates/accountDeletionEmailTemplate';
 
 type SendEmailService = {
   receiver: string;
@@ -23,7 +31,9 @@ async function sendEmailService({ receiver, subject, html }: SendEmailService): 
   }
 }
 
-export async function sendAccountVerificationEmailService(payload: { receiver: string } & AccountVerificationEmailTemplate): Promise<void> {
+export async function sendAccountVerificationEmailService(
+  payload: { receiver: string } & AccountVerificationEmailTemplate
+): Promise<void> {
   const { receiver, ...rest } = payload;
 
   await sendEmailService({
@@ -33,7 +43,9 @@ export async function sendAccountVerificationEmailService(payload: { receiver: s
   });
 }
 
-export async function sendEmailUpdateStartEmailService(payload: { receiver: string } & EmailUpdateStartEmailTemplate): Promise<void> {
+export async function sendEmailUpdateStartEmailService(
+  payload: { receiver: string } & EmailUpdateStartEmailTemplate
+): Promise<void> {
   const { receiver, ...rest } = payload;
 
   await sendEmailService({
@@ -43,7 +55,9 @@ export async function sendEmailUpdateStartEmailService(payload: { receiver: stri
   });
 }
 
-export async function sendAccountRecoveryEmailService(payload: { receiver: string } & AccountRecoveryEmailTemplate): Promise<void> {
+export async function sendAccountRecoveryEmailService(
+  payload: { receiver: string } & AccountRecoveryEmailTemplate
+): Promise<void> {
   const { receiver, ...rest } = payload;
 
   await sendEmailService({
@@ -53,7 +67,9 @@ export async function sendAccountRecoveryEmailService(payload: { receiver: strin
   });
 }
 
-export async function sendAccountDeletionEmailService(payload: { receiver: string } & AccountDeletionEmailTemplate): Promise<void> {
+export async function sendAccountDeletionEmailService(
+  payload: { receiver: string } & AccountDeletionEmailTemplate
+): Promise<void> {
   const { receiver, ...rest } = payload;
 
   await sendEmailService({

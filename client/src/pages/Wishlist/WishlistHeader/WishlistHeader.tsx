@@ -38,14 +38,20 @@ export default function WishlistHeader(): JSX.Element {
 
               <StatisticItem
                 title='Worth'
-                value={getFormattedPrice(wishlistItems.reduce((acc: number, curr: WishlistItemType) => acc + (curr.price || 0), 0))}
+                value={getFormattedPrice(
+                  wishlistItems.reduce(
+                    (acc: number, curr: WishlistItemType) => acc + (curr.price || 0),
+                    0
+                  )
+                )}
               />
 
               <StatisticItem
                 title='To complete'
                 value={getFormattedPrice(
                   wishlistItems.reduce(
-                    (acc: number, curr: WishlistItemType) => (curr.purchased_on_timestamp ? acc : acc + (curr.price || 0)),
+                    (acc: number, curr: WishlistItemType) =>
+                      curr.purchased_on_timestamp ? acc : acc + (curr.price || 0),
                     0
                   )
                 )}
@@ -53,7 +59,9 @@ export default function WishlistHeader(): JSX.Element {
             </div>
 
             <div className='text-description flex justify-between items-center'>
-              <p className='text-sm font-medium'>{getFullDateString(wishlistDetails.created_on_timestamp)}</p>
+              <p className='text-sm font-medium'>
+                {getFullDateString(wishlistDetails.created_on_timestamp)}
+              </p>
               {wishlistDetails.is_favorited && (
                 <span
                   title='Favorited'

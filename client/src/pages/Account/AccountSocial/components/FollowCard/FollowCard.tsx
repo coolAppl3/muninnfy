@@ -4,7 +4,9 @@ import { getFullDateString } from '../../../../../utils/globalUtils';
 import RemoveIcon from '../../../../../assets/svg/RemoveIcon.svg?react';
 import Button from '../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import { removeFollowerService, unfollowService } from '../../../../../services/socialServices';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 
@@ -27,7 +29,8 @@ function FollowCard({
   setSearchQueryResults,
   setSocialCounts,
 }: FollowCardProps): JSX.Element {
-  const { follow_id, public_account_id, username, display_name, follow_timestamp } = followDetails;
+  const { follow_id, public_account_id, username, display_name, follow_timestamp } =
+    followDetails;
 
   const [cardMode, setCardMode] = useState<'view' | 'confirm' | 'loading'>('view');
 
@@ -38,8 +41,12 @@ function FollowCard({
     try {
       await unfollowService(follow_id);
 
-      setFollowing((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
-      setSearchQueryResults((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
+      setFollowing((prev) =>
+        prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id)
+      );
+      setSearchQueryResults((prev) =>
+        prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id)
+      );
       setSocialCounts((prev) => ({ ...prev, following_count: prev.following_count - 1 }));
 
       displayPopupMessage('Unfollowed.', 'success');
@@ -63,8 +70,12 @@ function FollowCard({
     try {
       await removeFollowerService(follow_id);
 
-      setFollowers((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
-      setSearchQueryResults((prev) => prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id));
+      setFollowers((prev) =>
+        prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id)
+      );
+      setSearchQueryResults((prev) =>
+        prev.filter((followDetails: FollowDetails) => followDetails.follow_id !== follow_id)
+      );
       setSocialCounts((prev) => ({ ...prev, followers_count: prev.followers_count - 1 }));
 
       displayPopupMessage('Follower removed.', 'success');

@@ -13,4 +13,6 @@ export type OngoingAccountRequest = {
   is_suspended: boolean;
 };
 
-export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & { is_following: boolean };
+export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & {
+  is_following: boolean;
+};

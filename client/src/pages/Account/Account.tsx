@@ -19,12 +19,15 @@ import { clearAccountNotificationsSubscriptions } from '../../services/websocket
 
 export default function Account(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [initialAccountDetails, setInitialAccountDetails] = useState<AccountDetailsType | null>(null);
+  const [initialAccountDetails, setInitialAccountDetails] = useState<AccountDetailsType | null>(
+    null
+  );
 
   const [initialOngoingEmailUpdateRequest, setInitialOngoingEmailUpdateRequest] = useState<
     (OngoingAccountRequest & { new_email: string }) | null
   >(null);
-  const [initialOngoingAccountDeletionRequest, setInitialOngoingAccountDeletionRequest] = useState<OngoingAccountRequest | null>(null);
+  const [initialOngoingAccountDeletionRequest, setInitialOngoingAccountDeletionRequest] =
+    useState<OngoingAccountRequest | null>(null);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { setAuthStatus } = useAuth();

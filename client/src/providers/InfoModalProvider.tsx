@@ -38,7 +38,10 @@ export default function InfoModalProvider({ children }: InfoModalProviderProps):
   }, [routerLocation, removeInfoModal]);
 
   const { title, description, btnTitle, onClick } = InfoModalState;
-  const contextValue: InfoModalContextType = useMemo(() => ({ displayInfoModal, removeInfoModal }), [displayInfoModal, removeInfoModal]);
+  const contextValue: InfoModalContextType = useMemo(
+    () => ({ displayInfoModal, removeInfoModal }),
+    [displayInfoModal, removeInfoModal]
+  );
 
   return (
     <InfoModalContext value={contextValue}>

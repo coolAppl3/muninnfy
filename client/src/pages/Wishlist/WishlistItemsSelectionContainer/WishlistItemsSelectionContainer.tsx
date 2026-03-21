@@ -6,10 +6,15 @@ import useConfirmModal from '../../../hooks/useConfirmModal';
 import CheckIcon from '../../../assets/svg/CheckIcon.svg?react';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
-import { bulkDeleteWishlistItemsService, bulkSetWishlistItemIsPurchasedService } from '../../../services/wishlistItemServices';
+import {
+  bulkDeleteWishlistItemsService,
+  bulkSetWishlistItemIsPurchasedService,
+} from '../../../services/wishlistItemServices';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useInfoModal from '../../../hooks/useInfoModal';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../hooks/useHistory';
 import useWishlistItems from '../hooks/useWishlistItems';
@@ -22,15 +27,24 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const [selectedAction, setSelectedAction] = useState<SelectedActionType>('mark_as_purchased');
 
   const { wishlistId } = useWishlist();
-  const { selectionModeActive, setSelectionModeActive, wishlistItems, setWishlistItems, itemMatchesFilterConfig } = useWishlistItems();
+  const {
+    selectionModeActive,
+    setSelectionModeActive,
+    wishlistItems,
+    setWishlistItems,
+    itemMatchesFilterConfig,
+  } = useWishlistItems();
 
-  const { selectedItemsIdsSet, selectAllWishlistItems, unselectAllWishlistItems } = useWishlistItemsSelectionStore(
-    useShallow(({ selectedItemsIdsSet, selectAllWishlistItems, unselectAllWishlistItems }) => ({
-      selectedItemsIdsSet,
-      selectAllWishlistItems,
-      unselectAllWishlistItems,
-    }))
-  );
+  const { selectedItemsIdsSet, selectAllWishlistItems, unselectAllWishlistItems } =
+    useWishlistItemsSelectionStore(
+      useShallow(
+        ({ selectedItemsIdsSet, selectAllWishlistItems, unselectAllWishlistItems }) => ({
+          selectedItemsIdsSet,
+          selectAllWishlistItems,
+          unselectAllWishlistItems,
+        })
+      )
+    );
 
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
@@ -57,7 +71,11 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
     try {
       const { newPurchasedOnTimestamp, updatedItemsCount } = (
-        await bulkSetWishlistItemIsPurchasedService({ wishlistId, itemsIdArr: [...selectedItemsIdsSet], markAsPurchased })
+        await bulkSetWishlistItemIsPurchasedService({
+          wishlistId,
+          itemsIdArr: [...selectedItemsIdsSet],
+          markAsPurchased,
+        })
       ).data;
 
       if (updatedItemsCount === 0) {
@@ -67,7 +85,9 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
       setWishlistItems((prev) =>
         prev.map((item: WishlistItemType) =>
-          selectedItemsIdsSet.has(item.item_id) ? { ...item, purchased_on_timestamp: newPurchasedOnTimestamp } : item
+          selectedItemsIdsSet.has(item.item_id)
+            ? { ...item, purchased_on_timestamp: newPurchasedOnTimestamp }
+            : item
         )
       );
 
@@ -77,7 +97,8 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
       displayPopupMessage('Items updated.', 'success');
 
-      updatedItemsCount < expectedUpdatesCount && displayIncompleteOperationModal('update', expectedUpdatesCount, updatedItemsCount);
+      updatedItemsCount < expectedUpdatesCount &&
+        displayIncompleteOperationModal('update', expectedUpdatesCount, updatedItemsCount);
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errReason } = handleAsyncError(err);
@@ -109,15 +130,21 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
     displayLoadingOverlay();
 
     try {
-      const deletedItemsCount: number = (await bulkDeleteWishlistItemsService({ wishlistId, itemsIdArr: [...selectedItemsIdsSet] })).data
-        .deletedItemsCount;
+      const deletedItemsCount: number = (
+        await bulkDeleteWishlistItemsService({
+          wishlistId,
+          itemsIdArr: [...selectedItemsIdsSet],
+        })
+      ).data.deletedItemsCount;
 
       if (deletedItemsCount === 0) {
         displayPopupMessage('Something went wrong.', 'error');
         return;
       }
 
-      setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => !selectedItemsIdsSet.has(item_id)));
+      setWishlistItems((prev) =>
+        prev.filter(({ item_id }: WishlistItemType) => !selectedItemsIdsSet.has(item_id))
+      );
 
       setSelectionModeActive(false);
       setSelectedAction('mark_as_purchased');
@@ -125,7 +152,8 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
       displayPopupMessage('Items deleted.', 'success');
 
-      deletedItemsCount < expectedUpdatesCount && displayIncompleteOperationModal('delete', expectedUpdatesCount, deletedItemsCount);
+      deletedItemsCount < expectedUpdatesCount &&
+        displayIncompleteOperationModal('delete', expectedUpdatesCount, deletedItemsCount);
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errReason } = handleAsyncError(err);
@@ -163,9 +191,13 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
 
   const allItemsSelected: boolean =
     wishlistItems.length > 0 &&
-    wishlistItems.every((item: WishlistItemType) => selectedItemsIdsSet.has(item.item_id) || !itemMatchesFilterConfig(item));
+    wishlistItems.every(
+      (item: WishlistItemType) =>
+        selectedItemsIdsSet.has(item.item_id) || !itemMatchesFilterConfig(item)
+    );
 
-  const btnClassname: string = 'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
+  const btnClassname: string =
+    'bg-secondary p-1 rounded cursor-pointer transition-[filter] hover:brightness-75 border-1 border-secondary';
 
   return (
     <div>
@@ -173,7 +205,8 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
         <div className='p-2 bg-dark rounded-sm shadow-simple-tiny'>
           <div className='text-description text-sm mb-[1.6rem]'>
             <p>
-              Items selected: <span className='text-title font-medium'>{selectedItemsIdsSet.size}</span>
+              Items selected:{' '}
+              <span className='text-title font-medium'>{selectedItemsIdsSet.size}</span>
             </p>
 
             <p>
@@ -255,7 +288,8 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
                 });
               }}
             >
-              {selectedAction === 'delete' ? 'Delete' : 'Update'} {selectedItemsIdsSet.size === 1 ? 'item' : 'items'}
+              {selectedAction === 'delete' ? 'Delete' : 'Update'}{' '}
+              {selectedItemsIdsSet.size === 1 ? 'item' : 'items'}
             </Button>
 
             <Button
@@ -284,7 +318,11 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
                 return;
               }
 
-              selectAllWishlistItems(wishlistItems.filter(itemMatchesFilterConfig).map(({ item_id }: WishlistItemType) => item_id));
+              selectAllWishlistItems(
+                wishlistItems
+                  .filter(itemMatchesFilterConfig)
+                  .map(({ item_id }: WishlistItemType) => item_id)
+              );
             }}
           >
             <CheckIcon

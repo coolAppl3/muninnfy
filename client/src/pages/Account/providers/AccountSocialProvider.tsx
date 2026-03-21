@@ -1,11 +1,16 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
-import AccountSocialContext, { AccountSocialContextType, AccountSocialSection } from '../contexts/AccountSocialContext';
+import AccountSocialContext, {
+  AccountSocialContextType,
+  AccountSocialSection,
+} from '../contexts/AccountSocialContext';
 
 type AccountSocialProviderProps = {
   children: ReactNode;
 };
 
-export default function AccountSocialProvider({ children }: AccountSocialProviderProps): JSX.Element {
+export default function AccountSocialProvider({
+  children,
+}: AccountSocialProviderProps): JSX.Element {
   const [socialSection, setSocialSection] = useState<AccountSocialSection>('followers');
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);

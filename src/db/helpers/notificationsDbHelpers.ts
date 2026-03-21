@@ -1,6 +1,10 @@
 import { FollowDetails, FollowRequest, SocialData } from '../../routers/socialRouter';
 import { generatePlaceHolders } from '../../util/sqlUtils/generatePlaceHolders';
-import { NotificationDetails, NotificationType, sendWebSocketNotification } from '../../webSocket/webSocketHelpers';
+import {
+  NotificationDetails,
+  NotificationType,
+  sendWebSocketNotification,
+} from '../../webSocket/webSocketHelpers';
 import { dbPool } from '../db';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 

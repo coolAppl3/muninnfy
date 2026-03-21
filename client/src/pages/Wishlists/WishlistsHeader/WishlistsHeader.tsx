@@ -11,12 +11,19 @@ type WishlistsHeaderProps = {
   combinedWishlistsStatistics: CombinedWishlistsStatistics;
 };
 
-export default function WishlistsHeader({ combinedWishlistsStatistics }: WishlistsHeaderProps): JSX.Element {
+export default function WishlistsHeader({
+  combinedWishlistsStatistics,
+}: WishlistsHeaderProps): JSX.Element {
   const { wishlists } = useWishlists();
   const navigate: NavigateFunction = useNavigate();
 
-  const { totalItemsCount, totalPurchasedItemsCount, totalWishlistsWorth, totalWishlistsSpent, totalWishlistsToComplete } =
-    combinedWishlistsStatistics;
+  const {
+    totalItemsCount,
+    totalPurchasedItemsCount,
+    totalWishlistsWorth,
+    totalWishlistsSpent,
+    totalWishlistsToComplete,
+  } = combinedWishlistsStatistics;
 
   return (
     <header>

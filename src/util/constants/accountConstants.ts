@@ -1,4 +1,8 @@
-import { dayMilliseconds, hourMilliseconds, minuteMilliseconds } from '../constants/globalConstants';
+import {
+  dayMilliseconds,
+  hourMilliseconds,
+  minuteMilliseconds,
+} from '../constants/globalConstants';
 
 export const ACCOUNT_FAILED_SIGN_IN_LIMIT: number = 5;
 export const ACCOUNT_FAILED_ATTEMPTS_LIMIT: number = 3;

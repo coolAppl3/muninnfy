@@ -5,16 +5,22 @@ import useAccountProfile from '../../../../hooks/useAccountProfile';
 import useLoadingOverlay from '../../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../../hooks/usePopupMessage';
 import useAuth from '../../../../../../hooks/useAuth';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../../hooks/useHandleAsyncError';
 import useAccountDetails from '../../../../hooks/useAccountDetails';
 import useAccountOngoingRequests from '../../../../hooks/useAccountOngoingRequests';
 import { validateHexCode } from '../../../../../../utils/validation/sharedValidation';
-import { confirmAccountDeletionService, resendAccountDeletionEmailService } from '../../../../../../services/accountServices';
+import {
+  confirmAccountDeletionService,
+  resendAccountDeletionEmailService,
+} from '../../../../../../services/accountServices';
 import { resDataContainsExpiryTimestamp } from '../../../util/AccountProfileUtils';
 
 export default function AccountDeletionConfirm(): JSX.Element {
   const { accountDetails } = useAccountDetails();
-  const { ongoingAccountDeletionRequest, setOngoingAccountDeletionRequest } = useAccountOngoingRequests();
+  const { ongoingAccountDeletionRequest, setOngoingAccountDeletionRequest } =
+    useAccountOngoingRequests();
   const { setProfileSection, setIsSubmitting, isSubmitting } = useAccountProfile();
 
   const [value, setValue] = useState<string>('');
@@ -72,7 +78,10 @@ export default function AccountDeletionConfirm(): JSX.Element {
       }
 
       if (errReason === 'requestSuspended' || errReason === 'incorrectCode_suspended') {
-        setOngoingAccountDeletionRequest({ expiry_timestamp: errResData.expiryTimestamp, is_suspended: true });
+        setOngoingAccountDeletionRequest({
+          expiry_timestamp: errResData.expiryTimestamp,
+          is_suspended: true,
+        });
       }
     }
   }
@@ -112,7 +121,10 @@ export default function AccountDeletionConfirm(): JSX.Element {
         return;
       }
 
-      setOngoingAccountDeletionRequest({ expiry_timestamp: errResData.expiryTimestamp, is_suspended: true });
+      setOngoingAccountDeletionRequest({
+        expiry_timestamp: errResData.expiryTimestamp,
+        is_suspended: true,
+      });
     }
   }
 
@@ -120,7 +132,8 @@ export default function AccountDeletionConfirm(): JSX.Element {
     <section>
       <header className='mb-1'>
         <p className='text-description font-medium text-sm break-words'>
-          Confirmation email sent to <span className='text-title'>{accountDetails?.email}</span>.
+          Confirmation email sent to <span className='text-title'>{accountDetails?.email}</span>
+          .
         </p>
 
         <button
@@ -142,7 +155,8 @@ export default function AccountDeletionConfirm(): JSX.Element {
         </button>
 
         <p className='bg-dark rounded p-1 text-danger font-medium text-sm break-words'>
-          This action is irreversible and will permanently delete your account! Please proceed with caution!
+          This action is irreversible and will permanently delete your account! Please proceed
+          with caution!
         </p>
       </header>
 

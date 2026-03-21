@@ -4,10 +4,17 @@ import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { RowDataPacket } from 'mysql2/promise';
 import { hourMilliseconds } from '../util/constants/globalConstants';
-import { ABUSE_INCREMENT_THRESHOLD, REQUESTS_RATE_LIMIT } from '../util/constants/rateLimitingConstants';
+import {
+  ABUSE_INCREMENT_THRESHOLD,
+  REQUESTS_RATE_LIMIT,
+} from '../util/constants/rateLimitingConstants';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 
-export async function rateLimiter(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function rateLimiter(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
   const rateLimitId: string | null = getRequestCookie(req, 'rateLimitId');
 
   if (!rateLimitId || !isValidUuid(rateLimitId)) {
@@ -47,7 +54,11 @@ async function addToRateTracker(res: Response): Promise<void> {
   }
 }
 
-async function rateLimitReached(rateLimitId: string, req: Request, res: Response): Promise<boolean> {
+async function rateLimitReached(
+  rateLimitId: string,
+  req: Request,
+  res: Response
+): Promise<boolean> {
   type RateTrackerDetails = {
     requests_count: number;
   };
@@ -71,7 +82,8 @@ async function rateLimitReached(rateLimitId: string, req: Request, res: Response
     }
 
     if (rateTrackerDetails.requests_count > REQUESTS_RATE_LIMIT) {
-      rateTrackerDetails.requests_count > ABUSE_INCREMENT_THRESHOLD && (await addToAbusiveUsers(req));
+      rateTrackerDetails.requests_count > ABUSE_INCREMENT_THRESHOLD &&
+        (await addToAbusiveUsers(req));
       return true;
     }
 

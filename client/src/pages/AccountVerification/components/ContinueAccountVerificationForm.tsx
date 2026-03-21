@@ -1,6 +1,8 @@
 import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import useAuth from '../../../hooks/useAuth';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
@@ -25,7 +27,8 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
     const email: string = value;
 
     try {
-      const publicAccountId: string = (await continueAccountVerificationService({ email })).data.publicAccountId;
+      const publicAccountId: string = (await continueAccountVerificationService({ email })).data
+        .publicAccountId;
       navigate(`/sign-up/verification?publicAccountId=${publicAccountId}`);
 
       displayPopupMessage('Verification request found.', 'success');
@@ -52,8 +55,12 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
     <section>
       <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Account verification</h1>
 
-      <p className='text-description text-sm mb-1'>Enter the email address you used for signing up below.</p>
-      <p className='text-description text-sm mb-2'>Unverified accounts are automatically deleted after 20 minutes.</p>
+      <p className='text-description text-sm mb-1'>
+        Enter the email address you used for signing up below.
+      </p>
+      <p className='text-description text-sm mb-2'>
+        Unverified accounts are automatically deleted after 20 minutes.
+      </p>
 
       <form
         onSubmit={async (e: SubmitEvent) => {

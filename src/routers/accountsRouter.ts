@@ -1,12 +1,23 @@
 import express, { Router, Request, Response } from 'express';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
-import { isValidDisplayName, isValidEmail, isValidNewPassword, isValidPassword, isValidUsername } from '../util/validation/userValidation';
+import {
+  isValidDisplayName,
+  isValidEmail,
+  isValidNewPassword,
+  isValidPassword,
+  isValidUsername,
+} from '../util/validation/userValidation';
 import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
 import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
-import { generateCryptoUuid, generateHexCode, isValidUuid, isValidHexCode } from '../util/tokenGenerator';
+import {
+  generateCryptoUuid,
+  generateHexCode,
+  isValidUuid,
+  isValidHexCode,
+} from '../util/tokenGenerator';
 import {
   ACCOUNT_DELETION_WINDOW,
   ACCOUNT_EMAIL_UPDATE_WINDOW,
@@ -41,7 +52,9 @@ export const accountsRouter: Router = express.Router();
 accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    res
+      .status(403)
+      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -83,7 +96,10 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   }
 
   if (username === password) {
-    res.status(409).json({ message: `Username and password can't match.`, reason: 'passwordMatchesUsername' });
+    res.status(409).json({
+      message: `Username and password can't match.`,
+      reason: 'passwordMatchesUsername',
+    });
     return;
   }
 
@@ -147,7 +163,16 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
         is_verified,
         failed_sign_in_attempts
       ) VALUES (${generatePlaceHolders(8)});`,
-      [publicAccountId, email, hashedPassword, username, displayName, currentTimestamp, false, 0]
+      [
+        publicAccountId,
+        email,
+        hashedPassword,
+        username,
+        displayName,
+        currentTimestamp,
+        false,
+        0,
+      ]
     );
 
     const accountId: number = resultSetHeader.insertId;
@@ -220,7 +245,9 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 accountsRouter.post('/verification/continue', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    res
+      .status(403)
+      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -268,13 +295,17 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
     if (!accountDetails || accountDetails.is_verified) {
-      res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Verification request not found.', reason: 'requestNotFound' });
       return;
     }
 
     if (!accountDetails.verification_request_exists) {
       await deleteAccountById(accountDetails.account_id, dbPool, req);
-      res.status(404).json({ message: 'Verification request not found.', reason: 'requestNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Verification request not found.', reason: 'requestNotFound' });
 
       return;
     }
@@ -296,7 +327,9 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
 accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    res
+      .status(403)
+      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -370,12 +403,17 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
 
     if (accountDetails.is_verified) {
       await connection.rollback();
-      res.status(409).json({ message: 'Account is already verified.', reason: 'alreadyVerified' });
+      res
+        .status(409)
+        .json({ message: 'Account is already verified.', reason: 'alreadyVerified' });
 
       return;
     }
 
-    if (!accountDetails.verification_request_id || accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+    if (
+      !accountDetails.verification_request_id ||
+      accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT
+    ) {
       await connection.rollback();
 
       await deleteAccountById(accountDetails.account_id, dbPool, req);
@@ -386,12 +424,20 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
 
     if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
-      res.status(403).json({ message: `Sent verification emails limit reached.`, reason: 'emailsSentLimitReached' });
+      res.status(403).json({
+        message: `Sent verification emails limit reached.`,
+        reason: 'emailsSentLimitReached',
+      });
 
       return;
     }
 
-    await incrementAccountRequestEmailsSent('account_verification', accountDetails.verification_request_id, connection, req);
+    await incrementAccountRequestEmailsSent(
+      'account_verification',
+      accountDetails.verification_request_id,
+      connection,
+      req
+    );
 
     await connection.commit();
     res.json({});
@@ -421,7 +467,9 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
 accountsRouter.patch('/verification/confirm', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+    res
+      .status(403)
+      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -446,7 +494,9 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
   }
 
   if (!isValidUuid(verificationToken)) {
-    res.status(400).json({ message: 'Invalid verification token.', reason: 'invalidVerificationToken' });
+    res
+      .status(400)
+      .json({ message: 'Invalid verification token.', reason: 'invalidVerificationToken' });
     return;
   }
 
@@ -493,12 +543,17 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
 
     if (accountDetails.is_verified) {
       await connection.rollback();
-      res.status(409).json({ message: 'Account is already verified.', reason: 'alreadyVerified' });
+      res
+        .status(409)
+        .json({ message: 'Account is already verified.', reason: 'alreadyVerified' });
 
       return;
     }
 
-    if (!accountDetails.verification_request_id || accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+    if (
+      !accountDetails.verification_request_id ||
+      accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT
+    ) {
       await connection.rollback();
 
       await deleteAccountById(accountDetails.account_id, dbPool, req);
@@ -526,7 +581,12 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
         return;
       }
 
-      const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, false);
+      const authSessionCreated: boolean = await createAuthSession(
+        res,
+        connection,
+        accountDetails.account_id,
+        false
+      );
 
       await connection.commit();
       res.json({ authSessionCreated });
@@ -538,13 +598,23 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
 
     if (accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await deleteAccountById(accountDetails.account_id, dbPool, req);
-      res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken_deleted' });
+      res.status(401).json({
+        message: 'Incorrect verification token.',
+        reason: 'incorrectVerificationToken_deleted',
+      });
 
       return;
     }
 
-    await incrementFailedAccountRequestAttempts('account_verification', accountDetails.verification_request_id, dbPool, req);
-    res.status(401).json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken' });
+    await incrementFailedAccountRequestAttempts(
+      'account_verification',
+      accountDetails.verification_request_id,
+      dbPool,
+      req
+    );
+    res
+      .status(401)
+      .json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken' });
   } catch (err: unknown) {
     console.log(err);
     connection?.rollback();
@@ -629,7 +699,9 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
 
     if (!accountDetails || !accountDetails.is_verified) {
       await connection.rollback();
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
@@ -641,15 +713,29 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
       return;
     }
 
-    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    const passwordIsCorrect: boolean = await bcrypt.compare(
+      password,
+      accountDetails.hashed_password
+    );
     if (!passwordIsCorrect) {
       await connection.rollback();
-      await handleIncorrectPassword(accountDetails.account_id, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+      await handleIncorrectPassword(
+        accountDetails.account_id,
+        accountDetails.failed_sign_in_attempts,
+        dbPool,
+        req,
+        res
+      );
 
       return;
     }
 
-    const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, keepSignedIn);
+    const authSessionCreated: boolean = await createAuthSession(
+      res,
+      connection,
+      accountDetails.account_id,
+      keepSignedIn
+    );
     if (!authSessionCreated) {
       await connection.rollback();
 
@@ -757,7 +843,9 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
       { accountId, failedAttemptsLimit: ACCOUNT_FAILED_ATTEMPTS_LIMIT }
     );
 
-    const accountDetails = (accountRows[0] ? accountRows[0][0] : undefined) as AccountDetails | undefined;
+    const accountDetails = (accountRows[0] ? accountRows[0][0] : undefined) as
+      | AccountDetails
+      | undefined;
 
     if (!accountDetails) {
       removeRequestCookie(res, 'authSessionId');
@@ -766,13 +854,21 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
       return;
     }
 
-    const ongoingEmailUpdateRequest = (accountRows[1] ? accountRows[1][0] : null) as (OngoingAccountRequest & { new_email: string }) | null;
+    const ongoingEmailUpdateRequest = (accountRows[1] ? accountRows[1][0] : null) as
+      | (OngoingAccountRequest & { new_email: string })
+      | null;
     const ongoingAccountDeletionRequest = (accountRows[2] ? accountRows[2][0] : null) as
       | (OngoingAccountRequest & { new_email: string })
       | null;
 
-    ongoingEmailUpdateRequest && (ongoingEmailUpdateRequest.is_suspended = Boolean(ongoingEmailUpdateRequest.is_suspended));
-    ongoingAccountDeletionRequest && (ongoingAccountDeletionRequest.is_suspended = Boolean(ongoingAccountDeletionRequest.is_suspended));
+    ongoingEmailUpdateRequest &&
+      (ongoingEmailUpdateRequest.is_suspended = Boolean(
+        ongoingEmailUpdateRequest.is_suspended
+      ));
+    ongoingAccountDeletionRequest &&
+      (ongoingAccountDeletionRequest.is_suspended = Boolean(
+        ongoingAccountDeletionRequest.is_suspended
+      ));
 
     res.json({
       accountDetails,
@@ -794,7 +890,9 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
 
 accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res, false);
-  const accountId: number | null = !authSessionId ? null : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+  const accountId: number | null = !authSessionId
+    ? null
+    : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
 
   const publicAccountId: string | undefined = req.params.publicAccountId;
 
@@ -878,12 +976,16 @@ accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => 
   const { isPrivate, approveFollowRequests } = requestData;
 
   if (typeof isPrivate !== 'boolean' || typeof approveFollowRequests !== 'boolean') {
-    res.status(400).json({ message: 'Invalid privacy configuration.', reason: 'invalidConfiguration' });
+    res
+      .status(400)
+      .json({ message: 'Invalid privacy configuration.', reason: 'invalidConfiguration' });
     return;
   }
 
   if (isPrivate && !approveFollowRequests) {
-    res.status(400).json({ message: 'Invalid privacy configuration.', reason: 'invalidConfiguration' });
+    res
+      .status(400)
+      .json({ message: 'Invalid privacy configuration.', reason: 'invalidConfiguration' });
     return;
   }
 
@@ -907,7 +1009,11 @@ accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => 
 
     if (resultSetHeader.affectedRows === 0) {
       res.status(500).json({ message: 'Internal server error.' });
-      await logUnexpectedError(req, null, 'Failed to update is_private and approve_follow_requests.');
+      await logUnexpectedError(
+        req,
+        null,
+        'Failed to update is_private and approve_follow_requests.'
+      );
 
       return;
     }
@@ -983,7 +1089,10 @@ accountsRouter.patch('/details/displayName', async (req: Request, res: Response)
     }
 
     if (accountDetails.display_name === newDisplayName) {
-      res.status(409).json({ message: 'Account already has this display name.', reason: 'duplicateDisplayName' });
+      res.status(409).json({
+        message: 'Account already has this display name.',
+        reason: 'duplicateDisplayName',
+      });
       return;
     }
 
@@ -1041,7 +1150,9 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
   const { password, newPassword } = requestData;
 
   if (!isValidPassword(password)) {
-    res.status(400).json({ message: 'Invalid current password.', reason: 'invalidCurrentPassword' });
+    res
+      .status(400)
+      .json({ message: 'Invalid current password.', reason: 'invalidCurrentPassword' });
     return;
   }
 
@@ -1094,22 +1205,37 @@ accountsRouter.patch('/details/password', async (req: Request, res: Response) =>
 
     if (newPassword === accountDetails.username) {
       await connection.rollback();
-      res.status(409).json({ message: `Username and password can't match.`, reason: 'newPasswordMatchesUsername' });
+      res.status(409).json({
+        message: `Username and password can't match.`,
+        reason: 'newPasswordMatchesUsername',
+      });
 
       return;
     }
 
-    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    const passwordIsCorrect: boolean = await bcrypt.compare(
+      password,
+      accountDetails.hashed_password
+    );
     if (!passwordIsCorrect) {
       await connection.rollback();
-      await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+      await handleIncorrectPassword(
+        accountId,
+        accountDetails.failed_sign_in_attempts,
+        dbPool,
+        req,
+        res
+      );
 
       return;
     }
 
     if (newPassword === password) {
       await connection.rollback();
-      res.status(409).json({ message: `New password can't match current password.`, reason: 'newPasswordMatchesUsername' });
+      res.status(409).json({
+        message: `New password can't match current password.`,
+        reason: 'newPasswordMatchesUsername',
+      });
 
       return;
     }
@@ -1254,10 +1380,19 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
-    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    const passwordIsCorrect: boolean = await bcrypt.compare(
+      password,
+      accountDetails.hashed_password
+    );
     if (!passwordIsCorrect) {
       await connection.rollback();
-      await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+      await handleIncorrectPassword(
+        accountId,
+        accountDetails.failed_sign_in_attempts,
+        dbPool,
+        req,
+        res
+      );
 
       return;
     }
@@ -1280,7 +1415,9 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
 
     if (newEmail === accountDetails.email) {
       await connection.rollback();
-      res.status(409).json({ message: 'Email already linked to this account.', reason: 'duplicateEmail' });
+      res
+        .status(409)
+        .json({ message: 'Email already linked to this account.', reason: 'duplicateEmail' });
 
       return;
     }
@@ -1409,7 +1546,10 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
 
     if (!accountDetails.request_id) {
       await connection.rollback();
-      res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
+      res.status(404).json({
+        message: 'Email change request not found or has expired.',
+        reason: 'requestNotFound',
+      });
 
       return;
     }
@@ -1428,12 +1568,20 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
 
     if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
-      res.status(403).json({ message: `Sent confirmation emails limit reached.`, reason: 'emailsSentLimitReached' });
+      res.status(403).json({
+        message: `Sent confirmation emails limit reached.`,
+        reason: 'emailsSentLimitReached',
+      });
 
       return;
     }
 
-    await incrementAccountRequestEmailsSent('email_update', accountDetails.request_id, connection, req);
+    await incrementAccountRequestEmailsSent(
+      'email_update',
+      accountDetails.request_id,
+      connection,
+      req
+    );
 
     await connection.commit();
     res.json({});
@@ -1523,7 +1671,10 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
 
     if (!requestDetails) {
       await connection.rollback();
-      res.status(404).json({ message: 'Email change request not found or has expired.', reason: 'requestNotFound' });
+      res.status(404).json({
+        message: 'Email change request not found or has expired.',
+        reason: 'requestNotFound',
+      });
 
       return;
     }
@@ -1543,15 +1694,28 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
     if (requestDetails.confirmation_code !== confirmationCode) {
       await connection.rollback();
 
-      const suspendRequest: boolean = requestDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
+      const suspendRequest: boolean =
+        requestDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
       if (!suspendRequest) {
-        await incrementFailedAccountRequestAttempts('email_update', requestDetails.request_id, dbPool, req);
-        res.status(401).json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
+        await incrementFailedAccountRequestAttempts(
+          'email_update',
+          requestDetails.request_id,
+          dbPool,
+          req
+        );
+        res
+          .status(401)
+          .json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
 
         return;
       }
 
-      const expiryTimestamp: number | null = await suspendAccountRequest('email_update', requestDetails.request_id, dbPool, req);
+      const expiryTimestamp: number | null = await suspendAccountRequest(
+        'email_update',
+        requestDetails.request_id,
+        dbPool,
+        req
+      );
       if (!expiryTimestamp) {
         res.status(500).json({ message: 'Internal server error.' });
         return;
@@ -1620,7 +1784,9 @@ accountsRouter.patch('/details/email/confirm', async (req: Request, res: Respons
 accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
+    res
+      .status(403)
+      .json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
@@ -1683,7 +1849,9 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 
     if (!accountDetails || !accountDetails.is_verified) {
       await connection.rollback();
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
@@ -1752,7 +1920,9 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
 accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
+    res
+      .status(403)
+      .json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
@@ -1817,14 +1987,19 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
 
     if (!accountDetails || !accountDetails.is_verified) {
       await connection.rollback();
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
 
     if (!accountDetails.request_id) {
       await connection.rollback();
-      res.status(404).json({ message: 'Recovery request not found or has expired.', reason: 'requestNotFound' });
+      res.status(404).json({
+        message: 'Recovery request not found or has expired.',
+        reason: 'requestNotFound',
+      });
 
       return;
     }
@@ -1843,12 +2018,20 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
 
     if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
-      res.status(403).json({ message: 'Sent recovery emails limit reached.', reason: 'emailsSentLimitReached' });
+      res.status(403).json({
+        message: 'Sent recovery emails limit reached.',
+        reason: 'emailsSentLimitReached',
+      });
 
       return;
     }
 
-    await incrementAccountRequestEmailsSent('account_recovery', accountDetails.request_id, connection, req);
+    await incrementAccountRequestEmailsSent(
+      'account_recovery',
+      accountDetails.request_id,
+      connection,
+      req
+    );
 
     await connection.commit();
     res.json({});
@@ -1878,7 +2061,9 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
 accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) => {
   const isSignedIn: boolean = getRequestCookie(req, 'authSessionId') !== null;
   if (isSignedIn) {
-    res.status(403).json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
+    res
+      .status(403)
+      .json({ message: `Can't recover an account while signed in.`, reason: 'signedIn' });
     return;
   }
 
@@ -1904,7 +2089,9 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
   }
 
   if (!isValidUuid(recoveryToken)) {
-    res.status(400).json({ message: 'Invalid recovery token.', reason: 'invalidRecoveryToken' });
+    res
+      .status(400)
+      .json({ message: 'Invalid recovery token.', reason: 'invalidRecoveryToken' });
     return;
   }
 
@@ -1953,14 +2140,19 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
 
     if (!accountDetails || !accountDetails.is_verified) {
       await connection.rollback();
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
 
     if (!accountDetails.account_id) {
       await connection.rollback();
-      res.status(404).json({ message: 'Recovery request not found or has expired.', reason: 'requestNotFound' });
+      res.status(404).json({
+        message: 'Recovery request not found or has expired.',
+        reason: 'requestNotFound',
+      });
 
       return;
     }
@@ -1980,15 +2172,28 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
     if (accountDetails.recovery_token !== recoveryToken) {
       await connection.rollback();
 
-      const suspendRequest: boolean = accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
+      const suspendRequest: boolean =
+        accountDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
       if (!suspendRequest) {
-        await incrementFailedAccountRequestAttempts('account_recovery', accountDetails.request_id, dbPool, req);
-        res.status(401).json({ message: 'Incorrect recovery token.', reason: 'incorrectToken' });
+        await incrementFailedAccountRequestAttempts(
+          'account_recovery',
+          accountDetails.request_id,
+          dbPool,
+          req
+        );
+        res
+          .status(401)
+          .json({ message: 'Incorrect recovery token.', reason: 'incorrectToken' });
 
         return;
       }
 
-      const expiryTimestamp: number | null = await suspendAccountRequest('account_recovery', accountDetails.request_id, dbPool, req);
+      const expiryTimestamp: number | null = await suspendAccountRequest(
+        'account_recovery',
+        accountDetails.request_id,
+        dbPool,
+        req
+      );
       if (!expiryTimestamp) {
         res.status(500).json({ message: 'Internal server error.' });
         return;
@@ -2004,7 +2209,10 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
 
     if (accountDetails.username === newPassword) {
       await connection.rollback();
-      res.status(409).json({ message: `Username and new password can't match.`, reason: 'newPasswordMatchesUsername' });
+      res.status(409).json({
+        message: `Username and new password can't match.`,
+        reason: 'newPasswordMatchesUsername',
+      });
 
       return;
     }
@@ -2047,7 +2255,12 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
     }
 
     await purgeAuthSessions(accountDetails.account_id);
-    const authSessionCreated: boolean = await createAuthSession(res, connection, accountDetails.account_id, false);
+    const authSessionCreated: boolean = await createAuthSession(
+      res,
+      connection,
+      accountDetails.account_id,
+      false
+    );
 
     connection.commit();
     res.json({ authSessionCreated });
@@ -2143,15 +2356,26 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
       await connection.rollback();
 
       removeRequestCookie(res, 'authSessionId');
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
 
-    const passwordIsCorrect: boolean = await bcrypt.compare(password, accountDetails.hashed_password);
+    const passwordIsCorrect: boolean = await bcrypt.compare(
+      password,
+      accountDetails.hashed_password
+    );
     if (!passwordIsCorrect) {
       await connection.rollback();
-      await handleIncorrectPassword(accountId, accountDetails.failed_sign_in_attempts, dbPool, req, res);
+      await handleIncorrectPassword(
+        accountId,
+        accountDetails.failed_sign_in_attempts,
+        dbPool,
+        req,
+        res
+      );
 
       return;
     }
@@ -2268,7 +2492,9 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
       await connection.rollback();
 
       removeRequestCookie(res, 'authSessionId');
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
@@ -2287,12 +2513,20 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
 
     if (accountDetails.emails_sent >= ACCOUNT_EMAILS_SENT_LIMIT) {
       await connection.rollback();
-      res.status(403).json({ message: 'Sent confirmation emails limit reached.', reason: 'emailsSentLimitReached' });
+      res.status(403).json({
+        message: 'Sent confirmation emails limit reached.',
+        reason: 'emailsSentLimitReached',
+      });
 
       return;
     }
 
-    await incrementAccountRequestEmailsSent('account_deletion', accountDetails.request_id, connection, req);
+    await incrementAccountRequestEmailsSent(
+      'account_deletion',
+      accountDetails.request_id,
+      connection,
+      req
+    );
 
     await connection.commit();
     res.json({});
@@ -2318,41 +2552,43 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
   }
 });
 
-accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+accountsRouter.delete(
+  '/deletion/confirm/:confirmationCode',
+  async (req: Request, res: Response) => {
+    const authSessionId: string | null = getAuthSessionId(req, res);
 
-  if (!authSessionId) {
-    return;
-  }
+    if (!authSessionId) {
+      return;
+    }
 
-  const confirmationCode: string | undefined = req.params.confirmationCode;
+    const confirmationCode: string | undefined = req.params.confirmationCode;
 
-  if (!confirmationCode || !isValidHexCode(confirmationCode)) {
-    res.status(400).json({ message: 'Invalid confirmation code.', reason: 'invalidCode' });
-    return;
-  }
+    if (!confirmationCode || !isValidHexCode(confirmationCode)) {
+      res.status(400).json({ message: 'Invalid confirmation code.', reason: 'invalidCode' });
+      return;
+    }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
-  if (!accountId) {
-    return;
-  }
+    if (!accountId) {
+      return;
+    }
 
-  let connection: PoolConnection | null = null;
+    let connection: PoolConnection | null = null;
 
-  try {
-    connection = await dbPool.getConnection();
-    await connection.beginTransaction();
+    try {
+      connection = await dbPool.getConnection();
+      await connection.beginTransaction();
 
-    type RequestDetails = {
-      request_id: number;
-      confirmation_code: string;
-      failed_attempts: number;
-      expiry_timestamp: number;
-    };
+      type RequestDetails = {
+        request_id: number;
+        confirmation_code: string;
+        failed_attempts: number;
+        expiry_timestamp: number;
+      };
 
-    const [requestRows] = await connection.execute<RowDataPacket[]>(
-      `SELECT
+      const [requestRows] = await connection.execute<RowDataPacket[]>(
+        `SELECT
         request_id,
         confirmation_code,
         failed_attempts,
@@ -2362,88 +2598,105 @@ accountsRouter.delete('/deletion/confirm/:confirmationCode', async (req: Request
       WHERE
         account_id = ?
       FOR UPDATE;`,
-      [accountId]
-    );
+        [accountId]
+      );
 
-    const requestDetails = requestRows[0] as RequestDetails | undefined;
+      const requestDetails = requestRows[0] as RequestDetails | undefined;
 
-    if (!requestDetails) {
-      await connection.rollback();
-      res.status(404).json({ message: 'Deletion request not found or has expired.', reason: 'requestNotFound' });
-
-      return;
-    }
-
-    if (requestDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
-      await connection.rollback();
-
-      res.status(403).json({
-        message: 'Deletion request suspended.',
-        reason: 'requestSuspended',
-        resData: { expiryTimestamp: requestDetails.expiry_timestamp },
-      });
-
-      return;
-    }
-
-    if (requestDetails.confirmation_code !== confirmationCode) {
-      await connection.rollback();
-
-      const suspendRequest: boolean = requestDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
-      if (!suspendRequest) {
-        await incrementFailedAccountRequestAttempts('account_deletion', requestDetails.request_id, dbPool, req);
-        res.status(401).json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
+      if (!requestDetails) {
+        await connection.rollback();
+        res.status(404).json({
+          message: 'Deletion request not found or has expired.',
+          reason: 'requestNotFound',
+        });
 
         return;
       }
 
-      const expiryTimestamp: number | null = await suspendAccountRequest('account_deletion', requestDetails.request_id, dbPool, req);
-      if (!expiryTimestamp) {
-        res.status(500).json({ message: 'Internal server error.' });
+      if (requestDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
+        await connection.rollback();
+
+        res.status(403).json({
+          message: 'Deletion request suspended.',
+          reason: 'requestSuspended',
+          resData: { expiryTimestamp: requestDetails.expiry_timestamp },
+        });
+
         return;
       }
 
-      res.status(401).json({
-        message: 'Incorrect confirmation code.',
-        reason: 'incorrectCode_suspended',
-        resData: { expiryTimestamp },
-      });
-      return;
-    }
+      if (requestDetails.confirmation_code !== confirmationCode) {
+        await connection.rollback();
 
-    const [resultSetHeader] = await connection.execute<ResultSetHeader>(
-      `DELETE FROM
+        const suspendRequest: boolean =
+          requestDetails.failed_attempts + 1 >= ACCOUNT_FAILED_ATTEMPTS_LIMIT;
+        if (!suspendRequest) {
+          await incrementFailedAccountRequestAttempts(
+            'account_deletion',
+            requestDetails.request_id,
+            dbPool,
+            req
+          );
+          res
+            .status(401)
+            .json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
+
+          return;
+        }
+
+        const expiryTimestamp: number | null = await suspendAccountRequest(
+          'account_deletion',
+          requestDetails.request_id,
+          dbPool,
+          req
+        );
+        if (!expiryTimestamp) {
+          res.status(500).json({ message: 'Internal server error.' });
+          return;
+        }
+
+        res.status(401).json({
+          message: 'Incorrect confirmation code.',
+          reason: 'incorrectCode_suspended',
+          resData: { expiryTimestamp },
+        });
+        return;
+      }
+
+      const [resultSetHeader] = await connection.execute<ResultSetHeader>(
+        `DELETE FROM
         accounts
       WHERE
         account_id = ?;`,
-      [accountId]
-    );
+        [accountId]
+      );
 
-    if (resultSetHeader.affectedRows === 0) {
-      await connection.rollback();
+      if (resultSetHeader.affectedRows === 0) {
+        await connection.rollback();
+
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, null, 'Failed to delete account.');
+
+        return;
+      }
+
+      removeRequestCookie(res, 'authSessionId');
+
+      await connection.commit();
+      res.json({});
+    } catch (err: unknown) {
+      console.log(err);
+      await connection?.rollback();
+
+      if (res.headersSent) {
+        await logUnexpectedError(req, err, 'Attempted to send two responses.');
+        return;
+      }
 
       res.status(500).json({ message: 'Internal server error.' });
-      await logUnexpectedError(req, null, 'Failed to delete account.');
-
-      return;
+      await logUnexpectedError(req, err);
+    } finally {
+      connection?.release();
     }
-
-    removeRequestCookie(res, 'authSessionId');
-
-    await connection.commit();
-    res.json({});
-  } catch (err: unknown) {
-    console.log(err);
-    await connection?.rollback();
-
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
-    }
-
-    res.status(500).json({ message: 'Internal server error.' });
-    await logUnexpectedError(req, err);
-  } finally {
-    connection?.release();
   }
-});
+);

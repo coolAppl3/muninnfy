@@ -7,7 +7,11 @@ type FilterTogglerCheckboxBtnProps = {
   isChecked: boolean;
 };
 
-export default function FilterTogglerCheckboxBtn({ onClick, title, isChecked }: FilterTogglerCheckboxBtnProps): JSX.Element {
+export default function FilterTogglerCheckboxBtn({
+  onClick,
+  title,
+  isChecked,
+}: FilterTogglerCheckboxBtnProps): JSX.Element {
   return (
     <button
       type='button'

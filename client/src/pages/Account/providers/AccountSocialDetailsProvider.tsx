@@ -9,8 +9,14 @@ type AccountSocialDetailsProviderProps = {
   children: ReactNode;
 };
 
-export default function AccountSocialDetailsProvider({ children }: AccountSocialDetailsProviderProps): JSX.Element {
-  const [socialCounts, setSocialCounts] = useState<SocialCounts>({ followers_count: 0, following_count: 0, follow_requests_count: 0 });
+export default function AccountSocialDetailsProvider({
+  children,
+}: AccountSocialDetailsProviderProps): JSX.Element {
+  const [socialCounts, setSocialCounts] = useState<SocialCounts>({
+    followers_count: 0,
+    following_count: 0,
+    follow_requests_count: 0,
+  });
   const [followers, setFollowers] = useState<FollowDetails[]>([]);
   const [following, setFollowing] = useState<FollowDetails[]>([]);
   const [followRequests, setFollowRequests] = useState<FollowRequest[]>([]);
@@ -42,5 +48,7 @@ export default function AccountSocialDetailsProvider({ children }: AccountSocial
     [socialCounts, followers, following, followRequests, fetchDetails]
   );
 
-  return <AccountSocialDetailsContext value={contextValue}>{children}</AccountSocialDetailsContext>;
+  return (
+    <AccountSocialDetailsContext value={contextValue}>{children}</AccountSocialDetailsContext>
+  );
 }
