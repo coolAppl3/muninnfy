@@ -939,7 +939,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({ viewAccountDetails });
+    res.json({ ...viewAccountDetails, is_following: Boolean(viewAccountDetails.is_following) });
   } catch (err: unknown) {
     console.log(err);
 
