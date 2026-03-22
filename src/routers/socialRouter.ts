@@ -11,7 +11,7 @@ import {
 } from '../util/constants/socialConstants';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
-import { deleteFollowRequest } from '../db/helpers/socialDbHelpers';
+import { deleteFollowRequest, getTargetAccountId } from '../db/helpers/socialDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import {
@@ -159,24 +159,14 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
     ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
     : null;
 
-  const publicAccountId = req.query.publicAccountId;
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
+    return;
+  }
+
   const searchQuery: string = req.query.searchQuery?.toString().trim() || '';
   const offset: number = +(req.query.offset || 0);
-
-  if (!publicAccountId && !accountId) {
-    removeRequestCookie(res, 'authSessionId');
-    res.status(401).json({ message: 'Sign in session expired.', reason: 'authSessionExpired' });
-
-    return;
-  }
-
-  if (
-    publicAccountId &&
-    (typeof publicAccountId !== 'string' || !isValidUuid(publicAccountId))
-  ) {
-    res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-    return;
-  }
 
   if (!isValidSocialQuery(searchQuery)) {
     res.status(400).json({ message: 'Invalid search query.', reason: 'invalidSearchQuery' });
@@ -188,51 +178,7 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
     return;
   }
 
-  let targetAccountId: number | null = accountId;
-
   try {
-    if (publicAccountId) {
-      type AccountDetails = {
-        target_account_id: number;
-        is_private: boolean;
-        is_following: boolean;
-      };
-
-      const [accountRows] = await dbPool.execute<RowDataPacket[]>(
-        `SELECT
-          accounts.account_id AS target_account_id,
-          account_preferences.is_private,
-          
-          EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
-        FROM
-          accounts
-        INNER JOIN
-          account_preferences USING(account_id)
-        WHERE
-          accounts.public_account_id = ?;`,
-        [accountId || 0, publicAccountId]
-      );
-
-      const accountDetails = accountRows[0] as AccountDetails | undefined;
-
-      if (!accountDetails) {
-        res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-        return;
-      }
-
-      if (accountDetails.is_private && !accountDetails.is_following) {
-        res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
-        return;
-      }
-
-      targetAccountId = accountDetails.target_account_id;
-    }
-
-    if (!targetAccountId) {
-      res.status(500).json({ message: 'Internal server error.' });
-      return;
-    }
-
     const [followers] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         followers.follow_id,
