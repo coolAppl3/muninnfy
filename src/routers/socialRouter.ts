@@ -466,23 +466,22 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
   }
 });
 
-socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+socialRouter.get('/followRequests', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
+    : null;
 
-  if (!authSessionId) {
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
     return;
   }
 
-  const offset: number = +(req.params.offset || 0);
+  const offset: number = +(req.query.offset || 0);
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
-    return;
-  }
-
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
     return;
   }
 
@@ -499,7 +498,7 @@ socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) 
       INNER JOIN
         accounts ON follow_requests.requester_account_id = accounts.account_id
       WHERE
-        follow_requests.requestee_account_id = :accountId
+        follow_requests.requestee_account_id = :targetAccountId
       ORDER BY
         follow_requests.request_timestamp DESC,
         follow_requests.request_id ASC
@@ -507,7 +506,7 @@ socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) 
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { targetAccountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(followRequests as FollowRequest[]);
