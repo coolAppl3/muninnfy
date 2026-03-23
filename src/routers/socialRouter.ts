@@ -168,7 +168,7 @@ socialRouter.get('/view', async (req: Request, res: Response) => {
     const [socialRows] = await dbPool.query<RowDataPacket[][]>(
       `SELECT
         (SELECT COUNT(*) FROM followers WHERE account_id = :accountId) AS followers_count,
-        (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId) AS following_count,
+        (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId) AS following_count;
       
       SELECT
         followers.follow_id,
