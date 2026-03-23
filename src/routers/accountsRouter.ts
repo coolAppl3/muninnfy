@@ -910,6 +910,8 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       is_private: boolean;
       approve_follow_requests: boolean;
       is_following: boolean;
+      follower_count: number;
+      following_count: number;
     };
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
@@ -922,7 +924,10 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
         account_preferences.is_private,
         account_preferences.approve_follow_requests,
 
-        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following,
+
+        (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id) AS followers_count,
+        (SELECT COUNT(*) FROM followers WHERE follower_account_id = accounts.account_id) AS following_count
       FROM
         accounts
       LEFT JOIN
