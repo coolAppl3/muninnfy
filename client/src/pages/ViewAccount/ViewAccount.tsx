@@ -13,7 +13,6 @@ import useAuth from '../../hooks/useAuth';
 import { getViewAccountDetailsService } from '../../services/accountServices';
 import { CanceledError } from 'axios';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
-import ViewAccountProfile from './components/ViewAccountProfile/ViewAccountProfile';
 import AccountSocialProvider from '../Account/providers/AccountSocialProvider';
 import ViewAccountContent from './components/ViewAccountContent/ViewAccountContent';
 import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDetailsProvider';
