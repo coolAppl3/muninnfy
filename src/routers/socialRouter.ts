@@ -190,7 +190,7 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
       INNER JOIN
         accounts ON followers.follower_account_id = accounts.account_id
       WHERE
-        followers.account_id = :accountId AND (
+        followers.account_id = :targetAccountId AND (
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
@@ -201,7 +201,7 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
       OFFSET
         :offset;`,
       {
-        accountId: targetAccountId,
+        targetAccountId,
         searchQuery,
         offset,
         socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE,
