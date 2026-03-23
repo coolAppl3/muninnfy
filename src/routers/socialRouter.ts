@@ -404,8 +404,13 @@ socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
 
 socialRouter.get('/followRequests/search', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res)
+    : null;
 
-  if (!authSessionId) {
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
     return;
   }
 
@@ -422,12 +427,6 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
-    return;
-  }
-
   try {
     const [followRequests] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -441,7 +440,7 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
       INNER JOIN
         accounts ON follow_requests.requester_account_id = accounts.account_id
       WHERE
-        follow_requests.requestee_account_id = :accountId AND (
+        follow_requests.requestee_account_id = :targetAccountId AND (
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
@@ -451,7 +450,7 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { targetAccountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(followRequests as FollowRequest[]);
