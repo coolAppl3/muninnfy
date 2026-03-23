@@ -130,7 +130,7 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       await logUnexpectedError(
         req,
         null,
-        `Failed to fetch social data. Social count dat fetched: ${Boolean(socialCounts)}. Followers fetched: ${Boolean(
+        `Failed to fetch social data. Social count data fetched: ${Boolean(socialCounts)}. Followers fetched: ${Boolean(
           followers
         )}. Following fetched: ${Boolean(following)}. Follow requests fetched: ${Boolean(followRequests)}.`
       );
