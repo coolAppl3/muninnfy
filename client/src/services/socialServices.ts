@@ -21,6 +21,22 @@ export function getAccountSocialDetailsService(
   return axiosInstance.get('/social', { signal: abortSignal });
 }
 
+type GetViewAccountSocialDetailsServiceData = {
+  socialCounts: Omit<SocialCounts, 'follow_requests_count'>;
+  followers: FollowDetails[];
+  following: FollowDetails[];
+};
+
+export function getViewAccountSocialDetailsService(
+  abortSignal: AbortSignal,
+  publicAccountId?: string
+): Promise<AxiosResponse<GetViewAccountSocialDetailsServiceData>> {
+  return axiosInstance.get('/social/view', {
+    params: { publicAccountId },
+    signal: abortSignal,
+  });
+}
+
 export function getSocialBatchService(
   type: 'followers' | 'following',
   offset: number,
