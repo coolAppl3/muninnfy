@@ -23,41 +23,49 @@ export function getAccountSocialDetailsService(
 
 export function getSocialBatchService(
   type: 'followers' | 'following',
-  offset: number
+  offset: number,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowDetails[]>>;
+
 export function getSocialBatchService(
   type: 'followRequests',
-  offset: number
+  offset: number,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowRequest[]>>;
+
 export function getSocialBatchService(
   type: SocialSectionType,
-  offset: number
+  offset: number,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowDetails[] | FollowRequest[]>> {
-  return axiosInstance.get(`/social/${type}/${offset}`);
+  return axiosInstance.get(`/social/${type}`, { params: { offset, publicAccountId } });
 }
 
 export function searchSocialService(
   type: 'followers' | 'following',
   searchQuery: string,
   offset: number,
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowDetails[]>>;
 
 export function searchSocialService(
   type: 'followRequests',
   searchQuery: string,
   offset: number,
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowRequest[]>>;
 
 export function searchSocialService(
   type: SocialSectionType,
   searchQuery: string,
   offset: number,
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowDetails[] | FollowRequest[]>> {
   return axiosInstance.get(`/social/${type}/search`, {
-    params: { searchQuery, offset },
+    params: { searchQuery, offset, publicAccountId },
     signal: abortSignal,
   });
 }
