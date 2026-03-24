@@ -912,6 +912,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       is_following: boolean;
       followers_count: number;
       following_count: number;
+      wishlists_count: number;
     };
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
@@ -927,7 +928,8 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
         EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following,
 
         (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id) AS followers_count,
-        (SELECT COUNT(*) FROM followers WHERE follower_account_id = accounts.account_id) AS following_count
+        (SELECT COUNT(*) FROM followers WHERE follower_account_id = accounts.account_id) AS following_count,
+        (SELECT COUNT(*) FROM wishlists WHERE account_id = accounts.account_id) AS wishlists_count
       FROM
         accounts
       LEFT JOIN

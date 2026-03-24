@@ -17,4 +17,5 @@ export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & {
   is_following: boolean;
   followers_count: number;
   following_count: number;
+  wishlists_count: number;
 };
