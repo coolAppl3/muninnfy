@@ -15,7 +15,7 @@ import { CanceledError } from 'axios';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import AccountSocialProvider from '../Account/providers/AccountSocialProvider';
 import ViewAccountContent from './components/ViewAccountContent/ViewAccountContent';
-import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDetailsProvider';
+import ViewAccountDetailsProvider from './providers/ViewAccountDetailsProvider';
 
 export default function ViewAccount(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -93,13 +93,17 @@ export default function ViewAccount(): JSX.Element {
                 publicAccountId={viewAccountDetails.public_account_id}
               />
 
-              <AccountSocialDetailsProvider>
+              <ViewAccountDetailsProvider
+                initialAccountCounts={{
+                  followers_count: viewAccountDetails.followers_count,
+                  following_count: viewAccountDetails.following_count,
+                  wishlists_count: viewAccountDetails.wishlists_count,
+                }}
+              >
                 <AccountSocialProvider>
                   <ViewAccountContent viewAccountDetails={viewAccountDetails} />
                 </AccountSocialProvider>
-              </AccountSocialDetailsProvider>
-
-              {/* TODO: continue implementation */}
+              </ViewAccountDetailsProvider>
             </Container>
           </main>
         ) : (

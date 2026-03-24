@@ -6,6 +6,7 @@ import useAccountLocation from '../../../Account/hooks/useAccountLocation';
 import useAccountSocial from '../../../Account/hooks/useAccountSocial';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Button from '../../../../components/Button/Button';
+import { useViewAccountDetails } from '../../hooks/useViewAccountDetails';
 
 type ViewAccountProfileProps = {
   viewAccountDetails: ViewAccountDetailsType;
@@ -14,6 +15,9 @@ type ViewAccountProfileProps = {
 export default function ViewAccountProfile({
   viewAccountDetails,
 }: ViewAccountProfileProps): JSX.Element {
+  const { accountCounts } = useViewAccountDetails();
+
+  const { followers_count, following_count, wishlists_count } = accountCounts;
   const { public_account_id, username, display_name, created_on_timestamp, is_following } =
     viewAccountDetails;
 
@@ -35,7 +39,7 @@ export default function ViewAccountProfile({
         >
           <StatisticItem
             title='Wishlists'
-            value={8}
+            value={wishlists_count}
           />
         </button>
 
@@ -45,7 +49,7 @@ export default function ViewAccountProfile({
         >
           <StatisticItem
             title='Followers'
-            value={32}
+            value={followers_count}
           />
         </button>
 
@@ -58,7 +62,7 @@ export default function ViewAccountProfile({
         >
           <StatisticItem
             title='Following'
-            value={41}
+            value={following_count}
           />
         </button>
       </div>
