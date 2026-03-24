@@ -910,7 +910,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       is_private: boolean;
       approve_follow_requests: boolean;
       is_following: boolean;
-      follower_count: number;
+      followers_count: number;
       following_count: number;
     };
 

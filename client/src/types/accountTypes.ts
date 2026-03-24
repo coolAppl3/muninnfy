@@ -15,6 +15,6 @@ export type OngoingAccountRequest = {
 
 export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & {
   is_following: boolean;
-  follower_count: number;
+  followers_count: number;
   following_count: number;
 };
