@@ -90,6 +90,26 @@ export function declineFollowRequestService(requestId: number): Promise<AxiosRes
   return axiosInstance.delete(`/social/followRequests/decline/${requestId}`);
 }
 
+type SendFollowRequestServicePayload = {
+  requesteePublicAccountId: string;
+};
+
+type SendFollowRequestServiceData =
+  | {
+      requestId: number;
+      requestTimestamp: number;
+    }
+  | {
+      followId: number;
+      followTimestamp: number;
+    };
+
+export function sendFollowRequestService(
+  body: SendFollowRequestServicePayload
+): Promise<AxiosResponse<SendFollowRequestServiceData>> {
+  return axiosInstance.post('/social/followRequests/send', body);
+}
+
 export function unfollowService(followId: number): Promise<AxiosResponse> {
   return axiosInstance.delete(`/social/followers/unfollow/${followId}`);
 }
