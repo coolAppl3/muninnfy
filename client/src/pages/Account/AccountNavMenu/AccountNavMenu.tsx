@@ -4,18 +4,13 @@ import CrossIcon from '../../../assets/svg/CrossIcon.svg?react';
 import useAccountLocation from '../hooks/useAccountLocation';
 import AccountNavMenuButton from './components/AccountNavMenuButton';
 import { Link } from 'react-router-dom';
+import useViewMode from '../../../hooks/useViewMode';
 
-type AccountNavMenuProps = {
-  inViewMode: boolean;
-  publicAccountId?: string;
-};
-
-export default function AccountNavMenu({
-  inViewMode,
-  publicAccountId,
-}: AccountNavMenuProps): JSX.Element {
-  const { accountLocation, setAccountLocation } = useAccountLocation();
+export default function AccountNavMenu(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const { accountLocation, setAccountLocation } = useAccountLocation();
+  const { inViewMode, publicAccountId } = useViewMode();
 
   return (
     <nav

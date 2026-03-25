@@ -20,6 +20,7 @@ import { debounce } from '../../../../../utils/debounce';
 import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
 import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
+import useViewMode from '../../../../../hooks/useViewMode';
 
 export default function AccountSocialFollowing(): JSX.Element {
   const {
@@ -31,6 +32,7 @@ export default function AccountSocialFollowing(): JSX.Element {
     setSocialCounts,
     setFetchDetails,
   } = useAccountSocialDetails();
+  const { inViewMode, publicAccountId } = useViewMode();
 
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -60,7 +62,13 @@ export default function AccountSocialFollowing(): JSX.Element {
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
         const followingBatch: FollowDetails[] = (
-          await searchSocialService('following', searchQuery, offset, abortSignal)
+          await searchSocialService(
+            'following',
+            searchQuery,
+            offset,
+            abortSignal,
+            publicAccountId
+          )
         ).data;
 
         offset === 0
@@ -96,7 +104,7 @@ export default function AccountSocialFollowing(): JSX.Element {
         setErrorMessage(errMessage);
       }
     },
-    [handleAsyncError, displayPopupMessage]
+    [publicAccountId, handleAsyncError, displayPopupMessage]
   );
 
   useEffect(() => {
@@ -119,7 +127,7 @@ export default function AccountSocialFollowing(): JSX.Element {
   async function getFollowingBatch(): Promise<void> {
     try {
       const followingBatch: FollowDetails[] = (
-        await getSocialBatchService('following', following.length)
+        await getSocialBatchService('following', following.length, publicAccountId)
       ).data;
       setFollowing((prev) => [...prev, ...followingBatch]);
 
@@ -199,6 +207,7 @@ export default function AccountSocialFollowing(): JSX.Element {
             renderArray.slice(0, renderLimit).map((followDetails: FollowDetails) => (
               <FollowCard
                 key={followDetails.follow_id}
+                inViewMode={inViewMode}
                 isFollowerCard={false}
                 followDetails={followDetails}
                 setSearchQueryResults={setSearchQueryResults}

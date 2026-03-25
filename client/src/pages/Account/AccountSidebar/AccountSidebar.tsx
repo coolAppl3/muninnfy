@@ -3,17 +3,11 @@ import AccountSidebarButton from './components/AccountSidebarButton';
 import useAccountLocation from '../hooks/useAccountLocation';
 import { Link } from 'react-router-dom';
 import RedirectIcon from '../../../assets/svg/RedirectIcon.svg?react';
+import useViewMode from '../../../hooks/useViewMode';
 
-type AccountSidebarProps = {
-  inViewMode: boolean;
-  publicAccountId?: string;
-};
-
-export default function AccountSidebar({
-  inViewMode,
-  publicAccountId,
-}: AccountSidebarProps): JSX.Element {
+export default function AccountSidebar(): JSX.Element {
   const { accountLocation, setAccountLocation } = useAccountLocation();
+  const { inViewMode, publicAccountId } = useViewMode();
 
   return (
     <nav className='sticky top-7 bg-secondary rounded-sm hidden md:grid md:col-span-3 text-description overflow-hidden font-medium text-sm shadow-simple-tiny'>

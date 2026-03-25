@@ -15,7 +15,8 @@ import { CanceledError } from 'axios';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import AccountSocialProvider from '../Account/providers/AccountSocialProvider';
 import ViewAccountContent from './components/ViewAccountContent/ViewAccountContent';
-import ViewAccountDetailsProvider from './providers/ViewAccountDetailsProvider';
+import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDetailsProvider';
+import ViewModeProvider from '../../providers/ViewModeProvider';
 
 export default function ViewAccount(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -79,37 +80,29 @@ export default function ViewAccount(): JSX.Element {
     <>
       <Head title='View Account - Muninnfy' />
 
-      <AccountLocationProvider>
-        {isLoaded && viewAccountDetails ? (
-          <main className='py-4'>
-            <Container className='grid grid-cols-12 items-start gap-1'>
-              <AccountSidebar
-                inViewMode={true}
-                publicAccountId={viewAccountDetails.public_account_id}
-              />
+      <ViewModeProvider
+        inViewMode={true}
+        publicAccountId={viewAccountDetails?.public_account_id}
+      >
+        <AccountLocationProvider>
+          {isLoaded && viewAccountDetails ? (
+            <main className='py-4'>
+              <Container className='grid grid-cols-12 items-start gap-1'>
+                <AccountSidebar />
+                <AccountNavMenu />
 
-              <AccountNavMenu
-                inViewMode={true}
-                publicAccountId={viewAccountDetails.public_account_id}
-              />
-
-              <ViewAccountDetailsProvider
-                initialAccountCounts={{
-                  followers_count: viewAccountDetails.followers_count,
-                  following_count: viewAccountDetails.following_count,
-                  wishlists_count: viewAccountDetails.wishlists_count,
-                }}
-              >
-                <AccountSocialProvider>
-                  <ViewAccountContent viewAccountDetails={viewAccountDetails} />
-                </AccountSocialProvider>
-              </ViewAccountDetailsProvider>
-            </Container>
-          </main>
-        ) : (
-          <LoadingSkeleton />
-        )}
-      </AccountLocationProvider>
+                <AccountSocialDetailsProvider>
+                  <AccountSocialProvider>
+                    <ViewAccountContent viewAccountDetails={viewAccountDetails} />
+                  </AccountSocialProvider>
+                </AccountSocialDetailsProvider>
+              </Container>
+            </main>
+          ) : (
+            <LoadingSkeleton />
+          )}
+        </AccountLocationProvider>
+      </ViewModeProvider>
     </>
   );
 }

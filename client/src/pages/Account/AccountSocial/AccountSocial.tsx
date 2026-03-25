@@ -17,6 +17,7 @@ import { SOCIAL_FETCH_BATCH_SIZE } from '../../../utils/constants/socialConstant
 import { NotificationDetails } from '../../../types/notificationTypes';
 import { FollowDetails, FollowRequest } from '../../../types/socialTypes';
 import { subscribeToAccountNotifications } from '../../../services/websockets/accountNotificationsWebsSocket';
+import useViewMode from '../../../hooks/useViewMode';
 
 export default function AccountSocial(): JSX.Element {
   const { socialSection } = useAccountSocial();
@@ -28,6 +29,7 @@ export default function AccountSocial(): JSX.Element {
     setFollowing,
     setFollowRequests,
   } = useAccountSocialDetails();
+  const { inViewMode, publicAccountId } = useViewMode();
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
@@ -41,7 +43,10 @@ export default function AccountSocial(): JSX.Element {
     const getSocialDetails = async () => {
       try {
         const { socialCounts, followers, following, followRequests } = (
-          await getAccountSocialDetailsService(abortController.signal)
+          await getAccountSocialDetailsService(
+            abortController.signal,
+            inViewMode ? publicAccountId : undefined
+          )
         ).data;
 
         setSocialCounts({ ...socialCounts });
@@ -69,6 +74,8 @@ export default function AccountSocial(): JSX.Element {
     getSocialDetails();
     return () => abortController.abort();
   }, [
+    inViewMode,
+    publicAccountId,
     fetchDetails,
     setFetchDetails,
     setSocialCounts,
@@ -108,9 +115,9 @@ export default function AccountSocial(): JSX.Element {
   );
 
   useEffect(() => {
-    subscribeToAccountNotifications('social', notificationsHandler);
+    inViewMode || subscribeToAccountNotifications('social', notificationsHandler);
     // unsubscribed when Account unmounts
-  }, [notificationsHandler]);
+  }, [inViewMode, notificationsHandler]);
 
   const MappedComponent: ComponentType = componentRecord[socialSection];
 

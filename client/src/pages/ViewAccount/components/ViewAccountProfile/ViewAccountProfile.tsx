@@ -6,7 +6,6 @@ import useAccountLocation from '../../../Account/hooks/useAccountLocation';
 import useAccountSocial from '../../../Account/hooks/useAccountSocial';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Button from '../../../../components/Button/Button';
-import { useViewAccountDetails } from '../../hooks/useViewAccountDetails';
 
 type ViewAccountProfileProps = {
   viewAccountDetails: ViewAccountDetailsType;
@@ -15,11 +14,16 @@ type ViewAccountProfileProps = {
 export default function ViewAccountProfile({
   viewAccountDetails,
 }: ViewAccountProfileProps): JSX.Element {
-  const { accountCounts } = useViewAccountDetails();
-
-  const { followers_count, following_count, wishlists_count } = accountCounts;
-  const { public_account_id, username, display_name, created_on_timestamp, is_following } =
-    viewAccountDetails;
+  const {
+    public_account_id,
+    username,
+    display_name,
+    created_on_timestamp,
+    is_following,
+    followers_count,
+    following_count,
+    wishlists_count,
+  } = viewAccountDetails;
 
   const { setAccountLocation } = useAccountLocation();
   const { setSocialSection } = useAccountSocial();

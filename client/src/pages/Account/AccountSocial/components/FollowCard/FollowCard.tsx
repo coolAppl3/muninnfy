@@ -11,6 +11,7 @@ import { removeFollowerService, unfollowService } from '../../../../../services/
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 
 type FollowCardProps = {
+  inViewMode: boolean;
   isFollowerCard: boolean;
   followDetails: FollowDetails;
 
@@ -22,6 +23,7 @@ type FollowCardProps = {
 
 export default memo(FollowCard);
 function FollowCard({
+  inViewMode,
   isFollowerCard,
   followDetails,
   setFollowers,
@@ -150,15 +152,17 @@ function FollowCard({
           </Link>
         </div>
 
-        <button
-          type='button'
-          title={isFollowerCard ? 'Remove follower' : 'Unfollow'}
-          aria-label={isFollowerCard ? 'Remove follower' : 'Unfollow'}
-          className='ml-[4px] cursor-pointer group'
-          onClick={() => setCardMode('confirm')}
-        >
-          <RemoveIcon className='w-[1.4rem] h-[1.4rem] transition-colors group-hover:text-danger' />
-        </button>
+        {inViewMode || (
+          <button
+            type='button'
+            title={isFollowerCard ? 'Remove follower' : 'Unfollow'}
+            aria-label={isFollowerCard ? 'Remove follower' : 'Unfollow'}
+            className='ml-[4px] cursor-pointer group'
+            onClick={() => setCardMode('confirm')}
+          >
+            <RemoveIcon className='w-[1.4rem] h-[1.4rem] transition-colors group-hover:text-danger' />
+          </button>
+        )}
       </div>
 
       <div className='text-description/50 text-xs'>
