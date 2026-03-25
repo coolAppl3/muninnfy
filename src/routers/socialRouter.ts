@@ -45,15 +45,14 @@ export type FollowRequest = SocialData & {
 };
 
 socialRouter.get('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
+    : null;
 
-  if (!authSessionId) {
-    return;
-  }
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
+  if (!targetAccountId) {
     return;
   }
 
@@ -114,7 +113,7 @@ socialRouter.get('/', async (req: Request, res: Response) => {
         follow_requests.request_timestamp DESC,
         follow_requests.request_id ASC
       LIMIT :socialFetchBatchSize;`,
-      { accountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { accountId: targetAccountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     const socialCounts = (socialRows[0] ? socialRows[0][0] : undefined) as
@@ -138,95 +137,17 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({ socialCounts, followers, following, followRequests });
-  } catch (err: unknown) {
-    console.log(err);
+    const isOwnerRequest: boolean = targetAccountId === accountId;
 
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
-    }
-
-    res.status(500).json({ message: 'Internal server error.' });
-    await logUnexpectedError(req, err);
-  }
-});
-
-socialRouter.get('/view', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res, false);
-  const accountId: number | null = authSessionId
-    ? await getAccountIdByAuthSessionId(authSessionId, req, res)
-    : null;
-
-  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
-
-  if (!targetAccountId) {
-    return;
-  }
-
-  try {
-    const [socialRows] = await dbPool.query<RowDataPacket[][]>(
-      `SELECT
-        (SELECT COUNT(*) FROM followers WHERE account_id = :accountId) AS followers_count,
-        (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId) AS following_count;
-      
-      SELECT
-        followers.follow_id,
-        followers.follow_timestamp,
-        accounts.public_account_id,
-        accounts.username,
-        accounts.display_name
-      FROM
-        followers
-      INNER JOIN
-        accounts ON followers.follower_account_id = accounts.account_id
-      WHERE
-        followers.account_id = :accountId
-      ORDER BY
-        followers.follow_timestamp DESC,
-        followers.follow_id ASC
-      LIMIT :socialFetchBatchSize;
-
-      SELECT
-        followers.follow_id,
-        followers.follow_timestamp,
-        accounts.public_account_id,
-        accounts.username,
-        accounts.display_name
-      FROM
-        followers
-      INNER JOIN
-        accounts ON followers.account_id = accounts.account_id
-      WHERE
-        followers.follower_account_id = :accountId
-      ORDER BY
-        followers.follow_timestamp DESC,
-        followers.follow_id ASC
-      LIMIT :socialFetchBatchSize;`,
-      { accountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
-    );
-
-    const socialCounts = (socialRows[0] ? socialRows[0][0] : undefined) as
-      | Omit<SocialCounts, 'follow_requests_count'>
-      | undefined;
-    const followers = socialRows[1] as FollowDetails[] | undefined;
-    const following = socialRows[2] as FollowDetails[] | undefined;
-
-    if (!socialCounts || !followers || !following) {
-      res.status(500).json({ message: 'Internal server error.' });
-
-      await logUnexpectedError(
-        req,
-        null,
-        `Failed to fetch social data. Social count data fetched: ${Boolean(socialCounts)}. Followers fetched: ${Boolean(
-          followers
-        )}. Following fetched: ${Boolean(following)}.`
-      );
-
-      return;
-    }
-
-    res.json({ socialCounts, followers, following });
+    res.json({
+      socialCounts: {
+        ...socialCounts,
+        follow_requests_count: isOwnerRequest ? socialCounts.follow_requests_count : 0,
+      },
+      followers,
+      following,
+      followRequests: isOwnerRequest ? followRequests : [],
+    });
   } catch (err: unknown) {
     console.log(err);
 
