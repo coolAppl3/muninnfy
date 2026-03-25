@@ -110,6 +110,10 @@ export function sendFollowRequestService(
   return axiosInstance.post('/social/followRequests/send', body);
 }
 
+export function cancelFollowRequestService(requestId: number): Promise<AxiosResponse> {
+  return axiosInstance.delete(`/social/followRequests/cancel/${requestId}`);
+}
+
 export function unfollowService(followId: number): Promise<AxiosResponse> {
   return axiosInstance.delete(`/social/followers/unfollow/${followId}`);
 }
