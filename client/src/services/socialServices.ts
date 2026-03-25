@@ -16,25 +16,10 @@ type GetAccountSocialDetailsServiceData = {
 };
 
 export function getAccountSocialDetailsService(
-  abortSignal: AbortSignal
-): Promise<AxiosResponse<GetAccountSocialDetailsServiceData>> {
-  return axiosInstance.get('/social', { signal: abortSignal });
-}
-
-type GetViewAccountSocialDetailsServiceData = {
-  socialCounts: Omit<SocialCounts, 'follow_requests_count'>;
-  followers: FollowDetails[];
-  following: FollowDetails[];
-};
-
-export function getViewAccountSocialDetailsService(
   abortSignal: AbortSignal,
   publicAccountId?: string
-): Promise<AxiosResponse<GetViewAccountSocialDetailsServiceData>> {
-  return axiosInstance.get('/social/view', {
-    params: { publicAccountId },
-    signal: abortSignal,
-  });
+): Promise<AxiosResponse<GetAccountSocialDetailsServiceData>> {
+  return axiosInstance.get('/social', { signal: abortSignal, params: { publicAccountId } });
 }
 
 export function getSocialBatchService(
