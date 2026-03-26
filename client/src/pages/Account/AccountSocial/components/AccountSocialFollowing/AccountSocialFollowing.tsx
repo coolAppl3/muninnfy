@@ -21,6 +21,10 @@ import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
 import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 import useViewMode from '../../../../../hooks/useViewMode';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAuth from '../../../../../hooks/useAuth';
+import useHistory from '../../../../../hooks/useHistory';
+import useAccountLocation from '../../../hooks/useAccountLocation';
 
 export default function AccountSocialFollowing(): JSX.Element {
   const {
@@ -33,6 +37,11 @@ export default function AccountSocialFollowing(): JSX.Element {
     setFetchDetails,
   } = useAccountSocialDetails();
   const { inViewMode, publicAccountId } = useViewMode();
+  const { setAccountLocation } = useAccountLocation();
+
+  const { authStatus } = useAuth();
+  const { referrerLocation } = useHistory();
+  const navigate: NavigateFunction = useNavigate();
 
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -92,19 +101,40 @@ export default function AccountSocialFollowing(): JSX.Element {
           return;
         }
 
-        if (status !== 400) {
+        if (status === 400) {
+          if (errReason === 'invalidOffset') {
+            displayPopupMessage('Something went wrong.', 'error');
+            return;
+          }
+
+          setErrorMessage(errMessage);
           return;
         }
 
-        if (errReason === 'invalidOffset') {
-          displayPopupMessage('Something went wrong.', 'error');
+        if (!inViewMode) {
           return;
         }
 
-        setErrorMessage(errMessage);
+        if (status === 404) {
+          navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
+          return;
+        }
+
+        if (status === 401 && errReason === 'privateAccount') {
+          setAccountLocation('profile');
+        }
       }
     },
-    [publicAccountId, handleAsyncError, displayPopupMessage]
+    [
+      inViewMode,
+      publicAccountId,
+      referrerLocation,
+      authStatus,
+      navigate,
+      setAccountLocation,
+      handleAsyncError,
+      displayPopupMessage,
+    ]
   );
 
   useEffect(() => {
@@ -138,7 +168,7 @@ export default function AccountSocialFollowing(): JSX.Element {
       setFetchingAdditionalFollowing(false);
     } catch (err: unknown) {
       console.log(err);
-      const { isHandled, status } = handleAsyncError(err);
+      const { isHandled, status, errReason } = handleAsyncError(err);
 
       if (isHandled) {
         return;
@@ -146,6 +176,20 @@ export default function AccountSocialFollowing(): JSX.Element {
 
       if (status === 400) {
         displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      if (!inViewMode) {
+        return;
+      }
+
+      if (status === 404) {
+        navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
+        return;
+      }
+
+      if (status === 401 && errReason === 'privateAccount') {
+        setAccountLocation('profile');
       }
     }
   }
