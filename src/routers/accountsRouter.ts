@@ -902,6 +902,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       is_private: boolean;
       approve_follow_requests: boolean;
       is_following: boolean;
+      follow_request_sent: boolean;
       followers_count: number;
       following_count: number;
       wishlists_count: number;
@@ -916,7 +917,8 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
         is_private,
         approve_follow_requests,
 
-        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following,
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = :accountId) AS is_following,
+        EXISTS (SELECT 1 FROM follow_requests WHERE requester_account_id = :accountId AND requestee_account_id = accounts.account_id) AS follow_request_sent,
 
         (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id) AS followers_count,
         (SELECT COUNT(*) FROM followers WHERE follower_account_id = accounts.account_id) AS following_count,
@@ -924,8 +926,8 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       FROM
         accounts
       WHERE
-        public_account_id = ?;`,
-      [accountId, publicAccountId]
+        public_account_id = :publicAccountId;`,
+      { accountId, publicAccountId }
     );
 
     const viewAccountDetails = accountRows[0] as ViewAccountDetails | undefined;
@@ -939,6 +941,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       viewAccountDetails: {
         ...viewAccountDetails,
         is_following: Boolean(viewAccountDetails.is_following),
+        follow_request_sent: Boolean(viewAccountDetails.follow_request_sent),
       },
     });
   } catch (err: unknown) {
