@@ -18,6 +18,10 @@ import { NotificationDetails } from '../../../types/notificationTypes';
 import { FollowDetails, FollowRequest } from '../../../types/socialTypes';
 import { subscribeToAccountNotifications } from '../../../services/websockets/accountNotificationsWebsSocket';
 import useViewMode from '../../../hooks/useViewMode';
+import useHistory from '../../../hooks/useHistory';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAuth from '../../../hooks/useAuth';
+import useAccountLocation from '../hooks/useAccountLocation';
 
 export default function AccountSocial(): JSX.Element {
   const { socialSection } = useAccountSocial();
@@ -30,8 +34,12 @@ export default function AccountSocial(): JSX.Element {
     setFollowRequests,
   } = useAccountSocialDetails();
   const { inViewMode, publicAccountId } = useViewMode();
+  const { setAccountLocation } = useAccountLocation();
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
+  const { referrerLocation } = useHistory();
+  const navigate: NavigateFunction = useNavigate();
+  const { authStatus } = useAuth();
 
   useEffect(() => {
     if (fetchDetails.initialFetchCompleted) {
@@ -67,7 +75,20 @@ export default function AccountSocial(): JSX.Element {
         }
 
         console.log(err);
-        handleAsyncError(err);
+        const { status, errReason } = handleAsyncError(err);
+
+        if (!inViewMode) {
+          return;
+        }
+
+        if (status === 404) {
+          navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
+          return;
+        }
+
+        if (status === 401 && errReason === 'privateAccount') {
+          setAccountLocation('profile');
+        }
       }
     };
 
@@ -76,7 +97,11 @@ export default function AccountSocial(): JSX.Element {
   }, [
     inViewMode,
     publicAccountId,
+    authStatus,
     fetchDetails,
+    referrerLocation,
+    navigate,
+    setAccountLocation,
     setFetchDetails,
     setSocialCounts,
     setFollowers,
