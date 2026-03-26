@@ -586,6 +586,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       `SELECT
         account_id AS requestee_account_id,
         is_verified AS requestee_is_verified,
+        approve_follow_requests AS follow_requires_approval,
 
         EXISTS (
           SELECT 1 FROM followers WHERE follower_account_id = :accountId AND account_id = accounts.account_id
@@ -595,11 +596,9 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
           SELECT 1 FROM follow_requests WHERE requester_account_id = :accountId AND requestee_account_id = accounts.account_id
         ) AS already_requested,
 
-        
         (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId FOR UPDATE) AS requester_following_count,
         (SELECT COUNT(*) FROM follow_requests WHERE requester_account_id = :accountId FOR UPDATE) AS requester_follow_requests_count,
         (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id FOR UPDATE) AS requestee_followers_count,
-        (SELECT approve_follow_requests FROM account_preferences WHERE account_id = accounts.account_id) AS follow_requires_approval
       FROM
         accounts
       WHERE

@@ -161,8 +161,10 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
         display_name,
         created_on_timestamp,
         is_verified,
-        failed_sign_in_attempts
-      ) VALUES (${generatePlaceHolders(8)});`,
+        failed_sign_in_attempts,
+        is_private,
+        approve_follow_requests
+      ) VALUES (${generatePlaceHolders(10)});`,
       [
         publicAccountId,
         email,
@@ -172,6 +174,8 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
         currentTimestamp,
         false,
         0,
+        true,
+        true,
       ]
     );
 
@@ -179,15 +183,6 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     const verificationToken: string = generateCryptoUuid();
     const verificationExpiryTimestamp: number = currentTimestamp + ACCOUNT_VERIFICATION_WINDOW;
-
-    await connection.execute(
-      `INSERT INTO account_preferences (
-        account_id,
-        is_private,
-        approve_follow_requests
-      ) VALUES (${generatePlaceHolders(3)});`,
-      [accountId, true, true]
-    );
 
     await connection.execute(
       `INSERT INTO account_verification (
@@ -807,20 +802,17 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
 
     const [accountRows] = await dbPool.query<RowDataPacket[][]>(
       `SELECT
-        accounts.public_account_id,
-        accounts.email,
-        accounts.username,
-        accounts.display_name,
-        accounts.created_on_timestamp,
-
-        account_preferences.is_private,
-        account_preferences.approve_follow_requests
+        public_account_id,
+        email,
+        username,
+        display_name,
+        created_on_timestamp,
+        is_private,
+        approve_follow_requests
       FROM
         accounts
-      LEFT JOIN
-        account_preferences USING(account_id)
       WHERE
-        accounts.account_id = :accountId;
+        account_id = :accountId;
       
       SELECT
         request_id,
@@ -917,13 +909,12 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        accounts.public_account_id,
-        accounts.username,
-        accounts.display_name,
-        accounts.created_on_timestamp,
-
-        account_preferences.is_private,
-        account_preferences.approve_follow_requests,
+        public_account_id,
+        username,
+        display_name,
+        created_on_timestamp,
+        is_private,
+        approve_follow_requests,
 
         EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following,
 
@@ -932,10 +923,8 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
         (SELECT COUNT(*) FROM wishlists WHERE account_id = accounts.account_id) AS wishlists_count
       FROM
         accounts
-      LEFT JOIN
-        account_preferences USING(account_id)
       WHERE
-        accounts.public_account_id = ?;`,
+        public_account_id = ?;`,
       [accountId, publicAccountId]
     );
 
@@ -1010,7 +999,7 @@ accountsRouter.patch('/details/privacy', async (req: Request, res: Response) => 
   try {
     const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
       `UPDATE
-        account_preferences
+        accounts
       SET
         is_private = ?,
         approve_follow_requests = ?
@@ -2601,15 +2590,15 @@ accountsRouter.delete(
 
       const [requestRows] = await connection.execute<RowDataPacket[]>(
         `SELECT
-        request_id,
-        confirmation_code,
-        failed_attempts,
-        expiry_timestamp
-      FROM
-        account_deletion
-      WHERE
-        account_id = ?
-      FOR UPDATE;`,
+          request_id,
+          confirmation_code,
+          failed_attempts,
+          expiry_timestamp
+        FROM
+          account_deletion
+        WHERE
+          account_id = ?
+        FOR UPDATE;`,
         [accountId]
       );
 
