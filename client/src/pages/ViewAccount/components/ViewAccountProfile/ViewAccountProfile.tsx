@@ -20,6 +20,7 @@ export default function ViewAccountProfile({
     display_name,
     created_on_timestamp,
     is_following,
+    follow_request_sent,
     followers_count,
     following_count,
     wishlists_count,
@@ -28,6 +29,32 @@ export default function ViewAccountProfile({
   const { setAccountLocation } = useAccountLocation();
   const { setSocialSection } = useAccountSocial();
   const navigate: NavigateFunction = useNavigate();
+
+  async function sendFollowRequest(): Promise<void> {
+    // TODO: continue implementation
+  }
+
+  async function cancelFollowRequest(): Promise<void> {
+    // TODO: continue implementation
+  }
+
+  async function unfollow(): Promise<void> {
+    // TODO: continue implementation
+  }
+
+  async function handleOnClick(): Promise<void> {
+    if (is_following) {
+      await unfollow();
+      return;
+    }
+
+    if (follow_request_sent) {
+      await cancelFollowRequest();
+      return;
+    }
+
+    await sendFollowRequest();
+  }
 
   return (
     <section>
@@ -71,25 +98,12 @@ export default function ViewAccountProfile({
         </button>
       </div>
 
-      {is_following ? (
-        <Button
-          className='bg-secondary border-title text-title w-full sm:w-fit mb-1'
-          onClick={() => {
-            /** TODO: continue implementation */
-          }}
-        >
-          Unfollow
-        </Button>
-      ) : (
-        <Button
-          className='bg-cta border-cta text-dark w-full sm:w-fit mb-1'
-          onClick={() => {
-            /** TODO: continue implementation */
-          }}
-        >
-          Follow
-        </Button>
-      )}
+      <Button
+        className={`${!is_following && !follow_request_sent ? 'bg-cta border-cta text-dark' : 'bg-description border-description text-dark'} w-full sm:w-fit mb-1`}
+        onClick={handleOnClick}
+      >
+        {is_following ? 'Unfollow' : follow_request_sent ? 'Cancel follow request' : 'Follow'}
+      </Button>
 
       <div className='text-description/50 text-xs'>
         <p className='leading-none mb-[4px]'>
