@@ -6,25 +6,30 @@ import useAccountSocial from '../../../Account/hooks/useAccountSocial';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Button from '../../../../components/Button/Button';
 import useViewAccountDetails from '../../hooks/useViewAccountDetails';
+import useAuth from '../../../../hooks/useAuth';
 
 export default function ViewAccountProfile(): JSX.Element {
   const { setAccountLocation } = useAccountLocation();
   const { setSocialSection } = useAccountSocial();
   const { viewAccountDetails } = useViewAccountDetails();
 
+  const { authStatus } = useAuth();
+  const navigate: NavigateFunction = useNavigate();
+
   const {
     public_account_id,
     username,
     display_name,
     created_on_timestamp,
-    is_following,
-    follow_request_sent,
+    follow_id,
+    follow_request_id,
     followers_count,
     following_count,
     wishlists_count,
   } = viewAccountDetails;
 
-  const navigate: NavigateFunction = useNavigate();
+  const isFollowing: boolean = follow_id !== null;
+  const followRequestSEnt: boolean = follow_request_id !== null;
 
   async function sendFollowRequest(): Promise<void> {
     // TODO: continue implementation
@@ -39,13 +44,18 @@ export default function ViewAccountProfile(): JSX.Element {
   }
 
   async function handleOnClick(): Promise<void> {
-    if (is_following) {
+    if (isFollowing) {
       await unfollow();
       return;
     }
 
-    if (follow_request_sent) {
+    if (followRequestSEnt) {
       await cancelFollowRequest();
+      return;
+    }
+
+    if (authStatus !== 'authenticated') {
+      navigate('/sign-in');
       return;
     }
 
@@ -95,10 +105,10 @@ export default function ViewAccountProfile(): JSX.Element {
       </div>
 
       <Button
-        className={`${!is_following && !follow_request_sent ? 'bg-cta border-cta text-dark' : 'bg-description border-description text-dark'} w-full sm:w-fit mb-1`}
+        className={`${!isFollowing && !followRequestSEnt ? 'bg-cta border-cta text-dark' : 'bg-description border-description text-dark'} w-full sm:w-fit mb-1`}
         onClick={handleOnClick}
       >
-        {is_following ? 'Unfollow' : follow_request_sent ? 'Cancel follow request' : 'Follow'}
+        {isFollowing ? 'Unfollow' : followRequestSEnt ? 'Cancel follow request' : 'Follow'}
       </Button>
 
       <div className='text-description/50 text-xs'>

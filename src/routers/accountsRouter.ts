@@ -901,8 +901,8 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       created_on_timestamp: number;
       is_private: boolean;
       approve_follow_requests: boolean;
-      is_following: boolean;
-      follow_request_sent: boolean;
+      follow_id: number | null;
+      follow_request_id: number | null;
       followers_count: number;
       following_count: number;
       wishlists_count: number;
@@ -910,23 +910,31 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-        public_account_id,
-        username,
-        display_name,
-        created_on_timestamp,
-        is_private,
-        approve_follow_requests,
+        accounts.public_account_id,
+        accounts.username,
+        accounts.display_name,
+        accounts.created_on_timestamp,
+        accounts.is_private,
+        accounts.approve_follow_requests,
 
-        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = :accountId) AS is_following,
-        EXISTS (SELECT 1 FROM follow_requests WHERE requester_account_id = :accountId AND requestee_account_id = accounts.account_id) AS follow_request_sent,
+        followers.follow_id,
+        follow_requests.request_id AS follow_request_id,
 
         (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id) AS followers_count,
         (SELECT COUNT(*) FROM followers WHERE follower_account_id = accounts.account_id) AS following_count,
         (SELECT COUNT(*) FROM wishlists WHERE account_id = accounts.account_id) AS wishlists_count
       FROM
         accounts
+      LEFT JOIN
+        followers ON
+          accounts.account_id = followers.account_id AND
+          followers.follower_account_id = :accountId
+      LEFT JOIN
+        follow_requests ON
+          accounts.account_id = follow_requests.requestee_account_id AND
+          follow_requests.requester_account_id = :accountId
       WHERE
-        public_account_id = :publicAccountId;`,
+        accounts.public_account_id = :publicAccountId;`,
       { accountId, publicAccountId }
     );
 
@@ -937,13 +945,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({
-      viewAccountDetails: {
-        ...viewAccountDetails,
-        is_following: Boolean(viewAccountDetails.is_following),
-        follow_request_sent: Boolean(viewAccountDetails.follow_request_sent),
-      },
-    });
+    res.json({ viewAccountDetails });
   } catch (err: unknown) {
     console.log(err);
 
