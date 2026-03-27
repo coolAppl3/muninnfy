@@ -17,6 +17,7 @@ import AccountSocialProvider from '../Account/providers/AccountSocialProvider';
 import ViewAccountContent from './components/ViewAccountContent/ViewAccountContent';
 import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDetailsProvider';
 import ViewModeProvider from '../../providers/ViewModeProvider';
+import ViewAccountDetailsProvider from './provider/ViewAccountDetailsProvider';
 
 export default function ViewAccount(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -86,18 +87,20 @@ export default function ViewAccount(): JSX.Element {
       >
         <AccountLocationProvider>
           {isLoaded && viewAccountDetails ? (
-            <main className='py-4'>
-              <Container className='grid grid-cols-12 items-start gap-1'>
-                <AccountSidebar />
-                <AccountNavMenu />
+            <ViewAccountDetailsProvider initialViewAccountDetails={viewAccountDetails}>
+              <main className='py-4'>
+                <Container className='grid grid-cols-12 items-start gap-1'>
+                  <AccountSidebar />
+                  <AccountNavMenu />
 
-                <AccountSocialDetailsProvider>
-                  <AccountSocialProvider>
-                    <ViewAccountContent viewAccountDetails={viewAccountDetails} />
-                  </AccountSocialProvider>
-                </AccountSocialDetailsProvider>
-              </Container>
-            </main>
+                  <AccountSocialDetailsProvider>
+                    <AccountSocialProvider>
+                      <ViewAccountContent />
+                    </AccountSocialProvider>
+                  </AccountSocialDetailsProvider>
+                </Container>
+              </main>
+            </ViewAccountDetailsProvider>
           ) : (
             <LoadingSkeleton />
           )}

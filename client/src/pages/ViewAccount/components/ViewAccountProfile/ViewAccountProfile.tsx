@@ -1,19 +1,17 @@
 import { JSX } from 'react';
 import StatisticItem from '../../../../components/StatisticItem/StatisticItem';
-import { ViewAccountDetailsType } from '../../../../types/accountTypes';
 import { getFullDateString } from '../../../../utils/globalUtils';
 import useAccountLocation from '../../../Account/hooks/useAccountLocation';
 import useAccountSocial from '../../../Account/hooks/useAccountSocial';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Button from '../../../../components/Button/Button';
+import useViewAccountDetails from '../../hooks/useViewAccountDetails';
 
-type ViewAccountProfileProps = {
-  viewAccountDetails: ViewAccountDetailsType;
-};
+export default function ViewAccountProfile(): JSX.Element {
+  const { setAccountLocation } = useAccountLocation();
+  const { setSocialSection } = useAccountSocial();
+  const { viewAccountDetails } = useViewAccountDetails();
 
-export default function ViewAccountProfile({
-  viewAccountDetails,
-}: ViewAccountProfileProps): JSX.Element {
   const {
     public_account_id,
     username,
@@ -26,8 +24,6 @@ export default function ViewAccountProfile({
     wishlists_count,
   } = viewAccountDetails;
 
-  const { setAccountLocation } = useAccountLocation();
-  const { setSocialSection } = useAccountSocial();
   const navigate: NavigateFunction = useNavigate();
 
   async function sendFollowRequest(): Promise<void> {
