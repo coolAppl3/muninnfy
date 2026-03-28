@@ -11,7 +11,7 @@ export default function AccountLinkCard({ account }: AccountLinkCardProps): JSX.
 
   return (
     <Link
-      to={`/account/view/${public_account_id}`}
+      to={`/view/account/${public_account_id}`}
       className='p-1 bg-primary rounded text-description text-sm overflow-hidden min-w-0 transition-[filter] hover:brightness-75'
     >
       <p className='text-title font-medium leading-none max-w-full truncate mb-[4px]'>

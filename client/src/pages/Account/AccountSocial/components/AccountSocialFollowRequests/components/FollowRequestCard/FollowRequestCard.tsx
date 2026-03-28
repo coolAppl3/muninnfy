@@ -175,7 +175,7 @@ function FollowRequestCard({
         >
           <p className='text-title leading-none mb-[4px]'>{display_name}</p>
           <Link
-            to={`/account/view/${public_account_id}`}
+            to={`/view/account/${public_account_id}`}
             className='block leading-none transition-colors hover:text-cta'
           >
             @{username}
