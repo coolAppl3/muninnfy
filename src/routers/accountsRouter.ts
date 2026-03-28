@@ -901,6 +901,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       created_on_timestamp: number;
       is_private: boolean;
       approve_follow_requests: boolean;
+      is_owner: boolean;
 
       follow_id: number | null;
       follow_request_id: number | null;
@@ -918,6 +919,7 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
         accounts.created_on_timestamp,
         accounts.is_private,
         accounts.approve_follow_requests,
+        (accounts.account_id = :accountId) AS is_owner,
 
         followers.follow_id,
         follow_requests.request_id AS follow_request_id,
@@ -947,7 +949,12 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({ viewAccountDetails });
+    res.json({
+      viewAccountDetails: {
+        ...viewAccountDetails,
+        is_owner: Boolean(viewAccountDetails.is_owner),
+      },
+    });
   } catch (err: unknown) {
     console.log(err);
 

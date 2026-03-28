@@ -45,6 +45,11 @@ export default function ViewAccount(): JSX.Element {
           await getViewAccountDetailsService(publicAccountId, abortController.signal)
         ).data;
 
+        if (viewAccountDetails.is_owner) {
+          navigate('/account');
+          return;
+        }
+
         setViewAccountDetails(viewAccountDetails);
         setIsLoaded(true);
       } catch (err: unknown) {
