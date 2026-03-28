@@ -120,6 +120,9 @@ export default function ViewAccountProfile(): JSX.Element {
 
     try {
       await cancelFollowRequestService(follow_request_id);
+      setViewAccountDetails((prev) => ({ ...prev, follow_request_id: null }));
+
+      displayPopupMessage('Request cancelled.', 'success');
     } catch (err: unknown) {
       console.log(err);
       const { status } = handleAsyncError(err);
