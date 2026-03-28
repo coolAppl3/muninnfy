@@ -675,7 +675,11 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       );
 
       await connection.commit();
-      res.json({ followId: resultSetHeader.insertId, followTimestamp: currentTimestamp });
+      res.json({
+        followAutoApproved: true,
+        insertId: resultSetHeader.insertId,
+        timestamp: currentTimestamp,
+      });
 
       await addNotification(
         followDetails.requestee_account_id,
@@ -697,7 +701,11 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     );
 
     await connection.commit();
-    res.json({ requestId: resultSetHeader.insertId, requestTimestamp: currentTimestamp });
+    res.json({
+      followAutoApproved: false,
+      insertId: resultSetHeader.insertId,
+      timestamp: currentTimestamp,
+    });
 
     await addNotification(
       followDetails.requestee_account_id,

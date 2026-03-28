@@ -94,15 +94,11 @@ type SendFollowRequestServicePayload = {
   requesteePublicAccountId: string;
 };
 
-type SendFollowRequestServiceData =
-  | {
-      requestId: number;
-      requestTimestamp: number;
-    }
-  | {
-      followId: number;
-      followTimestamp: number;
-    };
+type SendFollowRequestServiceData = {
+  followAutoApproved: boolean;
+  insertId: number;
+  timestamp: number;
+};
 
 export function sendFollowRequestService(
   body: SendFollowRequestServicePayload
