@@ -10,6 +10,7 @@ import useAuth from '../../../../hooks/useAuth';
 import {
   cancelFollowRequestService,
   sendFollowRequestService,
+  unfollowService,
 } from '../../../../services/socialServices';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useHandleAsyncError, {
@@ -17,6 +18,7 @@ import useHandleAsyncError, {
 } from '../../../../hooks/useHandleAsyncError';
 import useHistory from '../../../../hooks/useHistory';
 import useInfoModal from '../../../../hooks/useInfoModal';
+import useConfirmModal from '../../../../hooks/useConfirmModal';
 
 export default function ViewAccountProfile(): JSX.Element {
   const { setAccountLocation } = useAccountLocation();
@@ -31,6 +33,7 @@ export default function ViewAccountProfile(): JSX.Element {
   const { displayPopupMessage } = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
+  const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   const {
     public_account_id,
@@ -136,16 +139,48 @@ export default function ViewAccountProfile(): JSX.Element {
   }
 
   async function unfollow(): Promise<void> {
-    // TODO: continue implementation
+    if (!follow_id) {
+      displayPopupMessage(`You're not following this user.`, 'error');
+      return;
+    }
+
+    try {
+      await unfollowService(follow_id);
+      setViewAccountDetails((prev) => ({ ...prev, follow_id: null }));
+
+      displayPopupMessage('Unfollowed successfully.', 'success');
+    } catch (err: unknown) {
+      console.log(err);
+      const { status } = handleAsyncError(err);
+
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   async function handleOnClick(): Promise<void> {
-    setIsSubmitting(true);
-
     if (isFollowing) {
-      await unfollow();
+      displayConfirmModal({
+        description: `Are you sure you want to unfollow ${display_name}?`,
+        confirmBtnTitle: 'Confirm',
+        cancelBtnTitle: 'Cancel',
+        isDangerous: true,
+        onCancel: removeConfirmModal,
+        onConfirm: async () => {
+          removeConfirmModal();
+          setIsSubmitting(true);
+
+          await unfollow();
+        },
+      });
+
       return;
     }
+
+    setIsSubmitting(true);
 
     if (followRequestSent) {
       await cancelFollowRequest();
