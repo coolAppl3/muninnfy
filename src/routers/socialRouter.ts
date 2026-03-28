@@ -576,10 +576,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       follow_requires_approval: boolean;
 
       follow_id: number | null;
-      follow_timestamp: number;
-
       follow_request_id: number | null;
-      request_timestamp: number;
 
       requester_following_count: number;
       requester_follow_requests_count: number;
@@ -593,10 +590,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
         accounts.approve_follow_requests AS follow_requires_approval,
 
         followers.follow_id,
-        followers.follow_timestamp,
-
         follow_requests.request_id AS follow_request_id,
-        follow_requests.request_timestamp,
 
         (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId FOR UPDATE) AS requester_following_count,
         (SELECT COUNT(*) FROM follow_requests WHERE requester_account_id = :accountId FOR UPDATE) AS requester_follow_requests_count,
@@ -639,7 +633,6 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       res.status(201).json({
         followAutoApproved: true,
         insertId: followDetails.follow_id,
-        timestamp: followDetails.follow_timestamp,
       });
 
       return;
@@ -650,7 +643,6 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       res.status(201).json({
         followAutoApproved: false,
         insertId: followDetails.follow_request_id,
-        timestamp: followDetails.request_timestamp,
       });
 
       return;
@@ -694,7 +686,6 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       res.status(201).json({
         followAutoApproved: true,
         insertId: resultSetHeader.insertId,
-        timestamp: currentTimestamp,
       });
 
       await addNotification(
@@ -720,7 +711,6 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     res.status(201).json({
       followAutoApproved: false,
       insertId: resultSetHeader.insertId,
-      timestamp: currentTimestamp,
     });
 
     await addNotification(

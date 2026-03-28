@@ -97,7 +97,6 @@ type SendFollowRequestServicePayload = {
 type SendFollowRequestServiceData = {
   followAutoApproved: boolean;
   insertId: number;
-  timestamp: number;
 };
 
 export function sendFollowRequestService(
