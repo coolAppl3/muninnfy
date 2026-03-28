@@ -7,6 +7,11 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Button from '../../../../components/Button/Button';
 import useViewAccountDetails from '../../hooks/useViewAccountDetails';
 import useAuth from '../../../../hooks/useAuth';
+import { cancelFollowRequestService } from '../../../../services/socialServices';
+import usePopupMessage from '../../../../hooks/usePopupMessage';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../hooks/useHandleAsyncError';
 
 export default function ViewAccountProfile(): JSX.Element {
   const { setAccountLocation } = useAccountLocation();
@@ -15,6 +20,8 @@ export default function ViewAccountProfile(): JSX.Element {
 
   const { authStatus } = useAuth();
   const navigate: NavigateFunction = useNavigate();
+  const { displayPopupMessage } = usePopupMessage();
+  const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
   const {
     public_account_id,
@@ -36,7 +43,21 @@ export default function ViewAccountProfile(): JSX.Element {
   }
 
   async function cancelFollowRequest(): Promise<void> {
-    // TODO: continue implementation
+    if (!follow_request_id) {
+      displayPopupMessage('Follow request already sent.', 'success');
+      return;
+    }
+
+    try {
+      await cancelFollowRequestService(follow_request_id);
+    } catch (err: unknown) {
+      console.log(err);
+      const { status } = handleAsyncError(err);
+
+      if (status === 400) {
+        displayPopupMessage('Something went wrong.', 'error');
+      }
+    }
   }
 
   async function unfollow(): Promise<void> {
