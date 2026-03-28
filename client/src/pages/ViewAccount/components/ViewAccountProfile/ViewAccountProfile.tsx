@@ -238,7 +238,7 @@ export default function ViewAccountProfile(): JSX.Element {
       </div>
 
       <Button
-        className={`${!isFollowing && !followRequestSent ? 'bg-cta border-cta text-dark' : 'bg-description border-description text-dark'} w-full sm:w-fit mb-1 text-sm !leading-[1.2rem] ${isSubmitting ? '!brightness-75' : ''}`}
+        className={`${!isFollowing && !followRequestSent ? 'bg-cta border-cta text-dark' : 'bg-description border-description text-dark'} w-fit mb-1 text-sm !leading-[1.2rem] ${isSubmitting ? '!brightness-75' : ''}`}
         onClick={handleOnClick}
         disabled={isSubmitting}
       >
