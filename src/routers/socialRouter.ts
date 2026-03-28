@@ -540,20 +540,20 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
   }
 
   type RequestData = {
-    requesteePublicAccountId: string;
+    publicAccountId: string;
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['requesteePublicAccountId'];
+  const expectedKeys: string[] = ['publicAccountId'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { requesteePublicAccountId } = requestData;
+  const { publicAccountId } = requestData;
 
-  if (!isValidUuid(requesteePublicAccountId)) {
+  if (!isValidUuid(publicAccountId)) {
     res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
     return;
   }
@@ -573,37 +573,47 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     type FollowDetails = {
       requestee_account_id: number;
       requestee_is_verified: boolean;
-      already_following: boolean;
-      already_requested: boolean;
+      follow_requires_approval: boolean;
+
+      follow_id: number | null;
+      follow_timestamp: number;
+
+      follow_request_id: number | null;
+      request_timestamp: number;
 
       requester_following_count: number;
       requester_follow_requests_count: number;
       requestee_followers_count: number;
-      follow_requires_approval: boolean;
     };
 
     const [followRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        account_id AS requestee_account_id,
-        is_verified AS requestee_is_verified,
-        approve_follow_requests AS follow_requires_approval,
+        accounts.account_id AS requestee_account_id,
+        accounts.is_verified AS requestee_is_verified,
+        accounts.approve_follow_requests AS follow_requires_approval,
 
-        EXISTS (
-          SELECT 1 FROM followers WHERE follower_account_id = :accountId AND account_id = accounts.account_id
-        ) AS already_following,
+        followers.follow_id,
+        followers.follow_timestamp,
 
-        EXISTS (
-          SELECT 1 FROM follow_requests WHERE requester_account_id = :accountId AND requestee_account_id = accounts.account_id
-        ) AS already_requested,
+        follow_requests.request_id AS follow_request_id,
+        follow_requests.request_timestamp,
 
         (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId FOR UPDATE) AS requester_following_count,
         (SELECT COUNT(*) FROM follow_requests WHERE requester_account_id = :accountId FOR UPDATE) AS requester_follow_requests_count,
         (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id FOR UPDATE) AS requestee_followers_count
       FROM
         accounts
+      LEFT JOIN
+        followers ON
+          accounts.account_id = followers.account_id AND
+          followers.follower_account_id = :accountId
+      LEFT JOIN
+        follow_requests ON
+          accounts.account_id = follow_requests.requestee_account_id AND
+          follow_requests.requester_account_id = :accountId
       WHERE
-        public_account_id = :requesteePublicAccountId;`,
-      { accountId, requesteePublicAccountId }
+        public_account_id = :publicAccountId;`,
+      { accountId, publicAccountId }
     );
 
     const followDetails = followRows[0] as FollowDetails | undefined;
@@ -624,18 +634,24 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       return;
     }
 
-    if (followDetails.already_following) {
+    if (followDetails.follow_id) {
       await connection.rollback();
-      res
-        .status(409)
-        .json({ message: 'Already following this user.', reason: 'alreadyFollowing' });
+      res.status(201).json({
+        followAutoApproved: true,
+        insertId: followDetails.follow_id,
+        timestamp: followDetails.follow_timestamp,
+      });
 
       return;
     }
 
-    if (followDetails.already_requested) {
+    if (followDetails.follow_request_id) {
       await connection.rollback();
-      res.status(409).json({ message: 'Follow request already sent.', reason: 'alreadySent' });
+      res.status(201).json({
+        followAutoApproved: false,
+        insertId: followDetails.follow_request_id,
+        timestamp: followDetails.request_timestamp,
+      });
 
       return;
     }
@@ -675,7 +691,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       );
 
       await connection.commit();
-      res.json({
+      res.status(201).json({
         followAutoApproved: true,
         insertId: resultSetHeader.insertId,
         timestamp: currentTimestamp,
@@ -701,7 +717,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     );
 
     await connection.commit();
-    res.json({
+    res.status(201).json({
       followAutoApproved: false,
       insertId: resultSetHeader.insertId,
       timestamp: currentTimestamp,
