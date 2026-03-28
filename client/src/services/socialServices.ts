@@ -91,7 +91,7 @@ export function declineFollowRequestService(requestId: number): Promise<AxiosRes
 }
 
 type SendFollowRequestServicePayload = {
-  requesteePublicAccountId: string;
+  publicAccountId: string;
 };
 
 type SendFollowRequestServiceData = {
