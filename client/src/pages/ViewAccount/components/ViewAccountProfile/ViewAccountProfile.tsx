@@ -1,4 +1,4 @@
-import { JSX, ReactNode, useState } from 'react';
+import { JSX, useState } from 'react';
 import StatisticItem from '../../../../components/StatisticItem/StatisticItem';
 import { getFullDateString } from '../../../../utils/globalUtils';
 import useAccountLocation from '../../../Account/hooks/useAccountLocation';
@@ -237,16 +237,13 @@ export default function ViewAccountProfile(): JSX.Element {
         </button>
       </div>
 
-      {isSubmitting && <div className='spinner w-[2.8rem] h-[2.8rem] mb-1'></div>}
-
-      {isSubmitting || (
-        <Button
-          className={`${!isFollowing && !followRequestSent ? 'bg-cta border-cta text-dark' : 'bg-description border-description text-dark'} w-full sm:w-fit mb-1 text-sm !leading-[1.2rem]`}
-          onClick={handleOnClick}
-        >
-          {isFollowing ? 'Unfollow' : followRequestSent ? 'Follow requested' : 'Follow'}
-        </Button>
-      )}
+      <Button
+        className={`${!isFollowing && !followRequestSent ? 'bg-cta border-cta text-dark' : 'bg-description border-description text-dark'} w-full sm:w-fit mb-1 text-sm !leading-[1.2rem] ${isSubmitting ? '!brightness-75' : ''}`}
+        onClick={handleOnClick}
+        disabled={isSubmitting}
+      >
+        {isFollowing ? 'Unfollow' : followRequestSent ? 'Follow requested' : 'Follow'}
+      </Button>
 
       <div className='text-description/50 text-xs'>
         <p className='leading-none mb-[4px]'>
