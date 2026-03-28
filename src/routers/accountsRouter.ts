@@ -901,8 +901,10 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       created_on_timestamp: number;
       is_private: boolean;
       approve_follow_requests: boolean;
+
       follow_id: number | null;
       follow_request_id: number | null;
+
       followers_count: number;
       following_count: number;
       wishlists_count: number;
