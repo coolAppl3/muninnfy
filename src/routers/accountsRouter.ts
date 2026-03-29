@@ -46,6 +46,10 @@ import {
 import { createAuthSession, purgeAuthSessions } from '../auth/authSessions';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
+import {
+  FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+  PUBLIC_WISHLIST_PRIVACY_LEVEL,
+} from '../util/constants/wishlistConstants';
 
 export const accountsRouter: Router = express.Router();
 
@@ -926,7 +930,17 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
 
         (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id) AS followers_count,
         (SELECT COUNT(*) FROM followers WHERE follower_account_id = accounts.account_id) AS following_count,
-        (SELECT COUNT(*) FROM wishlists WHERE account_id = accounts.account_id) AS wishlists_count
+
+        (SELECT
+          COUNT(*)
+        FROM
+          wishlists
+        WHERE
+          account_id = accounts.account_id AND
+          (
+            privacy_level = :publicPrivacyLevel OR
+            (privacy_level = :followersPrivacyLevel AND followers.follow_id IS NOT NULL)
+          )) AS wishlists_count
       FROM
         accounts
       LEFT JOIN
@@ -939,7 +953,12 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
           follow_requests.requester_account_id = :accountId
       WHERE
         accounts.public_account_id = :publicAccountId;`,
-      { accountId, publicAccountId }
+      {
+        accountId,
+        publicAccountId,
+        publicPrivacyLevel: PUBLIC_WISHLIST_PRIVACY_LEVEL,
+        followersPrivacyLevel: FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+      }
     );
 
     const viewAccountDetails = accountRows[0] as ViewAccountDetails | undefined;
