@@ -10,7 +10,7 @@ import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHa
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import WishlistsProvider from './providers/WishlistsProvider';
 import WishlistsContainer from './WishlistsContainer/WishlistsContainer';
-import { WishlistsToolbar } from './WishlistsToolbar/WishlistsToolbar';
+import WishlistsToolbar from './WishlistsToolbar/WishlistsToolbar';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../hooks/useHistory';
 import WishlistsHeader from './WishlistsHeader/WishlistsHeader';
