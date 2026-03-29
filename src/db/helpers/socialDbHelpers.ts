@@ -67,7 +67,7 @@ export async function getTargetAccountId(
       accounts
     WHERE
       public_account_id = ?;`,
-    [accountId || 0, publicAccountId]
+    [accountId, publicAccountId]
   );
 
   const accountDetails = accountRows[0] as AccountDetails | undefined;
