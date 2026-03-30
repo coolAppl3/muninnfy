@@ -2,13 +2,13 @@ import { JSX, useMemo } from 'react';
 import Container from '../../../components/Container/Container';
 import useWishlists from '../hooks/useWishlists';
 import WishlistCard from '../../../components/WishlistCard/WishlistCard';
-import { ExtendedWishlistDetailsType } from '../../../types/wishlistTypes';
+import { ExtendedWishlistDetailsType, ViewWishlistDetails } from '../../../types/wishlistTypes';
 
 export default function WishlistsContainer(): JSX.Element {
   const { wishlists, isSingleColumnView, wishlistsFilterConfig, wishlistMatchesFilterConfig } =
     useWishlists();
 
-  const filteredWishlists: ExtendedWishlistDetailsType[] = useMemo(
+  const filteredWishlists: (ExtendedWishlistDetailsType | ViewWishlistDetails)[] = useMemo(
     () => wishlists.filter(wishlistMatchesFilterConfig),
     [wishlists, wishlistMatchesFilterConfig]
   );
@@ -56,12 +56,14 @@ export default function WishlistsContainer(): JSX.Element {
               No wishlists found
             </p>
           ) : (
-            filteredWishlists.map((wishlist: ExtendedWishlistDetailsType) => (
-              <WishlistCard
-                key={wishlist.wishlist_id}
-                wishlist={wishlist}
-              />
-            ))
+            filteredWishlists.map(
+              (wishlist: ExtendedWishlistDetailsType | ViewWishlistDetails) => (
+                <WishlistCard
+                  key={wishlist.wishlist_id}
+                  wishlist={wishlist}
+                />
+              )
+            )
           )}
         </div>
       </Container>

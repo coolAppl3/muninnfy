@@ -1,38 +1,50 @@
 import { JSX, useEffect, useState } from 'react';
 import Head from '../../components/Head/Head';
-import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
+import { ViewWishlistDetails } from '../../types/wishlistTypes';
 import {
   CombinedWishlistsStatistics,
-  getAllWishlistsService,
+  getAllViewWishlistsService,
 } from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
-import WishlistsProvider from './providers/WishlistsProvider';
-import WishlistsContainer from './WishlistsContainer/WishlistsContainer';
-import WishlistsToolbar from './WishlistsToolbar/WishlistsToolbar';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
+import WishlistsProvider from '../Wishlists/providers/WishlistsProvider';
+import WishlistsContainer from '../Wishlists/WishlistsContainer/WishlistsContainer';
+import WishlistsToolbar from '../Wishlists/WishlistsToolbar/WishlistsToolbar';
+import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import useHistory from '../../hooks/useHistory';
-import WishlistsHeader from './WishlistsHeader/WishlistsHeader';
+import WishlistsHeader from '../Wishlists/WishlistsHeader/WishlistsHeader';
 import ViewModeProvider from '../../providers/ViewModeProvider';
+import useAuth from '../../hooks/useAuth';
+import usePopupMessage from '../../hooks/usePopupMessage';
 
-export default function Wishlists(): JSX.Element {
+export default function ViewWishlists(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>([]);
+  const [wishlists, setWishlists] = useState<ViewWishlistDetails[]>([]);
   const [combinedWishlistsStatistics, setCombinedWishlistsStatistics] =
     useState<CombinedWishlistsStatistics | null>(null);
 
+  const { publicAccountId } = useParams();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
-  const navigate: NavigateFunction = useNavigate();
+  const { authStatus } = useAuth();
   const { referrerLocation } = useHistory();
+  const navigate: NavigateFunction = useNavigate();
+  const { displayPopupMessage } = usePopupMessage();
 
   useEffect(() => {
+    if (!publicAccountId) {
+      displayPopupMessage('Account not found.', 'error');
+      navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
+
+      return;
+    }
+
     const abortController: AbortController = new AbortController();
 
-    const getAllWishlists = async () => {
+    const getAllViewWishlists = async () => {
       try {
         const { wishlists: fetchedWishlists, combinedWishlistsStatistics } = (
-          await getAllWishlistsService(abortController.signal)
+          await getAllViewWishlistsService(publicAccountId, abortController.signal)
         ).data;
 
         if (abortController.signal.aborted) {
@@ -55,22 +67,32 @@ export default function Wishlists(): JSX.Element {
           return;
         }
 
-        navigate(referrerLocation || '/account');
+        navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
       }
     };
 
-    getAllWishlists();
+    getAllViewWishlists();
 
     return () => abortController.abort();
-  }, [handleAsyncError, navigate, referrerLocation]);
+  }, [
+    handleAsyncError,
+    navigate,
+    displayPopupMessage,
+    referrerLocation,
+    publicAccountId,
+    authStatus,
+  ]);
 
   return (
     <>
-      <Head title='Wishlists - Muninnfy' />
+      <Head title='View Wishlists - Muninnfy' />
 
       {isLoaded || <LoadingSkeleton />}
       {isLoaded && (
-        <ViewModeProvider inViewMode={false}>
+        <ViewModeProvider
+          inViewMode={true}
+          publicAccountId={publicAccountId}
+        >
           <WishlistsProvider initialWishlists={wishlists}>
             <main className='py-4 grid gap-2'>
               {combinedWishlistsStatistics && (

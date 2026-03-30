@@ -3,10 +3,12 @@ import useWishlists from '../../hooks/useWishlists';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import SortIcon from '../../../../assets/svg/SortIcon.svg?react';
 import { WishlistsSortingMode } from '../../contexts/WishlistsContext';
+import useViewMode from '../../../../hooks/useViewMode';
 
 export default function WishlistsToolbarSort(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const { inViewMode } = useViewMode();
   const { wishlistsSortingMode, setWishlistsSortingMode, sortWishlists } = useWishlists();
   const { displayPopupMessage } = usePopupMessage();
 
@@ -39,14 +41,18 @@ export default function WishlistsToolbarSort(): JSX.Element {
         <SortIcon className={`w-2 h-2 transition-colors ${isOpen ? 'text-cta' : ''}`} />
       </button>
 
-      <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
-        <button
-          type='button'
-          className={`context-menu-btn ${wishlistsSortingMode === 'interactivity' ? 'text-cta' : ''}`}
-          onClick={() => handleSortBtnClick('interactivity')}
-        >
-          Interactivity
-        </button>
+      <div
+        className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}
+      >
+        {inViewMode || (
+          <button
+            type='button'
+            className={`context-menu-btn ${wishlistsSortingMode === 'interactivity' ? 'text-cta' : ''}`}
+            onClick={() => handleSortBtnClick('interactivity')}
+          >
+            Interactivity
+          </button>
+        )}
 
         <button
           type='button'

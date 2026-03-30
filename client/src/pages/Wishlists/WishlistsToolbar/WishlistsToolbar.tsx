@@ -9,8 +9,10 @@ import WishlistsToolbarSort from './components/WishlistsToolbarSort';
 import WishlistsToolbarOptions from './components/WishlistsToolbarOptions';
 import CalendarProvider from '../../../providers/CalendarProvider';
 import WishlistsToolbarFilters from './components/WishlistsToolbarFilters/WishlistsToolbarFilters';
+import useViewMode from '../../../hooks/useViewMode';
 
 export default function WishlistsToolbar(): JSX.Element {
+  const { inViewMode } = useViewMode();
   const { setWishlistsFilterConfig } = useWishlists();
 
   const [value, setValue] = useState<string>('');
@@ -47,7 +49,7 @@ export default function WishlistsToolbar(): JSX.Element {
             </button>
 
             <WishlistsToolbarSort />
-            <WishlistsToolbarOptions />
+            {inViewMode || <WishlistsToolbarOptions />}
           </header>
 
           <CalendarProvider>

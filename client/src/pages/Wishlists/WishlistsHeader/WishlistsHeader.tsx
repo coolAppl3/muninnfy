@@ -6,6 +6,7 @@ import { CombinedWishlistsStatistics } from '../../../services/wishlistServices'
 import Button from '../../../components/Button/Button';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useWishlists from '../hooks/useWishlists';
+import useViewMode from '../../../hooks/useViewMode';
 
 type WishlistsHeaderProps = {
   combinedWishlistsStatistics: CombinedWishlistsStatistics;
@@ -14,6 +15,7 @@ type WishlistsHeaderProps = {
 export default function WishlistsHeader({
   combinedWishlistsStatistics,
 }: WishlistsHeaderProps): JSX.Element {
+  const { inViewMode } = useViewMode();
   const { wishlists } = useWishlists();
   const navigate: NavigateFunction = useNavigate();
 
@@ -65,12 +67,14 @@ export default function WishlistsHeader({
             />
           </div>
 
-          <Button
-            className='bg-cta border-cta text-dark w-full sm:w-fit'
-            onClick={() => navigate('/wishlist/new')}
-          >
-            New wishlist
-          </Button>
+          {inViewMode || (
+            <Button
+              className='bg-cta border-cta text-dark w-full sm:w-fit'
+              onClick={() => navigate('/wishlist/new')}
+            >
+              New wishlist
+            </Button>
+          )}
         </div>
       </Container>
     </header>

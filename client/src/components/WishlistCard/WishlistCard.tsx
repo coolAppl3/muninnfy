@@ -3,21 +3,23 @@ import { getFormattedPrice } from '../../utils/wishlistUtils';
 import { getFullDateString } from '../../utils/globalUtils';
 import { Link } from 'react-router-dom';
 import WishlistPrivacyLevelIcon from '../WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
-import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
+import { ExtendedWishlistDetailsType, ViewWishlistDetails } from '../../types/wishlistTypes';
 import StatisticItem from '../StatisticItem/StatisticItem';
 import ArrowIcon from '../../assets/svg/ArrowIcon.svg?react';
 import HeartIcon from '../../assets/svg/HeartIcon.svg?react';
+import useViewMode from '../../hooks/useViewMode';
 
 type WishlistCardProps = {
-  wishlist: ExtendedWishlistDetailsType;
+  wishlist: ExtendedWishlistDetailsType | ViewWishlistDetails;
 };
 
 export default memo(WishlistCard);
 function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
+  const { inViewMode } = useViewMode();
+
   const {
     wishlist_id,
     title,
-    privacy_level,
     created_on_timestamp,
     items_count,
     total_items_price,
@@ -50,7 +52,7 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
       <div className='text-description flex justify-between items-center'>
         <p className='text-sm font-medium mr-auto'>{getFullDateString(created_on_timestamp)}</p>
 
-        {wishlist.is_favorited && (
+        {inViewMode && 'is_favorited' in wishlist && wishlist.is_favorited && (
           <span
             title='Favorited'
             aria-label='Favorited'
@@ -60,10 +62,12 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
           </span>
         )}
 
-        <WishlistPrivacyLevelIcon privacyLevel={privacy_level} />
+        {inViewMode && 'privacy_level' in wishlist && (
+          <WishlistPrivacyLevelIcon privacyLevel={wishlist.privacy_level} />
+        )}
 
         <Link
-          to={`/wishlist/${wishlist_id}`}
+          to={inViewMode ? `/view/wishlist/${wishlist_id}` : `/wishlist/${wishlist_id}`}
           className='ml-1 bg-dark text-title px-[2.4rem] h-[2.8rem] rounded-pill hidden xs:flex justify-center items-center transition-colors hover:text-cta'
           title='View'
           aria-label='View wishlist'
@@ -73,7 +77,7 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
       </div>
 
       <Link
-        to={`/wishlist/${wishlist_id}`}
+        to={inViewMode ? `/view/wishlist/${wishlist_id}` : `/wishlist/${wishlist_id}`}
         className='bg-dark text-title ml-auto mt-1 py-[1rem] rounded xs:hidden flex justify-center items-center text-sm font-medium'
       >
         View

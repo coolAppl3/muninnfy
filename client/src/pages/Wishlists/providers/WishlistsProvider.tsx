@@ -4,10 +4,11 @@ import WishlistsContext, {
   WishlistsFilterConfigType,
   WishlistsSortingMode,
 } from '../contexts/WishlistsContext';
-import { ExtendedWishlistDetailsType } from '../../../types/wishlistTypes';
+import { ExtendedWishlistDetailsType, ViewWishlistDetails } from '../../../types/wishlistTypes';
+import useViewMode from '../../../hooks/useViewMode';
 
 type WishlistsProviderProps = {
-  initialWishlists: ExtendedWishlistDetailsType[];
+  initialWishlists: (ExtendedWishlistDetailsType | ViewWishlistDetails)[];
   children: ReactNode;
 };
 
@@ -15,16 +16,20 @@ export default function WishlistsProvider({
   initialWishlists,
   children,
 }: WishlistsProviderProps): JSX.Element {
-  const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>(initialWishlists);
+  const { inViewMode } = useViewMode();
+
+  const [wishlists, setWishlists] =
+    useState<(ExtendedWishlistDetailsType | ViewWishlistDetails)[]>(initialWishlists);
   const [wishlistsFilterConfig, setWishlistsFilterConfig] = useState<WishlistsFilterConfigType>(
     defaultWishlistsFilterConfig
   );
-  const [wishlistsSortingMode, setWishlistsSortingMode] =
-    useState<WishlistsSortingMode>('interactivity');
+  const [wishlistsSortingMode, setWishlistsSortingMode] = useState<WishlistsSortingMode>(
+    inViewMode ? 'newest' : 'interactivity'
+  );
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
 
   const wishlistMatchesFilterConfig = useCallback(
-    (wishlist: ExtendedWishlistDetailsType): boolean => {
+    (wishlist: ExtendedWishlistDetailsType | ViewWishlistDetails): boolean => {
       const {
         createdAfterTimestamp,
         createdBeforeTimestamp,
@@ -81,7 +86,11 @@ export default function WishlistsProvider({
         return false;
       }
 
-      if (isFavorited !== null && wishlist.is_favorited !== isFavorited) {
+      if (
+        isFavorited !== null &&
+        'is_favorited' in wishlist &&
+        wishlist.is_favorited !== isFavorited
+      ) {
         return false;
       }
 
@@ -129,18 +138,30 @@ export default function WishlistsProvider({
         return;
       }
 
+      if (inViewMode) {
+        return;
+      }
+
       // sort by interactivity
-      setWishlists((prev) =>
-        prev.toSorted((a, b) => {
+      setWishlists((prev) => {
+        if (inViewMode) {
+          return prev;
+        }
+
+        if (prev[0] && !('interactivity_index' in prev[0])) {
+          return prev;
+        }
+
+        return (prev as ExtendedWishlistDetailsType[]).toSorted((a, b) => {
           if (a.interactivity_index === b.interactivity_index) {
             return b.latest_interaction_timestamp - a.latest_interaction_timestamp;
           }
 
           return b.interactivity_index - a.interactivity_index;
-        })
-      );
+        });
+      });
     },
-    [wishlistsSortingMode]
+    [inViewMode, wishlistsSortingMode]
   );
 
   const contextValue: WishlistsContextType = useMemo(
