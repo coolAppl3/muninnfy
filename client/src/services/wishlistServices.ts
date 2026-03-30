@@ -3,6 +3,7 @@ import axiosInstance from './axiosInstance';
 import { WishlistItemType } from '../types/wishlistItemTypes';
 import {
   ExtendedWishlistDetailsType,
+  ViewWishlistDetails,
   ViewWishlistDetailsType,
   ViewWishlistOwnerDetails,
   WishlistDetailsType,
@@ -54,6 +55,15 @@ export async function crossWishlistSearchService(
   return axiosInstance.get(`/wishlists/crossWishlistSearch/${itemTitleQuery}`);
 }
 
+export async function viewCrossWishlistSearchService(
+  itemTitleQuery: string,
+  publicAccountId?: string
+): Promise<AxiosResponse<string[]>> {
+  return axiosInstance.get('/wishlists/crossWishlistSearch', {
+    params: { publicAccountId, itemTitleQuery },
+  });
+}
+
 export type CombinedWishlistsStatistics = {
   totalItemsCount: number;
   totalPurchasedItemsCount: number;
@@ -71,6 +81,18 @@ export async function getAllWishlistsService(
   abortSignal: AbortSignal
 ): Promise<AxiosResponse<GetAllWishlistsServiceData>> {
   return axiosInstance.get('/wishlists/all', { signal: abortSignal });
+}
+
+type GetAllViewWishlistsServiceData = {
+  wishlists: ViewWishlistDetails[];
+  combinedWishlistsStatistics: CombinedWishlistsStatistics;
+};
+
+export async function getAllViewWishlistsService(
+  publicAccountId: string,
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<GetAllViewWishlistsServiceData>> {
+  return axiosInstance.get(`/wishlists/view/all/${publicAccountId}`, { signal: abortSignal });
 }
 
 type ChangeWishlistTitleServicePayload = {
