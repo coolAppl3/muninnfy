@@ -9,9 +9,9 @@ import useHandleAsyncError, {
 } from '../../../../../hooks/useHandleAsyncError';
 import { removeFollowerService, unfollowService } from '../../../../../services/socialServices';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
+import useViewMode from '../../../../../hooks/useViewMode';
 
 type FollowCardProps = {
-  inViewMode: boolean;
   isFollowerCard: boolean;
   followDetails: FollowDetails;
 
@@ -23,7 +23,6 @@ type FollowCardProps = {
 
 export default memo(FollowCard);
 function FollowCard({
-  inViewMode,
   isFollowerCard,
   followDetails,
   setFollowers,
@@ -35,6 +34,7 @@ function FollowCard({
     followDetails;
 
   const [cardMode, setCardMode] = useState<'view' | 'confirm' | 'loading'>('view');
+  const { inViewMode } = useViewMode();
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayPopupMessage } = usePopupMessage();

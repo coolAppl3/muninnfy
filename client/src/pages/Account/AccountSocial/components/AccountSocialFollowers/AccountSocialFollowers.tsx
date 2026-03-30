@@ -251,7 +251,6 @@ export default function AccountSocialFollowers(): JSX.Element {
             renderArray.slice(0, renderLimit).map((followDetails: FollowDetails) => (
               <FollowCard
                 key={followDetails.follow_id}
-                inViewMode={inViewMode}
                 isFollowerCard={true}
                 followDetails={followDetails}
                 setSearchQueryResults={setSearchQueryResults}
