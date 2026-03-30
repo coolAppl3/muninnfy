@@ -1,5 +1,60 @@
 # Changelog
 
+## [0.4.0] (2026-03-30)
+
+### Features
+
+- Add and implement `ViewAccount` and `ViewWishlist`, completing the viewing-based pages in the app.
+- Reworked the following endpoints to also support viewing-oriented use, establishing a dual-functionality:
+  - GET `social/followers` (previously GET `social/followers/:offset`).
+  - GET `social/following` (previously GET `social/following/:offset`).
+  - GET `social/followRequests` (previously GET `social/followRequests/:offset`).
+  - GET `social/followers/search`.
+  - GET `social/following/search`.
+  - GET `social/followRequests/search`.
+- Added the following endpoints:
+  - GET `social/view`.
+  - GET `wishlists/view/all/:publicAccountId`.
+  - GET `wishlists/crossWishlistSearch`.
+- Added `getTargetAccountId()` helper.
+- Added the following services:
+  - `sendFollowRequestService()`.
+  - `cancelFollowRequestService()`.
+  - `viewCrossWishlistSearchService()`.
+- Added `ViewAccountDetailsContext`, `ViewAccountDetailsProvider`, and `useViewAccountDetails` custom hook.
+- Added `ViewModeContext`, `ViewModeProvider`, and `useViewMode` custom hook.
+
+
+### Changes
+
+- Reworked GET `social` to handle the functionality of `social/:publicAccountId`.
+- Removed `account_preferences` table and move its data to `accounts` table, reworking necessary logic in the process.
+- Replaced `is_following` and `follow_request_sent` with `follow_id` and `follow_request_id` in GET `accounts/:publicAccountId`.
+
+
+### Improvements
+
+- Unified return data for POST `social/followRequests/send`.
+- Reworked how POST `social/followRequests/send` handles existing followers and follow requests for a smoother user experience.
+
+
+### Bug Fixes
+
+- Fixed `is_following` in GET `accounts/:publicAccountId` not being of type `boolean`.
+- Fixed `WishlistsToolbar` not being a default export.
+
+
+### Code Refactoring
+
+- Reduced formatting column width to `96`.
+- Removed short-circuiting redundancy in `getTargetAccountId()`.
+
+
+### Chore Changes
+
+- Add `.DS_Store` to `.gitignore`.
+
+
 ## [0.3.4] (2026-03-19)
 
 ### Features
