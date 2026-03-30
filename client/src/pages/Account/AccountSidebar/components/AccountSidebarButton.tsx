@@ -7,7 +7,12 @@ type AccountSidebarButtonProps = {
   className?: string;
 };
 
-export default function AccountSidebarButton({ isSelected, onClick, children, className }: AccountSidebarButtonProps): JSX.Element {
+export default function AccountSidebarButton({
+  isSelected,
+  onClick,
+  children,
+  className,
+}: AccountSidebarButtonProps): JSX.Element {
   return (
     <button
       type='button'

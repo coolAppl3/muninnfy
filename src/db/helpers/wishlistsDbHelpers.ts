@@ -1,7 +1,10 @@
 import { Request } from 'express';
 import { Pool, PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { logUnexpectedError } from '../../logs/errorLogger';
-import { WISHLIST_INTERACTION_THROTTLE_WINDOW, WISHLIST_INTERACTIVITY_MAX_VALUE } from '../../util/constants/wishlistConstants';
+import {
+  WISHLIST_INTERACTION_THROTTLE_WINDOW,
+  WISHLIST_INTERACTIVITY_MAX_VALUE,
+} from '../../util/constants/wishlistConstants';
 
 export async function incrementWishlistInteractivityIndex(
   wishlistId: string,

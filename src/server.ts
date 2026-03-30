@@ -8,7 +8,11 @@ import { handleWebSocketUpgrade } from './webSocket/webSocketAuth';
 const port: number = process.env.PORT ? +process.env.PORT : 5000;
 const server = http.createServer(app);
 
-server.on('upgrade', async (req: IncomingMessage, socket: Socket, head: Buffer) => await handleWebSocketUpgrade(req, socket, head));
+server.on(
+  'upgrade',
+  async (req: IncomingMessage, socket: Socket, head: Buffer) =>
+    await handleWebSocketUpgrade(req, socket, head)
+);
 
 async function initServer(): Promise<void> {
   try {

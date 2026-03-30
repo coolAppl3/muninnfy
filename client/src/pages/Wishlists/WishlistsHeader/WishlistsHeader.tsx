@@ -6,17 +6,26 @@ import { CombinedWishlistsStatistics } from '../../../services/wishlistServices'
 import Button from '../../../components/Button/Button';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useWishlists from '../hooks/useWishlists';
+import useViewMode from '../../../hooks/useViewMode';
 
 type WishlistsHeaderProps = {
   combinedWishlistsStatistics: CombinedWishlistsStatistics;
 };
 
-export default function WishlistsHeader({ combinedWishlistsStatistics }: WishlistsHeaderProps): JSX.Element {
+export default function WishlistsHeader({
+  combinedWishlistsStatistics,
+}: WishlistsHeaderProps): JSX.Element {
+  const { inViewMode } = useViewMode();
   const { wishlists } = useWishlists();
   const navigate: NavigateFunction = useNavigate();
 
-  const { totalItemsCount, totalPurchasedItemsCount, totalWishlistsWorth, totalWishlistsSpent, totalWishlistsToComplete } =
-    combinedWishlistsStatistics;
+  const {
+    totalItemsCount,
+    totalPurchasedItemsCount,
+    totalWishlistsWorth,
+    totalWishlistsSpent,
+    totalWishlistsToComplete,
+  } = combinedWishlistsStatistics;
 
   return (
     <header>
@@ -58,12 +67,14 @@ export default function WishlistsHeader({ combinedWishlistsStatistics }: Wishlis
             />
           </div>
 
-          <Button
-            className='bg-cta border-cta text-dark w-full sm:w-fit'
-            onClick={() => navigate('/wishlist/new')}
-          >
-            New wishlist
-          </Button>
+          {inViewMode || (
+            <Button
+              className='bg-cta border-cta text-dark w-full sm:w-fit'
+              onClick={() => navigate('/wishlist/new')}
+            >
+              New wishlist
+            </Button>
+          )}
         </div>
       </Container>
     </header>

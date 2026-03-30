@@ -7,7 +7,9 @@ import useAccountProfile from '../../../hooks/useAccountProfile';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import { updateDisplayNameService } from '../../../../../services/accountServices';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import useAuth from '../../../../../hooks/useAuth';
 
 export default function AccountChangeDisplayName(): JSX.Element {
@@ -60,7 +62,9 @@ export default function AccountChangeDisplayName(): JSX.Element {
         }
 
         const newErrorMessage: string | null =
-          value === accountDetails.display_name ? 'Account already has this display name.' : validateDisplayName(value);
+          value === accountDetails.display_name
+            ? 'Account already has this display name.'
+            : validateDisplayName(value);
 
         if (newErrorMessage) {
           setErrorMessage(newErrorMessage);
@@ -89,7 +93,9 @@ export default function AccountChangeDisplayName(): JSX.Element {
 
           setValue(newValue);
           setErrorMessage(
-            newValue === accountDetails.display_name ? 'Account already has this display name.' : validateDisplayName(newValue)
+            newValue === accountDetails.display_name
+              ? 'Account already has this display name.'
+              : validateDisplayName(newValue)
           );
         }}
       />

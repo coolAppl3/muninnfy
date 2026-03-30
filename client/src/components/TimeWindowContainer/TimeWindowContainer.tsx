@@ -11,8 +11,19 @@ type TimeWindowContainerProps = {
   className?: string;
 };
 
-export default function TimeWindowContainer({ calendarKey, startLabel, endLabel, className }: TimeWindowContainerProps): JSX.Element {
-  const { startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap, displayCalendar } = useCalendar();
+export default function TimeWindowContainer({
+  calendarKey,
+  startLabel,
+  endLabel,
+  className,
+}: TimeWindowContainerProps): JSX.Element {
+  const {
+    startTimestampsMap,
+    endTimestampsMap,
+    setStartTimestampsMap,
+    setEndTimestampsMap,
+    displayCalendar,
+  } = useCalendar();
 
   const startTimestamp: number | undefined = startTimestampsMap.get(calendarKey);
   const endTimestamp: number | undefined = endTimestampsMap.get(calendarKey);
@@ -46,10 +57,16 @@ export default function TimeWindowContainer({ calendarKey, startLabel, endLabel,
           <button
             type='button'
             id={`time-window-${index === 0 ? 'start' : 'end'}`}
-            onClick={() => (index === 0 ? displayCalendar('start', calendarKey) : displayCalendar('end', calendarKey))}
+            onClick={() =>
+              index === 0
+                ? displayCalendar('start', calendarKey)
+                : displayCalendar('end', calendarKey)
+            }
             className='w-full h-4 p-1 rounded border-1 border-description/75 hover:border-cta outline-0 text-description text-start text-sm transition-colors cursor-pointer'
           >
-            {index === 0 ? startTimestamp && getFullDateString(startTimestamp) : endTimestamp && getFullDateString(endTimestamp)}
+            {index === 0
+              ? startTimestamp && getFullDateString(startTimestamp)
+              : endTimestamp && getFullDateString(endTimestamp)}
           </button>
 
           {((index === 0 && startTimestamp) || (index === 1 && endTimestamp)) && (

@@ -16,7 +16,9 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
 
     const checkForAuthSession = async () => {
       try {
-        const isValidAuthSession: boolean = (await checkForAuthSessionService(abortController.signal)).data.isValidAuthSession;
+        const isValidAuthSession: boolean = (
+          await checkForAuthSessionService(abortController.signal)
+        ).data.isValidAuthSession;
         setAuthStatus(isValidAuthSession ? 'authenticated' : 'unauthenticated');
 
         if (isValidAuthSession) {
@@ -35,6 +37,9 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
     return () => abortController.abort();
   }, []);
 
-  const contextValue: AuthContextType = useMemo(() => ({ authStatus, setAuthStatus }), [authStatus]);
+  const contextValue: AuthContextType = useMemo(
+    () => ({ authStatus, setAuthStatus }),
+    [authStatus]
+  );
   return <AuthContext value={contextValue}>{children}</AuthContext>;
 }

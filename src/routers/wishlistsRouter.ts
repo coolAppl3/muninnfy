@@ -1,7 +1,10 @@
 import express, { Router, Request, Response } from 'express';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
-import { isValidWishlistPrivacyLevel, isValidWishlistTitle } from '../util/validation/wishlistValidation';
+import {
+  isValidWishlistPrivacyLevel,
+  isValidWishlistTitle,
+} from '../util/validation/wishlistValidation';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
@@ -9,6 +12,7 @@ import { dbPool } from '../db/db';
 import {
   FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
+  PUBLIC_WISHLIST_PRIVACY_LEVEL,
   TOTAL_WISHLISTS_LIMIT,
   WISHLIST_INTERACTION_CREATE,
   WISHLIST_ITEMS_LIMIT,
@@ -78,7 +82,9 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
       { accountId, title: title }
     );
 
-    const accountWishlistsDetails = accountWishlistsRows[0] as AccountWishlistsDetails | undefined;
+    const accountWishlistsDetails = accountWishlistsRows[0] as
+      | AccountWishlistsDetails
+      | undefined;
 
     if (!accountWishlistsDetails) {
       res.status(500).json({ message: 'Internal server error.' });
@@ -88,12 +94,17 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (accountWishlistsDetails.wishlists_created_count >= TOTAL_WISHLISTS_LIMIT) {
-      res.status(403).json({ message: 'Wishlists limit reached.', reason: 'wishlistLimitReached' });
+      res
+        .status(403)
+        .json({ message: 'Wishlists limit reached.', reason: 'wishlistLimitReached' });
       return;
     }
 
     if (accountWishlistsDetails.title_already_used) {
-      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      res.status(409).json({
+        message: 'You already have a wishlist with this title.',
+        reason: 'duplicateTitle',
+      });
       return;
     }
 
@@ -111,7 +122,16 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
         interactivity_index,
         is_favorited
       ) VALUES (${generatePlaceHolders(8)});`,
-      [wishlistId, accountId, privacyLevel, title, currentTimestamp, currentTimestamp, WISHLIST_INTERACTION_CREATE, false]
+      [
+        wishlistId,
+        accountId,
+        privacyLevel,
+        title,
+        currentTimestamp,
+        currentTimestamp,
+        WISHLIST_INTERACTION_CREATE,
+        false,
+      ]
     );
 
     res.status(201).json({ wishlistId });
@@ -131,7 +151,10 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
-      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      res.status(409).json({
+        message: 'You already have a wishlist with this title.',
+        reason: 'duplicateTitle',
+      });
       return;
     }
 
@@ -140,33 +163,35 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
   }
 });
 
-wishlistsRouter.get('/crossWishlistSearch/:itemTitleQuery', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+wishlistsRouter.get(
+  '/crossWishlistSearch/:itemTitleQuery',
+  async (req: Request, res: Response) => {
+    const authSessionId: string | null = getAuthSessionId(req, res);
 
-  if (!authSessionId) {
-    return;
-  }
+    if (!authSessionId) {
+      return;
+    }
 
-  const itemTitleQuery: string | undefined = req.params.itemTitleQuery;
+    const itemTitleQuery: string | undefined = req.params.itemTitleQuery;
 
-  if (!itemTitleQuery || !isValidWishlistItemTitle(itemTitleQuery)) {
-    res.status(400).json({ message: 'Invalid search query.', reason: 'invalidQuery' });
-    return;
-  }
+    if (!itemTitleQuery || !isValidWishlistItemTitle(itemTitleQuery)) {
+      res.status(400).json({ message: 'Invalid search query.', reason: 'invalidQuery' });
+      return;
+    }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
-  if (!accountId) {
-    return;
-  }
+    if (!accountId) {
+      return;
+    }
 
-  try {
-    type WishlistDetails = {
-      wishlist_id: string;
-    };
+    try {
+      type WishlistDetails = {
+        wishlist_id: string;
+      };
 
-    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
-      `SELECT
+      const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+        `SELECT
         wishlist_id
       FROM
         wishlists
@@ -182,10 +207,117 @@ wishlistsRouter.get('/crossWishlistSearch/:itemTitleQuery', async (req: Request,
             title LIKE ?
         )
       LIMIT ?;`,
-      [accountId, `%${itemTitleQuery}%`, TOTAL_WISHLISTS_LIMIT]
+        [accountId, `%${itemTitleQuery}%`, TOTAL_WISHLISTS_LIMIT]
+      );
+
+      const wishlistIdsArr: string[] = (wishlistRows as WishlistDetails[]).map(
+        ({ wishlist_id }: WishlistDetails) => wishlist_id
+      );
+
+      res.json(wishlistIdsArr);
+    } catch (err: unknown) {
+      console.log(err);
+
+      if (res.headersSent) {
+        await logUnexpectedError(req, err, 'Attempted to send two responses.');
+        return;
+      }
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
+    }
+  }
+);
+
+wishlistsRouter.get('/crossWishlistSearch', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = !authSessionId
+    ? null
+    : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+
+  const publicAccountId = req.query.publicAccountId;
+  const itemTitleQuery = req.query.itemTitleQuery;
+
+  if (typeof publicAccountId !== 'string' || !isValidUuid(publicAccountId)) {
+    res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+    return;
+  }
+
+  if (typeof itemTitleQuery !== 'string' || !isValidWishlistItemTitle(itemTitleQuery)) {
+    res.status(400).json({ message: 'Invalid search query.', reason: 'invalidQuery' });
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      target_account_id: number;
+      is_private: boolean;
+      is_following: boolean;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        account_id AS target_account_id,
+        is_private,
+        
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
+      FROM
+        accounts
+      WHERE
+        public_account_id = ?;`,
+      [accountId, publicAccountId]
     );
 
-    const wishlistIdsArr: string[] = (wishlistRows as WishlistDetails[]).map(({ wishlist_id }: WishlistDetails) => wishlist_id);
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (accountDetails.is_private && !accountDetails.is_following) {
+      res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
+      return;
+    }
+
+    type WishlistDetails = {
+      wishlist_id: string;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        wishlist_id
+      FROM
+        wishlists
+      WHERE
+        account_id = ? AND
+        (
+          privacy_level = ? OR
+          (privacy_level = ? AND ?)
+        ) AND
+        EXISTS (
+          SELECT
+            1
+          FROM
+            wishlist_items
+          WHERE
+            wishlist_id = wishlists.wishlist_id AND
+            title LIKE ?
+        )
+      LIMIT ?;`,
+      [
+        accountDetails.target_account_id,
+        PUBLIC_WISHLIST_PRIVACY_LEVEL,
+        FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+        accountDetails.is_following,
+        `%${itemTitleQuery}%`,
+        TOTAL_WISHLISTS_LIMIT,
+      ]
+    );
+
+    const wishlistIdsArr: string[] = (wishlistRows as WishlistDetails[]).map(
+      ({ wishlist_id }: WishlistDetails) => wishlist_id
+    );
 
     res.json(wishlistIdsArr);
   } catch (err: unknown) {
@@ -288,7 +420,146 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
       combinedWishlistsStatistics.totalItemsCount += wishlist.items_count;
       combinedWishlistsStatistics.totalPurchasedItemsCount += wishlist.purchased_items_count;
       combinedWishlistsStatistics.totalWishlistsWorth += wishlist.total_items_price;
-      combinedWishlistsStatistics.totalWishlistsSpent += wishlist.total_items_price - wishlist.price_to_complete;
+      combinedWishlistsStatistics.totalWishlistsSpent +=
+        wishlist.total_items_price - wishlist.price_to_complete;
+      combinedWishlistsStatistics.totalWishlistsToComplete += wishlist.price_to_complete;
+    }
+
+    res.json({ combinedWishlistsStatistics, wishlists: wishlists as Wishlist[] });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = !authSessionId
+    ? null
+    : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+
+  const publicAccountId: string | undefined = req.params.publicAccountId;
+
+  if (!publicAccountId || !isValidUuid(publicAccountId)) {
+    res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      target_account_id: number;
+      is_private: boolean;
+      is_following: boolean;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        account_id AS target_account_id,
+        is_private,
+        
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
+      FROM
+        accounts
+      WHERE
+        public_account_id = ?;`,
+      [accountId, publicAccountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (accountDetails.is_private && !accountDetails.is_following) {
+      res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
+      return;
+    }
+
+    type Wishlist = {
+      wishlist_id: string;
+      title: string;
+      created_on_timestamp: number;
+      items_count: number;
+      purchased_items_count: number;
+      total_items_price: number;
+      price_to_complete: number;
+    };
+
+    const [wishlists] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        wishlists.wishlist_id,
+        wishlists.title,
+        wishlists.created_on_timestamp,
+
+        COUNT(wishlist_items.item_id) AS items_count,
+        COALESCE(SUM(
+          CASE
+            WHEN wishlist_items.purchased_on_timestamp IS NULL
+              THEN 0
+            ELSE 1
+          END
+        ), 0)AS purchased_items_count,
+        COALESCE(SUM(wishlist_items.price), 0) AS total_items_price,
+        COALESCE(SUM(
+          CASE
+            WHEN wishlist_items.purchased_on_timestamp IS NULL
+              THEN wishlist_items.price
+            ELSE 0
+          END
+        ), 0) AS price_to_complete
+      FROM
+        wishlists
+      LEFT JOIN
+        wishlist_items USING(wishlist_id)
+      WHERE
+        wishlists.account_id = :targetAccountId AND
+        (
+          privacy_level = :publicPrivacyLevel OR
+          (privacy_level = :followersPrivacyLevel AND :isFollowing)
+        )
+      GROUP BY
+        wishlists.wishlist_id
+      ORDER BY
+        created_on_timestamp DESC
+      LIMIT :totalWishlistsLimit;`,
+      {
+        targetAccountId: accountDetails.target_account_id,
+        isFollowing: accountDetails.is_following,
+        totalWishlistsLimit: TOTAL_WISHLISTS_LIMIT,
+        publicPrivacyLevel: PUBLIC_WISHLIST_PRIVACY_LEVEL,
+        followersPrivacyLevel: FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+      }
+    );
+
+    const combinedWishlistsStatistics: {
+      totalItemsCount: number;
+      totalPurchasedItemsCount: number;
+      totalWishlistsWorth: number;
+      totalWishlistsSpent: number;
+      totalWishlistsToComplete: number;
+    } = {
+      totalItemsCount: 0,
+      totalPurchasedItemsCount: 0,
+      totalWishlistsWorth: 0,
+      totalWishlistsSpent: 0,
+      totalWishlistsToComplete: 0,
+    };
+
+    for (const wishlist of wishlists as Wishlist[]) {
+      combinedWishlistsStatistics.totalItemsCount += wishlist.items_count;
+      combinedWishlistsStatistics.totalPurchasedItemsCount += wishlist.purchased_items_count;
+      combinedWishlistsStatistics.totalWishlistsWorth += wishlist.total_items_price;
+      combinedWishlistsStatistics.totalWishlistsSpent +=
+        wishlist.total_items_price - wishlist.price_to_complete;
       combinedWishlistsStatistics.totalWishlistsToComplete += wishlist.price_to_complete;
     }
 
@@ -387,7 +658,8 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       const { tag_id, tag_name, ...rest } = item;
 
       if (item.item_id === currentItemId) {
-        const mappedWishlistItem: MappedWishlistItem | undefined = mappedWishlistItems[mappedWishlistItems.length - 1];
+        const mappedWishlistItem: MappedWishlistItem | undefined =
+          mappedWishlistItems[mappedWishlistItems.length - 1];
         mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
 
         continue;
@@ -496,12 +768,17 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     }
 
     if (wishlistDetails.title === newTitle) {
-      res.status(409).json({ message: 'Wishlist already has this title.', reason: 'identicalTitle' });
+      res
+        .status(409)
+        .json({ message: 'Wishlist already has this title.', reason: 'identicalTitle' });
       return;
     }
 
     if (wishlistDetails.new_title_used_elsewhere) {
-      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      res.status(409).json({
+        message: 'You already have a wishlist with this title.',
+        reason: 'duplicateTitle',
+      });
       return;
     }
 
@@ -539,7 +816,10 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'account_id'`)) {
-      res.status(409).json({ message: 'You already have a wishlist with this title.', reason: 'duplicateTitle' });
+      res.status(409).json({
+        message: 'You already have a wishlist with this title.',
+        reason: 'duplicateTitle',
+      });
       return;
     }
 
@@ -673,7 +953,9 @@ wishlistsRouter.patch('/change/favorite', async (req: Request, res: Response) =>
   }
 
   if (typeof newIsFavorited !== 'boolean') {
-    res.status(400).json({ message: 'Invalid favorite value.', reason: 'invalidFavoriteValue' });
+    res
+      .status(400)
+      .json({ message: 'Invalid favorite value.', reason: 'invalidFavoriteValue' });
     return;
   }
 
@@ -850,7 +1132,9 @@ wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
 
 wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res, false);
-  const accountId: number | null = !authSessionId ? null : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+  const accountId: number | null = !authSessionId
+    ? null
+    : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
 
   const wishlistId: string | undefined = req.params.wishlistId;
 
@@ -911,7 +1195,10 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       return;
     }
 
-    if (wishlistDetails.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL && !wishlistDetails.is_follower) {
+    if (
+      wishlistDetails.privacy_level === FOLLOWERS_WISHLIST_PRIVACY_LEVEL &&
+      !wishlistDetails.is_follower
+    ) {
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
@@ -948,7 +1235,8 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       const { tag_id, tag_name, ...rest } = item;
 
       if (item.item_id === currentItemId) {
-        const mappedWishlistItem: MappedWishlistItem | undefined = mappedWishlistItems[mappedWishlistItems.length - 1];
+        const mappedWishlistItem: MappedWishlistItem | undefined =
+          mappedWishlistItems[mappedWishlistItems.length - 1];
         mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
 
         continue;
@@ -970,7 +1258,13 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       mappedWishlistItems.push(mappedItem);
     }
 
-    const { owner_public_account_id, owner_display_name, owner_username, title, created_on_timestamp } = wishlistDetails;
+    const {
+      owner_public_account_id,
+      owner_display_name,
+      owner_username,
+      title,
+      created_on_timestamp,
+    } = wishlistDetails;
 
     res.json({
       ownerDetails: {

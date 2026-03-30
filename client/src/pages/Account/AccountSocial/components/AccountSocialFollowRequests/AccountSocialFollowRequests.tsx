@@ -2,10 +2,18 @@ import { ChangeEvent, JSX, useCallback, useEffect, useMemo, useState } from 'rea
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import { FollowRequest } from '../../../../../types/socialTypes';
 import FollowRequestCard from './components/FollowRequestCard/FollowRequestCard';
-import { getSocialBatchService, searchSocialService } from '../../../../../services/socialServices';
-import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_RENDER_BATCH_SIZE } from '../../../../../utils/constants/socialConstants';
+import {
+  getSocialBatchService,
+  searchSocialService,
+} from '../../../../../services/socialServices';
+import {
+  SOCIAL_FETCH_BATCH_SIZE,
+  SOCIAL_RENDER_BATCH_SIZE,
+} from '../../../../../utils/constants/socialConstants';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import DefaultFormGroup from '../../../../../components/DefaultFormGroup/DefaultFormGroup';
 import { validateSocialSearchQuery } from '../../../../../utils/validation/socialValidation';
 import { debounce } from '../../../../../utils/debounce';
@@ -14,8 +22,15 @@ import Button from '../../../../../components/Button/Button';
 import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
 
 export default function AccountSocialFollowRequests(): JSX.Element {
-  const { followRequests, socialCounts, fetchDetails, setFollowRequests, setSocialCounts, setFollowers, setFetchDetails } =
-    useAccountSocialDetails();
+  const {
+    followRequests,
+    socialCounts,
+    fetchDetails,
+    setFollowRequests,
+    setSocialCounts,
+    setFollowers,
+    setFetchDetails,
+  } = useAccountSocialDetails();
 
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -25,23 +40,32 @@ export default function AccountSocialFollowRequests(): JSX.Element {
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchQueryResults, setSearchQueryResults] = useState<FollowRequest[]>(followRequests);
-  const [allSearchQueryResultsFetched, setAllSearchQueryResultsFetched] = useState<boolean>(false);
+  const [allSearchQueryResultsFetched, setAllSearchQueryResultsFetched] =
+    useState<boolean>(false);
 
   const [fetchingSearchQueryResults, setFetchingSearchQueryResults] = useState<boolean>(false);
-  const [fetchingAdditionalFollowRequests, setFetchingAdditionalFollowRequests] = useState<boolean>(false);
+  const [fetchingAdditionalFollowRequests, setFetchingAdditionalFollowRequests] =
+    useState<boolean>(false);
 
   const { displayPopupMessage } = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
-  const renderArray: FollowRequest[] = renderMode === 'local' ? followRequests : searchQueryResults;
+  const renderArray: FollowRequest[] =
+    renderMode === 'local' ? followRequests : searchQueryResults;
   const allFollowRequestsRendered: boolean =
-    renderMode === 'local' ? renderLimit >= socialCounts.follow_requests_count : allSearchQueryResultsFetched;
+    renderMode === 'local'
+      ? renderLimit >= socialCounts.follow_requests_count
+      : allSearchQueryResultsFetched;
 
   const searchFollowRequests = useCallback(
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
-        const followRequestsBatch: FollowRequest[] = (await searchSocialService('followRequests', searchQuery, offset, abortSignal)).data;
-        offset === 0 ? setSearchQueryResults(followRequestsBatch) : setSearchQueryResults((prev) => [...prev, ...followRequestsBatch]);
+        const followRequestsBatch: FollowRequest[] = (
+          await searchSocialService('followRequests', searchQuery, offset, abortSignal)
+        ).data;
+        offset === 0
+          ? setSearchQueryResults(followRequestsBatch)
+          : setSearchQueryResults((prev) => [...prev, ...followRequestsBatch]);
         followRequestsBatch.length < SOCIAL_FETCH_BATCH_SIZE
           ? setAllSearchQueryResultsFetched(true)
           : setAllSearchQueryResultsFetched(false);
@@ -94,10 +118,15 @@ export default function AccountSocialFollowRequests(): JSX.Element {
 
   async function getFollowRequestsBatch(): Promise<void> {
     try {
-      const followRequestsBatch: FollowRequest[] = (await getSocialBatchService('followRequests', followRequests.length)).data;
+      const followRequestsBatch: FollowRequest[] = (
+        await getSocialBatchService('followRequests', followRequests.length)
+      ).data;
       setFollowRequests((prev) => [...prev, ...followRequestsBatch]);
 
-      if (followRequests.length + followRequestsBatch.length >= socialCounts.follow_requests_count) {
+      if (
+        followRequests.length + followRequestsBatch.length >=
+        socialCounts.follow_requests_count
+      ) {
         setFetchDetails((prev) => ({ ...prev, allFollowRequestsFetched: true }));
       }
 
@@ -116,7 +145,10 @@ export default function AccountSocialFollowRequests(): JSX.Element {
     }
   }
 
-  const debouncedSetSearchQuery = useMemo(() => debounce((searchQuery: string) => setSearchQuery(searchQuery), 300), []);
+  const debouncedSetSearchQuery = useMemo(
+    () => debounce((searchQuery: string) => setSearchQuery(searchQuery), 300),
+    []
+  );
 
   return (
     <section>
@@ -191,8 +223,12 @@ export default function AccountSocialFollowRequests(): JSX.Element {
                   setFetchingAdditionalFollowRequests(true);
 
                   if (renderMode === 'local') {
-                    const nextRenderOverflowsFetchedData: boolean = renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length;
-                    if (nextRenderOverflowsFetchedData && !fetchDetails.allFollowRequestsFetched) {
+                    const nextRenderOverflowsFetchedData: boolean =
+                      renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length;
+                    if (
+                      nextRenderOverflowsFetchedData &&
+                      !fetchDetails.allFollowRequestsFetched
+                    ) {
                       await getFollowRequestsBatch();
                     }
 
@@ -203,7 +239,11 @@ export default function AccountSocialFollowRequests(): JSX.Element {
                   }
 
                   renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length &&
-                    (await searchFollowRequests(searchQuery, renderArray.length, new AbortController().signal));
+                    (await searchFollowRequests(
+                      searchQuery,
+                      renderArray.length,
+                      new AbortController().signal
+                    ));
 
                   setRenderLimit((prev) => prev + SOCIAL_RENDER_BATCH_SIZE);
                   setFetchingAdditionalFollowRequests(false);

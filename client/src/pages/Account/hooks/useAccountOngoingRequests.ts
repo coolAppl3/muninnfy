@@ -1,11 +1,17 @@
 import { useContext } from 'react';
-import AccountOngoingRequestsContext, { AccountOngoingRequestsContextType } from '../contexts/AccountOngoingRequestsContext';
+import AccountOngoingRequestsContext, {
+  AccountOngoingRequestsContextType,
+} from '../contexts/AccountOngoingRequestsContext';
 
 export default function useAccountOngoingRequests(): AccountOngoingRequestsContextType {
-  const context = useContext<AccountOngoingRequestsContextType | null>(AccountOngoingRequestsContext);
+  const context = useContext<AccountOngoingRequestsContextType | null>(
+    AccountOngoingRequestsContext
+  );
 
   if (!context) {
-    throw new Error('useAccountOngoingRequest must be used within AccountOngoingRequestsProvider.');
+    throw new Error(
+      'useAccountOngoingRequest must be used within AccountOngoingRequestsProvider.'
+    );
   }
 
   return context;

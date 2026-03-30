@@ -1,12 +1,16 @@
 import { JSX, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import LoadingOverlayContext, { LoadingOverlayContextType } from '../contexts/LoadingOverlayContext';
+import LoadingOverlayContext, {
+  LoadingOverlayContextType,
+} from '../contexts/LoadingOverlayContext';
 import { Location, useLocation } from 'react-router-dom';
 
 type LoadingOverlayProviderProps = {
   children: ReactNode;
 };
 
-export default function LoadingOverlayProvider({ children }: LoadingOverlayProviderProps): JSX.Element {
+export default function LoadingOverlayProvider({
+  children,
+}: LoadingOverlayProviderProps): JSX.Element {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const routerLocation: Location = useLocation();
 

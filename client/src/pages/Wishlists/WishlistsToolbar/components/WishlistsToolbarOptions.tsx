@@ -4,8 +4,13 @@ import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useConfirmModal from '../../../../hooks/useConfirmModal';
 import { deleteEmptyWishlistsService } from '../../../../services/wishlistServices';
 import useWishlists from '../../hooks/useWishlists';
-import { ExtendedWishlistDetailsType } from '../../../../types/wishlistTypes';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../hooks/useHandleAsyncError';
+import {
+  ExtendedWishlistDetailsType,
+  ViewWishlistDetails,
+} from '../../../../types/wishlistTypes';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../hooks/useHandleAsyncError';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
 
 export default function WishlistsToolbarOptions(): JSX.Element {
@@ -18,7 +23,12 @@ export default function WishlistsToolbarOptions(): JSX.Element {
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   const emptyWishlistsCount: number = useMemo(
-    () => wishlists.reduce((acc: number, cur: ExtendedWishlistDetailsType) => (cur.items_count > 0 ? acc : acc + 1), 0),
+    () =>
+      wishlists.reduce(
+        (acc: number, cur: ExtendedWishlistDetailsType | ViewWishlistDetails) =>
+          cur.items_count > 0 ? acc : acc + 1,
+        0
+      ),
     [wishlists]
   );
 
@@ -27,9 +37,17 @@ export default function WishlistsToolbarOptions(): JSX.Element {
 
     try {
       await deleteEmptyWishlistsService();
-      setWishlists((prev) => prev.filter((wishlist: ExtendedWishlistDetailsType) => wishlist.items_count > 0));
+      setWishlists((prev) =>
+        prev.filter(
+          (wishlist: ExtendedWishlistDetailsType | ViewWishlistDetails) =>
+            wishlist.items_count > 0
+        )
+      );
 
-      displayPopupMessage(emptyWishlistsCount === 1 ? 'Wishlist deleted.' : 'Wishlists deleted.', 'success');
+      displayPopupMessage(
+        emptyWishlistsCount === 1 ? 'Wishlist deleted.' : 'Wishlists deleted.',
+        'success'
+      );
     } catch (err: unknown) {
       console.log(err);
       handleAsyncError(err);
@@ -42,7 +60,10 @@ export default function WishlistsToolbarOptions(): JSX.Element {
     <div
       className='relative'
       onBlur={(e: FocusEvent) => {
-        if (e.relatedTarget?.classList.contains('context-menu-btn') || e.target.getAttribute('disabled')) {
+        if (
+          e.relatedTarget?.classList.contains('context-menu-btn') ||
+          e.target.getAttribute('disabled')
+        ) {
           return;
         }
 
@@ -56,10 +77,14 @@ export default function WishlistsToolbarOptions(): JSX.Element {
         title={`${isOpen ? 'Hide' : 'View'} context menu`}
         aria-label={`${isOpen ? 'Hide' : 'View'} context menu`}
       >
-        <TripleDotMenuIcon className={`w-2 h-2 transition-colors ${isOpen ? 'text-cta' : ''}`} />
+        <TripleDotMenuIcon
+          className={`w-2 h-2 transition-colors ${isOpen ? 'text-cta' : ''}`}
+        />
       </button>
 
-      <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
+      <div
+        className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}
+      >
         <button
           type='button'
           className='context-menu-btn text-danger'

@@ -8,7 +8,12 @@ type AccountNavMenuButtonProps = {
   className?: string;
 };
 
-export default function AccountNavMenuButton({ children, isSelected, onClick, className }: AccountNavMenuButtonProps): JSX.Element {
+export default function AccountNavMenuButton({
+  children,
+  isSelected,
+  onClick,
+  className,
+}: AccountNavMenuButtonProps): JSX.Element {
   return (
     <button
       type='button'

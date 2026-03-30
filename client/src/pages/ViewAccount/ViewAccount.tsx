@@ -13,14 +13,17 @@ import useAuth from '../../hooks/useAuth';
 import { getViewAccountDetailsService } from '../../services/accountServices';
 import { CanceledError } from 'axios';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
-import ViewAccountProfile from './components/ViewAccountProfile/ViewAccountProfile';
 import AccountSocialProvider from '../Account/providers/AccountSocialProvider';
 import ViewAccountContent from './components/ViewAccountContent/ViewAccountContent';
 import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDetailsProvider';
+import ViewModeProvider from '../../providers/ViewModeProvider';
+import ViewAccountDetailsProvider from './provider/ViewAccountDetailsProvider';
 
 export default function ViewAccount(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [viewAccountDetails, setViewAccountDetails] = useState<ViewAccountDetailsType | null>(null);
+  const [viewAccountDetails, setViewAccountDetails] = useState<ViewAccountDetailsType | null>(
+    null
+  );
 
   const { authStatus, setAuthStatus } = useAuth();
   const { referrerLocation } = useHistory();
@@ -38,7 +41,14 @@ export default function ViewAccount(): JSX.Element {
 
     const getViewAccountDetails = async () => {
       try {
-        const { viewAccountDetails } = (await getViewAccountDetailsService(publicAccountId, abortController.signal)).data;
+        const { viewAccountDetails } = (
+          await getViewAccountDetailsService(publicAccountId, abortController.signal)
+        ).data;
+
+        if (viewAccountDetails.is_owner) {
+          navigate('/account');
+          return;
+        }
 
         setViewAccountDetails(viewAccountDetails);
         setIsLoaded(true);
@@ -63,39 +73,44 @@ export default function ViewAccount(): JSX.Element {
     getViewAccountDetails();
 
     return () => abortController.abort();
-  }, [publicAccountId, referrerLocation, authStatus, navigate, setAuthStatus, handleAsyncError]);
+  }, [
+    publicAccountId,
+    referrerLocation,
+    authStatus,
+    navigate,
+    setAuthStatus,
+    handleAsyncError,
+  ]);
 
   return (
     <>
       <Head title='View Account - Muninnfy' />
 
-      <AccountLocationProvider>
-        {isLoaded && viewAccountDetails ? (
-          <main className='py-4'>
-            <Container className='grid grid-cols-12 items-start gap-1'>
-              <AccountSidebar
-                inViewMode={true}
-                publicAccountId={viewAccountDetails.public_account_id}
-              />
+      <ViewModeProvider
+        inViewMode={true}
+        publicAccountId={viewAccountDetails?.public_account_id}
+      >
+        <AccountLocationProvider>
+          {isLoaded && viewAccountDetails ? (
+            <ViewAccountDetailsProvider initialViewAccountDetails={viewAccountDetails}>
+              <main className='py-4'>
+                <Container className='grid grid-cols-12 items-start gap-1'>
+                  <AccountSidebar />
+                  <AccountNavMenu />
 
-              <AccountNavMenu
-                inViewMode={true}
-                publicAccountId={viewAccountDetails.public_account_id}
-              />
-
-              <AccountSocialDetailsProvider>
-                <AccountSocialProvider>
-                  <ViewAccountContent viewAccountDetails={viewAccountDetails} />
-                </AccountSocialProvider>
-              </AccountSocialDetailsProvider>
-
-              {/* TODO: continue implementation */}
-            </Container>
-          </main>
-        ) : (
-          <LoadingSkeleton />
-        )}
-      </AccountLocationProvider>
+                  <AccountSocialDetailsProvider>
+                    <AccountSocialProvider>
+                      <ViewAccountContent />
+                    </AccountSocialProvider>
+                  </AccountSocialDetailsProvider>
+                </Container>
+              </main>
+            </ViewAccountDetailsProvider>
+          ) : (
+            <LoadingSkeleton />
+          )}
+        </AccountLocationProvider>
+      </ViewModeProvider>
     </>
   );
 }

@@ -14,11 +14,15 @@ export default function NewWishlistItemFormContainer(): JSX.Element {
             type='button'
             onClick={() => setIsExpanded((prev) => !prev)}
             className={`w-full flex justify-between items-center p-2 transition-colors bg-gradient-to-b from-secondary to-cta/10 hover:to-cta/20 text-title cursor-pointer border-b-1 rounded-sm ${
-              isExpanded ? 'to-secondary hover:!to-cta/10 border-b-light-gray rounded-bl-none rounded-br-none' : 'border-b-secondary'
+              isExpanded
+                ? 'to-secondary hover:!to-cta/10 border-b-light-gray rounded-bl-none rounded-br-none'
+                : 'border-b-secondary'
             }`}
           >
             <h4 className='font-medium'>New wishlist item</h4>
-            <ChevronIcon className={`w-[1.6rem] h-[1.6rem] ${isExpanded ? 'rotate-180' : ''}`} />
+            <ChevronIcon
+              className={`w-[1.6rem] h-[1.6rem] ${isExpanded ? 'rotate-180' : ''}`}
+            />
           </button>
 
           {isExpanded && (

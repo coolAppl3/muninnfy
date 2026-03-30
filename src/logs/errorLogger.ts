@@ -2,7 +2,11 @@ import { Request } from 'express';
 import { dbPool } from '../db/db';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 
-export async function logUnexpectedError(req: Request | null, err: unknown, description: string | null = null): Promise<void> {
+export async function logUnexpectedError(
+  req: Request | null,
+  err: unknown,
+  description: string | null = null
+): Promise<void> {
   const currentTimestamp: number = Date.now();
   const { message, trace } = getErrorData(err);
 

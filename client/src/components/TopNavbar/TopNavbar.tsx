@@ -1,5 +1,12 @@
 import { JSX } from 'react';
-import { Link, NavLink, NavigateFunction, useNavigate, Location, useLocation } from 'react-router-dom';
+import {
+  Link,
+  NavLink,
+  NavigateFunction,
+  useNavigate,
+  Location,
+  useLocation,
+} from 'react-router-dom';
 import Button from '../Button/Button';
 import Container from '../Container/Container';
 import Logo from '../../assets/svg/Logo.svg?react';
@@ -23,7 +30,9 @@ export default function TopNavbar(): JSX.Element {
           <NavLink
             to='/home'
             className={({ isActive }) =>
-              isActive || pathname === '/' ? `mr-2 after:bg-cta/100 ${navLinkClassname}` : `mr-2 ${navLinkClassname}`
+              isActive || pathname === '/'
+                ? `mr-2 after:bg-cta/100 ${navLinkClassname}`
+                : `mr-2 ${navLinkClassname}`
             }
           >
             Home
@@ -31,7 +40,9 @@ export default function TopNavbar(): JSX.Element {
 
           <NavLink
             to='/account/wishlists'
-            className={({ isActive }) => (isActive ? `after:bg-cta/100 ${navLinkClassname}` : navLinkClassname)}
+            className={({ isActive }) =>
+              isActive ? `after:bg-cta/100 ${navLinkClassname}` : navLinkClassname
+            }
           >
             Wishlists
           </NavLink>
@@ -69,7 +80,11 @@ function AdditionalLinks(): JSX.Element {
 
       {pathname === '/sign-up' || (
         <Button
-          className={pathname === '/sign-in' ? 'bg-description border-description text-dark' : 'bg-cta border-cta text-dark'}
+          className={
+            pathname === '/sign-in'
+              ? 'bg-description border-description text-dark'
+              : 'bg-cta border-cta text-dark'
+          }
           onClick={() => navigate('/sign-up')}
         >
           Sign up

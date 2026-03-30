@@ -1,12 +1,17 @@
 import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import DefaultFormGroup from '../../../../../../components/DefaultFormGroup/DefaultFormGroup';
-import { validateEmail, validatePassword } from '../../../../../../utils/validation/userValidation';
+import {
+  validateEmail,
+  validatePassword,
+} from '../../../../../../utils/validation/userValidation';
 import Button from '../../../../../../components/Button/Button';
 import useAccountProfile from '../../../../hooks/useAccountProfile';
 import useLoadingOverlay from '../../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../../hooks/usePopupMessage';
 import useAuth from '../../../../../../hooks/useAuth';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../../hooks/useHandleAsyncError';
 import PasswordFormGroup from '../../../../../../components/PasswordFormGroup/PasswordFormGroup';
 import useAccountDetails from '../../../../hooks/useAccountDetails';
 import { startEmailUpdateService } from '../../../../../../services/accountServices';
@@ -35,8 +40,13 @@ export default function AccountChangeEmailStart(): JSX.Element {
     const password: string = passwordValue;
 
     try {
-      const expiryTimestamp: number = (await startEmailUpdateService({ newEmail, password })).data.expiryTimestamp;
-      setOngoingEmailUpdateRequest({ new_email: newEmail, expiry_timestamp: expiryTimestamp, is_suspended: false });
+      const expiryTimestamp: number = (await startEmailUpdateService({ newEmail, password }))
+        .data.expiryTimestamp;
+      setOngoingEmailUpdateRequest({
+        new_email: newEmail,
+        expiry_timestamp: expiryTimestamp,
+        is_suspended: false,
+      });
 
       displayPopupMessage('Confirmation email sent.', 'success');
     } catch (err: unknown) {
@@ -48,7 +58,9 @@ export default function AccountChangeEmailStart(): JSX.Element {
       }
 
       if (status === 400 && errReason) {
-        errReason === 'invalidEmail' ? setEmailErrorMessage(errMessage) : setPasswordErrorMessage(errMessage);
+        errReason === 'invalidEmail'
+          ? setEmailErrorMessage(errMessage)
+          : setPasswordErrorMessage(errMessage);
         return;
       }
 
@@ -84,7 +96,9 @@ export default function AccountChangeEmailStart(): JSX.Element {
 
   function allFieldsValid(): boolean {
     const newEmailErrorMessage: string | null =
-      accountDetails.email === emailValue ? 'Email already linked to this account.' : validateEmail(emailValue);
+      accountDetails.email === emailValue
+        ? 'Email already linked to this account.'
+        : validateEmail(emailValue);
     const newPasswordErrorMessage: string | null = validatePassword(passwordValue);
 
     setEmailErrorMessage(newEmailErrorMessage);
@@ -129,7 +143,11 @@ export default function AccountChangeEmailStart(): JSX.Element {
           const newValue: string = e.target.value;
 
           setEmailValue(newValue);
-          setEmailErrorMessage(newValue === accountDetails.email ? 'Email already linked to this account.' : validateEmail(newValue));
+          setEmailErrorMessage(
+            newValue === accountDetails.email
+              ? 'Email already linked to this account.'
+              : validateEmail(newValue)
+          );
         }}
       />
 
@@ -165,7 +183,9 @@ export default function AccountChangeEmailStart(): JSX.Element {
   );
 }
 
-function isValidOngoingEmailUpdateRequest(errResData: unknown): errResData is OngoingAccountRequest & { new_email: string } {
+function isValidOngoingEmailUpdateRequest(
+  errResData: unknown
+): errResData is OngoingAccountRequest & { new_email: string } {
   if (!isValidOngoingRequestData(errResData)) {
     return false;
   }

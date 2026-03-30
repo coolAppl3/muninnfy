@@ -16,7 +16,8 @@ export default function WishlistProvider({
   children,
 }: WishlistProviderProps): JSX.Element {
   const [wishlistId, setWishlistId] = useState<string>(initialWishlistId);
-  const [wishlistDetails, setWishlistDetails] = useState<WishlistDetailsType>(initialWishlistDetails);
+  const [wishlistDetails, setWishlistDetails] =
+    useState<WishlistDetailsType>(initialWishlistDetails);
 
   const contextValue: WishlistContextType = useMemo(
     () => ({

@@ -7,7 +7,9 @@ type ConfirmModalProviderProps = {
   children: ReactNode;
 };
 
-export default function ConfirmModalProvider({ children }: ConfirmModalProviderProps): JSX.Element {
+export default function ConfirmModalProvider({
+  children,
+}: ConfirmModalProviderProps): JSX.Element {
   const routerLocation: Location = useLocation();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);

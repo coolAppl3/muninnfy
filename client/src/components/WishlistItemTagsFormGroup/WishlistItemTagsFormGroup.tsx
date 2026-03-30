@@ -8,7 +8,11 @@ type WishlistItemTagsFormGroupProps = {
   label: string;
 };
 
-export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }: WishlistItemTagsFormGroupProps): JSX.Element {
+export default function WishlistItemTagsFormGroup({
+  tagsSet,
+  setTagsSet,
+  label,
+}: WishlistItemTagsFormGroupProps): JSX.Element {
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -123,7 +127,9 @@ export default function WishlistItemTagsFormGroup({ tagsSet, setTagsSet, label }
         />
       </div>
 
-      <span className={`text-[12px] font-medium text-danger leading-[1.2] break-words ${errorMessage ? 'block' : 'hidden'}`}>
+      <span
+        className={`text-[12px] font-medium text-danger leading-[1.2] break-words ${errorMessage ? 'block' : 'hidden'}`}
+      >
         {errorMessage}
       </span>
     </div>

@@ -2,7 +2,9 @@ import { ChangeEvent, SubmitEvent, JSX, useReducer, useState } from 'react';
 import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
-import signUpFormValidationReducer, { initialSignUpFormValidationState } from './signUpFormValidationReducer';
+import signUpFormValidationReducer, {
+  initialSignUpFormValidationState,
+} from './signUpFormValidationReducer';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../hooks/useLoadingOverlay';
 import { signUpService } from '../../services/accountServices';
@@ -14,7 +16,10 @@ import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHa
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
-  const [{ formData, formErrors }, dispatch] = useReducer(signUpFormValidationReducer, initialSignUpFormValidationState);
+  const [{ formData, formErrors }, dispatch] = useReducer(
+    signUpFormValidationReducer,
+    initialSignUpFormValidationState
+  );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const { setAuthStatus } = useAuth();
@@ -26,7 +31,9 @@ export default function SignUp(): JSX.Element {
     const { displayName, username, email, password } = formData;
 
     try {
-      const publicAccountId: string = (await signUpService({ displayName, username, email, password })).data.publicAccountId;
+      const publicAccountId: string = (
+        await signUpService({ displayName, username, email, password })
+      ).data.publicAccountId;
       navigate(`/sign-up/verification?publicAccountId=${publicAccountId}`);
 
       displayPopupMessage('Account created.', 'success');
@@ -51,7 +58,10 @@ export default function SignUp(): JSX.Element {
 
   function allFieldsValid(): boolean {
     dispatch({ type: 'validateAllFields', payload: null });
-    const newState = signUpFormValidationReducer({ formData, formErrors }, { type: 'validateAllFields', payload: null });
+    const newState = signUpFormValidationReducer(
+      { formData, formErrors },
+      { type: 'validateAllFields', payload: null }
+    );
 
     for (const errorMessage of Object.values(newState.formErrors)) {
       if (errorMessage) {
@@ -70,7 +80,9 @@ export default function SignUp(): JSX.Element {
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
-            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>Sign up to Muninnfy</h1>
+            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>
+              Sign up to Muninnfy
+            </h1>
 
             <form
               id='sign-up-form'
@@ -96,7 +108,9 @@ export default function SignUp(): JSX.Element {
                 label='Display name'
                 autoComplete='name'
                 value={formData.displayName}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  dispatch({ type: 'validateField', payload: e })
+                }
                 errorMessage={formErrors.displayName}
               />
 
@@ -105,7 +119,9 @@ export default function SignUp(): JSX.Element {
                 label='Username'
                 autoComplete='username'
                 value={formData.username}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  dispatch({ type: 'validateField', payload: e })
+                }
                 errorMessage={formErrors.username}
               />
 
@@ -114,7 +130,9 @@ export default function SignUp(): JSX.Element {
                 label='Email address'
                 autoComplete='email'
                 value={formData.email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  dispatch({ type: 'validateField', payload: e })
+                }
                 errorMessage={formErrors.email}
               />
 
@@ -122,7 +140,9 @@ export default function SignUp(): JSX.Element {
                 id='password'
                 label='Password'
                 value={formData.password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  dispatch({ type: 'validateField', payload: e })
+                }
                 errorMessage={formErrors.password}
               />
 
@@ -130,7 +150,9 @@ export default function SignUp(): JSX.Element {
                 id='confirm-password'
                 label='Confirm password'
                 value={formData.confirmPassword}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch({ type: 'validateField', payload: e })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  dispatch({ type: 'validateField', payload: e })
+                }
                 errorMessage={formErrors.confirmPassword}
               />
 

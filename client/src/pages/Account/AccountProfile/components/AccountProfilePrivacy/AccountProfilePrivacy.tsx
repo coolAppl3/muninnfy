@@ -4,7 +4,9 @@ import Button from '../../../../../components/Button/Button';
 import useAccountDetails from '../../../hooks/useAccountDetails';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import { updateAccountPrivacyService } from '../../../../../services/accountServices';
 import useAccountProfile from '../../../hooks/useAccountProfile';
 
@@ -15,19 +17,25 @@ export default function AccountProfilePrivacy(): JSX.Element {
   const { is_private, approve_follow_requests } = accountDetails;
 
   const [isPrivate, setIsPrivate] = useState<boolean>(is_private);
-  const [approveFollowRequests, setApproveFollowRequests] = useState<boolean>(approve_follow_requests);
+  const [approveFollowRequests, setApproveFollowRequests] =
+    useState<boolean>(approve_follow_requests);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
-  const changesDetected: boolean = isPrivate !== is_private || approveFollowRequests !== approve_follow_requests;
+  const changesDetected: boolean =
+    isPrivate !== is_private || approveFollowRequests !== approve_follow_requests;
 
   async function updateAccountPrivacy(): Promise<void> {
     try {
       await updateAccountPrivacyService({ isPrivate, approveFollowRequests });
-      setAccountDetails((prev) => ({ ...prev, is_private: isPrivate, approve_follow_requests: approveFollowRequests }));
+      setAccountDetails((prev) => ({
+        ...prev,
+        is_private: isPrivate,
+        approve_follow_requests: approveFollowRequests,
+      }));
 
       displayPopupMessage('Privacy preferences changed.', 'success');
       setProfileSection(null);

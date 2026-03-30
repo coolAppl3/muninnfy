@@ -13,4 +13,11 @@ export type OngoingAccountRequest = {
   is_suspended: boolean;
 };
 
-export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & { is_following: boolean };
+export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & {
+  is_owner: boolean;
+  follow_id: number | null;
+  follow_request_id: number | null;
+  followers_count: number;
+  following_count: number;
+  wishlists_count: number;
+};

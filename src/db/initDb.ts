@@ -1,4 +1,8 @@
-import { ACCOUNT_EMAILS_SENT_LIMIT, ACCOUNT_FAILED_ATTEMPTS_LIMIT, ACCOUNT_FAILED_SIGN_IN_LIMIT } from '../util/constants/accountConstants';
+import {
+  ACCOUNT_EMAILS_SENT_LIMIT,
+  ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+  ACCOUNT_FAILED_SIGN_IN_LIMIT,
+} from '../util/constants/accountConstants';
 import { AUTH_EXTENSIONS_LIMIT } from '../util/constants/authConstants';
 import {
   FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
@@ -10,7 +14,6 @@ import { dbPool } from './db';
 
 export async function initDb(): Promise<void> {
   await createAccountsTable();
-  await createAccountPreferencesTable();
   await createAccountVerificationTable();
   await createAccountRecoveryTable();
   await createAccountDeletionTable();
@@ -45,24 +48,11 @@ async function createAccountsTable(): Promise<void> {
         display_name VARCHAR(40) NOT NULL,
         created_on_timestamp BIGINT UNSIGNED NOT NULL,
         is_verified BOOLEAN NOT NULL,
-        failed_sign_in_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_sign_in_attempts <= ?)
-      );`,
-      [ACCOUNT_FAILED_SIGN_IN_LIMIT]
-    );
-  } catch (err: unknown) {
-    console.log(err);
-  }
-}
-
-async function createAccountPreferencesTable(): Promise<void> {
-  try {
-    await dbPool.execute(
-      `CREATE TABLE IF NOT EXISTS account_preferences (
-        account_id INT UNSIGNED PRIMARY KEY,
-        is_private BOOLEAN NOT NULL,
+        failed_sign_in_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_sign_in_attempts <= ?),
         approve_follow_requests BOOLEAN NOT NULL,
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
-      );`
+      );`,
+      [ACCOUNT_FAILED_SIGN_IN_LIMIT]
     );
   } catch (err: unknown) {
     console.log(err);
@@ -235,7 +225,12 @@ async function createWishlistsTable(): Promise<void> {
         FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
         UNIQUE(account_id, title)
       );`,
-      [PRIVATE_WISHLIST_PRIVACY_LEVEL, FOLLOWERS_WISHLIST_PRIVACY_LEVEL, PUBLIC_WISHLIST_PRIVACY_LEVEL, WISHLIST_INTERACTIVITY_MAX_VALUE]
+      [
+        PRIVATE_WISHLIST_PRIVACY_LEVEL,
+        FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+        PUBLIC_WISHLIST_PRIVACY_LEVEL,
+        WISHLIST_INTERACTIVITY_MAX_VALUE,
+      ]
     );
   } catch (err: unknown) {
     console.log(err);

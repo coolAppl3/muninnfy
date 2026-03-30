@@ -9,8 +9,14 @@ type WishlistItemsProps = {
 };
 
 export default function WishlistItems({ inViewMode = false }: WishlistItemsProps): JSX.Element {
-  const { wishlistItems, selectionModeActive, isSingleColumnView, itemsFilterConfig, itemMatchesFilterConfig, setWishlistItems } =
-    useWishlistItems();
+  const {
+    wishlistItems,
+    selectionModeActive,
+    isSingleColumnView,
+    itemsFilterConfig,
+    itemMatchesFilterConfig,
+    setWishlistItems,
+  } = useWishlistItems();
 
   const filteredItems: WishlistItemType[] = useMemo(
     () => wishlistItems.filter(itemMatchesFilterConfig),
@@ -43,7 +49,8 @@ export default function WishlistItems({ inViewMode = false }: WishlistItemsProps
           <>
             <div className='text-sm font-medium flex justify-between items-center'>
               <p className='text-cta leading-none flex gap-1'>
-                {filtersAppliedCount === 1 ? '1 filter' : `${filtersAppliedCount} filters`} applied
+                {filtersAppliedCount === 1 ? '1 filter' : `${filtersAppliedCount} filters`}{' '}
+                applied
               </p>
 
               <p className='text-description leading-none'>
@@ -55,9 +62,13 @@ export default function WishlistItems({ inViewMode = false }: WishlistItemsProps
           </>
         )}
 
-        <div className={`grid grid-cols-1 ${isSingleColumnView ? '' : 'sm:grid-cols-2'} gap-1 items-start`}>
+        <div
+          className={`grid grid-cols-1 ${isSingleColumnView ? '' : 'sm:grid-cols-2'} gap-1 items-start`}
+        >
           {filteredItems.length === 0 ? (
-            <p className='sm:!col-span-2 text-sm font-medium text-description w-fit mx-auto'>No items found</p>
+            <p className='sm:!col-span-2 text-sm font-medium text-description w-fit mx-auto'>
+              No items found
+            </p>
           ) : (
             filteredItems.map((item: WishlistItemType) => (
               <WishlistItem

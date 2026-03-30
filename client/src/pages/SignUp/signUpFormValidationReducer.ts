@@ -1,5 +1,10 @@
 import { ChangeEvent } from 'react';
-import { validateDisplayName, validateEmail, validateNewPassword, validateUsername } from '../../utils/validation/userValidation';
+import {
+  validateDisplayName,
+  validateEmail,
+  validateNewPassword,
+  validateUsername,
+} from '../../utils/validation/userValidation';
 
 type FormData = {
   displayName: string;
@@ -70,7 +75,9 @@ export default function signUpFormValidationReducer(
         displayName: validateDisplayName(displayName),
         username: validateUsername(username),
         email: validateEmail(email),
-        password: validateNewPassword(password) || (password === username ? `Username and password can't match.` : null),
+        password:
+          validateNewPassword(password) ||
+          (password === username ? `Username and password can't match.` : null),
         confirmPassword: confirmPassword === password ? null : `Passwords don't match.`,
       },
     };
@@ -137,7 +144,8 @@ export default function signUpFormValidationReducer(
       formErrors: {
         ...state.formErrors,
         password: validateNewPassword(value),
-        confirmPassword: value === state.formData.confirmPassword ? null : `Passwords don't match.`,
+        confirmPassword:
+          value === state.formData.confirmPassword ? null : `Passwords don't match.`,
       },
     };
 

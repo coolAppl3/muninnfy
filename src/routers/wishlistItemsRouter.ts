@@ -22,7 +22,10 @@ import {
   WISHLIST_ITEMS_LIMIT,
 } from '../util/constants/wishlistConstants';
 import { sanitizeWishlistItemTags } from '../util/validation/wishlistItemTagValidation';
-import { deleteWishlistItemTags, insertWishlistItemTags } from '../db/helpers/wishlistItemTagsDbHelpers';
+import {
+  deleteWishlistItemTags,
+  insertWishlistItemTags,
+} from '../db/helpers/wishlistItemTagsDbHelpers';
 import { getWishlistItemByTitle } from '../db/helpers/wishlistItemsDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
 import { incrementWishlistInteractivityIndex } from '../db/helpers/wishlistsDbHelpers';
@@ -61,7 +64,14 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'title', 'description', 'link', 'price', 'tags'];
+  const expectedKeys: string[] = [
+    'wishlistId',
+    'title',
+    'description',
+    'link',
+    'price',
+    'tags',
+  ];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
@@ -126,7 +136,9 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (wishlistDetails.wishlist_items_count >= WISHLIST_ITEMS_LIMIT) {
-      res.status(409).json({ message: 'Wishlist items limit reached.', reason: 'itemLimitReached' });
+      res
+        .status(409)
+        .json({ message: 'Wishlist items limit reached.', reason: 'itemLimitReached' });
       return;
     }
 
@@ -185,7 +197,12 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     await connection.commit();
     res.status(201).json(mappedWishlistItem);
 
-    await incrementWishlistInteractivityIndex(wishlistId, WISHLIST_INTERACTION_ADD_ITEM, dbPool, req);
+    await incrementWishlistInteractivityIndex(
+      wishlistId,
+      WISHLIST_INTERACTION_ADD_ITEM,
+      dbPool,
+      req
+    );
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -203,7 +220,12 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
-      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
+      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(
+        title,
+        wishlistId,
+        dbPool,
+        req
+      );
 
       if (!existingWishlistItem) {
         res.status(500).json({ message: 'Internal server error.' });
@@ -245,7 +267,15 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['wishlistId', 'itemId', 'title', 'description', 'link', 'price', 'tags'];
+  const expectedKeys: string[] = [
+    'wishlistId',
+    'itemId',
+    'title',
+    'description',
+    'link',
+    'price',
+    'tags',
+  ];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
@@ -358,10 +388,14 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     if (wishlistItemDetails.tags_count !== sanitizedTags.length) {
       const deletedSuccessfully: boolean =
-        wishlistItemDetails.tags_count === 0 ? true : await deleteWishlistItemTags(itemId, connection, req);
+        wishlistItemDetails.tags_count === 0
+          ? true
+          : await deleteWishlistItemTags(itemId, connection, req);
 
       const insertedSuccessfully: boolean =
-        sanitizedTags.length === 0 ? true : await insertWishlistItemTags(sanitizedTags, connection, req);
+        sanitizedTags.length === 0
+          ? true
+          : await insertWishlistItemTags(sanitizedTags, connection, req);
 
       if (!deletedSuccessfully || !insertedSuccessfully) {
         await connection.rollback();
@@ -403,7 +437,12 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     await connection.commit();
     res.json(mappedWishlistItem);
 
-    await incrementWishlistInteractivityIndex(wishlistId, WISHLIST_INTERACTION_GENERAL, dbPool, req);
+    await incrementWishlistInteractivityIndex(
+      wishlistId,
+      WISHLIST_INTERACTION_GENERAL,
+      dbPool,
+      req
+    );
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -421,7 +460,12 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
     }
 
     if (err.errno === 1062 && err.sqlMessage?.endsWith(`for key 'title'`)) {
-      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(title, wishlistId, dbPool, req);
+      const existingWishlistItem: MappedWishlistItem | null = await getWishlistItemByTitle(
+        title,
+        wishlistId,
+        dbPool,
+        req
+      );
 
       if (!existingWishlistItem) {
         res.status(500).json({ message: 'Internal server error.' });
@@ -515,7 +559,12 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
 
     res.json({});
 
-    await incrementWishlistInteractivityIndex(wishlistId, WISHLIST_INTERACTION_GENERAL, dbPool, req);
+    await incrementWishlistInteractivityIndex(
+      wishlistId,
+      WISHLIST_INTERACTION_GENERAL,
+      dbPool,
+      req
+    );
   } catch (err: unknown) {
     console.log(err);
 
@@ -611,7 +660,9 @@ wishlistItemsRouter.delete('/bulk', async (req: Request, res: Response) => {
 
     await incrementWishlistInteractivityIndex(
       wishlistId,
-      itemsIdArr.length > WISHLIST_INTERACTION_BULK_BORDER ? WISHLIST_INTERACTION_BULK_LARGE : WISHLIST_INTERACTION_BULK_SMALL,
+      itemsIdArr.length > WISHLIST_INTERACTION_BULK_BORDER
+        ? WISHLIST_INTERACTION_BULK_LARGE
+        : WISHLIST_INTERACTION_BULK_SMALL,
       dbPool,
       req
     );
@@ -662,7 +713,9 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
   }
 
   if (typeof markAsPurchased !== 'boolean') {
-    res.status(400).json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
+    res
+      .status(400)
+      .json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
     return;
   }
 
@@ -728,7 +781,12 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
 
     res.json({ newPurchasedOnTimestamp });
 
-    await incrementWishlistInteractivityIndex(wishlistId, WISHLIST_INTERACTION_GENERAL, dbPool, req);
+    await incrementWishlistInteractivityIndex(
+      wishlistId,
+      WISHLIST_INTERACTION_GENERAL,
+      dbPool,
+      req
+    );
   } catch (err: unknown) {
     console.log(err);
 
@@ -771,7 +829,9 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
   }
 
   if (typeof markAsPurchased !== 'boolean') {
-    res.status(400).json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
+    res
+      .status(400)
+      .json({ message: 'Invalid purchase status.', reason: 'invalidPurchaseStatus' });
     return;
   }
 
@@ -834,7 +894,9 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
 
     await incrementWishlistInteractivityIndex(
       wishlistId,
-      itemsIdArr.length > WISHLIST_INTERACTION_BULK_BORDER ? WISHLIST_INTERACTION_BULK_LARGE : WISHLIST_INTERACTION_BULK_SMALL,
+      itemsIdArr.length > WISHLIST_INTERACTION_BULK_BORDER
+        ? WISHLIST_INTERACTION_BULK_LARGE
+        : WISHLIST_INTERACTION_BULK_SMALL,
       dbPool,
       req
     );

@@ -1,5 +1,7 @@
 import { JSX, ReactNode, useMemo, useState } from 'react';
-import AccountOngoingRequestsContext, { AccountOngoingRequestsContextType } from '../contexts/AccountOngoingRequestsContext';
+import AccountOngoingRequestsContext, {
+  AccountOngoingRequestsContextType,
+} from '../contexts/AccountOngoingRequestsContext';
 import { OngoingAccountRequest } from '../../../types/accountTypes';
 
 type AccountOngoingRequestsProviderProps = {
@@ -13,13 +15,12 @@ export default function AccountOngoingRequestsProvider({
   initialOngoingAccountDeletionRequest,
   children,
 }: AccountOngoingRequestsProviderProps): JSX.Element {
-  const [ongoingEmailUpdateRequest, setOngoingEmailUpdateRequest] = useState<(OngoingAccountRequest & { new_email: string }) | null>(
-    initialOngoingEmailUpdateRequest
-  );
+  const [ongoingEmailUpdateRequest, setOngoingEmailUpdateRequest] = useState<
+    (OngoingAccountRequest & { new_email: string }) | null
+  >(initialOngoingEmailUpdateRequest);
 
-  const [ongoingAccountDeletionRequest, setOngoingAccountDeletionRequest] = useState<OngoingAccountRequest | null>(
-    initialOngoingAccountDeletionRequest
-  );
+  const [ongoingAccountDeletionRequest, setOngoingAccountDeletionRequest] =
+    useState<OngoingAccountRequest | null>(initialOngoingAccountDeletionRequest);
 
   const contextValue: AccountOngoingRequestsContextType = useMemo(
     () => ({
@@ -32,5 +33,9 @@ export default function AccountOngoingRequestsProvider({
     [ongoingEmailUpdateRequest, ongoingAccountDeletionRequest]
   );
 
-  return <AccountOngoingRequestsContext value={contextValue}>{children}</AccountOngoingRequestsContext>;
+  return (
+    <AccountOngoingRequestsContext value={contextValue}>
+      {children}
+    </AccountOngoingRequestsContext>
+  );
 }

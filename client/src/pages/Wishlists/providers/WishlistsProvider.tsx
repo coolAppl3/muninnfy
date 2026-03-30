@@ -1,20 +1,35 @@
 import { JSX, ReactNode, useCallback, useMemo, useState } from 'react';
-import WishlistsContext, { WishlistsContextType, WishlistsFilterConfigType, WishlistsSortingMode } from '../contexts/WishlistsContext';
-import { ExtendedWishlistDetailsType } from '../../../types/wishlistTypes';
+import WishlistsContext, {
+  WishlistsContextType,
+  WishlistsFilterConfigType,
+  WishlistsSortingMode,
+} from '../contexts/WishlistsContext';
+import { ExtendedWishlistDetailsType, ViewWishlistDetails } from '../../../types/wishlistTypes';
+import useViewMode from '../../../hooks/useViewMode';
 
 type WishlistsProviderProps = {
-  initialWishlists: ExtendedWishlistDetailsType[];
+  initialWishlists: (ExtendedWishlistDetailsType | ViewWishlistDetails)[];
   children: ReactNode;
 };
 
-export default function WishlistsProvider({ initialWishlists, children }: WishlistsProviderProps): JSX.Element {
-  const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>(initialWishlists);
-  const [wishlistsFilterConfig, setWishlistsFilterConfig] = useState<WishlistsFilterConfigType>(defaultWishlistsFilterConfig);
-  const [wishlistsSortingMode, setWishlistsSortingMode] = useState<WishlistsSortingMode>('interactivity');
+export default function WishlistsProvider({
+  initialWishlists,
+  children,
+}: WishlistsProviderProps): JSX.Element {
+  const { inViewMode } = useViewMode();
+
+  const [wishlists, setWishlists] =
+    useState<(ExtendedWishlistDetailsType | ViewWishlistDetails)[]>(initialWishlists);
+  const [wishlistsFilterConfig, setWishlistsFilterConfig] = useState<WishlistsFilterConfigType>(
+    defaultWishlistsFilterConfig
+  );
+  const [wishlistsSortingMode, setWishlistsSortingMode] = useState<WishlistsSortingMode>(
+    inViewMode ? 'newest' : 'interactivity'
+  );
   const [isSingleColumnView, setIsSingleColumnView] = useState<boolean>(false);
 
   const wishlistMatchesFilterConfig = useCallback(
-    (wishlist: ExtendedWishlistDetailsType): boolean => {
+    (wishlist: ExtendedWishlistDetailsType | ViewWishlistDetails): boolean => {
       const {
         createdAfterTimestamp,
         createdBeforeTimestamp,
@@ -33,11 +48,17 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
         return false;
       }
 
-      if (createdAfterTimestamp !== null && wishlist.created_on_timestamp < createdAfterTimestamp) {
+      if (
+        createdAfterTimestamp !== null &&
+        wishlist.created_on_timestamp < createdAfterTimestamp
+      ) {
         return false;
       }
 
-      if (createdBeforeTimestamp !== null && wishlist.created_on_timestamp > createdBeforeTimestamp) {
+      if (
+        createdBeforeTimestamp !== null &&
+        wishlist.created_on_timestamp > createdBeforeTimestamp
+      ) {
         return false;
       }
 
@@ -65,7 +86,11 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
         return false;
       }
 
-      if (isFavorited !== null && wishlist.is_favorited !== isFavorited) {
+      if (
+        isFavorited !== null &&
+        'is_favorited' in wishlist &&
+        wishlist.is_favorited !== isFavorited
+      ) {
         return false;
       }
 
@@ -83,12 +108,16 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       const sortingMode: WishlistsSortingMode = explicitSortingMode || wishlistsSortingMode;
 
       if (sortingMode === 'newest') {
-        setWishlists((prev) => prev.toSorted((a, b) => b.created_on_timestamp - a.created_on_timestamp));
+        setWishlists((prev) =>
+          prev.toSorted((a, b) => b.created_on_timestamp - a.created_on_timestamp)
+        );
         return;
       }
 
       if (sortingMode === 'oldest') {
-        setWishlists((prev) => prev.toSorted((a, b) => a.created_on_timestamp - b.created_on_timestamp));
+        setWishlists((prev) =>
+          prev.toSorted((a, b) => a.created_on_timestamp - b.created_on_timestamp)
+        );
         return;
       }
 
@@ -103,22 +132,36 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       }
 
       if (sortingMode === 'lexicographical') {
-        setWishlists((prev) => prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' })));
+        setWishlists((prev) =>
+          prev.toSorted((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }))
+        );
+        return;
+      }
+
+      if (inViewMode) {
         return;
       }
 
       // sort by interactivity
-      setWishlists((prev) =>
-        prev.toSorted((a, b) => {
+      setWishlists((prev) => {
+        if (inViewMode) {
+          return prev;
+        }
+
+        if (prev[0] && !('interactivity_index' in prev[0])) {
+          return prev;
+        }
+
+        return (prev as ExtendedWishlistDetailsType[]).toSorted((a, b) => {
           if (a.interactivity_index === b.interactivity_index) {
             return b.latest_interaction_timestamp - a.latest_interaction_timestamp;
           }
 
           return b.interactivity_index - a.interactivity_index;
-        })
-      );
+        });
+      });
     },
-    [wishlistsSortingMode]
+    [inViewMode, wishlistsSortingMode]
   );
 
   const contextValue: WishlistsContextType = useMemo(
@@ -137,7 +180,14 @@ export default function WishlistsProvider({ initialWishlists, children }: Wishli
       isSingleColumnView,
       setIsSingleColumnView,
     }),
-    [wishlists, wishlistsFilterConfig, wishlistsSortingMode, isSingleColumnView, sortWishlists, wishlistMatchesFilterConfig]
+    [
+      wishlists,
+      wishlistsFilterConfig,
+      wishlistsSortingMode,
+      isSingleColumnView,
+      sortWishlists,
+      wishlistMatchesFilterConfig,
+    ]
   );
 
   return <WishlistsContext value={contextValue}>{children}</WishlistsContext>;

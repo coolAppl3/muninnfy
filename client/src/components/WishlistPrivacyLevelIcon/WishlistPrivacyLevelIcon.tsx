@@ -1,10 +1,17 @@
 import { JSX } from 'react';
-import { FOLLOWERS_WISHLIST_PRIVACY_LEVEL, PRIVATE_WISHLIST_PRIVACY_LEVEL } from '../../utils/constants/wishlistConstants';
+import {
+  FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+  PRIVATE_WISHLIST_PRIVACY_LEVEL,
+} from '../../utils/constants/wishlistConstants';
 import LockIcon from '../../assets/svg/LockIcon.svg?react';
 import PersonIcon from '../../assets/svg/PersonIcon.svg?react';
 import EyeIcon from '../../assets/svg/EyeIcon.svg?react';
 
-export default function WishlistPrivacyLevelIcon({ privacyLevel }: { privacyLevel: number }): JSX.Element {
+export default function WishlistPrivacyLevelIcon({
+  privacyLevel,
+}: {
+  privacyLevel: number;
+}): JSX.Element {
   if (privacyLevel === PRIVATE_WISHLIST_PRIVACY_LEVEL) {
     return (
       <span

@@ -17,6 +17,7 @@ import useHistory from '../hooks/useHistory';
 import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
 import AccountRecovery from '../pages/AccountRecovery/AccountRecovery';
 import ViewAccount from '../pages/ViewAccount/ViewAccount';
+import ViewWishlists from '../pages/ViewWishlists/ViewWishlists';
 
 type RouteDetails = {
   path: string;
@@ -43,6 +44,7 @@ export default function Router(): JSX.Element {
   const publicRoutes: RouteDetails[] = [
     { path: '/home', element: <Home /> },
     { path: '/view/wishlist/:wishlistId', element: <ViewWishlist /> },
+    { path: '/view/account/wishlists/:publicAccountId', element: <ViewWishlists /> },
     { path: '/view/account/:publicAccountId', element: <ViewAccount /> },
     { path: '*', element: <NotFound /> },
   ];
@@ -93,7 +95,13 @@ export default function Router(): JSX.Element {
   );
 }
 
-function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: AuthStatus; redirectTo?: string }): JSX.Element {
+function AuthOnlyRoute({
+  authStatus,
+  redirectTo = '/sign-in',
+}: {
+  authStatus: AuthStatus;
+  redirectTo?: string;
+}): JSX.Element {
   const { postAuthNavigate, setPostAuthNavigate } = useHistory();
   const { pathname, search } = useLocation();
 
@@ -121,7 +129,13 @@ function AuthOnlyRoute({ authStatus, redirectTo = '/sign-in' }: { authStatus: Au
   );
 }
 
-function NonAuthOnlyRoute({ authStatus, redirectTo = '/account' }: { authStatus: AuthStatus; redirectTo?: string }): JSX.Element {
+function NonAuthOnlyRoute({
+  authStatus,
+  redirectTo = '/account',
+}: {
+  authStatus: AuthStatus;
+  redirectTo?: string;
+}): JSX.Element {
   const { postAuthNavigate } = useHistory();
 
   if (authStatus === 'loading') {

@@ -6,7 +6,11 @@ type ToggleSwitchProps = {
   className?: string;
 };
 
-export default function ToggleSwitch({ isToggled, onClick, className }: ToggleSwitchProps): JSX.Element {
+export default function ToggleSwitch({
+  isToggled,
+  onClick,
+  className,
+}: ToggleSwitchProps): JSX.Element {
   return (
     <button
       type='button'
@@ -17,7 +21,9 @@ export default function ToggleSwitch({ isToggled, onClick, className }: ToggleSw
         isToggled ? 'bg-cta/30 brightness-100' : 'bg-dark brightness-50'
       } ${className || ''}`}
     >
-      <div className={`h-[1.6rem] w-[1.6rem] bg-cta rounded-[50%] transition-transform ${isToggled ? 'translate-x-[2.2rem]' : ''}`}></div>
+      <div
+        className={`h-[1.6rem] w-[1.6rem] bg-cta rounded-[50%] transition-transform ${isToggled ? 'translate-x-[2.2rem]' : ''}`}
+      ></div>
     </button>
   );
 }

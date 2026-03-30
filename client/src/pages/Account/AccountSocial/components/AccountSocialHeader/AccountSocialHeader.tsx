@@ -4,13 +4,13 @@ import StatisticItem from '../../../../../components/StatisticItem/StatisticItem
 import useAccountSocial from '../../../hooks/useAccountSocial';
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import { copyToClipboard } from '../../../../../utils/globalUtils';
-import useAccountDetails from '../../../hooks/useAccountDetails';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
+import useViewMode from '../../../../../hooks/useViewMode';
 
 export default function AccountSocialHeader(): JSX.Element {
-  const { accountDetails } = useAccountDetails();
   const { menuIsOpen, socialSection, setMenuIsOpen, setSocialSection } = useAccountSocial();
   const { socialCounts } = useAccountSocialDetails();
+  const { inViewMode, publicAccountId } = useViewMode();
 
   const { displayPopupMessage } = usePopupMessage();
 
@@ -28,45 +28,56 @@ export default function AccountSocialHeader(): JSX.Element {
       >
         <h3 className='text-md font-normal'>Social</h3>
 
-        <button
-          type='button'
-          className='bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
-          onClick={() => setMenuIsOpen((prev) => !prev)}
-          title={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
-          aria-label={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
-        >
-          <TripleDotMenuIcon className={`w-[1.6rem] h-[1.6rem] transition-colors ${menuIsOpen ? 'text-cta' : ''}`} />
-        </button>
+        {inViewMode || (
+          <>
+            <button
+              type='button'
+              className='bg-dark p-1 rounded-[50%] shadow-simple-tiny cursor-pointer transition-[filter] hover:brightness-75'
+              onClick={() => setMenuIsOpen((prev) => !prev)}
+              title={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
+              aria-label={`${menuIsOpen ? 'Hide' : 'View'} profile menu`}
+            >
+              <TripleDotMenuIcon
+                className={`w-[1.6rem] h-[1.6rem] transition-colors ${menuIsOpen ? 'text-cta' : ''}`}
+              />
+            </button>
 
-        <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
-          <button
-            type='button'
-            className='context-menu-btn bg-primary'
-            onClick={async () => {
-              setMenuIsOpen(false);
+            <div
+              className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}
+            >
+              <button
+                type='button'
+                className='context-menu-btn bg-primary'
+                onClick={async () => {
+                  setMenuIsOpen(false);
 
-              const successfullyCopied: boolean = await copyToClipboard(
-                `${window.location.origin}/accounts/view/${accountDetails.public_account_id}`
-              );
-              successfullyCopied
-                ? displayPopupMessage('Copied to clipboard.', 'success')
-                : displayPopupMessage('Failed to copy to clipboard.', 'error');
-            }}
-          >
-            Copy account link
-          </button>
+                  const successfullyCopied: boolean = publicAccountId
+                    ? await copyToClipboard(
+                        `${window.location.origin}/accounts/view/${publicAccountId}`
+                      )
+                    : false;
 
-          <button
-            type='button'
-            className={`context-menu-btn bg-primary ${socialSection === 'findAccount' ? 'text-cta' : ''}`}
-            onClick={() => {
-              setMenuIsOpen(false);
-              setSocialSection('findAccount');
-            }}
-          >
-            Find account
-          </button>
-        </div>
+                  successfullyCopied
+                    ? displayPopupMessage('Copied to clipboard.', 'success')
+                    : displayPopupMessage('Failed to copy to clipboard.', 'error');
+                }}
+              >
+                Copy account link
+              </button>
+
+              <button
+                type='button'
+                className={`context-menu-btn bg-primary ${socialSection === 'findAccount' ? 'text-cta' : ''}`}
+                onClick={() => {
+                  setMenuIsOpen(false);
+                  setSocialSection('findAccount');
+                }}
+              >
+                Find account
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div>
@@ -97,18 +108,20 @@ export default function AccountSocialHeader(): JSX.Element {
             />
           </button>
 
-          <button
-            type='button'
-            onClick={() => setSocialSection('followRequests')}
-            className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
-              socialSection === 'followRequests' ? 'text-cta' : ''
-            }`}
-          >
-            <StatisticItem
-              title='Follow requests'
-              value={`${socialCounts.follow_requests_count}`}
-            />
-          </button>
+          {inViewMode || (
+            <button
+              type='button'
+              onClick={() => setSocialSection('followRequests')}
+              className={`flex justify-start items-center text-start p-1 bg-dark rounded cursor-pointer transition-[filter] hover:brightness-75 ${
+                socialSection === 'followRequests' ? 'text-cta' : ''
+              }`}
+            >
+              <StatisticItem
+                title='Follow requests'
+                value={`${socialCounts.follow_requests_count}`}
+              />
+            </button>
+          )}
         </div>
       </div>
     </header>

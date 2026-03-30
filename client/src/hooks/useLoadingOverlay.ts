@@ -1,5 +1,7 @@
 import { useContext } from 'react';
-import LoadingOverlayContext, { LoadingOverlayContextType } from '../contexts/LoadingOverlayContext';
+import LoadingOverlayContext, {
+  LoadingOverlayContextType,
+} from '../contexts/LoadingOverlayContext';
 
 export default function useLoadingOverlay(): LoadingOverlayContextType {
   const context = useContext<LoadingOverlayContextType | null>(LoadingOverlayContext);

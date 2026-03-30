@@ -1,11 +1,20 @@
 import { Dispatch, JSX, memo, SetStateAction, useState } from 'react';
-import { FollowDetails, FollowRequest, SocialCounts } from '../../../../../../../types/socialTypes';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../../hooks/useHandleAsyncError';
+import {
+  FollowDetails,
+  FollowRequest,
+  SocialCounts,
+} from '../../../../../../../types/socialTypes';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../../../hooks/useHandleAsyncError';
 import usePopupMessage from '../../../../../../../hooks/usePopupMessage';
 import Button from '../../../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
 import { getFullDateString } from '../../../../../../../utils/globalUtils';
-import { acceptFollowRequestService, declineFollowRequestService } from '../../../../../../../services/socialServices';
+import {
+  acceptFollowRequestService,
+  declineFollowRequestService,
+} from '../../../../../../../services/socialServices';
 import useInfoModal from '../../../../../../../hooks/useInfoModal';
 
 type FollowRequestCardProps = {
@@ -25,7 +34,8 @@ function FollowRequestCard({
   setFollowers,
   setSocialCounts,
 }: FollowRequestCardProps): JSX.Element {
-  const { request_id, public_account_id, username, display_name, request_timestamp } = followRequest;
+  const { request_id, public_account_id, username, display_name, request_timestamp } =
+    followRequest;
 
   const [actionLoading, setActionLoading] = useState<boolean>(false);
 
@@ -35,7 +45,9 @@ function FollowRequestCard({
 
   async function acceptFollowRequest(): Promise<void> {
     try {
-      const { follow_id, follow_timestamp } = (await acceptFollowRequestService({ requestId: request_id })).data;
+      const { follow_id, follow_timestamp } = (
+        await acceptFollowRequestService({ requestId: request_id })
+      ).data;
 
       const newFollowerDetails: FollowDetails = {
         follow_id,
@@ -45,8 +57,12 @@ function FollowRequestCard({
         username,
       };
 
-      setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-      setSearchQueryResults((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+      setFollowRequests((prev) =>
+        prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id)
+      );
+      setSearchQueryResults((prev) =>
+        prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id)
+      );
       setFollowers((prev) => [newFollowerDetails, ...prev]);
       setSocialCounts((prev) => ({
         ...prev,
@@ -71,7 +87,9 @@ function FollowRequestCard({
       }
 
       if (status === 404) {
-        setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
+        setFollowRequests((prev) =>
+          prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id)
+        );
         return;
       }
 
@@ -80,8 +98,13 @@ function FollowRequestCard({
       }
 
       if (errReason === 'alreadyAccepted') {
-        setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-        setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
+        setFollowRequests((prev) =>
+          prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id)
+        );
+        setSocialCounts((prev) => ({
+          ...prev,
+          follow_requests_count: prev.follow_requests_count - 1,
+        }));
 
         displayPopupMessage(errMessage, 'success');
         return;
@@ -104,9 +127,16 @@ function FollowRequestCard({
     try {
       await declineFollowRequestService(request_id);
 
-      setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-      setSearchQueryResults((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-      setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
+      setFollowRequests((prev) =>
+        prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id)
+      );
+      setSearchQueryResults((prev) =>
+        prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id)
+      );
+      setSocialCounts((prev) => ({
+        ...prev,
+        follow_requests_count: prev.follow_requests_count - 1,
+      }));
 
       displayPopupMessage('Requested declined.', 'success');
     } catch (err: unknown) {
@@ -125,8 +155,13 @@ function FollowRequestCard({
       }
 
       if (status === 404) {
-        setFollowRequests((prev) => prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id));
-        setSocialCounts((prev) => ({ ...prev, follow_requests_count: prev.follow_requests_count - 1 }));
+        setFollowRequests((prev) =>
+          prev.filter((followRequest: FollowRequest) => followRequest.request_id !== request_id)
+        );
+        setSocialCounts((prev) => ({
+          ...prev,
+          follow_requests_count: prev.follow_requests_count - 1,
+        }));
       }
     }
   }
@@ -140,14 +175,16 @@ function FollowRequestCard({
         >
           <p className='text-title leading-none mb-[4px]'>{display_name}</p>
           <Link
-            to={`/account/view/${public_account_id}`}
+            to={`/view/account/${public_account_id}`}
             className='block leading-none transition-colors hover:text-cta'
           >
             @{username}
           </Link>
         </div>
         <div className='text-description/50 text-xs'>
-          <p className='leading-none mb-[4px]'>Requested on {getFullDateString(request_timestamp)}</p>
+          <p className='leading-none mb-[4px]'>
+            Requested on {getFullDateString(request_timestamp)}
+          </p>
           <p className='leading-none'>{public_account_id}</p>
         </div>
       </div>

@@ -14,10 +14,12 @@ export default function JoinMuninnfy(): JSX.Element {
           <div className='content md:!max-w-1/2'>
             <h2 className='text-title text-4xl font-bold mb-2'>Join Muninnfy.</h2>
             <p className='text-description font-medium mb-1'>
-              Muninnfy is completely free — crafted to deliver a truly personalized experience that comes alive when you sign up.
+              Muninnfy is completely free — crafted to deliver a truly personalized experience
+              that comes alive when you sign up.
             </p>
             <p className='text-description font-medium mb-2'>
-              Try it out as a guest with a temporary wishlist, but to unlock its full power and make it truly yours, create an account.
+              Try it out as a guest with a temporary wishlist, but to unlock its full power and
+              make it truly yours, create an account.
             </p>
 
             <div className='btn-container flex flex-col gap-1 sm:flex-row-reverse justify-end'>

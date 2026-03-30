@@ -9,7 +9,9 @@ import DefaultFormGroup from '../../../../components/DefaultFormGroup/DefaultFor
 import { validateWishlistTitle } from '../../../../utils/validation/wishlistValidation';
 import Button from '../../../../components/Button/Button';
 import useWishlist from '../../hooks/useWishlist';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../hooks/useHandleAsyncError';
 
 export default function EditWishlistTitleForm(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
@@ -84,7 +86,10 @@ export default function EditWishlistTitleForm(): JSX.Element {
         }
 
         const newTitleErrorMessage: string | null =
-          validateWishlistTitle(value) || (value.trimEnd() === wishlistDetails.title ? 'Wishlist already has this title.' : null);
+          validateWishlistTitle(value) ||
+          (value.trimEnd() === wishlistDetails.title
+            ? 'Wishlist already has this title.'
+            : null);
 
         if (newTitleErrorMessage) {
           setErrorMessage(newTitleErrorMessage);

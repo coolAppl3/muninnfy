@@ -1,5 +1,7 @@
 import { Dispatch, FocusEvent, JSX, memo, SetStateAction, useState } from 'react';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import useHistory from '../../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
@@ -8,7 +10,10 @@ import useConfirmModal from '../../../../../hooks/useConfirmModal';
 import { WishlistItemType } from '../../../../../types/wishlistItemTypes';
 import TripleDotMenuIcon from '../../../../../assets/svg/TripleDotMenuIcon.svg?react';
 import CheckIcon from '../../../../../assets/svg/CheckIcon.svg?react';
-import { deleteWishlistItemService, setWishlistItemIsPurchasedService } from '../../../../../services/wishlistItemServices';
+import {
+  deleteWishlistItemService,
+  setWishlistItemIsPurchasedService,
+} from '../../../../../services/wishlistItemServices';
 
 type WishlistItemButtonContainerProps = {
   wishlistItem: WishlistItemType;
@@ -17,7 +22,11 @@ type WishlistItemButtonContainerProps = {
 };
 
 export default memo(WishlistItemButtonContainer);
-function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistItems }: WishlistItemButtonContainerProps): JSX.Element {
+function WishlistItemButtonContainer({
+  wishlistItem,
+  setIsEditing,
+  setWishlistItems,
+}: WishlistItemButtonContainerProps): JSX.Element {
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [updatingPurchaseStatus, setUpdatingPurchaseStatus] = useState<boolean>(false);
 
@@ -78,7 +87,9 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
         return;
       }
 
-      setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id));
+      setWishlistItems((prev) =>
+        prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id)
+      );
     } finally {
       setUpdatingPurchaseStatus(false);
     }
@@ -89,7 +100,9 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
 
     try {
       await deleteWishlistItemService(wishlistId, wishlistItem.item_id);
-      setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id));
+      setWishlistItems((prev) =>
+        prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id)
+      );
 
       displayPopupMessage('Item removed.', 'success');
     } catch (err: unknown) {
@@ -142,7 +155,9 @@ function WishlistItemButtonContainer({ wishlistItem, setIsEditing, setWishlistIt
         <button
           type='button'
           className={`p-1 rounded-[50%] transition-colors cursor-pointer  ${
-            wishlistItem.purchased_on_timestamp ? 'bg-cta hover:bg-cta/75' : 'bg-light/50 hover:bg-light'
+            wishlistItem.purchased_on_timestamp
+              ? 'bg-cta hover:bg-cta/75'
+              : 'bg-light/50 hover:bg-light'
           }`}
           title={`Mark as ${wishlistItem.purchased_on_timestamp ? 'purchased' : 'unpurchased'}`}
           aria-label={`Mark as ${wishlistItem.purchased_on_timestamp ? 'purchased' : 'unpurchased'}`}

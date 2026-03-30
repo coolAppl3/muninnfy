@@ -3,7 +3,10 @@ export type AccountDeletionEmailTemplate = {
   confirmationCode: string;
 };
 
-export default function accountDeletionEmailTemplate({ displayName, confirmationCode }: AccountDeletionEmailTemplate): string {
+export default function accountDeletionEmailTemplate({
+  displayName,
+  confirmationCode,
+}: AccountDeletionEmailTemplate): string {
   return `
     <!DOCTYPE html>
     <html lang="en">

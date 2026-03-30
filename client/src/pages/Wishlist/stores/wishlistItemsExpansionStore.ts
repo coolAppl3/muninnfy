@@ -11,7 +11,8 @@ type WishlistItemsExpansionStoreType = {
 const useWishlistItemsExpansionStore = create<WishlistItemsExpansionStoreType>((set, get) => ({
   expandedItemsIdsSet: new Set<number>(),
 
-  expandAllWishlistItems: (itemIdsArr: number[]) => set({ expandedItemsIdsSet: new Set<number>(itemIdsArr) }),
+  expandAllWishlistItems: (itemIdsArr: number[]) =>
+    set({ expandedItemsIdsSet: new Set<number>(itemIdsArr) }),
   collapseAllWishlistItems: () => set({ expandedItemsIdsSet: new Set<number>() }),
 
   toggleWishlistItemExpansion: (itemId: number) => {

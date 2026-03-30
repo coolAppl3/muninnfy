@@ -25,7 +25,11 @@ export async function insertWishlistItemTags(
   }
 }
 
-export async function deleteWishlistItemTags(itemId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+export async function deleteWishlistItemTags(
+  itemId: number,
+  executor: Pool | PoolConnection,
+  req: Request
+): Promise<boolean> {
   try {
     await executor.execute<ResultSetHeader>(
       `DELETE FROM

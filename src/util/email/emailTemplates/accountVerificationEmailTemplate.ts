@@ -12,7 +12,8 @@ export default function accountVerificationEmailTemplate({
   publicAccountId,
   verificationToken,
 }: AccountVerificationEmailTemplate): string {
-  const origin: string = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://muninnfy.com';
+  const origin: string =
+    process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://muninnfy.com';
 
   return `
     <!DOCTYPE html>

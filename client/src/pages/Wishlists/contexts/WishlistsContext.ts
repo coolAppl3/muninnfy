@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
-import { ExtendedWishlistDetailsType } from '../../../types/wishlistTypes';
+import { ExtendedWishlistDetailsType, ViewWishlistDetails } from '../../../types/wishlistTypes';
 
 export type WishlistsFilterConfigType = {
   createdAfterTimestamp: number | null;
@@ -21,15 +21,23 @@ export type WishlistsFilterConfigType = {
   crossWishlistQueryIdSet: Set<string> | null;
 };
 
-export type WishlistsSortingMode = 'interactivity' | 'newest' | 'oldest' | 'largest' | 'smallest' | 'lexicographical';
+export type WishlistsSortingMode =
+  | 'interactivity'
+  | 'newest'
+  | 'oldest'
+  | 'largest'
+  | 'smallest'
+  | 'lexicographical';
 
 export type WishlistsContextType = {
-  wishlists: ExtendedWishlistDetailsType[];
-  setWishlists: Dispatch<SetStateAction<ExtendedWishlistDetailsType[]>>;
+  wishlists: (ExtendedWishlistDetailsType | ViewWishlistDetails)[];
+  setWishlists: Dispatch<SetStateAction<(ExtendedWishlistDetailsType | ViewWishlistDetails)[]>>;
 
   wishlistsFilterConfig: WishlistsFilterConfigType;
   setWishlistsFilterConfig: Dispatch<SetStateAction<WishlistsFilterConfigType>>;
-  wishlistMatchesFilterConfig: (wishlist: ExtendedWishlistDetailsType) => boolean;
+  wishlistMatchesFilterConfig: (
+    wishlist: ExtendedWishlistDetailsType | ViewWishlistDetails
+  ) => boolean;
 
   wishlistsSortingMode: WishlistsSortingMode;
   setWishlistsSortingMode: Dispatch<SetStateAction<WishlistsSortingMode>>;

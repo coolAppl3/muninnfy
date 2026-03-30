@@ -10,7 +10,11 @@ import {
 import { removeRequestCookie } from '../../util/cookieUtils';
 import { purgeAuthSessions } from '../../auth/authSessions';
 
-type AccountRequestTables = 'account_verification' | 'account_recovery' | 'account_deletion' | 'email_update';
+type AccountRequestTables =
+  | 'account_verification'
+  | 'account_recovery'
+  | 'account_deletion'
+  | 'email_update';
 
 export async function incrementAccountRequestEmailsSent(
   tableName: AccountRequestTables,
@@ -105,7 +109,8 @@ export async function handleIncorrectPassword(
   res: Response
 ): Promise<void> {
   const incremented: boolean = await incrementFailedSignInAttempts(accountId, executor, req);
-  const hasBeenLocked: boolean = failedSignInAttempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
+  const hasBeenLocked: boolean =
+    failedSignInAttempts + 1 >= ACCOUNT_FAILED_SIGN_IN_LIMIT && incremented;
 
   if (hasBeenLocked) {
     removeRequestCookie(res, 'authSessionId');
@@ -118,7 +123,11 @@ export async function handleIncorrectPassword(
   });
 }
 
-async function incrementFailedSignInAttempts(accountId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+async function incrementFailedSignInAttempts(
+  accountId: number,
+  executor: Pool | PoolConnection,
+  req: Request
+): Promise<boolean> {
   try {
     const [resultSetHeader] = await executor.execute<ResultSetHeader>(
       `UPDATE
@@ -139,7 +148,11 @@ async function incrementFailedSignInAttempts(accountId: number, executor: Pool |
   }
 }
 
-export async function resetFailedSignInAttempts(accountId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+export async function resetFailedSignInAttempts(
+  accountId: number,
+  executor: Pool | PoolConnection,
+  req: Request
+): Promise<boolean> {
   try {
     const [resultSetHeader] = await executor.execute<ResultSetHeader>(
       `UPDATE
@@ -160,7 +173,11 @@ export async function resetFailedSignInAttempts(accountId: number, executor: Poo
   }
 }
 
-export async function deleteAccountById(accountId: number, executor: Pool | PoolConnection, req: Request): Promise<boolean> {
+export async function deleteAccountById(
+  accountId: number,
+  executor: Pool | PoolConnection,
+  req: Request
+): Promise<boolean> {
   try {
     const [resultSetHeader] = await executor.execute<ResultSetHeader>(
       `DELETE FROM

@@ -1,6 +1,8 @@
 import { Dispatch, JSX, SetStateAction, useCallback, useEffect, useState } from 'react';
 import useAuth from '../../../hooks/useAuth';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import { confirmAccountVerificationService } from '../../../services/accountServices';
@@ -20,7 +22,9 @@ export default function ConfirmAccountVerification({
 }: ConfirmAccountVerificationProps): JSX.Element {
   const [verificationFailed, setVerificationFailed] = useState<boolean>(false);
   const [title, setTitle] = useState<string>('Ongoing account verification detected.');
-  const [description, setDescription] = useState<string>('Check your inbox for the verification email and click the link to continue.');
+  const [description, setDescription] = useState<string>(
+    'Check your inbox for the verification email and click the link to continue.'
+  );
   const [btnTitle, setBtnTitle] = useState<string>('Resend email');
   const [btnNavigateLocation, setBtnNavigateLocation] = useState<string | null>(null);
 
@@ -32,8 +36,12 @@ export default function ConfirmAccountVerification({
   const confirmAccountVerification = useCallback(
     async (abortSignal: AbortSignal = new AbortController().signal) => {
       try {
-        const authSessionCreated: boolean = (await confirmAccountVerificationService({ publicAccountId, verificationToken }, abortSignal))
-          .data.authSessionCreated;
+        const authSessionCreated: boolean = (
+          await confirmAccountVerificationService(
+            { publicAccountId, verificationToken },
+            abortSignal
+          )
+        ).data.authSessionCreated;
 
         displayPopupMessage('Account verified.', 'success');
 
@@ -106,7 +114,9 @@ export default function ConfirmAccountVerification({
         }
 
         if (status === 404) {
-          setDescription(`Account either doesn't exist or has had its verification window expire.`);
+          setDescription(
+            `Account either doesn't exist or has had its verification window expire.`
+          );
           setBtnTitle('Sign up');
           setBtnNavigateLocation('/sign-up');
 
@@ -114,7 +124,15 @@ export default function ConfirmAccountVerification({
         }
       }
     },
-    [publicAccountId, verificationToken, setIsValidVerificationLink, displayPopupMessage, navigate, setAuthStatus, handleAsyncError]
+    [
+      publicAccountId,
+      verificationToken,
+      setIsValidVerificationLink,
+      displayPopupMessage,
+      navigate,
+      setAuthStatus,
+      handleAsyncError,
+    ]
   );
 
   useEffect(() => {

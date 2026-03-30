@@ -1,10 +1,15 @@
 import { ChangeEvent, SubmitEvent, JSX, useState } from 'react';
 import Button from '../../../../../components/Button/Button';
-import { validateNewPassword, validatePassword } from '../../../../../utils/validation/userValidation';
+import {
+  validateNewPassword,
+  validatePassword,
+} from '../../../../../utils/validation/userValidation';
 import useAccountProfile from '../../../hooks/useAccountProfile';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import useAuth from '../../../../../hooks/useAuth';
 import PasswordFormGroup from '../../../../../components/PasswordFormGroup/PasswordFormGroup';
 import { updatePasswordService } from '../../../../../services/accountServices';
@@ -15,13 +20,17 @@ export default function AccountChangePassword(): JSX.Element {
   const { setProfileSection, setIsSubmitting, isSubmitting } = useAccountProfile();
 
   const [currentPasswordValue, setCurrentPasswordValue] = useState<string>('');
-  const [currentPasswordErrorMessage, setCurrentPasswordErrorMessage] = useState<string | null>(null);
+  const [currentPasswordErrorMessage, setCurrentPasswordErrorMessage] = useState<string | null>(
+    null
+  );
 
   const [newPasswordValue, setNewPasswordValue] = useState<string>('');
   const [newPasswordErrorMessage, setNewPasswordErrorMessage] = useState<string | null>(null);
 
   const [confirmNewPasswordValue, setConfirmNewPasswordValue] = useState<string>('');
-  const [confirmNewPasswordErrorMessage, setConfirmNewPasswordErrorMessage] = useState<string | null>(null);
+  const [confirmNewPasswordErrorMessage, setConfirmNewPasswordErrorMessage] = useState<
+    string | null
+  >(null);
 
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
@@ -46,7 +55,9 @@ export default function AccountChangePassword(): JSX.Element {
       }
 
       if (status === 400 && errReason) {
-        errReason === 'invalidCurrentPassword' ? setCurrentPasswordErrorMessage(errMessage) : setNewPasswordErrorMessage(errMessage);
+        errReason === 'invalidCurrentPassword'
+          ? setCurrentPasswordErrorMessage(errMessage)
+          : setNewPasswordErrorMessage(errMessage);
         return;
       }
 
@@ -69,17 +80,25 @@ export default function AccountChangePassword(): JSX.Element {
   }
 
   function allFieldsValid(): boolean {
-    const newCurrentPasswordErrorMessage: string | null = validatePassword(currentPasswordValue);
+    const newCurrentPasswordErrorMessage: string | null =
+      validatePassword(currentPasswordValue);
 
     const newNewPasswordErrorMessage: string | null =
-      newPasswordValue === accountDetails.username ? `Username and password can't match.` : validateNewPassword(newPasswordValue);
-    const newConfirmNewPasswordErrorMessage: string | null = confirmNewPasswordValue === newPasswordValue ? null : `Passwords don't match.`;
+      newPasswordValue === accountDetails.username
+        ? `Username and password can't match.`
+        : validateNewPassword(newPasswordValue);
+    const newConfirmNewPasswordErrorMessage: string | null =
+      confirmNewPasswordValue === newPasswordValue ? null : `Passwords don't match.`;
 
     setCurrentPasswordErrorMessage(newCurrentPasswordErrorMessage);
     setNewPasswordErrorMessage(newNewPasswordErrorMessage);
     setConfirmNewPasswordErrorMessage(newConfirmNewPasswordErrorMessage);
 
-    for (const errorMessage of [newCurrentPasswordErrorMessage, newNewPasswordErrorMessage, newConfirmNewPasswordErrorMessage]) {
+    for (const errorMessage of [
+      newCurrentPasswordErrorMessage,
+      newNewPasswordErrorMessage,
+      newConfirmNewPasswordErrorMessage,
+    ]) {
       if (errorMessage) {
         displayPopupMessage(errorMessage, 'error');
         return false;
@@ -131,7 +150,9 @@ export default function AccountChangePassword(): JSX.Element {
 
           setNewPasswordValue(newValue);
           setNewPasswordErrorMessage(
-            newValue === accountDetails.username ? `Username and password can't match.` : validateNewPassword(newValue)
+            newValue === accountDetails.username
+              ? `Username and password can't match.`
+              : validateNewPassword(newValue)
           );
         }}
       />
@@ -145,7 +166,9 @@ export default function AccountChangePassword(): JSX.Element {
           const newValue: string = e.target.value;
 
           setConfirmNewPasswordValue(newValue);
-          setConfirmNewPasswordErrorMessage(newValue === newPasswordValue ? null : `Passwords don't match`);
+          setConfirmNewPasswordErrorMessage(
+            newValue === newPasswordValue ? null : `Passwords don't match`
+          );
         }}
       />
 

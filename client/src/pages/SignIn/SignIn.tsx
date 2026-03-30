@@ -50,7 +50,8 @@ export default function SignIn(): JSX.Element {
       }
 
       if (errReason && [400, 401, 404].includes(status)) {
-        const setErrorMessage: ((errorMessage: string | null) => void) | undefined = errFieldRecord[errReason];
+        const setErrorMessage: ((errorMessage: string | null) => void) | undefined =
+          errFieldRecord[errReason];
         setErrorMessage && setErrorMessage(errMessage);
 
         return;
@@ -114,7 +115,9 @@ export default function SignIn(): JSX.Element {
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
-            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>Sign in to Muninnfy</h1>
+            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>
+              Sign in to Muninnfy
+            </h1>
 
             <form
               id='sign-up-form'

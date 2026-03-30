@@ -18,7 +18,9 @@ import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHa
 export default function NewWishlist(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const [privacyLevelValue, setPrivacyLevelValue] = useState<number>(FOLLOWERS_WISHLIST_PRIVACY_LEVEL);
+  const [privacyLevelValue, setPrivacyLevelValue] = useState<number>(
+    FOLLOWERS_WISHLIST_PRIVACY_LEVEL
+  );
   const [titleValue, setTitleValue] = useState<string>('');
   const [titleErrorMessage, setTitleErrorMessage] = useState<string | null>(null);
 
@@ -32,7 +34,8 @@ export default function NewWishlist(): JSX.Element {
     const privacyLevel: number = privacyLevelValue;
 
     try {
-      const wishlistId: string = (await createWishlistAsAccountService({ title, privacyLevel })).data.wishlistId;
+      const wishlistId: string = (await createWishlistAsAccountService({ title, privacyLevel }))
+        .data.wishlistId;
 
       displayPopupMessage('Wishlist created.', 'success');
       navigate(`/wishlist/${wishlistId}`, { replace: true });
@@ -69,7 +72,9 @@ export default function NewWishlist(): JSX.Element {
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>
           <div className='py-3 px-2 bg-secondary rounded-sm shadow-simple max-w-[36rem] mx-auto'>
-            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>New wishlist</h1>
+            <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-[1.6rem]'>
+              New wishlist
+            </h1>
 
             <form
               className='grid grid-cols-1 gap-2'
@@ -144,7 +149,9 @@ export default function NewWishlist(): JSX.Element {
                   </button>
                 </div>
 
-                <p className='text-description text-sm'>Privacy settings can be changed later if needed.</p>
+                <p className='text-description text-sm'>
+                  Privacy settings can be changed later if needed.
+                </p>
               </div>
 
               <Button

@@ -1,6 +1,8 @@
 import { JSX, useCallback, useEffect, useState } from 'react';
 import ContentLoadingSkeleton from '../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useAccountNotifications from '../hooks/useAccountNotifications';
 import { getNotificationsBatchService } from '../../../services/notificationServices';
@@ -8,14 +10,19 @@ import { NotificationDetails } from '../../../types/notificationTypes';
 import { CanceledError } from 'axios';
 import NotificationCard from './components/NotificationCard';
 import { subscribeToAccountNotifications } from '../../../services/websockets/accountNotificationsWebsSocket';
-import { NOTIFICATIONS_FETCH_BATCH_SIZE, NOTIFICATIONS_RENDER_BATCH_SIZE } from '../../../utils/constants/notificationsConstants';
+import {
+  NOTIFICATIONS_FETCH_BATCH_SIZE,
+  NOTIFICATIONS_RENDER_BATCH_SIZE,
+} from '../../../utils/constants/notificationsConstants';
 import Button from '../../../components/Button/Button';
 
 export default function AccountNotifications(): JSX.Element {
-  const { notifications, initialFetchCompleted, setNotifications, setInitialFetchCompleted } = useAccountNotifications();
+  const { notifications, initialFetchCompleted, setNotifications, setInitialFetchCompleted } =
+    useAccountNotifications();
 
   const [renderLimit, setRenderLimit] = useState<number>(NOTIFICATIONS_RENDER_BATCH_SIZE);
-  const [fetchingAdditionalNotifications, setFetchingAdditionalNotifications] = useState<boolean>(false);
+  const [fetchingAdditionalNotifications, setFetchingAdditionalNotifications] =
+    useState<boolean>(false);
   const [allNotificationsFetched, setAllNotificationsFetched] = useState<boolean>(false);
 
   const allNotificationsRendered: boolean = renderLimit >= notifications.length;
@@ -26,7 +33,9 @@ export default function AccountNotifications(): JSX.Element {
   const getNotificationsBatch = useCallback(
     async (offset: number, abortSignal: AbortSignal) => {
       try {
-        const notificationsBatch: NotificationDetails[] = (await getNotificationsBatchService(offset, abortSignal)).data;
+        const notificationsBatch: NotificationDetails[] = (
+          await getNotificationsBatchService(offset, abortSignal)
+        ).data;
 
         setNotifications((prev) => [...prev, ...notificationsBatch]);
         setInitialFetchCompleted(true);
@@ -87,7 +96,11 @@ export default function AccountNotifications(): JSX.Element {
       <div className='h-line my-1'></div>
 
       <div className='grid gap-1'>
-        {notifications.length === 0 && <p className='text-sm text-description font-medium w-fit mx-auto'>No recent notifications</p>}
+        {notifications.length === 0 && (
+          <p className='text-sm text-description font-medium w-fit mx-auto'>
+            No recent notifications
+          </p>
+        )}
 
         {notifications.slice(0, renderLimit).map((notification: NotificationDetails) => (
           <NotificationCard
@@ -109,9 +122,13 @@ export default function AccountNotifications(): JSX.Element {
 
                 setFetchingAdditionalNotifications(true);
 
-                const nextRenderOverflowsFetchedData: boolean = renderLimit + NOTIFICATIONS_RENDER_BATCH_SIZE > notifications.length;
+                const nextRenderOverflowsFetchedData: boolean =
+                  renderLimit + NOTIFICATIONS_RENDER_BATCH_SIZE > notifications.length;
                 if (nextRenderOverflowsFetchedData && !allNotificationsFetched) {
-                  await getNotificationsBatch(notifications.length, new AbortController().signal);
+                  await getNotificationsBatch(
+                    notifications.length,
+                    new AbortController().signal
+                  );
                 }
 
                 setRenderLimit((prev) => prev + NOTIFICATIONS_RENDER_BATCH_SIZE);

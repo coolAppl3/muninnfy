@@ -1,4 +1,13 @@
-import { ChangeEvent, Dispatch, JSX, SetStateAction, SubmitEvent, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  JSX,
+  SetStateAction,
+  SubmitEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import TextareaFormGroup from '../../../components/TextareaFormGroup/TextareaFormGroup';
 import Button from '../../../components/Button/Button';
 import WishlistItemTagsFormGroup from '../../../components/WishlistItemTagsFormGroup/WishlistItemTagsFormGroup';
@@ -11,10 +20,15 @@ import {
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import useWishlist from '../hooks/useWishlist';
-import { addWishlistItemService, editWishlistItemService } from '../../../services/wishlistItemServices';
+import {
+  addWishlistItemService,
+  editWishlistItemService,
+} from '../../../services/wishlistItemServices';
 import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import useWishlistItems from '../hooks/useWishlistItems';
 import useWishlistItemsExpansionStore from '../stores/wishlistItemsExpansionStore';
@@ -29,9 +43,20 @@ type WishlistItemFromProps = {
   className?: string;
 };
 
-export default function WishlistItemForm({ formMode, wishlistItem, onFinish, className }: WishlistItemFromProps): JSX.Element {
+export default function WishlistItemForm({
+  formMode,
+  wishlistItem,
+  onFinish,
+  className,
+}: WishlistItemFromProps): JSX.Element {
   const { wishlistId } = useWishlist();
-  const { wishlistItems, setWishlistItems, wishlistItemsTitleSet, itemsSortingMode, sortWishlistItems } = useWishlistItems();
+  const {
+    wishlistItems,
+    setWishlistItems,
+    wishlistItemsTitleSet,
+    itemsSortingMode,
+    sortWishlistItems,
+  } = useWishlistItems();
 
   const { expandedItemsIdsSet, toggleWishlistItemExpansion } = useWishlistItemsExpansionStore(
     useShallow(({ expandedItemsIdsSet, toggleWishlistItemExpansion }) => ({
@@ -51,7 +76,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
   const [linkValue, setLinkValue] = useState<string>(wishlistItem?.link || '');
   const [linkErrorMessage, setLinkErrorMessage] = useState<string | null>(null);
 
-  const [descriptionValue, setDescriptionValue] = useState<string>(wishlistItem?.description || '');
+  const [descriptionValue, setDescriptionValue] = useState<string>(
+    wishlistItem?.description || ''
+  );
   const [descriptionErrorMessage, setDescriptionErrorMessage] = useState<string | null>(null);
 
   const [tagsSet, setTagsSet] = useState<Set<string>>(
@@ -109,7 +136,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const tags: string[] = [...tagsSet];
 
     try {
-      const newWishlistItem: WishlistItemType = (await addWishlistItemService({ wishlistId, title, description, link, price, tags })).data;
+      const newWishlistItem: WishlistItemType = (
+        await addWishlistItemService({ wishlistId, title, description, link, price, tags })
+      ).data;
 
       setWishlistItems((prev) => [newWishlistItem, ...prev]);
       itemsSortingMode === 'newest' || sortWishlistItems();
@@ -144,7 +173,8 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
         return;
       }
 
-      const setErrorMessage: ((errMessage: string | null) => void) | undefined = wishlistItemErrFieldRecord[errReason];
+      const setErrorMessage: ((errMessage: string | null) => void) | undefined =
+        wishlistItemErrFieldRecord[errReason];
       setErrorMessage && setErrorMessage(errMessage);
     }
   }
@@ -165,10 +195,22 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
 
     try {
       const updatedWishlistItem: WishlistItemType = (
-        await editWishlistItemService({ wishlistId, itemId, title, description, link, price, tags })
+        await editWishlistItemService({
+          wishlistId,
+          itemId,
+          title,
+          description,
+          link,
+          price,
+          tags,
+        })
       ).data;
 
-      setWishlistItems((prev) => prev.map((item: WishlistItemType) => (item.item_id === itemId ? updatedWishlistItem : item)));
+      setWishlistItems((prev) =>
+        prev.map((item: WishlistItemType) =>
+          item.item_id === itemId ? updatedWishlistItem : item
+        )
+      );
       sortWishlistItems();
 
       displayPopupMessage('Item updated.', 'success');
@@ -192,7 +234,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
           return;
         }
 
-        setWishlistItems((prev) => prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id));
+        setWishlistItems((prev) =>
+          prev.filter(({ item_id }: WishlistItemType) => item_id !== wishlistItem.item_id)
+        );
         return;
       }
 
@@ -200,7 +244,8 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
         return;
       }
 
-      const setErrorMessage: ((errMessage: string | null) => void) | undefined = wishlistItemErrFieldRecord[errReason];
+      const setErrorMessage: ((errMessage: string | null) => void) | undefined =
+        wishlistItemErrFieldRecord[errReason];
       setErrorMessage && setErrorMessage(errMessage);
     }
   }
@@ -215,7 +260,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     }
 
     const existingWishlistItem = errResData.existingWishlistItem as WishlistItemType;
-    const itemExists: boolean = wishlistItems.some((item: WishlistItemType) => item.item_id === existingWishlistItem.item_id);
+    const itemExists: boolean = wishlistItems.some(
+      (item: WishlistItemType) => item.item_id === existingWishlistItem.item_id
+    );
 
     if (itemExists) {
       setWishlistItems((prev) => [...prev, existingWishlistItem]);
@@ -227,16 +274,25 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
     const newTitleErrorMessage: string | null = validateWishlistItemTitle(titleValue);
     setTitleErrorMessage(newTitleErrorMessage);
 
-    const newDescriptionErrorMessage: string | null = validateWishlistItemDescription(descriptionValue);
+    const newDescriptionErrorMessage: string | null =
+      validateWishlistItemDescription(descriptionValue);
     setDescriptionErrorMessage(newDescriptionErrorMessage);
 
     const newLinkErrorMessage: string | null = validateWishlistItemLink(linkValue);
     setLinkErrorMessage(newLinkErrorMessage);
 
-    const newPriceErrorMessage: string | null = validatePrice(priceValue, WISHLIST_ITEM_MAX_PRICE);
+    const newPriceErrorMessage: string | null = validatePrice(
+      priceValue,
+      WISHLIST_ITEM_MAX_PRICE
+    );
     setPriceErrorMessage(newPriceErrorMessage);
 
-    for (const errorMessage of [newTitleErrorMessage, newDescriptionErrorMessage, newLinkErrorMessage, priceErrorMessage]) {
+    for (const errorMessage of [
+      newTitleErrorMessage,
+      newDescriptionErrorMessage,
+      newLinkErrorMessage,
+      priceErrorMessage,
+    ]) {
       if (errorMessage) {
         displayPopupMessage(errorMessage, 'error');
         return false;
@@ -274,7 +330,10 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       return true;
     }
 
-    if ((priceValue === '' && wishlistItem.price !== null) || +priceValue !== wishlistItem.price) {
+    if (
+      (priceValue === '' && wishlistItem.price !== null) ||
+      +priceValue !== wishlistItem.price
+    ) {
       return true;
     }
 
@@ -402,7 +461,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
       >
         <Button
           className={`bg-secondary border-title text-title w-full order-2 ${
-            formMode === 'editItem' ? 'sm:w-full md:w-fit sm:order-2 md:order-1' : 'sm:w-fit sm:order-1'
+            formMode === 'editItem'
+              ? 'sm:w-full md:w-fit sm:order-2 md:order-1'
+              : 'sm:w-fit sm:order-1'
           }`}
           onClick={() => {
             clearForm();
@@ -415,7 +476,9 @@ export default function WishlistItemForm({ formMode, wishlistItem, onFinish, cla
         <Button
           isSubmitBtn
           className={`bg-cta border-cta w-full order-1 ${
-            formMode === 'editItem' ? 'sm:w-full md:w-fit sm:order-1 md:order-2' : 'sm:w-fit sm:order-2'
+            formMode === 'editItem'
+              ? 'sm:w-full md:w-fit sm:order-1 md:order-2'
+              : 'sm:w-fit sm:order-2'
           }`}
         >
           {wishlistItem ? 'Update wishlist item' : 'Add wishlist item'}

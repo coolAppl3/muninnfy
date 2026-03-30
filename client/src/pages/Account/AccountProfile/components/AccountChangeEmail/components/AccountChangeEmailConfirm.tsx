@@ -5,16 +5,22 @@ import useAccountProfile from '../../../../hooks/useAccountProfile';
 import useLoadingOverlay from '../../../../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../../../../hooks/usePopupMessage';
 import useAuth from '../../../../../../hooks/useAuth';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../../hooks/useHandleAsyncError';
 import useAccountDetails from '../../../../hooks/useAccountDetails';
 import useAccountOngoingRequests from '../../../../hooks/useAccountOngoingRequests';
 import { validateHexCode } from '../../../../../../utils/validation/sharedValidation';
-import { confirmEmailUpdateService, resendEmailUpdateEmailService } from '../../../../../../services/accountServices';
+import {
+  confirmEmailUpdateService,
+  resendEmailUpdateEmailService,
+} from '../../../../../../services/accountServices';
 import { resDataContainsExpiryTimestamp } from '../../../util/AccountProfileUtils';
 
 export default function AccountChangeEmailConfirm(): JSX.Element {
   const { setAccountDetails } = useAccountDetails();
-  const { ongoingEmailUpdateRequest, setOngoingEmailUpdateRequest } = useAccountOngoingRequests();
+  const { ongoingEmailUpdateRequest, setOngoingEmailUpdateRequest } =
+    useAccountOngoingRequests();
   const { setProfileSection, setIsSubmitting, isSubmitting } = useAccountProfile();
 
   const [value, setValue] = useState<string>('');
@@ -81,7 +87,14 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
       }
 
       if (errReason === 'requestSuspended' || errReason === 'incorrectCode_suspended') {
-        setOngoingEmailUpdateRequest((prev) => prev && { ...prev, expiry_timestamp: errResData.expiryTimestamp, is_suspended: true });
+        setOngoingEmailUpdateRequest(
+          (prev) =>
+            prev && {
+              ...prev,
+              expiry_timestamp: errResData.expiryTimestamp,
+              is_suspended: true,
+            }
+        );
       }
     }
   }
@@ -128,7 +141,10 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
         return;
       }
 
-      setOngoingEmailUpdateRequest((prev) => prev && { ...prev, expiry_timestamp: errResData.expiryTimestamp, is_suspended: true });
+      setOngoingEmailUpdateRequest(
+        (prev) =>
+          prev && { ...prev, expiry_timestamp: errResData.expiryTimestamp, is_suspended: true }
+      );
     }
   }
 
@@ -136,7 +152,8 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
     <section>
       <header className='mb-1'>
         <p className='text-description font-medium text-sm break-words'>
-          Confirmation email sent to <span className='text-title'>{ongoingEmailUpdateRequest?.new_email}</span>.
+          Confirmation email sent to{' '}
+          <span className='text-title'>{ongoingEmailUpdateRequest?.new_email}</span>.
         </p>
 
         <button

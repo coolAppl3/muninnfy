@@ -1,6 +1,8 @@
 import { Dispatch, JSX, SetStateAction, useState } from 'react';
 import useAuth from '../../../hooks/useAuth';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
@@ -17,7 +19,9 @@ export default function ResendAccountVerificationEmail({
   setIsValidVerificationLink,
 }: ResendAccountVerificationEmailProps): JSX.Element {
   const [title, setTitle] = useState<string>('Account verification in progress.');
-  const [description, setDescription] = useState<string>('Check your inbox for a verification email and click the link to continue.');
+  const [description, setDescription] = useState<string>(
+    'Check your inbox for a verification email and click the link to continue.'
+  );
 
   const [btnDisabled, setBtnDisabled] = useState<boolean>(false);
   const [btnTitle, setBtnTitle] = useState<string>('Resend email');
@@ -51,7 +55,9 @@ export default function ResendAccountVerificationEmail({
       setTitle(errMessage);
 
       if (status === 404) {
-        setDescription(`Account either doesn't exist or has had its verification window expire.`);
+        setDescription(
+          `Account either doesn't exist or has had its verification window expire.`
+        );
         setBtnTitle('Sign up');
         setBtnNavigateLocation('/sign-up');
 
@@ -75,7 +81,9 @@ export default function ResendAccountVerificationEmail({
         return;
       }
 
-      setDescription(`If you still can't find the email, you can try signing up again after 20 minutes.`);
+      setDescription(
+        `If you still can't find the email, you can try signing up again after 20 minutes.`
+      );
       setBtnTitle('Go to homepage');
       setBtnNavigateLocation('/home');
     }

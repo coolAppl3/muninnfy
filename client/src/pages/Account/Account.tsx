@@ -16,15 +16,19 @@ import AccountOngoingRequestsProvider from './providers/AccountOngoingRequestsPr
 import AccountSocialDetailsProvider from './providers/AccountSocialDetailsProvider';
 import AccountNotificationsProvider from './providers/AccountNotificationsProvider';
 import { clearAccountNotificationsSubscriptions } from '../../services/websockets/accountNotificationsWebsSocket';
+import ViewModeProvider from '../../providers/ViewModeProvider';
 
 export default function Account(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [initialAccountDetails, setInitialAccountDetails] = useState<AccountDetailsType | null>(null);
+  const [initialAccountDetails, setInitialAccountDetails] = useState<AccountDetailsType | null>(
+    null
+  );
 
   const [initialOngoingEmailUpdateRequest, setInitialOngoingEmailUpdateRequest] = useState<
     (OngoingAccountRequest & { new_email: string }) | null
   >(null);
-  const [initialOngoingAccountDeletionRequest, setInitialOngoingAccountDeletionRequest] = useState<OngoingAccountRequest | null>(null);
+  const [initialOngoingAccountDeletionRequest, setInitialOngoingAccountDeletionRequest] =
+    useState<OngoingAccountRequest | null>(null);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { setAuthStatus } = useAuth();
@@ -74,31 +78,33 @@ export default function Account(): JSX.Element {
     <>
       <Head title='Account - Muninnfy' />
 
-      <AccountLocationProvider>
-        {isLoaded && initialAccountDetails ? (
-          <main className='py-4'>
-            <Container className='grid grid-cols-12 items-start gap-1'>
-              <AccountSidebar inViewMode={false} />
-              <AccountNavMenu inViewMode={false} />
+      <ViewModeProvider inViewMode={false}>
+        <AccountLocationProvider>
+          {isLoaded && initialAccountDetails ? (
+            <main className='py-4'>
+              <Container className='grid grid-cols-12 items-start gap-1'>
+                <AccountSidebar />
+                <AccountNavMenu />
 
-              <AccountDetailsProvider initialAccountDetails={initialAccountDetails}>
-                <AccountOngoingRequestsProvider
-                  initialOngoingEmailUpdateRequest={initialOngoingEmailUpdateRequest}
-                  initialOngoingAccountDeletionRequest={initialOngoingAccountDeletionRequest}
-                >
-                  <AccountSocialDetailsProvider>
-                    <AccountNotificationsProvider>
-                      <AccountContent />
-                    </AccountNotificationsProvider>
-                  </AccountSocialDetailsProvider>
-                </AccountOngoingRequestsProvider>
-              </AccountDetailsProvider>
-            </Container>
-          </main>
-        ) : (
-          <LoadingSkeleton />
-        )}
-      </AccountLocationProvider>
+                <AccountDetailsProvider initialAccountDetails={initialAccountDetails}>
+                  <AccountOngoingRequestsProvider
+                    initialOngoingEmailUpdateRequest={initialOngoingEmailUpdateRequest}
+                    initialOngoingAccountDeletionRequest={initialOngoingAccountDeletionRequest}
+                  >
+                    <AccountSocialDetailsProvider>
+                      <AccountNotificationsProvider>
+                        <AccountContent />
+                      </AccountNotificationsProvider>
+                    </AccountSocialDetailsProvider>
+                  </AccountOngoingRequestsProvider>
+                </AccountDetailsProvider>
+              </Container>
+            </main>
+          ) : (
+            <LoadingSkeleton />
+          )}
+        </AccountLocationProvider>
+      </ViewModeProvider>
     </>
   );
 }

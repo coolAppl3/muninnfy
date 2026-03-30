@@ -1,6 +1,10 @@
 import { AxiosResponse } from 'axios';
 import axiosInstance from './axiosInstance';
-import { AccountDetailsType, OngoingAccountRequest, ViewAccountDetailsType } from '../types/accountTypes';
+import {
+  AccountDetailsType,
+  OngoingAccountRequest,
+  ViewAccountDetailsType,
+} from '../types/accountTypes';
 
 type SignUpServicePayload = {
   email: string;
@@ -13,7 +17,9 @@ type SignUpServiceData = {
   publicAccountId: string;
 };
 
-export function signUpService(body: SignUpServicePayload): Promise<AxiosResponse<SignUpServiceData>> {
+export function signUpService(
+  body: SignUpServicePayload
+): Promise<AxiosResponse<SignUpServiceData>> {
   return axiosInstance.post(`/accounts/signUp`, body);
 }
 
@@ -35,7 +41,9 @@ type ResendAccountVerificationEmailServicePayload = {
   publicAccountId: string;
 };
 
-export function resendAccountVerificationEmailService(body: ResendAccountVerificationEmailServicePayload): Promise<AxiosResponse> {
+export function resendAccountVerificationEmailService(
+  body: ResendAccountVerificationEmailServicePayload
+): Promise<AxiosResponse> {
   return axiosInstance.patch('/accounts/verification/resendEmail', body);
 }
 
@@ -71,7 +79,9 @@ type GetAccountDetailsServiceData = {
   ongoingAccountDeletionRequest: OngoingAccountRequest | null;
 };
 
-export function getAccountDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
+export function getAccountDetailsService(
+  abortSignal: AbortSignal
+): Promise<AxiosResponse<GetAccountDetailsServiceData>> {
   return axiosInstance.get('/accounts', { signal: abortSignal });
 }
 
@@ -91,7 +101,9 @@ type UpdateAccountPrivacyServicePayload = {
   approveFollowRequests: boolean;
 };
 
-export function updateAccountPrivacyService(body: UpdateAccountPrivacyServicePayload): Promise<AxiosResponse> {
+export function updateAccountPrivacyService(
+  body: UpdateAccountPrivacyServicePayload
+): Promise<AxiosResponse> {
   return axiosInstance.patch('/accounts/details/privacy', body);
 }
 
@@ -99,7 +111,9 @@ type UpdateDisplayNameServicePayload = {
   newDisplayName: string;
 };
 
-export function updateDisplayNameService(body: UpdateDisplayNameServicePayload): Promise<AxiosResponse> {
+export function updateDisplayNameService(
+  body: UpdateDisplayNameServicePayload
+): Promise<AxiosResponse> {
   return axiosInstance.patch('/accounts/details/displayName', body);
 }
 
@@ -108,7 +122,9 @@ type UpdatePasswordServicePayload = {
   newPassword: string;
 };
 
-export function updatePasswordService(body: UpdatePasswordServicePayload): Promise<AxiosResponse> {
+export function updatePasswordService(
+  body: UpdatePasswordServicePayload
+): Promise<AxiosResponse> {
   return axiosInstance.patch('/accounts/details/password', body);
 }
 
@@ -121,7 +137,9 @@ type StartEmailUpdateServiceData = {
   expiryTimestamp: number;
 };
 
-export function startEmailUpdateService(body: StartEmailUpdateServicePayload): Promise<AxiosResponse<StartEmailUpdateServiceData>> {
+export function startEmailUpdateService(
+  body: StartEmailUpdateServicePayload
+): Promise<AxiosResponse<StartEmailUpdateServiceData>> {
   return axiosInstance.post('/accounts/details/email/start', body);
 }
 
@@ -133,7 +151,9 @@ type ConfirmEmailUpdateServicePayload = {
   confirmationCode: string;
 };
 
-export function confirmEmailUpdateService(body: ConfirmEmailUpdateServicePayload): Promise<AxiosResponse> {
+export function confirmEmailUpdateService(
+  body: ConfirmEmailUpdateServicePayload
+): Promise<AxiosResponse> {
   return axiosInstance.patch('/accounts/details/email/confirm', body);
 }
 
@@ -155,7 +175,9 @@ type ResendAccountRecoveryEmailServicePayload = {
   publicAccountId: string;
 };
 
-export function resendAccountRecoveryEmailService(body: ResendAccountRecoveryEmailServicePayload): Promise<AxiosResponse> {
+export function resendAccountRecoveryEmailService(
+  body: ResendAccountRecoveryEmailServicePayload
+): Promise<AxiosResponse> {
   return axiosInstance.patch('/accounts/recovery/resendEmail', body);
 }
 
@@ -193,6 +215,8 @@ export function resendAccountDeletionEmailService(): Promise<AxiosResponse> {
   return axiosInstance.patch('/accounts/deletion/resendEmail');
 }
 
-export function confirmAccountDeletionService(confirmationCode: string): Promise<AxiosResponse> {
+export function confirmAccountDeletionService(
+  confirmationCode: string
+): Promise<AxiosResponse> {
   return axiosInstance.delete(`/accounts/deletion/confirm/${confirmationCode}`);
 }

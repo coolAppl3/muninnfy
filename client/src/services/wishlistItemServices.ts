@@ -11,7 +11,9 @@ type AddWishlistItemServicePayload = {
   tags: string[];
 };
 
-export async function addWishlistItemService(body: AddWishlistItemServicePayload): Promise<AxiosResponse<WishlistItemType>> {
+export async function addWishlistItemService(
+  body: AddWishlistItemServicePayload
+): Promise<AxiosResponse<WishlistItemType>> {
   return axiosInstance.post('/wishlistItems', body);
 }
 
@@ -25,11 +27,16 @@ type EditWishlistItemServicePayload = {
   tags: string[];
 };
 
-export async function editWishlistItemService(body: EditWishlistItemServicePayload): Promise<AxiosResponse<WishlistItemType>> {
+export async function editWishlistItemService(
+  body: EditWishlistItemServicePayload
+): Promise<AxiosResponse<WishlistItemType>> {
   return axiosInstance.patch('/wishlistItems', body);
 }
 
-export async function deleteWishlistItemService(wishlistId: string, itemId: number): Promise<AxiosResponse> {
+export async function deleteWishlistItemService(
+  wishlistId: string,
+  itemId: number
+): Promise<AxiosResponse> {
   return axiosInstance.delete('/wishlistItems', { params: { wishlistId, itemId } });
 }
 

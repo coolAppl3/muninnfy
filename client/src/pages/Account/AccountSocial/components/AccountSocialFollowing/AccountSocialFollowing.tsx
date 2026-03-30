@@ -2,19 +2,46 @@ import { ChangeEvent, JSX, useCallback, useEffect, useMemo, useState } from 'rea
 import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import FollowCard from '../FollowCard/FollowCard';
 import { FollowDetails } from '../../../../../types/socialTypes';
-import { getSocialBatchService, searchSocialService } from '../../../../../services/socialServices';
-import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_RENDER_BATCH_SIZE } from '../../../../../utils/constants/socialConstants';
+import {
+  getSocialBatchService,
+  searchSocialService,
+} from '../../../../../services/socialServices';
+import {
+  SOCIAL_FETCH_BATCH_SIZE,
+  SOCIAL_RENDER_BATCH_SIZE,
+} from '../../../../../utils/constants/socialConstants';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import DefaultFormGroup from '../../../../../components/DefaultFormGroup/DefaultFormGroup';
 import { validateSocialSearchQuery } from '../../../../../utils/validation/socialValidation';
 import { debounce } from '../../../../../utils/debounce';
 import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
 import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
+import useViewMode from '../../../../../hooks/useViewMode';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAuth from '../../../../../hooks/useAuth';
+import useHistory from '../../../../../hooks/useHistory';
+import useAccountLocation from '../../../hooks/useAccountLocation';
 
 export default function AccountSocialFollowing(): JSX.Element {
-  const { following, socialCounts, fetchDetails, setFollowing, setFollowers, setSocialCounts, setFetchDetails } = useAccountSocialDetails();
+  const {
+    following,
+    socialCounts,
+    fetchDetails,
+    setFollowing,
+    setFollowers,
+    setSocialCounts,
+    setFetchDetails,
+  } = useAccountSocialDetails();
+  const { inViewMode, publicAccountId } = useViewMode();
+  const { setAccountLocation } = useAccountLocation();
+
+  const { authStatus } = useAuth();
+  const { referrerLocation } = useHistory();
+  const navigate: NavigateFunction = useNavigate();
 
   const [value, setValue] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -24,24 +51,41 @@ export default function AccountSocialFollowing(): JSX.Element {
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchQueryResults, setSearchQueryResults] = useState<FollowDetails[]>(following);
-  const [allSearchQueryResultsFetched, setAllSearchQueryResultsFetched] = useState<boolean>(false);
+  const [allSearchQueryResultsFetched, setAllSearchQueryResultsFetched] =
+    useState<boolean>(false);
 
   const [fetchingSearchQueryResults, setFetchingSearchQueryResults] = useState<boolean>(false);
-  const [fetchingAdditionalFollowing, setFetchingAdditionalFollowing] = useState<boolean>(false);
+  const [fetchingAdditionalFollowing, setFetchingAdditionalFollowing] =
+    useState<boolean>(false);
 
   const { displayPopupMessage } = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
   const renderArray: FollowDetails[] = renderMode === 'local' ? following : searchQueryResults;
-  const allFollowingRendered: boolean = renderMode === 'local' ? renderLimit >= socialCounts.following_count : allSearchQueryResultsFetched;
+  const allFollowingRendered: boolean =
+    renderMode === 'local'
+      ? renderLimit >= socialCounts.following_count
+      : allSearchQueryResultsFetched;
 
   const searchFollowing = useCallback(
     async (searchQuery: string, offset: number, abortSignal: AbortSignal) => {
       try {
-        const followingBatch: FollowDetails[] = (await searchSocialService('following', searchQuery, offset, abortSignal)).data;
+        const followingBatch: FollowDetails[] = (
+          await searchSocialService(
+            'following',
+            searchQuery,
+            offset,
+            abortSignal,
+            publicAccountId
+          )
+        ).data;
 
-        offset === 0 ? setSearchQueryResults(followingBatch) : setSearchQueryResults((prev) => [...prev, ...followingBatch]);
-        followingBatch.length < SOCIAL_FETCH_BATCH_SIZE ? setAllSearchQueryResultsFetched(true) : setAllSearchQueryResultsFetched(false);
+        offset === 0
+          ? setSearchQueryResults(followingBatch)
+          : setSearchQueryResults((prev) => [...prev, ...followingBatch]);
+        followingBatch.length < SOCIAL_FETCH_BATCH_SIZE
+          ? setAllSearchQueryResultsFetched(true)
+          : setAllSearchQueryResultsFetched(false);
 
         setFetchingSearchQueryResults(false);
       } catch (err: unknown) {
@@ -57,19 +101,40 @@ export default function AccountSocialFollowing(): JSX.Element {
           return;
         }
 
-        if (status !== 400) {
+        if (status === 400) {
+          if (errReason === 'invalidOffset') {
+            displayPopupMessage('Something went wrong.', 'error');
+            return;
+          }
+
+          setErrorMessage(errMessage);
           return;
         }
 
-        if (errReason === 'invalidOffset') {
-          displayPopupMessage('Something went wrong.', 'error');
+        if (!inViewMode) {
           return;
         }
 
-        setErrorMessage(errMessage);
+        if (status === 404) {
+          navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
+          return;
+        }
+
+        if (status === 401 && errReason === 'privateAccount') {
+          setAccountLocation('profile');
+        }
       }
     },
-    [handleAsyncError, displayPopupMessage]
+    [
+      inViewMode,
+      publicAccountId,
+      referrerLocation,
+      authStatus,
+      navigate,
+      setAccountLocation,
+      handleAsyncError,
+      displayPopupMessage,
+    ]
   );
 
   useEffect(() => {
@@ -91,7 +156,9 @@ export default function AccountSocialFollowing(): JSX.Element {
 
   async function getFollowingBatch(): Promise<void> {
     try {
-      const followingBatch: FollowDetails[] = (await getSocialBatchService('following', following.length)).data;
+      const followingBatch: FollowDetails[] = (
+        await getSocialBatchService('following', following.length, publicAccountId)
+      ).data;
       setFollowing((prev) => [...prev, ...followingBatch]);
 
       if (following.length + followingBatch.length >= socialCounts.following_count) {
@@ -101,7 +168,7 @@ export default function AccountSocialFollowing(): JSX.Element {
       setFetchingAdditionalFollowing(false);
     } catch (err: unknown) {
       console.log(err);
-      const { isHandled, status } = handleAsyncError(err);
+      const { isHandled, status, errReason } = handleAsyncError(err);
 
       if (isHandled) {
         return;
@@ -109,11 +176,28 @@ export default function AccountSocialFollowing(): JSX.Element {
 
       if (status === 400) {
         displayPopupMessage('Something went wrong.', 'error');
+        return;
+      }
+
+      if (!inViewMode) {
+        return;
+      }
+
+      if (status === 404) {
+        navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
+        return;
+      }
+
+      if (status === 401 && errReason === 'privateAccount') {
+        setAccountLocation('profile');
       }
     }
   }
 
-  const debouncedSetSearchQuery = useMemo(() => debounce((searchQuery: string) => setSearchQuery(searchQuery), 300), []);
+  const debouncedSetSearchQuery = useMemo(
+    () => debounce((searchQuery: string) => setSearchQuery(searchQuery), 300),
+    []
+  );
 
   return (
     <section>
@@ -160,11 +244,14 @@ export default function AccountSocialFollowing(): JSX.Element {
       ) : (
         <div className='grid md:grid-cols-2 gap-1 items-start'>
           {renderArray.length === 0 ? (
-            <p className='text-sm text-description font-medium w-fit mx-auto sm:col-span-2'>No users found</p>
+            <p className='text-sm text-description font-medium w-fit mx-auto sm:col-span-2'>
+              No users found
+            </p>
           ) : (
             renderArray.slice(0, renderLimit).map((followDetails: FollowDetails) => (
               <FollowCard
                 key={followDetails.follow_id}
+                inViewMode={inViewMode}
                 isFollowerCard={false}
                 followDetails={followDetails}
                 setSearchQueryResults={setSearchQueryResults}
@@ -189,7 +276,8 @@ export default function AccountSocialFollowing(): JSX.Element {
                   setFetchingAdditionalFollowing(true);
 
                   if (renderMode === 'local') {
-                    const nextRenderOverflowsFetchedData: boolean = renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length;
+                    const nextRenderOverflowsFetchedData: boolean =
+                      renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length;
                     if (nextRenderOverflowsFetchedData && !fetchDetails.allFollowingFetched) {
                       await getFollowingBatch();
                     }
@@ -201,7 +289,11 @@ export default function AccountSocialFollowing(): JSX.Element {
                   }
 
                   renderLimit + SOCIAL_RENDER_BATCH_SIZE > renderArray.length &&
-                    (await searchFollowing(searchQuery, renderArray.length, new AbortController().signal));
+                    (await searchFollowing(
+                      searchQuery,
+                      renderArray.length,
+                      new AbortController().signal
+                    ));
 
                   setRenderLimit((prev) => prev + SOCIAL_RENDER_BATCH_SIZE);
                   setFetchingAdditionalFollowing(false);

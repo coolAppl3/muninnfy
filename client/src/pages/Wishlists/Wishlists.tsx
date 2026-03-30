@@ -1,21 +1,26 @@
 import { JSX, useEffect, useState } from 'react';
 import Head from '../../components/Head/Head';
 import { ExtendedWishlistDetailsType } from '../../types/wishlistTypes';
-import { CombinedWishlistsStatistics, getAllWishlistsService } from '../../services/wishlistServices';
+import {
+  CombinedWishlistsStatistics,
+  getAllWishlistsService,
+} from '../../services/wishlistServices';
 import { CanceledError } from 'axios';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 import WishlistsProvider from './providers/WishlistsProvider';
 import WishlistsContainer from './WishlistsContainer/WishlistsContainer';
-import { WishlistsToolbar } from './WishlistsToolbar/WishlistsToolbar';
+import WishlistsToolbar from './WishlistsToolbar/WishlistsToolbar';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../hooks/useHistory';
 import WishlistsHeader from './WishlistsHeader/WishlistsHeader';
+import ViewModeProvider from '../../providers/ViewModeProvider';
 
 export default function Wishlists(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [wishlists, setWishlists] = useState<ExtendedWishlistDetailsType[]>([]);
-  const [combinedWishlistsStatistics, setCombinedWishlistsStatistics] = useState<CombinedWishlistsStatistics | null>(null);
+  const [combinedWishlistsStatistics, setCombinedWishlistsStatistics] =
+    useState<CombinedWishlistsStatistics | null>(null);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
@@ -26,7 +31,9 @@ export default function Wishlists(): JSX.Element {
 
     const getAllWishlists = async () => {
       try {
-        const { wishlists: fetchedWishlists, combinedWishlistsStatistics } = (await getAllWishlistsService(abortController.signal)).data;
+        const { wishlists: fetchedWishlists, combinedWishlistsStatistics } = (
+          await getAllWishlistsService(abortController.signal)
+        ).data;
 
         if (abortController.signal.aborted) {
           return;
@@ -61,16 +68,19 @@ export default function Wishlists(): JSX.Element {
     <>
       <Head title='Wishlists - Muninnfy' />
 
-      {isLoaded ? (
-        <WishlistsProvider initialWishlists={wishlists}>
-          <main className='py-4 grid gap-2'>
-            {combinedWishlistsStatistics && <WishlistsHeader combinedWishlistsStatistics={combinedWishlistsStatistics} />}
-            <WishlistsToolbar />
-            <WishlistsContainer />
-          </main>
-        </WishlistsProvider>
-      ) : (
-        <LoadingSkeleton />
+      {isLoaded || <LoadingSkeleton />}
+      {isLoaded && (
+        <ViewModeProvider inViewMode={false}>
+          <WishlistsProvider initialWishlists={wishlists}>
+            <main className='py-4 grid gap-2'>
+              {combinedWishlistsStatistics && (
+                <WishlistsHeader combinedWishlistsStatistics={combinedWishlistsStatistics} />
+              )}
+              <WishlistsToolbar />
+              <WishlistsContainer />
+            </main>
+          </WishlistsProvider>
+        </ViewModeProvider>
       )}
     </>
   );

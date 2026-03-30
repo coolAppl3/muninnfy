@@ -43,21 +43,29 @@ export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps
         type='button'
         onClick={handleClick}
         className={`flex justify-between items-center gap-1 px-[1.2rem] py-[4px] border-2 rounded-pill cursor-pointer transition-colors ${
-          isVisible ? 'text-cta border-cta' : 'text-title border-title hover:text-cta hover:border-cta'
+          isVisible
+            ? 'text-cta border-cta'
+            : 'text-title border-title hover:text-cta hover:border-cta'
         }`}
       >
         <span className='text-sm font-medium'>Menu</span>
-        <ChevronIcon className={`w-[1.6rem] h-[1.6rem] transition-transform ${isVisible ? '-rotate-180' : ''}`} />
+        <ChevronIcon
+          className={`w-[1.6rem] h-[1.6rem] transition-transform ${isVisible ? '-rotate-180' : ''}`}
+        />
       </button>
 
       <div
         className={`absolute rounded-sm overflow-hidden shadow-centered-tiny transform-gpu transition-all ${
-          navbarType === 'top' ? 'top-4 right-0' : 'bottom-[6.4rem] right-[1px] w-full border-1 border-cta'
+          navbarType === 'top'
+            ? 'top-4 right-0'
+            : 'bottom-[6.4rem] right-[1px] w-full border-1 border-cta'
         } ${isOpen ? 'block' : 'hidden'} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}
       >
         <NavLink
           to='/account'
-          className={({ isActive }) => `context-menu-btn bg-secondary ${isActive ? 'text-cta' : ''}`}
+          className={({ isActive }) =>
+            `context-menu-btn bg-secondary ${isActive ? 'text-cta' : ''}`
+          }
           onClick={() => {
             setIsVisible(false);
             setIsOpen(false);
@@ -67,7 +75,9 @@ export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps
         </NavLink>
         <NavLink
           to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
-          className={({ isActive }) => `context-menu-btn bg-secondary ${isActive ? 'text-cta' : ''}`}
+          className={({ isActive }) =>
+            `context-menu-btn bg-secondary ${isActive ? 'text-cta' : ''}`
+          }
           onClick={() => {
             setIsVisible(false);
             setIsOpen(false);

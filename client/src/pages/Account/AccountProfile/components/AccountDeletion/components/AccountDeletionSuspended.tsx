@@ -17,8 +17,12 @@ export default function AccountDeletionSuspended(): JSX.Element {
       <h4 className='text-danger mb-1'>Deletion request suspended.</h4>
 
       <p className='text-description text-sm mb-2 max-w-4/5'>
-        The request has been suspended for 24 hours as a result of multiple failed attempts. You can try again after{' '}
-        <span className='text-title font-medium'>{getDateAndTimeString(ongoingAccountDeletionRequest.expiry_timestamp)}</span>.
+        The request has been suspended for 24 hours as a result of multiple failed attempts. You
+        can try again after{' '}
+        <span className='text-title font-medium'>
+          {getDateAndTimeString(ongoingAccountDeletionRequest.expiry_timestamp)}
+        </span>
+        .
       </p>
 
       <Button

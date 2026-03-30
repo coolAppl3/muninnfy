@@ -1,4 +1,12 @@
-import { Dispatch, SubmitEvent, JSX, SetStateAction, useEffect, useReducer, useState } from 'react';
+import {
+  Dispatch,
+  SubmitEvent,
+  JSX,
+  SetStateAction,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react';
 import TimeWindowContainer from '../../../../../components/TimeWindowContainer/TimeWindowContainer';
 import Button from '../../../../../components/Button/Button';
 import useWishlists from '../../../hooks/useWishlists';
@@ -7,26 +15,48 @@ import PriceRangeFormGroup from '../../../../../components/PriceRangeFormGroup/P
 import { WISHLIST_MAX_TOTAL_ITEMS_PRICE } from '../../../../../utils/constants/wishlistConstants';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import WishlistsItemsCountRange from './components/WishlistsItemsCountRange';
-import wishlistsToolbarFiltersReducer, { initialWishlistsToolbarFiltersState } from './wishlistsToolbarFiltersReducer';
+import wishlistsToolbarFiltersReducer, {
+  initialWishlistsToolbarFiltersState,
+} from './wishlistsToolbarFiltersReducer';
 import DefaultFormGroup from '../../../../../components/DefaultFormGroup/DefaultFormGroup';
-import { crossWishlistSearchService } from '../../../../../services/wishlistServices';
+import {
+  crossWishlistSearchService,
+  viewCrossWishlistSearchService,
+} from '../../../../../services/wishlistServices';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import WishlistsFilterToggler from './components/WishlistsFilterToggler';
 import FilterTogglerCheckboxBtn from '../../../../../components/FilterTogglerCheckboxBtn/FilterTogglerCheckboxBtn';
+import useViewMode from '../../../../../hooks/useViewMode';
+import useAuth from '../../../../../hooks/useAuth';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useHistory from '../../../../../hooks/useHistory';
 
 type WishlistsToolbarFiltersProps = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: WishlistsToolbarFiltersProps): JSX.Element {
-  const [state, dispatch] = useReducer(wishlistsToolbarFiltersReducer, initialWishlistsToolbarFiltersState);
+export default function WishlistsToolbarFilters({
+  isOpen,
+  setIsOpen,
+}: WishlistsToolbarFiltersProps): JSX.Element {
+  const [state, dispatch] = useReducer(
+    wishlistsToolbarFiltersReducer,
+    initialWishlistsToolbarFiltersState
+  );
   const [isFetchingSearchQuery, setIsFetchingSearchingQuery] = useState<boolean>(false);
 
+  const { inViewMode, publicAccountId } = useViewMode();
   const { wishlistsFilterConfig, setWishlistsFilterConfig } = useWishlists();
-  const { startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
+  const { startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } =
+    useCalendar();
 
+  const { authStatus } = useAuth();
+  const { referrerLocation } = useHistory();
+  const navigate: NavigateFunction = useNavigate();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
@@ -46,7 +76,8 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
     ...filters
   } = state;
 
-  const allRangesValid: boolean = itemsCountRangeValid && totalItemsPriceRangeValid && priceToCompleteRangeValid;
+  const allRangesValid: boolean =
+    itemsCountRangeValid && totalItemsPriceRangeValid && priceToCompleteRangeValid;
   const createdTimestampsKey: string = 'createdTimestamps';
 
   const { displayPopupMessage } = usePopupMessage();
@@ -143,8 +174,16 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
     }
 
     try {
-      const wishlistIdsArr: string[] = (await crossWishlistSearchService(itemTitleQuery)).data;
-      setWishlistsFilterConfig((prev) => ({ ...prev, crossWishlistQueryIdSet: new Set<string>(wishlistIdsArr) }));
+      const wishlistIdsArr: string[] = (
+        inViewMode
+          ? await viewCrossWishlistSearchService(itemTitleQuery, publicAccountId)
+          : await crossWishlistSearchService(itemTitleQuery)
+      ).data;
+
+      setWishlistsFilterConfig((prev) => ({
+        ...prev,
+        crossWishlistQueryIdSet: new Set<string>(wishlistIdsArr),
+      }));
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errMessage } = handleAsyncError(err);
@@ -155,7 +194,10 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
 
       if (status === 400) {
         dispatch({ type: 'setItemTitleQueryErrorMessage', payload: { newValue: errMessage } });
+        return;
       }
+
+      navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
     } finally {
       setIsFetchingSearchingQuery(false);
       removeLoadingOverlay();
@@ -179,31 +221,49 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
       />
 
       <div className='grid gap-1'>
-        <WishlistsFilterToggler
-          title='Favorited'
-          isToggled={filters.isFavorited !== null}
-          onClick={() => dispatch({ type: 'setIsFavorited', payload: { newValue: filters.isFavorited ? null : true } })}
-          children={
-            <div className={`gap-[1.4rem] pl-1 mb-1 ${filters.isFavorited === null ? 'hidden' : 'grid'}`}>
-              <FilterTogglerCheckboxBtn
-                onClick={() => dispatch({ type: 'setIsFavorited', payload: { newValue: true } })}
-                title='Favorited'
-                isChecked={filters.isFavorited === true}
-              />
+        {inViewMode || (
+          <WishlistsFilterToggler
+            title='Favorited'
+            isToggled={filters.isFavorited !== null}
+            onClick={() =>
+              dispatch({
+                type: 'setIsFavorited',
+                payload: { newValue: filters.isFavorited ? null : true },
+              })
+            }
+            children={
+              <div
+                className={`gap-[1.4rem] pl-1 mb-1 ${filters.isFavorited === null ? 'hidden' : 'grid'}`}
+              >
+                <FilterTogglerCheckboxBtn
+                  onClick={() =>
+                    dispatch({ type: 'setIsFavorited', payload: { newValue: true } })
+                  }
+                  title='Favorited'
+                  isChecked={filters.isFavorited === true}
+                />
 
-              <FilterTogglerCheckboxBtn
-                onClick={() => dispatch({ type: 'setIsFavorited', payload: { newValue: false } })}
-                title='Not favorited'
-                isChecked={filters.isFavorited === false}
-              />
-            </div>
-          }
-        />
+                <FilterTogglerCheckboxBtn
+                  onClick={() =>
+                    dispatch({ type: 'setIsFavorited', payload: { newValue: false } })
+                  }
+                  title='Not favorited'
+                  isChecked={filters.isFavorited === false}
+                />
+              </div>
+            }
+          />
+        )}
 
         <WishlistsFilterToggler
           title='Items'
           isToggled={filterByItemsCount}
-          onClick={() => dispatch({ type: 'setFilterByItemsCount', payload: { newValue: !filterByItemsCount } })}
+          onClick={() =>
+            dispatch({
+              type: 'setFilterByItemsCount',
+              payload: { newValue: !filterByItemsCount },
+            })
+          }
           children={
             <WishlistsItemsCountRange
               dispatch={dispatch}
@@ -215,13 +275,20 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <WishlistsFilterToggler
           title='Worth'
           isToggled={filterByTotalItemsPrice}
-          onClick={() => dispatch({ type: 'setFilterByTotalItemsPrice', payload: { newValue: !filterByTotalItemsPrice } })}
+          onClick={() =>
+            dispatch({
+              type: 'setFilterByTotalItemsPrice',
+              payload: { newValue: !filterByTotalItemsPrice },
+            })
+          }
           children={
             <PriceRangeFormGroup
               setRangeValue={(newRange: { fromValue: number | null; toValue: number | null }) =>
                 dispatch({ type: 'setTotalItemsPriceRange', payload: { ...newRange } })
               }
-              setRangeIsValid={(newValue: boolean) => dispatch({ type: 'setTotalItemsPriceRangeValid', payload: { newValue } })}
+              setRangeIsValid={(newValue: boolean) =>
+                dispatch({ type: 'setTotalItemsPriceRangeValid', payload: { newValue } })
+              }
               maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
               className='mb-1'
             />
@@ -231,13 +298,20 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <WishlistsFilterToggler
           title='To complete'
           isToggled={filterByPriceToComplete}
-          onClick={() => dispatch({ type: 'setFilterByPriceToComplete', payload: { newValue: !filterByPriceToComplete } })}
+          onClick={() =>
+            dispatch({
+              type: 'setFilterByPriceToComplete',
+              payload: { newValue: !filterByPriceToComplete },
+            })
+          }
           children={
             <PriceRangeFormGroup
               setRangeValue={(newRange: { fromValue: number | null; toValue: number | null }) =>
                 dispatch({ type: 'setPriceToCompleteRange', payload: { ...newRange } })
               }
-              setRangeIsValid={(newValue: boolean) => dispatch({ type: 'setPriceToCompleteRangeValid', payload: { newValue } })}
+              setRangeIsValid={(newValue: boolean) =>
+                dispatch({ type: 'setPriceToCompleteRangeValid', payload: { newValue } })
+              }
               maxPrice={WISHLIST_MAX_TOTAL_ITEMS_PRICE}
             />
           }
@@ -246,7 +320,12 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
         <WishlistsFilterToggler
           title='Specific item'
           isToggled={filterByItemTitle}
-          onClick={() => dispatch({ type: 'setFilterByItemTitle', payload: { newValue: !filterByItemTitle } })}
+          onClick={() =>
+            dispatch({
+              type: 'setFilterByItemTitle',
+              payload: { newValue: !filterByItemTitle },
+            })
+          }
           children={
             <DefaultFormGroup
               id='cross-wishlists-search'
@@ -254,7 +333,9 @@ export default function WishlistsToolbarFilters({ isOpen, setIsOpen }: Wishlists
               autoComplete='off'
               value={itemTitleQuery}
               errorMessage={itemTitleQueryErrorMessage}
-              onChange={(e) => dispatch({ type: 'setItemTitleQuery', payload: { newValue: e.target.value } })}
+              onChange={(e) =>
+                dispatch({ type: 'setItemTitleQuery', payload: { newValue: e.target.value } })
+              }
             />
           }
         />

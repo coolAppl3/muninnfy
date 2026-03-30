@@ -3,7 +3,9 @@ import { validateEmail } from '../../../utils/validation/userValidation';
 import Button from '../../../components/Button/Button';
 import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import usePopupMessage from '../../../hooks/usePopupMessage';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../hooks/useHandleAsyncError';
 import useAuth from '../../../hooks/useAuth';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { startAccountRecoveryService } from '../../../services/accountServices';
@@ -25,7 +27,8 @@ export default function StartAccountRecovery(): JSX.Element {
     const email: string = value;
 
     try {
-      const publicAccountId: string = (await startAccountRecoveryService({ email })).data.publicAccountId;
+      const publicAccountId: string = (await startAccountRecoveryService({ email })).data
+        .publicAccountId;
 
       navigate(`/account/recovery?publicAccountId=${publicAccountId}`);
       displayPopupMessage('Recovery email sent.', 'success');
@@ -84,17 +87,24 @@ export default function StartAccountRecovery(): JSX.Element {
       return;
     }
 
-    if (typeof errResData.expiryTimestamp !== 'number' || !Number.isInteger(errResData.expiryTimestamp)) {
+    if (
+      typeof errResData.expiryTimestamp !== 'number' ||
+      !Number.isInteger(errResData.expiryTimestamp)
+    ) {
       return;
     }
 
-    setErrorMessage(`Recovery request suspended until ${getDateAndTimeString(errResData.expiryTimestamp)}.`);
+    setErrorMessage(
+      `Recovery request suspended until ${getDateAndTimeString(errResData.expiryTimestamp)}.`
+    );
   }
 
   return (
     <section>
       <h1 className='text-title text-xl 3xs:text-2xl font-bold mb-1'>Account recovery</h1>
-      <p className='text-description text-sm mb-[1.6rem]'>Enter your account's email address to start the recovery process.</p>
+      <p className='text-description text-sm mb-[1.6rem]'>
+        Enter your account's email address to start the recovery process.
+      </p>
 
       <form
         onSubmit={async (e: SubmitEvent) => {

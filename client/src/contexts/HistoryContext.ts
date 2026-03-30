@@ -10,5 +10,3 @@ export type HistoryContextType = {
 
 const HistoryContext = createContext<HistoryContextType | null>(null);
 export default HistoryContext;
-
-// }

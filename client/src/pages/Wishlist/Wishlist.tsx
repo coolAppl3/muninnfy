@@ -53,7 +53,9 @@ export default function Wishlist(): JSX.Element {
 
     const getWishlistDetails = async () => {
       try {
-        const { wishlistDetails, wishlistItems } = (await getWishlistDetailsService(wishlistId, abortController.signal)).data;
+        const { wishlistDetails, wishlistItems } = (
+          await getWishlistDetailsService(wishlistId, abortController.signal)
+        ).data;
 
         if (abortController.signal.aborted) {
           return;
@@ -94,7 +96,9 @@ export default function Wishlist(): JSX.Element {
       {isLoaded && initialWishlistProviderData ? (
         <WishlistProvider {...initialWishlistProviderData}>
           <main className='py-4 grid gap-2'>
-            <WishlistItemsProvider initialWishlistItems={initialWishlistProviderData.initialWishlistItems}>
+            <WishlistItemsProvider
+              initialWishlistItems={initialWishlistProviderData.initialWishlistItems}
+            >
               <WishlistHeaderProvider>
                 <WishlistHeader />
               </WishlistHeaderProvider>

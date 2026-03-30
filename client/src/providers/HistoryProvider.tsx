@@ -17,7 +17,8 @@ export default function HistoryProvider({ children }: HistoryProviderProps): JSX
 
   if (
     currentLocation !== currentLocationRef.current &&
-    pathname !== '/wishlist/new' /** avoids awkward/confusing navigation post wishlist creation*/
+    pathname !==
+      '/wishlist/new' /** avoids awkward/confusing navigation post wishlist creation*/
   ) {
     referrerLocationRef.current = currentLocationRef.current;
     currentLocationRef.current = currentLocation;

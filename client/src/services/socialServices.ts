@@ -1,6 +1,12 @@
 import { AxiosResponse } from 'axios';
 import axiosInstance from './axiosInstance';
-import { BasicSocialData, FollowDetails, FollowRequest, SocialCounts, SocialSectionType } from '../types/socialTypes';
+import {
+  BasicSocialData,
+  FollowDetails,
+  FollowRequest,
+  SocialCounts,
+  SocialSectionType,
+} from '../types/socialTypes';
 
 type GetAccountSocialDetailsServiceData = {
   socialCounts: SocialCounts;
@@ -9,38 +15,58 @@ type GetAccountSocialDetailsServiceData = {
   followRequests: FollowRequest[];
 };
 
-export function getAccountSocialDetailsService(abortSignal: AbortSignal): Promise<AxiosResponse<GetAccountSocialDetailsServiceData>> {
-  return axiosInstance.get('/social', { signal: abortSignal });
+export function getAccountSocialDetailsService(
+  abortSignal: AbortSignal,
+  publicAccountId?: string
+): Promise<AxiosResponse<GetAccountSocialDetailsServiceData>> {
+  return axiosInstance.get('/social', { signal: abortSignal, params: { publicAccountId } });
 }
 
-export function getSocialBatchService(type: 'followers' | 'following', offset: number): Promise<AxiosResponse<FollowDetails[]>>;
-export function getSocialBatchService(type: 'followRequests', offset: number): Promise<AxiosResponse<FollowRequest[]>>;
-export function getSocialBatchService(type: SocialSectionType, offset: number): Promise<AxiosResponse<FollowDetails[] | FollowRequest[]>> {
-  return axiosInstance.get(`/social/${type}/${offset}`);
+export function getSocialBatchService(
+  type: 'followers' | 'following',
+  offset: number,
+  publicAccountId?: string
+): Promise<AxiosResponse<FollowDetails[]>>;
+
+export function getSocialBatchService(
+  type: 'followRequests',
+  offset: number,
+  publicAccountId?: string
+): Promise<AxiosResponse<FollowRequest[]>>;
+
+export function getSocialBatchService(
+  type: SocialSectionType,
+  offset: number,
+  publicAccountId?: string
+): Promise<AxiosResponse<FollowDetails[] | FollowRequest[]>> {
+  return axiosInstance.get(`/social/${type}`, { params: { offset, publicAccountId } });
 }
 
 export function searchSocialService(
   type: 'followers' | 'following',
   searchQuery: string,
   offset: number,
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowDetails[]>>;
 
 export function searchSocialService(
   type: 'followRequests',
   searchQuery: string,
   offset: number,
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowRequest[]>>;
 
 export function searchSocialService(
   type: SocialSectionType,
   searchQuery: string,
   offset: number,
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
+  publicAccountId?: string
 ): Promise<AxiosResponse<FollowDetails[] | FollowRequest[]>> {
   return axiosInstance.get(`/social/${type}/search`, {
-    params: { searchQuery, offset },
+    params: { searchQuery, offset, publicAccountId },
     signal: abortSignal,
   });
 }
@@ -64,6 +90,25 @@ export function declineFollowRequestService(requestId: number): Promise<AxiosRes
   return axiosInstance.delete(`/social/followRequests/decline/${requestId}`);
 }
 
+type SendFollowRequestServicePayload = {
+  publicAccountId: string;
+};
+
+type SendFollowRequestServiceData = {
+  followAutoApproved: boolean;
+  insertId: number;
+};
+
+export function sendFollowRequestService(
+  body: SendFollowRequestServicePayload
+): Promise<AxiosResponse<SendFollowRequestServiceData>> {
+  return axiosInstance.post('/social/followRequests/send', body);
+}
+
+export function cancelFollowRequestService(requestId: number): Promise<AxiosResponse> {
+  return axiosInstance.delete(`/social/followRequests/cancel/${requestId}`);
+}
+
 export function unfollowService(followId: number): Promise<AxiosResponse> {
   return axiosInstance.delete(`/social/followers/unfollow/${followId}`);
 }
@@ -72,6 +117,8 @@ export function removeFollowerService(followId: number): Promise<AxiosResponse> 
   return axiosInstance.delete(`/social/followers/remove/${followId}`);
 }
 
-export function findAccountsService(searchQuery: string): Promise<AxiosResponse<BasicSocialData[]>> {
+export function findAccountsService(
+  searchQuery: string
+): Promise<AxiosResponse<BasicSocialData[]>> {
   return axiosInstance.get(`/social/find/${searchQuery}`);
 }

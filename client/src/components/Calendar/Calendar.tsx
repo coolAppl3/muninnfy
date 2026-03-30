@@ -10,7 +10,14 @@ type CalendarProps = {
 };
 
 export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
-  const { calendarKey, startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap, removeCalendar } = useCalendar();
+  const {
+    calendarKey,
+    startTimestampsMap,
+    endTimestampsMap,
+    setStartTimestampsMap,
+    setEndTimestampsMap,
+    removeCalendar,
+  } = useCalendar();
   const [renderMode, setRenderMode] = useState<'years' | 'months' | 'dates'>('years');
 
   const startTimestamp: number | undefined = startTimestampsMap.get(calendarKey);
@@ -22,8 +29,14 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
 
   const { displayPopupMessage } = usePopupMessage();
 
-  const yearsArr: number[] = Array.from({ length: 12 }, (_, index: number) => selectedYear - (selectedYear % 10) + index);
-  const daysArr: number[] = Array.from({ length: getMonthNumberOfDays(selectedMonth, selectedYear) }, (_, index: number) => index + 1);
+  const yearsArr: number[] = Array.from(
+    { length: 12 },
+    (_, index: number) => selectedYear - (selectedYear % 10) + index
+  );
+  const daysArr: number[] = Array.from(
+    { length: getMonthNumberOfDays(selectedMonth, selectedYear) },
+    (_, index: number) => index + 1
+  );
 
   function handleYearsClick(e: MouseEvent<HTMLDivElement>): void {
     if (!(e.target instanceof HTMLButtonElement)) {
@@ -46,7 +59,9 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
     }
 
     const newSelectedMonth: string = e.target.textContent;
-    const monthIndex: number = monthsArr.findIndex((month) => month.slice(0, 3) === newSelectedMonth);
+    const monthIndex: number = monthsArr.findIndex(
+      (month) => month.slice(0, 3) === newSelectedMonth
+    );
 
     if (monthIndex < 0 || monthIndex > 11) {
       return;
@@ -70,8 +85,12 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
 
     const timestamp: number = new Date(selectedYear, selectedMonth, newSelectedDate).getTime();
     calendarMode === 'start'
-      ? setStartTimestampsMap((prev) => new Map<string, number>(prev).set(calendarKey, timestamp))
-      : setEndTimestampsMap((prev) => new Map<string, number>(prev).set(calendarKey, timestamp));
+      ? setStartTimestampsMap((prev) =>
+          new Map<string, number>(prev).set(calendarKey, timestamp)
+        )
+      : setEndTimestampsMap((prev) =>
+          new Map<string, number>(prev).set(calendarKey, timestamp)
+        );
 
     removeConflictingTimestamp(timestamp);
     removeCalendar();
@@ -266,7 +285,9 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
                 <button
                   type='button'
                   className={`py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
-                    isCurrentMonth(selectedMonth) && date === dateObject.getDate() ? 'bg-cta/10' : 'bg-dark'
+                    isCurrentMonth(selectedMonth) && date === dateObject.getDate()
+                      ? 'bg-cta/10'
+                      : 'bg-dark'
                   }`}
                   key={index}
                 >

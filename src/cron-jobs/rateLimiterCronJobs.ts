@@ -1,6 +1,9 @@
 import { dbPool } from '../db/db';
 import { hourMilliseconds, minuteMilliseconds } from '../util/constants/globalConstants';
-import { REQUESTS_RATE_LIMIT, LIGHT_DAILY_RATE_ABUSE_COUNT } from '../util/constants/rateLimitingConstants';
+import {
+  REQUESTS_RATE_LIMIT,
+  LIGHT_DAILY_RATE_ABUSE_COUNT,
+} from '../util/constants/rateLimitingConstants';
 
 export async function replenishRateRequestsCron(currentTimestamp: number): Promise<void> {
   const requestsToReplenish: number = REQUESTS_RATE_LIMIT / 2;

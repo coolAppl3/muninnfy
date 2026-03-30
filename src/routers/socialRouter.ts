@@ -4,13 +4,20 @@ import { dbPool } from '../db/db';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { generatePlaceHolders } from '../util/sqlUtils/generatePlaceHolders';
 import { isValidUuid } from '../util/tokenGenerator';
-import { SOCIAL_FETCH_BATCH_SIZE, SOCIAL_MAX_FOLLOWING_LIMIT, SOCIAL_MAX_FOLLOWERS_LIMIT } from '../util/constants/socialConstants';
+import {
+  SOCIAL_FETCH_BATCH_SIZE,
+  SOCIAL_MAX_FOLLOWING_LIMIT,
+  SOCIAL_MAX_FOLLOWERS_LIMIT,
+} from '../util/constants/socialConstants';
 import { isSqlError } from '../util/sqlUtils/isSqlError';
 import { logUnexpectedError } from '../logs/errorLogger';
-import { deleteFollowRequest } from '../db/helpers/socialDbHelpers';
+import { deleteFollowRequest, getTargetAccountId } from '../db/helpers/socialDbHelpers';
 import { getAuthSessionId } from '../auth/authUtils';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
-import { isValidSocialFindQuery, isValidSocialQuery } from '../util/validation/socialValidation';
+import {
+  isValidSocialFindQuery,
+  isValidSocialQuery,
+} from '../util/validation/socialValidation';
 import { addNotification } from '../db/helpers/notificationsDbHelpers';
 
 export const socialRouter: Router = express.Router();
@@ -38,15 +45,14 @@ export type FollowRequest = SocialData & {
 };
 
 socialRouter.get('/', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
+    : null;
 
-  if (!authSessionId) {
-    return;
-  }
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
+  if (!targetAccountId) {
     return;
   }
 
@@ -107,10 +113,12 @@ socialRouter.get('/', async (req: Request, res: Response) => {
         follow_requests.request_timestamp DESC,
         follow_requests.request_id ASC
       LIMIT :socialFetchBatchSize;`,
-      { accountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { accountId: targetAccountId, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
-    const socialCounts = (socialRows[0] ? socialRows[0][0] : undefined) as SocialCounts | undefined;
+    const socialCounts = (socialRows[0] ? socialRows[0][0] : undefined) as
+      | SocialCounts
+      | undefined;
     const followers = socialRows[1] as FollowDetails[] | undefined;
     const following = socialRows[2] as FollowDetails[] | undefined;
     const followRequests = socialRows[3] as FollowRequest[] | undefined;
@@ -121,7 +129,7 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       await logUnexpectedError(
         req,
         null,
-        `Failed to fetch social data. Social count dat fetched: ${Boolean(socialCounts)}. Followers fetched: ${Boolean(
+        `Failed to fetch social data. Social count data fetched: ${Boolean(socialCounts)}. Followers fetched: ${Boolean(
           followers
         )}. Following fetched: ${Boolean(following)}. Follow requests fetched: ${Boolean(followRequests)}.`
       );
@@ -129,7 +137,17 @@ socialRouter.get('/', async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({ socialCounts, followers, following, followRequests });
+    const isOwnerRequest: boolean = targetAccountId === accountId;
+
+    res.json({
+      socialCounts: {
+        ...socialCounts,
+        follow_requests_count: isOwnerRequest ? socialCounts.follow_requests_count : 0,
+      },
+      followers,
+      following,
+      followRequests: isOwnerRequest ? followRequests : [],
+    });
   } catch (err: unknown) {
     console.log(err);
 
@@ -144,9 +162,14 @@ socialRouter.get('/', async (req: Request, res: Response) => {
 });
 
 socialRouter.get('/followers/search', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
+    : null;
 
-  if (!authSessionId) {
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
     return;
   }
 
@@ -163,12 +186,6 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
-    return;
-  }
-
   try {
     const [followers] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -182,7 +199,7 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
       INNER JOIN
         accounts ON followers.follower_account_id = accounts.account_id
       WHERE
-        followers.account_id = :accountId AND (
+        followers.account_id = :targetAccountId AND (
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
@@ -192,7 +209,12 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      {
+        targetAccountId,
+        searchQuery,
+        offset,
+        socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE,
+      }
     );
 
     res.json(followers as FollowDetails[]);
@@ -209,23 +231,22 @@ socialRouter.get('/followers/search', async (req: Request, res: Response) => {
   }
 });
 
-socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+socialRouter.get('/followers', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
+    : null;
 
-  if (!authSessionId) {
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
     return;
   }
 
-  const offset: number = +(req.params.offset || 0);
+  const offset: number = +(req.query.offset || 0);
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
-    return;
-  }
-
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
     return;
   }
 
@@ -242,7 +263,7 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
       INNER JOIN
         accounts ON followers.follower_account_id = accounts.account_id
       WHERE
-        followers.account_id = :accountId
+        followers.account_id = :targetAccountId
       ORDER BY
         followers.follow_timestamp DESC,
         followers.follow_id ASC
@@ -250,7 +271,7 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { targetAccountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(followers as FollowDetails[]);
@@ -268,9 +289,14 @@ socialRouter.get('/followers/:offset', async (req: Request, res: Response) => {
 });
 
 socialRouter.get('/following/search', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
+    : null;
 
-  if (!authSessionId) {
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
     return;
   }
 
@@ -287,12 +313,6 @@ socialRouter.get('/following/search', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
-    return;
-  }
-
   try {
     const [following] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -306,7 +326,7 @@ socialRouter.get('/following/search', async (req: Request, res: Response) => {
       INNER JOIN
         accounts ON followers.account_id = accounts.account_id
       WHERE
-        followers.follower_account_id = :accountId AND (
+        followers.follower_account_id = :targetAccountId AND (
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
@@ -316,7 +336,7 @@ socialRouter.get('/following/search', async (req: Request, res: Response) => {
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { targetAccountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(following as FollowDetails[]);
@@ -333,23 +353,22 @@ socialRouter.get('/following/search', async (req: Request, res: Response) => {
   }
 });
 
-socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+socialRouter.get('/following', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
+    : null;
 
-  if (!authSessionId) {
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
     return;
   }
 
-  const offset: number = +(req.params.offset || 0);
+  const offset: number = +(req.query.offset || 0);
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
-    return;
-  }
-
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
     return;
   }
 
@@ -366,7 +385,7 @@ socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
       INNER JOIN
         accounts ON followers.account_id = accounts.account_id
       WHERE
-        followers.follower_account_id = :accountId
+        followers.follower_account_id = :targetAccountId
       ORDER BY
         followers.follow_timestamp DESC,
         followers.follow_id ASC
@@ -374,7 +393,7 @@ socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { targetAccountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(following as FollowDetails[]);
@@ -393,8 +412,13 @@ socialRouter.get('/following/:offset', async (req: Request, res: Response) => {
 
 socialRouter.get('/followRequests/search', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res)
+    : null;
 
-  if (!authSessionId) {
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
     return;
   }
 
@@ -411,12 +435,6 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
-    return;
-  }
-
   try {
     const [followRequests] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
@@ -430,7 +448,7 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
       INNER JOIN
         accounts ON follow_requests.requester_account_id = accounts.account_id
       WHERE
-        follow_requests.requestee_account_id = :accountId AND (
+        follow_requests.requestee_account_id = :targetAccountId AND (
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
@@ -440,7 +458,7 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { targetAccountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(followRequests as FollowRequest[]);
@@ -457,23 +475,22 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
   }
 });
 
-socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+socialRouter.get('/followRequests', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = authSessionId
+    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
+    : null;
 
-  if (!authSessionId) {
+  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+
+  if (!targetAccountId) {
     return;
   }
 
-  const offset: number = +(req.params.offset || 0);
+  const offset: number = +(req.query.offset || 0);
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
-    return;
-  }
-
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
     return;
   }
 
@@ -490,7 +507,7 @@ socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) 
       INNER JOIN
         accounts ON follow_requests.requester_account_id = accounts.account_id
       WHERE
-        follow_requests.requestee_account_id = :accountId
+        follow_requests.requestee_account_id = :targetAccountId
       ORDER BY
         follow_requests.request_timestamp DESC,
         follow_requests.request_id ASC
@@ -498,7 +515,7 @@ socialRouter.get('/followRequests/:offset', async (req: Request, res: Response) 
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { targetAccountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(followRequests as FollowRequest[]);
@@ -523,20 +540,20 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
   }
 
   type RequestData = {
-    requesteePublicAccountId: string;
+    publicAccountId: string;
   };
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['requesteePublicAccountId'];
+  const expectedKeys: string[] = ['publicAccountId'];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { requesteePublicAccountId } = requestData;
+  const { publicAccountId } = requestData;
 
-  if (!isValidUuid(requesteePublicAccountId)) {
+  if (!isValidUuid(publicAccountId)) {
     res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
     return;
   }
@@ -556,45 +573,50 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     type FollowDetails = {
       requestee_account_id: number;
       requestee_is_verified: boolean;
-      already_following: boolean;
-      already_requested: boolean;
+      follow_requires_approval: boolean;
+
+      follow_id: number | null;
+      follow_request_id: number | null;
 
       requester_following_count: number;
       requester_follow_requests_count: number;
       requestee_followers_count: number;
-      follow_requires_approval: boolean;
     };
 
     const [followRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        account_id AS requestee_account_id,
-        is_verified AS requestee_is_verified,
+        accounts.account_id AS requestee_account_id,
+        accounts.is_verified AS requestee_is_verified,
+        accounts.approve_follow_requests AS follow_requires_approval,
 
-        EXISTS (
-          SELECT 1 FROM followers WHERE follower_account_id = :accountId AND account_id = accounts.account_id
-        ) AS already_following,
+        followers.follow_id,
+        follow_requests.request_id AS follow_request_id,
 
-        EXISTS (
-          SELECT 1 FROM follow_requests WHERE requester_account_id = :accountId AND requestee_account_id = accounts.account_id
-        ) AS already_requested,
-
-        
         (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId FOR UPDATE) AS requester_following_count,
         (SELECT COUNT(*) FROM follow_requests WHERE requester_account_id = :accountId FOR UPDATE) AS requester_follow_requests_count,
-        (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id FOR UPDATE) AS requestee_followers_count,
-        (SELECT approve_follow_requests FROM account_preferences WHERE account_id = accounts.account_id) AS follow_requires_approval
+        (SELECT COUNT(*) FROM followers WHERE account_id = accounts.account_id FOR UPDATE) AS requestee_followers_count
       FROM
         accounts
+      LEFT JOIN
+        followers ON
+          accounts.account_id = followers.account_id AND
+          followers.follower_account_id = :accountId
+      LEFT JOIN
+        follow_requests ON
+          accounts.account_id = follow_requests.requestee_account_id AND
+          follow_requests.requester_account_id = :accountId
       WHERE
-        public_account_id = :requesteePublicAccountId;`,
-      { accountId, requesteePublicAccountId }
+        public_account_id = :publicAccountId;`,
+      { accountId, publicAccountId }
     );
 
     const followDetails = followRows[0] as FollowDetails | undefined;
 
     if (!followDetails || !followDetails.requestee_is_verified) {
       await connection.rollback();
-      res.status(404).json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
+      res
+        .status(404)
+        .json({ message: 'Account not found or is unverified.', reason: 'accountNotFound' });
 
       return;
     }
@@ -606,30 +628,44 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       return;
     }
 
-    if (followDetails.already_following) {
+    if (followDetails.follow_id) {
       await connection.rollback();
-      res.status(409).json({ message: 'Already following this user.', reason: 'alreadyFollowing' });
+      res.status(201).json({
+        followAutoApproved: true,
+        insertId: followDetails.follow_id,
+      });
 
       return;
     }
 
-    if (followDetails.already_requested) {
+    if (followDetails.follow_request_id) {
       await connection.rollback();
-      res.status(409).json({ message: 'Follow request already sent.', reason: 'alreadySent' });
+      res.status(201).json({
+        followAutoApproved: false,
+        insertId: followDetails.follow_request_id,
+      });
 
       return;
     }
 
-    if (followDetails.requester_following_count + followDetails.requester_follow_requests_count >= SOCIAL_MAX_FOLLOWING_LIMIT) {
+    if (
+      followDetails.requester_following_count + followDetails.requester_follow_requests_count >=
+      SOCIAL_MAX_FOLLOWING_LIMIT
+    ) {
       await connection.rollback();
-      res.status(409).json({ message: 'Following limit reached.', reason: 'followingLimitReached' });
+      res
+        .status(409)
+        .json({ message: 'Following limit reached.', reason: 'followingLimitReached' });
 
       return;
     }
 
     if (followDetails.requestee_followers_count >= SOCIAL_MAX_FOLLOWERS_LIMIT) {
       await connection.rollback();
-      res.status(409).json({ message: `User can't accept followers at this time.`, reason: 'requesteeFollowersLimitReached' });
+      res.status(409).json({
+        message: `User can't accept followers at this time.`,
+        reason: 'requesteeFollowersLimitReached',
+      });
 
       return;
     }
@@ -647,9 +683,18 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       );
 
       await connection.commit();
-      res.json({ followId: resultSetHeader.insertId, followTimestamp: currentTimestamp });
+      res.status(201).json({
+        followAutoApproved: true,
+        insertId: resultSetHeader.insertId,
+      });
 
-      await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'new_follower', resultSetHeader.insertId);
+      await addNotification(
+        followDetails.requestee_account_id,
+        accountId,
+        currentTimestamp,
+        'new_follower',
+        resultSetHeader.insertId
+      );
       return;
     }
 
@@ -663,9 +708,18 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     );
 
     await connection.commit();
-    res.json({ requestId: resultSetHeader.insertId, requestTimestamp: currentTimestamp });
+    res.status(201).json({
+      followAutoApproved: false,
+      insertId: resultSetHeader.insertId,
+    });
 
-    await addNotification(followDetails.requestee_account_id, accountId, currentTimestamp, 'new_follow_request', resultSetHeader.insertId);
+    await addNotification(
+      followDetails.requestee_account_id,
+      accountId,
+      currentTimestamp,
+      'new_follow_request',
+      resultSetHeader.insertId
+    );
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
@@ -694,49 +748,54 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
   }
 });
 
-socialRouter.delete('/followRequests/cancel/:requestId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+socialRouter.delete(
+  '/followRequests/cancel/:requestId',
+  async (req: Request, res: Response) => {
+    const authSessionId: string | null = getAuthSessionId(req, res);
 
-  if (!authSessionId) {
-    return;
-  }
+    if (!authSessionId) {
+      return;
+    }
 
-  const requestId: number | undefined = req.params.requestId ? +req.params.requestId : undefined;
+    const requestId: number | undefined = req.params.requestId
+      ? +req.params.requestId
+      : undefined;
 
-  if (!requestId || !Number.isInteger(requestId)) {
-    res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
-    return;
-  }
+    if (!requestId || !Number.isInteger(requestId)) {
+      res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+      return;
+    }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
-  if (!accountId) {
-    return;
-  }
+    if (!accountId) {
+      return;
+    }
 
-  try {
-    await dbPool.execute<ResultSetHeader>(
-      `DELETE FROM
+    try {
+      await dbPool.execute<ResultSetHeader>(
+        `DELETE FROM
         follow_requests
       WHERE
         request_id = ? AND
         requester_account_id = ?;`,
-      [requestId, accountId]
-    );
+        [requestId, accountId]
+      );
 
-    res.json({});
-  } catch (err: unknown) {
-    console.log(err);
+      res.json({});
+    } catch (err: unknown) {
+      console.log(err);
 
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
+      if (res.headersSent) {
+        await logUnexpectedError(req, err, 'Attempted to send two responses.');
+        return;
+      }
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
     }
-
-    res.status(500).json({ message: 'Internal server error.' });
-    await logUnexpectedError(req, err);
   }
-});
+);
 
 socialRouter.post('/followRequests/accept', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
@@ -822,7 +881,9 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
 
     if (followDetails.followers_count >= SOCIAL_MAX_FOLLOWERS_LIMIT) {
       await connection.rollback();
-      res.status(409).json({ message: 'Followers limit reached.', reason: 'followersLimitReached' });
+      res
+        .status(409)
+        .json({ message: 'Followers limit reached.', reason: 'followersLimitReached' });
 
       return;
     }
@@ -872,49 +933,54 @@ socialRouter.post('/followRequests/accept', async (req: Request, res: Response) 
   }
 });
 
-socialRouter.delete('/followRequests/decline/:requestId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res);
+socialRouter.delete(
+  '/followRequests/decline/:requestId',
+  async (req: Request, res: Response) => {
+    const authSessionId: string | null = getAuthSessionId(req, res);
 
-  if (!authSessionId) {
-    return;
-  }
+    if (!authSessionId) {
+      return;
+    }
 
-  const requestId: number | undefined = req.params.requestId ? +req.params.requestId : undefined;
+    const requestId: number | undefined = req.params.requestId
+      ? +req.params.requestId
+      : undefined;
 
-  if (!requestId || !Number.isInteger(requestId)) {
-    res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
-    return;
-  }
+    if (!requestId || !Number.isInteger(requestId)) {
+      res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+      return;
+    }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+    const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
 
-  if (!accountId) {
-    return;
-  }
+    if (!accountId) {
+      return;
+    }
 
-  try {
-    await dbPool.execute<ResultSetHeader>(
-      `DELETE FROM
+    try {
+      await dbPool.execute<ResultSetHeader>(
+        `DELETE FROM
         follow_requests
       WHERE
         request_id = ? AND
         requestee_account_id = ?;`,
-      [requestId, accountId]
-    );
+        [requestId, accountId]
+      );
 
-    res.json({});
-  } catch (err: unknown) {
-    console.log(err);
+      res.json({});
+    } catch (err: unknown) {
+      console.log(err);
 
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
+      if (res.headersSent) {
+        await logUnexpectedError(req, err, 'Attempted to send two responses.');
+        return;
+      }
+
+      res.status(500).json({ message: 'Internal server error.' });
+      await logUnexpectedError(req, err);
     }
-
-    res.status(500).json({ message: 'Internal server error.' });
-    await logUnexpectedError(req, err);
   }
-});
+);
 
 socialRouter.delete('/followers/unfollow/:followId', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);

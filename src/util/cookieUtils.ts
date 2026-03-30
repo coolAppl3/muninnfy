@@ -30,7 +30,11 @@ export function getRequestCookie(req: Request, cookieName: AllowedCookieNames): 
   return null;
 }
 
-export function removeRequestCookie(res: Response, cookieName: AllowedCookieNames, httpOnly: boolean = true): void {
+export function removeRequestCookie(
+  res: Response,
+  cookieName: AllowedCookieNames,
+  httpOnly: boolean = true
+): void {
   res.clearCookie(cookieName, {
     httpOnly,
     secure: process.env.NODE_ENV === 'production',

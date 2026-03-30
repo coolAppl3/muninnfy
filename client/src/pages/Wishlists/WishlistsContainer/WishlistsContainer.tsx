@@ -2,12 +2,13 @@ import { JSX, useMemo } from 'react';
 import Container from '../../../components/Container/Container';
 import useWishlists from '../hooks/useWishlists';
 import WishlistCard from '../../../components/WishlistCard/WishlistCard';
-import { ExtendedWishlistDetailsType } from '../../../types/wishlistTypes';
+import { ExtendedWishlistDetailsType, ViewWishlistDetails } from '../../../types/wishlistTypes';
 
 export default function WishlistsContainer(): JSX.Element {
-  const { wishlists, isSingleColumnView, wishlistsFilterConfig, wishlistMatchesFilterConfig } = useWishlists();
+  const { wishlists, isSingleColumnView, wishlistsFilterConfig, wishlistMatchesFilterConfig } =
+    useWishlists();
 
-  const filteredWishlists: ExtendedWishlistDetailsType[] = useMemo(
+  const filteredWishlists: (ExtendedWishlistDetailsType | ViewWishlistDetails)[] = useMemo(
     () => wishlists.filter(wishlistMatchesFilterConfig),
     [wishlists, wishlistMatchesFilterConfig]
   );
@@ -34,7 +35,8 @@ export default function WishlistsContainer(): JSX.Element {
           <>
             <div className='text-sm font-medium flex justify-between items-center'>
               <p className='text-cta leading-none flex gap-1'>
-                {filtersAppliedCount === 1 ? '1 filter' : `${filtersAppliedCount} filters`} applied
+                {filtersAppliedCount === 1 ? '1 filter' : `${filtersAppliedCount} filters`}{' '}
+                applied
               </p>
 
               <p className='text-description leading-none'>
@@ -46,16 +48,22 @@ export default function WishlistsContainer(): JSX.Element {
           </>
         )}
 
-        <div className={`grid grid-cols-1 ${isSingleColumnView ? '' : 'sm:grid-cols-2'} gap-1 items-start`}>
+        <div
+          className={`grid grid-cols-1 ${isSingleColumnView ? '' : 'sm:grid-cols-2'} gap-1 items-start`}
+        >
           {filteredWishlists.length === 0 ? (
-            <p className='sm:!col-span-2 text-sm font-medium text-description w-fit mx-auto'>No wishlists found</p>
+            <p className='sm:!col-span-2 text-sm font-medium text-description w-fit mx-auto'>
+              No wishlists found
+            </p>
           ) : (
-            filteredWishlists.map((wishlist: ExtendedWishlistDetailsType) => (
-              <WishlistCard
-                key={wishlist.wishlist_id}
-                wishlist={wishlist}
-              />
-            ))
+            filteredWishlists.map(
+              (wishlist: ExtendedWishlistDetailsType | ViewWishlistDetails) => (
+                <WishlistCard
+                  key={wishlist.wishlist_id}
+                  wishlist={wishlist}
+                />
+              )
+            )
           )}
         </div>
       </Container>
