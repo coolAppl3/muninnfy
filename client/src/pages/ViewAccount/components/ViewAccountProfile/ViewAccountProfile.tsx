@@ -205,7 +205,7 @@ export default function ViewAccountProfile(): JSX.Element {
       <div className='grid grid-cols-3 gap-1 text-sm text-description relative z-0 h-fit mb-2'>
         <button
           className='w-fit text-start cursor-pointer hover:text-cta'
-          onClick={() => navigate(`/view/wishlists/${public_account_id}`)}
+          onClick={() => navigate(`/view/account/wishlists/${public_account_id}`)}
         >
           <StatisticItem
             title='Wishlists'
