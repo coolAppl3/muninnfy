@@ -229,6 +229,110 @@ wishlistsRouter.get(
   }
 );
 
+wishlistsRouter.get('/crossWishlistSearch', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = !authSessionId
+    ? null
+    : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+
+  const publicAccountId = req.query.publicAccountId;
+  const itemTitleQuery = req.query.itemTitleQuery;
+
+  if (typeof publicAccountId !== 'string' || !isValidUuid(publicAccountId)) {
+    res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+    return;
+  }
+
+  if (typeof itemTitleQuery !== 'string' || !isValidWishlistItemTitle(itemTitleQuery)) {
+    res.status(400).json({ message: 'Invalid search query.', reason: 'invalidQuery' });
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      target_account_id: number;
+      is_private: boolean;
+      is_following: boolean;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        account_id AS target_account_id,
+        is_private,
+        
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
+      FROM
+        accounts
+      WHERE
+        public_account_id = ?;`,
+      [accountId, publicAccountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (accountDetails.is_private && !accountDetails.is_following) {
+      res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
+      return;
+    }
+
+    type WishlistDetails = {
+      wishlist_id: string;
+    };
+
+    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        wishlist_id
+      FROM
+        wishlists
+      WHERE
+        account_id = ? AND
+        (
+          privacy_level = ? OR
+          (privacy_level = ? AND ?)
+        ) AND
+        EXISTS (
+          SELECT
+            1
+          FROM
+            wishlist_items
+          WHERE
+            wishlist_id = wishlists.wishlist_id AND
+            title LIKE ?
+        )
+      LIMIT ?;`,
+      [
+        accountDetails.target_account_id,
+        PUBLIC_WISHLIST_PRIVACY_LEVEL,
+        FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+        accountDetails.is_following,
+        `%${itemTitleQuery}%`,
+        TOTAL_WISHLISTS_LIMIT,
+      ]
+    );
+
+    const wishlistIdsArr: string[] = (wishlistRows as WishlistDetails[]).map(
+      ({ wishlist_id }: WishlistDetails) => wishlist_id
+    );
+
+    res.json(wishlistIdsArr);
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
 wishlistsRouter.get('/all', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
 
@@ -344,7 +448,7 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
   const publicAccountId: string | undefined = req.params.publicAccountId;
 
   if (!publicAccountId || !isValidUuid(publicAccountId)) {
-    res.status(400).json({ message: 'Invalid account ID.', reason: 'invalidPublicAccountId' });
+    res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
     return;
   }
 
