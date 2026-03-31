@@ -86,6 +86,7 @@ export async function getAllWishlistsService(
 type GetAllViewWishlistsServiceData = {
   wishlists: ViewWishlistDetails[];
   combinedWishlistsStatistics: CombinedWishlistsStatistics;
+  ownerDetails: { owner_username: string; owner_display_name: string };
 };
 
 export async function getAllViewWishlistsService(

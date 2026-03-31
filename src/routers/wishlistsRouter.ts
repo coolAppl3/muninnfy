@@ -1167,6 +1167,8 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
     type AccountDetails = {
       target_account_id: number;
       is_private: boolean;
+      owner_username: string;
+      owner_display_name: string;
       is_following: boolean;
     };
 
@@ -1174,6 +1176,8 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
       `SELECT
         account_id AS target_account_id,
         is_private,
+        username AS owner_username,
+        display_name AS owner_display_name,
         
         EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
       FROM
@@ -1274,7 +1278,13 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
       combinedWishlistsStatistics.totalWishlistsToComplete += wishlist.price_to_complete;
     }
 
-    res.json({ combinedWishlistsStatistics, wishlists: wishlists as Wishlist[] });
+    const { owner_username, owner_display_name } = accountDetails;
+
+    res.json({
+      ownerDetails: { owner_username, owner_display_name },
+      combinedWishlistsStatistics,
+      wishlists: wishlists as Wishlist[],
+    });
   } catch (err: unknown) {
     console.log(err);
 
