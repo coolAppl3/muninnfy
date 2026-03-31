@@ -23,7 +23,9 @@ export default function WishlistHeaderContent(): JSX.Element {
         setMenuIsOpen(false);
       }}
     >
-      <h3 className='text-title font-medium mb-1 leading-none wrap-anywhere'>{wishlistDetails.title}</h3>
+      <h3 className='text-title font-medium mb-1 leading-none wrap-anywhere'>
+        {wishlistDetails.title}
+      </h3>
 
       <button
         type='button'
@@ -32,10 +34,14 @@ export default function WishlistHeaderContent(): JSX.Element {
         className='mt-[-1rem] mr-[-9px] p-1 bg-dark rounded-[50%] transition-[filter] hover:brightness-75 cursor-pointer flex justify-center items-center'
         onClick={() => setMenuIsOpen((prev) => !prev)}
       >
-        <TripleDotMenuIcon className={`w-[1.4rem] h-[1.4rem] transition-colors ${menuIsOpen ? 'text-cta' : 'text-title'}`} />
+        <TripleDotMenuIcon
+          className={`w-[1.4rem] h-[1.4rem] transition-colors ${menuIsOpen ? 'text-cta' : 'text-title'}`}
+        />
       </button>
 
-      <div className={`absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}>
+      <div
+        className={`absolute top-[-1rem] right-4 rounded-sm overflow-hidden shadow-centered-tiny ${menuIsOpen ? 'block' : 'hidden'}`}
+      >
         <button
           type='button'
           className='context-menu-btn'
@@ -66,7 +72,9 @@ export default function WishlistHeaderContent(): JSX.Element {
           onClick={async () => {
             setMenuIsOpen(false);
 
-            const successfullyCopied: boolean = await copyToClipboard(`${window.location.origin}/wishlist/view/${wishlistId}`);
+            const successfullyCopied: boolean = await copyToClipboard(
+              `${window.location.origin}/wishlist/view/${wishlistId}`
+            );
             successfullyCopied
               ? displayPopupMessage('Share link copied to clipboard.', 'success')
               : displayPopupMessage('Failed to copy to clipboard.', 'error');
