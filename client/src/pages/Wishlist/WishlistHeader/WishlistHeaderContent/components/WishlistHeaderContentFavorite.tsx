@@ -4,7 +4,9 @@ import { setWishlistFavoriteService } from '../../../../../services/wishlistServ
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useLoadingOverlay from '../../../../../hooks/useLoadingOverlay';
 import useConfirmModal from '../../../../../hooks/useConfirmModal';
-import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../../../../hooks/useHandleAsyncError';
+import useHandleAsyncError, {
+  HandleAsyncErrorFunction,
+} from '../../../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../../../hooks/useHistory';
 
@@ -36,7 +38,10 @@ export default function WishlistHeaderContentFavorite(): JSX.Element {
         is_favorited: !wishlistDetails.is_favorited,
       }));
 
-      displayPopupMessage(newIsFavorited ? 'Added to favorites.' : 'Removed from favorites.', 'success');
+      displayPopupMessage(
+        newIsFavorited ? 'Added to favorites.' : 'Removed from favorites.',
+        'success'
+      );
     } catch (err: unknown) {
       console.log(err);
       const { isHandled, status, errReason } = handleAsyncError(err);
@@ -62,7 +67,9 @@ export default function WishlistHeaderContentFavorite(): JSX.Element {
         isSubmitting ||
         displayConfirmModal({
           title: `Are you sure you want to ${
-            wishlistDetails.is_favorited ? 'remove this wishlist from favorites?' : 'add this wishlist to favorites?'
+            wishlistDetails.is_favorited
+              ? 'remove this wishlist from favorites?'
+              : 'add this wishlist to favorites?'
           }`,
           confirmBtnTitle: 'Confirm',
           cancelBtnTitle: 'Cancel',
@@ -71,7 +78,7 @@ export default function WishlistHeaderContentFavorite(): JSX.Element {
             await setWishlistFavorite();
           },
           onCancel: removeConfirmModal,
-          isDangerous: false,
+          isDangerous: wishlistDetails.is_favorited ? true : false,
         })
       }
     >
