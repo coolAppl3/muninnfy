@@ -13,6 +13,7 @@ type WishlistsToolbarFiltersState = {
   priceToCompleteFrom: number | null;
   priceToCompleteTo: number | null;
 
+  privacyLevel: number | null;
   isFavorited: boolean | null;
 
   itemTitleQuery: string;
@@ -42,6 +43,7 @@ export const initialWishlistsToolbarFiltersState: WishlistsToolbarFiltersState =
   priceToCompleteFrom: null,
   priceToCompleteTo: null,
 
+  privacyLevel: null,
   isFavorited: null,
 
   itemTitleQuery: '',
@@ -61,12 +63,25 @@ export const initialWishlistsToolbarFiltersState: WishlistsToolbarFiltersState =
 export type WishlistsToolbarFiltersReducerAction =
   | { type: 'resetFilters' }
   //
-  | { type: 'setCreatedTimestampRange'; payload: { fromValue: number | null; toValue: number | null } }
-  | { type: 'setItemsCountRange'; payload: { fromValue: number | null; toValue: number | null } }
-  | { type: 'setTotalItemsPriceRange'; payload: { fromValue: number | null; toValue: number | null } }
-  | { type: 'setPriceToCompleteRange'; payload: { fromValue: number | null; toValue: number | null } }
+  | {
+      type: 'setCreatedTimestampRange';
+      payload: { fromValue: number | null; toValue: number | null };
+    }
+  | {
+      type: 'setItemsCountRange';
+      payload: { fromValue: number | null; toValue: number | null };
+    }
+  | {
+      type: 'setTotalItemsPriceRange';
+      payload: { fromValue: number | null; toValue: number | null };
+    }
+  | {
+      type: 'setPriceToCompleteRange';
+      payload: { fromValue: number | null; toValue: number | null };
+    }
   //
   | { type: 'setItemTitleQuery'; payload: { newValue: string } }
+  | { type: 'setPrivacyLevel'; payload: { newValue: number | null } }
   | { type: 'setIsFavorited'; payload: { newValue: boolean | null } }
   //
   | { type: 'setFilterByItemsCount'; payload: { newValue: boolean } }
@@ -137,7 +152,17 @@ export default function wishlistsToolbarFiltersReducer(
     const updatedState: WishlistsToolbarFiltersState = {
       ...state,
       itemTitleQuery: payload.newValue.trimEnd(),
-      itemTitleQueryErrorMessage: payload.newValue === '' ? null : validateWishlistItemTitle(payload.newValue),
+      itemTitleQueryErrorMessage:
+        payload.newValue === '' ? null : validateWishlistItemTitle(payload.newValue),
+    };
+
+    return updatedState;
+  }
+
+  if (type === 'setPrivacyLevel') {
+    const updatedState: WishlistsToolbarFiltersState = {
+      ...state,
+      privacyLevel: payload.newValue,
     };
 
     return updatedState;
