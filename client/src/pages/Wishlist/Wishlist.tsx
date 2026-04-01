@@ -93,7 +93,9 @@ export default function Wishlist(): JSX.Element {
     <>
       <Head title='Wishlist - Muninnfy' />
 
-      {isLoaded && initialWishlistProviderData ? (
+      {isLoaded || <LoadingSkeleton />}
+
+      {isLoaded && initialWishlistProviderData && (
         <WishlistProvider {...initialWishlistProviderData}>
           <main className='py-4 grid gap-2'>
             <WishlistItemsProvider
@@ -106,16 +108,14 @@ export default function Wishlist(): JSX.Element {
               <NewWishlistItemFormContainer />
 
               <CalendarProvider>
-                <WishlistItemsToolbar inViewMode={false} />
+                <WishlistItemsToolbar />
               </CalendarProvider>
 
               <WishlistItemsSelectionContainer />
-              <WishlistItems inViewMode={false} />
+              <WishlistItems />
             </WishlistItemsProvider>
           </main>
         </WishlistProvider>
-      ) : (
-        <LoadingSkeleton />
       )}
     </>
   );
