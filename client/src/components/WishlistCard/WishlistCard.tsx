@@ -52,7 +52,7 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
       <div className='text-description flex justify-between items-center'>
         <p className='text-sm font-medium mr-auto'>{getFullDateString(created_on_timestamp)}</p>
 
-        {inViewMode && 'is_favorited' in wishlist && wishlist.is_favorited && (
+        {!inViewMode && 'is_favorited' in wishlist && wishlist.is_favorited && (
           <span
             title='Favorited'
             aria-label='Favorited'
@@ -62,7 +62,7 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
           </span>
         )}
 
-        {inViewMode && 'privacy_level' in wishlist && (
+        {!inViewMode && 'privacy_level' in wishlist && (
           <WishlistPrivacyLevelIcon privacyLevel={wishlist.privacy_level} />
         )}
 
