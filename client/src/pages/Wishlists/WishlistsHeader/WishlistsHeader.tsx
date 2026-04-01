@@ -7,10 +7,11 @@ import Button from '../../../components/Button/Button';
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useWishlists from '../hooks/useWishlists';
 import useViewMode from '../../../hooks/useViewMode';
+import { ViewWishlistOwnerDetails } from '../../../types/wishlistTypes';
 
 type WishlistsHeaderProps = {
   combinedWishlistsStatistics: CombinedWishlistsStatistics;
-  ownerDetails?: { owner_username: string; owner_display_name: string };
+  ownerDetails?: Omit<ViewWishlistOwnerDetails, 'owner_public_account_id'>;
 };
 
 export default function WishlistsHeader({
