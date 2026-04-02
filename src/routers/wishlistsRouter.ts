@@ -251,14 +251,12 @@ wishlistsRouter.get('/crossWishlistSearch', async (req: Request, res: Response) 
   try {
     type AccountDetails = {
       target_account_id: number;
-      is_private: boolean;
       is_following: boolean;
     };
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         account_id AS target_account_id,
-        is_private,
         
         EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
       FROM
@@ -272,11 +270,6 @@ wishlistsRouter.get('/crossWishlistSearch', async (req: Request, res: Response) 
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-      return;
-    }
-
-    if (accountDetails.is_private && !accountDetails.is_following) {
-      res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
       return;
     }
 
@@ -1166,7 +1159,6 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
   try {
     type AccountDetails = {
       target_account_id: number;
-      is_private: boolean;
       owner_username: string;
       owner_display_name: string;
       is_following: boolean;
@@ -1175,7 +1167,6 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         account_id AS target_account_id,
-        is_private,
         username AS owner_username,
         display_name AS owner_display_name,
         
@@ -1191,11 +1182,6 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-      return;
-    }
-
-    if (accountDetails.is_private && !accountDetails.is_following) {
-      res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
       return;
     }
 
