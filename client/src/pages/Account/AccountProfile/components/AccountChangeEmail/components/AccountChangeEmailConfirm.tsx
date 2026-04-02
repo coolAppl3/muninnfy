@@ -227,7 +227,7 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
             className='bg-secondary border-title text-title order-2 sm:order-1 w-full sm:w-fit'
             onClick={() => setProfileSection(null)}
           >
-            Cancel
+            Close
           </Button>
         </div>
       </form>
