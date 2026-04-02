@@ -19,6 +19,7 @@ import WishlistItemsToolbar from './WishlistItemsToolbar/WishlistItemsToolbar';
 import CalendarProvider from '../../providers/CalendarProvider';
 import WishlistItemsSelectionContainer from './WishlistItemsSelectionContainer/WishlistItemsSelectionContainer';
 import WishlistItemsProvider from './providers/WishlistItemsProvider';
+import ViewModeProvider from '../../providers/ViewModeProvider';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -96,26 +97,28 @@ export default function Wishlist(): JSX.Element {
       {isLoaded || <LoadingSkeleton />}
 
       {isLoaded && initialWishlistProviderData && (
-        <WishlistProvider {...initialWishlistProviderData}>
-          <main className='py-4 grid gap-2'>
-            <WishlistItemsProvider
-              initialWishlistItems={initialWishlistProviderData.initialWishlistItems}
-            >
-              <WishlistHeaderProvider>
-                <WishlistHeader />
-              </WishlistHeaderProvider>
+        <ViewModeProvider inViewMode={false}>
+          <WishlistProvider {...initialWishlistProviderData}>
+            <main className='py-4 grid gap-2'>
+              <WishlistItemsProvider
+                initialWishlistItems={initialWishlistProviderData.initialWishlistItems}
+              >
+                <WishlistHeaderProvider>
+                  <WishlistHeader />
+                </WishlistHeaderProvider>
 
-              <NewWishlistItemFormContainer />
+                <NewWishlistItemFormContainer />
 
-              <CalendarProvider>
-                <WishlistItemsToolbar />
-              </CalendarProvider>
+                <CalendarProvider>
+                  <WishlistItemsToolbar />
+                </CalendarProvider>
 
-              <WishlistItemsSelectionContainer />
-              <WishlistItems />
-            </WishlistItemsProvider>
-          </main>
-        </WishlistProvider>
+                <WishlistItemsSelectionContainer />
+                <WishlistItems />
+              </WishlistItemsProvider>
+            </main>
+          </WishlistProvider>
+        </ViewModeProvider>
       )}
     </>
   );
