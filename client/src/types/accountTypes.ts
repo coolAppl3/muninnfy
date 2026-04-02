@@ -17,7 +17,6 @@ export type OngoingAccountRequest = {
 };
 
 export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & {
-  is_owner: boolean;
   follow_id: number | null;
   follow_request_id: number | null;
 };

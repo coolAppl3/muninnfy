@@ -975,12 +975,14 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({
-      viewAccountDetails: {
-        ...viewAccountDetails,
-        is_owner: Boolean(viewAccountDetails.is_owner),
-      },
-    });
+    if (viewAccountDetails.is_owner) {
+      res.status(409).json({ message: 'Account owner.', reason: 'accountOwner' });
+      return;
+    }
+
+    const { is_owner, ...rest } = viewAccountDetails;
+
+    res.json({ viewAccountDetails: rest });
   } catch (err: unknown) {
     console.log(err);
 
