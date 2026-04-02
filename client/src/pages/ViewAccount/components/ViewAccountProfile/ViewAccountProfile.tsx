@@ -215,7 +215,10 @@ export default function ViewAccountProfile(): JSX.Element {
 
         <button
           className='w-fit text-start cursor-pointer hover:text-cta'
-          onClick={() => setAccountLocation('social')}
+          onClick={() => {
+            setAccountLocation('social');
+            setSocialSection('followers');
+          }}
         >
           <StatisticItem
             title='Followers'
