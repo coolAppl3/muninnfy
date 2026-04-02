@@ -51,25 +51,33 @@ export default function AccountProfilePrivacy(): JSX.Element {
 
       <div className='grid gap-y-[4px] text-description text-sm font-medium'>
         <div className='flex justify-between items-center p-1 bg-dark rounded'>
-          <p>Private account</p>
-          <ToggleSwitch
-            isToggled={isPrivate}
-            onClick={() => {
-              const nextValueIsPrivate: boolean = !isPrivate;
-
-              nextValueIsPrivate && setApproveFollowRequests(true);
-              setIsPrivate((prev) => !prev);
-            }}
-          />
-        </div>
-
-        <div className='flex justify-between items-center p-1 bg-dark rounded'>
           <p>Approve followers</p>
           <ToggleSwitch
             isToggled={approveFollowRequests}
             onClick={() => isPrivate || setApproveFollowRequests((prev) => !prev)}
             className={isPrivate ? '!brightness-50 !cursor-default' : ''}
           />
+        </div>
+
+        <div className='p-1 bg-dark rounded'>
+          <div className='flex justify-between center gap-2 mb-1'>
+            <p>Private account</p>
+
+            <ToggleSwitch
+              isToggled={isPrivate}
+              onClick={() => {
+                const nextValueIsPrivate: boolean = !isPrivate;
+
+                nextValueIsPrivate && setApproveFollowRequests(true);
+                setIsPrivate((prev) => !prev);
+              }}
+            />
+          </div>
+
+          <p className='text-description/75 font-normal'>
+            When enabled, only your followers can see who else is following you and who you're
+            following. You'll be required to approve all new followers.
+          </p>
         </div>
       </div>
 
