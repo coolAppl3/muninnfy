@@ -7,7 +7,7 @@ export default function AccountProfileHeader(): JSX.Element {
 
   return (
     <header
-      className='flex justify-between items-center mb-[4px] text-title relative'
+      className='flex justify-between items-center gap-[4px] mb-1 text-title relative z-2 max-w-full'
       onBlur={(e: FocusEvent) => {
         if (e.relatedTarget?.classList.contains('context-menu-btn')) {
           return;
@@ -16,7 +16,7 @@ export default function AccountProfileHeader(): JSX.Element {
         setMenuIsOpen(false);
       }}
     >
-      <h3 className='text-md font-normal'>Personal information</h3>
+      <h3 className='text-title text-md font-normal'>Profile</h3>
 
       <button
         type='button'
