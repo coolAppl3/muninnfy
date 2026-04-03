@@ -64,6 +64,13 @@ export function clearAccountNotificationsSubscriptions(): void {
   wsListenersMap.clear();
 }
 
+export function disconnectAccountNotificationsWebSocket(): void {
+  clearAccountNotificationsSubscriptions();
+  ws?.close(1000);
+
+  ws = null;
+}
+
 function parseWebSocketMessageData(data: any): NotificationDetails | null {
   if (typeof data !== 'string') {
     return null;
