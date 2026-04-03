@@ -773,12 +773,12 @@ socialRouter.delete(
     }
 
     try {
-      await dbPool.execute<ResultSetHeader>(
+      await dbPool.execute(
         `DELETE FROM
-        follow_requests
-      WHERE
-        request_id = ? AND
-        requester_account_id = ?;`,
+          follow_requests
+        WHERE
+          request_id = ? AND
+          requester_account_id = ?;`,
         [requestId, accountId]
       );
 
@@ -958,7 +958,7 @@ socialRouter.delete(
     }
 
     try {
-      await dbPool.execute<ResultSetHeader>(
+      await dbPool.execute(
         `DELETE FROM
         follow_requests
       WHERE
@@ -1003,7 +1003,7 @@ socialRouter.delete('/followers/unfollow/:followId', async (req: Request, res: R
   }
 
   try {
-    await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute(
       `DELETE FROM
         followers
       WHERE
@@ -1047,7 +1047,7 @@ socialRouter.delete('/followers/remove/:followId', async (req: Request, res: Res
   }
 
   try {
-    await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute(
       `DELETE FROM
         followers
       WHERE

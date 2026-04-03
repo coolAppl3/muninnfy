@@ -111,7 +111,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     const wishlistId: string = generateCryptoUuid();
     const currentTimestamp: number = Date.now();
 
-    await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute(
       `INSERT INTO wishlists (
         wishlist_id,
         account_id,
@@ -893,7 +893,7 @@ wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
   }
 
   try {
-    await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute(
       `DELETE FROM
         wishlists
       WHERE
