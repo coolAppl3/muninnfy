@@ -39,7 +39,7 @@ export default function TopNavbar(): JSX.Element {
           </NavLink>
 
           <NavLink
-            to='/account/wishlists'
+            to='/wishlists'
             className={({ isActive }) =>
               isActive ? `after:bg-cta/100 ${navLinkClassname}` : navLinkClassname
             }

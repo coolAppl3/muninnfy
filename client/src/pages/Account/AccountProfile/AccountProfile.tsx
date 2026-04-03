@@ -47,7 +47,7 @@ export function AccountProfile(): JSX.Element {
       <div className='grid grid-cols-3 gap-1 text-sm text-description mb-1'>
         <button
           className='w-fit text-start cursor-pointer hover:text-cta'
-          onClick={() => navigate('/account/wishlists')}
+          onClick={() => navigate('/wishlists')}
         >
           <StatisticItem
             title='Wishlists'

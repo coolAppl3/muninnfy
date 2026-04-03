@@ -29,7 +29,7 @@ export default function Router(): JSX.Element {
 
   const authOnlyRoutes: RouteDetails[] = [
     { path: '/account', element: <Account /> },
-    { path: '/account/wishlists', element: <Wishlists /> },
+    { path: '/wishlists', element: <Wishlists /> },
     { path: '/wishlist/new', element: <NewWishlist /> },
     { path: '/wishlist/:wishlistId', element: <Wishlist /> },
   ];
@@ -44,7 +44,7 @@ export default function Router(): JSX.Element {
   const publicRoutes: RouteDetails[] = [
     { path: '/home', element: <Home /> },
     { path: '/view/wishlist/:wishlistId', element: <ViewWishlist /> },
-    { path: '/view/account/wishlists/:publicAccountId', element: <ViewWishlists /> },
+    { path: '/view/wishlists/:publicAccountId', element: <ViewWishlists /> },
     { path: '/view/account/:publicAccountId', element: <ViewAccount /> },
     { path: '*', element: <NotFound /> },
   ];
