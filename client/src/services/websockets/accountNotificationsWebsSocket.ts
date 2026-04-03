@@ -14,6 +14,10 @@ let reconnectionDelayMilliseconds: number = 1000;
 const maxReconnectionDelayMilliseconds: number = 1000 * 60 * 5;
 
 export function connectAccountNotificationsWebSocket(): void {
+  if (ws && (ws.readyState === ws.CONNECTING || ws.readyState === ws.OPEN)) {
+    return;
+  }
+
   ws = new WebSocket(webSocketServerURL);
 
   ws.addEventListener('open', () => {

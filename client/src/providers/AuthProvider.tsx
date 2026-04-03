@@ -37,6 +37,12 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
     return () => abortController.abort();
   }, []);
 
+  useEffect(() => {
+    if (authStatus === 'authenticated') {
+      connectAccountNotificationsWebSocket();
+    }
+  }, [authStatus]);
+
   const contextValue: AuthContextType = useMemo(
     () => ({ authStatus, setAuthStatus }),
     [authStatus]
