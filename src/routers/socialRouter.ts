@@ -773,7 +773,41 @@ socialRouter.delete(
     }
 
     try {
-      await dbPool.execute(
+      type RequestDetails = {
+        requester_account_id: number;
+        requestee_account_id: number;
+      };
+
+      const [requestRows] = await dbPool.execute<RowDataPacket[]>(
+        `SELECT
+          requester_account_id,
+          requestee_account_id
+        FROM
+          follow_requests
+        WHERE
+          request_id = ?;`,
+        [requestId]
+      );
+
+      const requestDetails = requestRows[0] as RequestDetails | undefined;
+
+      if (!requestDetails) {
+        res.json({});
+        return;
+      }
+
+      if (requestDetails.requester_account_id !== accountId) {
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(
+          req,
+          null,
+          `Attempt to delete another user's follow request detected.`
+        );
+
+        return;
+      }
+
+      const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
         `DELETE FROM
           follow_requests
         WHERE
@@ -782,7 +816,28 @@ socialRouter.delete(
         [requestId, accountId]
       );
 
+      if (resultSetHeader.affectedRows === 0) {
+        res.status(500).json({ message: 'Internal server error.' });
+        await logUnexpectedError(req, null, 'Failed to delete follow request.');
+
+        return;
+      }
+
       res.json({});
+
+      await dbPool.execute(
+        `DELETE FROM
+          notifications
+        WHERE
+          receiver_account_id = ? AND
+          sender_account_id = ? AND
+          notification_type = ?;`,
+        [
+          requestDetails.requestee_account_id,
+          requestDetails.requester_account_id,
+          'new_follow_request',
+        ]
+      );
     } catch (err: unknown) {
       console.log(err);
 
@@ -960,10 +1015,10 @@ socialRouter.delete(
     try {
       await dbPool.execute(
         `DELETE FROM
-        follow_requests
-      WHERE
-        request_id = ? AND
-        requestee_account_id = ?;`,
+          follow_requests
+        WHERE
+          request_id = ? AND
+          requestee_account_id = ?;`,
         [requestId, accountId]
       );
 
