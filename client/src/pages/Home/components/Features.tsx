@@ -22,7 +22,7 @@ export default function Features(): JSX.Element {
 
           <FeatureCard
             title='Control Visibility'
-            description='Keep wishlists private or share them with your followers — you decide who sees what.'
+            description={`Control each wishlist's privacy individually — you decide who sees what.`}
             Icon={EyeIcon}
           />
 
@@ -46,7 +46,7 @@ export default function Features(): JSX.Element {
 
           <FeatureCard
             title='Smart Tagging System'
-            description='Add your own tags to items and filter across wishlists for easy organization and discovery.'
+            description='Add your own tags to items for easier filtering and categorization.'
             Icon={TagIcon}
           />
         </div>
