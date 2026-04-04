@@ -1,5 +1,55 @@
 # Changelog
 
+## [0.4.1] (2026-04-04)
+
+### Features
+
+- Implemented owner details into `WishlistsHeader`.
+- Added filtering by wishlist privacy level (owners only).
+- Reworked the profile section under `Accounts` to better align with `ViewAccount`.
+- Added a description to the private account toggle.
+- Cancelling a follow request now removes its notification.
+
+
+### Changes
+
+- Moved `Wishlists` and `ViewWishlists` path from under `/account `to their dedicated `/wishlists` branch.
+- Reduced notifications stale time down to two weeks.
+
+
+### Improvements
+
+- Improved warning for removing a wishlist from favorites.
+- Implemented `ViewModeProvider` into `Wishlist` and `ViewWishlist`.
+- Improved how GET `accounts/:publicAccountId` handles owners making the request.
+- Reword "Cancel" button "Close" in `AccountChangeEmailConfirm` and `AccountDeletionConfirm` to avoid user confusion.
+
+
+### Bug Fixes
+
+
+- Fixed incorrect path to `ViewWishlists`.
+- Fixed typo causing privacy level and favorite status to not show in non-view mode in `WishlistCard`.
+- Reworded "No users found" to "No requests found" for `AccountSocialFollowRequests`.
+- Fixed incorrect handling of failed WebSocket upgrade attempts.
+- Fixed WebSockets not connecting upon a successful sign in.
+- Fixed WebSockets not being closed when a user signs out.
+- Fixed `deleteStaleNotificationsCron()` not being called in `initCronJobs()` due to a typo.
+
+
+### Code Refactoring
+
+- Refactored `FollowCard` to access view mode details from through the provider instead instead of props.
+- Refactored `ViewWishlistDetails` type to strengthen type safety.
+- Abolished expansion animations in `WishlistHeader` and `AccountProfile`.
+- REmoved unused `is_favorited` from GET `view/wishlist/:wishlistId`.
+
+
+### Build Changes
+
+- Explicitly set `./src` as `rootDir`.
+
+
 ## [0.4.0] (2026-03-30)
 
 ### Features
