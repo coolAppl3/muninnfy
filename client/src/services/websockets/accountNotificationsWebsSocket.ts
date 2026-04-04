@@ -14,6 +14,10 @@ let reconnectionDelayMilliseconds: number = 1000;
 const maxReconnectionDelayMilliseconds: number = 1000 * 60 * 5;
 
 export function connectAccountNotificationsWebSocket(): void {
+  if (ws && (ws.readyState === ws.CONNECTING || ws.readyState === ws.OPEN)) {
+    return;
+  }
+
   ws = new WebSocket(webSocketServerURL);
 
   ws.addEventListener('open', () => {
@@ -58,6 +62,13 @@ export function subscribeToAccountNotifications(
 
 export function clearAccountNotificationsSubscriptions(): void {
   wsListenersMap.clear();
+}
+
+export function disconnectAccountNotificationsWebSocket(): void {
+  clearAccountNotificationsSubscriptions();
+  ws?.close(1000);
+
+  ws = null;
 }
 
 function parseWebSocketMessageData(data: any): NotificationDetails | null {

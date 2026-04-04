@@ -30,12 +30,7 @@ export type ViewWishlistOwnerDetails = {
   owner_display_name: string;
 };
 
-export type ViewWishlistDetails = {
-  wishlist_id: string;
-  title: string;
-  created_on_timestamp: number;
-  items_count: number;
-  purchased_items_count: number;
-  total_items_price: number;
-  price_to_complete: number;
-};
+export type ViewWishlistDetails = Omit<
+  ExtendedWishlistDetailsType,
+  'privacy_level' | 'is_favorited' | 'interactivity_index' | 'latest_interaction_timestamp'
+>;

@@ -23,6 +23,10 @@ export default function ViewWishlists(): JSX.Element {
   const [wishlists, setWishlists] = useState<ViewWishlistDetails[]>([]);
   const [combinedWishlistsStatistics, setCombinedWishlistsStatistics] =
     useState<CombinedWishlistsStatistics | null>(null);
+  const [ownerDetails, setOwnerDetails] = useState<{
+    owner_username: string;
+    owner_display_name: string;
+  } | null>(null);
 
   const { publicAccountId } = useParams();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
@@ -43,9 +47,11 @@ export default function ViewWishlists(): JSX.Element {
 
     const getAllViewWishlists = async () => {
       try {
-        const { wishlists: fetchedWishlists, combinedWishlistsStatistics } = (
-          await getAllViewWishlistsService(publicAccountId, abortController.signal)
-        ).data;
+        const {
+          wishlists: fetchedWishlists,
+          combinedWishlistsStatistics,
+          ownerDetails,
+        } = (await getAllViewWishlistsService(publicAccountId, abortController.signal)).data;
 
         if (abortController.signal.aborted) {
           return;
@@ -53,6 +59,7 @@ export default function ViewWishlists(): JSX.Element {
 
         setWishlists(fetchedWishlists);
         setCombinedWishlistsStatistics(combinedWishlistsStatistics);
+        setOwnerDetails(ownerDetails);
 
         setIsLoaded(true);
       } catch (err: unknown) {
@@ -95,8 +102,11 @@ export default function ViewWishlists(): JSX.Element {
         >
           <WishlistsProvider initialWishlists={wishlists}>
             <main className='py-4 grid gap-2'>
-              {combinedWishlistsStatistics && (
-                <WishlistsHeader combinedWishlistsStatistics={combinedWishlistsStatistics} />
+              {combinedWishlistsStatistics && ownerDetails && (
+                <WishlistsHeader
+                  combinedWishlistsStatistics={combinedWishlistsStatistics}
+                  ownerDetails={ownerDetails}
+                />
               )}
               <WishlistsToolbar />
               <WishlistsContainer />

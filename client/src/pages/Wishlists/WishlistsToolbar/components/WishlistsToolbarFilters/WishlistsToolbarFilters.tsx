@@ -12,7 +12,12 @@ import Button from '../../../../../components/Button/Button';
 import useWishlists from '../../../hooks/useWishlists';
 import useCalendar from '../../../../../hooks/useCalendar';
 import PriceRangeFormGroup from '../../../../../components/PriceRangeFormGroup/PriceRangeFormGroup';
-import { WISHLIST_MAX_TOTAL_ITEMS_PRICE } from '../../../../../utils/constants/wishlistConstants';
+import {
+  FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+  PRIVATE_WISHLIST_PRIVACY_LEVEL,
+  PUBLIC_WISHLIST_PRIVACY_LEVEL,
+  WISHLIST_MAX_TOTAL_ITEMS_PRICE,
+} from '../../../../../utils/constants/wishlistConstants';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import WishlistsItemsCountRange from './components/WishlistsItemsCountRange';
 import wishlistsToolbarFiltersReducer, {
@@ -149,6 +154,7 @@ export default function WishlistsToolbarFilters({
       priceToCompleteFrom: null,
       priceToCompleteTo: null,
 
+      privacyLevel: null,
       isFavorited: null,
       titleQuery: '',
 
@@ -221,6 +227,59 @@ export default function WishlistsToolbarFilters({
       />
 
       <div className='grid gap-1'>
+        {inViewMode || (
+          <WishlistsFilterToggler
+            title='Privacy level'
+            isToggled={filters.privacyLevel !== null}
+            onClick={() =>
+              dispatch({
+                type: 'setPrivacyLevel',
+                payload: {
+                  newValue: filters.privacyLevel ? null : PRIVATE_WISHLIST_PRIVACY_LEVEL,
+                },
+              })
+            }
+            children={
+              <div
+                className={`gap-[1.4rem] pl-1 mb-1 ${filters.privacyLevel === null ? 'hidden' : 'grid'}`}
+              >
+                <FilterTogglerCheckboxBtn
+                  onClick={() =>
+                    dispatch({
+                      type: 'setPrivacyLevel',
+                      payload: { newValue: PRIVATE_WISHLIST_PRIVACY_LEVEL },
+                    })
+                  }
+                  title='Private'
+                  isChecked={filters.privacyLevel === PRIVATE_WISHLIST_PRIVACY_LEVEL}
+                />
+
+                <FilterTogglerCheckboxBtn
+                  onClick={() =>
+                    dispatch({
+                      type: 'setPrivacyLevel',
+                      payload: { newValue: FOLLOWERS_WISHLIST_PRIVACY_LEVEL },
+                    })
+                  }
+                  title='Followers'
+                  isChecked={filters.privacyLevel === FOLLOWERS_WISHLIST_PRIVACY_LEVEL}
+                />
+
+                <FilterTogglerCheckboxBtn
+                  onClick={() =>
+                    dispatch({
+                      type: 'setPrivacyLevel',
+                      payload: { newValue: PUBLIC_WISHLIST_PRIVACY_LEVEL },
+                    })
+                  }
+                  title='Public'
+                  isChecked={filters.privacyLevel === PUBLIC_WISHLIST_PRIVACY_LEVEL}
+                />
+              </div>
+            }
+          />
+        )}
+
         {inViewMode || (
           <WishlistsFilterToggler
             title='Favorited'

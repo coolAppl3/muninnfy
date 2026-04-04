@@ -1,4 +1,4 @@
-import { ComponentType, JSX, useCallback, useEffect } from 'react';
+import { ComponentType, Dispatch, JSX, SetStateAction, useCallback, useEffect } from 'react';
 import AccountSocialHeader from './components/AccountSocialHeader/AccountSocialHeader';
 import useHandleAsyncError, {
   HandleAsyncErrorFunction,
@@ -22,8 +22,13 @@ import useHistory from '../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import useAccountLocation from '../hooks/useAccountLocation';
+import { AccountDetailsType } from '../../../types/accountTypes';
 
-export default function AccountSocial(): JSX.Element {
+type AccountSocialProps = {
+  setAccountDetails?: Dispatch<SetStateAction<AccountDetailsType>>;
+};
+
+export default function AccountSocial({ setAccountDetails }: AccountSocialProps): JSX.Element {
   const { socialSection } = useAccountSocial();
   const {
     fetchDetails,
@@ -69,6 +74,14 @@ export default function AccountSocial(): JSX.Element {
           allFollowingFetched: following.length < SOCIAL_FETCH_BATCH_SIZE,
           allFollowRequestsFetched: followRequests.length < SOCIAL_FETCH_BATCH_SIZE,
         });
+
+        !inViewMode &&
+          setAccountDetails &&
+          setAccountDetails((prev) => ({
+            ...prev,
+            followers_count: socialCounts.followers_count,
+            following_count: socialCounts.following_count,
+          }));
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
           return;
@@ -108,6 +121,7 @@ export default function AccountSocial(): JSX.Element {
     setFollowing,
     setFollowRequests,
     handleAsyncError,
+    setAccountDetails,
   ]);
 
   const notificationsHandler = useCallback(
@@ -130,13 +144,34 @@ export default function AccountSocial(): JSX.Element {
         setFollowers((prev) => [followDetails, ...prev]);
         setSocialCounts((prev) => ({ ...prev, followers_count: prev.followers_count + 1 }));
 
+        !inViewMode &&
+          setAccountDetails &&
+          setAccountDetails((prev) => ({
+            ...prev,
+            followers_count: prev.followers_count + 1,
+          }));
+
         return;
       }
 
       setFollowing((prev) => [followDetails, ...prev]);
       setSocialCounts((prev) => ({ ...prev, following_count: prev.following_count + 1 }));
+
+      !inViewMode &&
+        setAccountDetails &&
+        setAccountDetails((prev) => ({
+          ...prev,
+          following_count: prev.following_count + 1,
+        }));
     },
-    [setFollowers, setFollowing, setFollowRequests, setSocialCounts]
+    [
+      inViewMode,
+      setFollowers,
+      setFollowing,
+      setFollowRequests,
+      setSocialCounts,
+      setAccountDetails,
+    ]
   );
 
   useEffect(() => {

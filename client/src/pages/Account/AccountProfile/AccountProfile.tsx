@@ -11,12 +11,26 @@ import AccountChangeDisplayName from './components/AccountChangeDisplayName/Acco
 import AccountChangePassword from './components/AccountChangePassword/AccountChangePassword';
 import AccountChangeEmail from './components/AccountChangeEmail/AccountChangeEmail';
 import AccountDeletion from './components/AccountDeletion/AccountDeletion';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import useAccountLocation from '../hooks/useAccountLocation';
+import useAccountSocial from '../hooks/useAccountSocial';
 
 export function AccountProfile(): JSX.Element {
-  const { profileSection } = useAccountProfile();
   const { accountDetails } = useAccountDetails();
-  const { public_account_id, created_on_timestamp, display_name, username, email } =
-    accountDetails;
+  const {
+    public_account_id,
+    created_on_timestamp,
+    display_name,
+    username,
+    followers_count,
+    following_count,
+    wishlists_count,
+  } = accountDetails;
+  const { profileSection } = useAccountProfile();
+  const { setAccountLocation } = useAccountLocation();
+  const { setSocialSection } = useAccountSocial();
+
+  const navigate: NavigateFunction = useNavigate();
 
   const MappedComponent: ComponentType | null =
     profileSection && componentRecord[profileSection];
@@ -25,39 +39,62 @@ export function AccountProfile(): JSX.Element {
     <section>
       <AccountProfileHeader />
 
-      <div className='text-description/50 text-xs mb-[1.2rem]'>
+      <div className='mb-1'>
+        <h3 className='text-title font-normal wrap-break-word'>{display_name}</h3>
+        <h3 className='text-description text-sm font-normal wrap-break-word'>@{username}</h3>
+      </div>
+
+      <div className='grid grid-cols-3 gap-1 text-sm text-description mb-1'>
+        <button
+          className='w-fit text-start cursor-pointer hover:text-cta'
+          onClick={() => navigate('/wishlists')}
+        >
+          <StatisticItem
+            title='Wishlists'
+            value={wishlists_count}
+          />
+        </button>
+
+        <button
+          className='w-fit text-start cursor-pointer hover:text-cta'
+          onClick={() => {
+            setAccountLocation('social');
+            setSocialSection('followers');
+          }}
+        >
+          <StatisticItem
+            title='Followers'
+            value={followers_count}
+          />
+        </button>
+
+        <button
+          className='w-fit text-start cursor-pointer hover:text-cta'
+          onClick={() => {
+            setAccountLocation('social');
+            setSocialSection('following');
+          }}
+        >
+          <StatisticItem
+            title='Following'
+            value={following_count}
+          />
+        </button>
+      </div>
+
+      <div className='text-description/50 text-xs relative z-0 mb-auto'>
         <p className='leading-none mb-[4px]'>
           Created on {getFullDateString(created_on_timestamp)}
         </p>
         <p className='leading-none'>{public_account_id}</p>
       </div>
 
-      <div
-        className={`grid transition-[grid] ${profileSection ? 'grid-rows-[auto_1fr]' : 'grid-rows-[auto_0fr]'}`}
-      >
-        <div className='grid md:grid-cols-2 gap-1 text-sm text-description relative z-0 h-fit'>
-          <StatisticItem
-            title='Display name'
-            value={display_name}
-          />
-
-          <StatisticItem
-            title='Username'
-            value={username}
-          />
-
-          <StatisticItem
-            title='Email address'
-            value={email}
-            className='md:col-span-2 break-all'
-          />
-        </div>
-
-        <div className='z-0 overflow-hidden'>
+      {MappedComponent && (
+        <>
           <div className='h-line mt-2 mb-[1rem]'></div>
-          {MappedComponent && <MappedComponent />}
-        </div>
-      </div>
+          <MappedComponent />
+        </>
+      )}
 
       {profileSection ? null : <AccountOngoingRequests />}
     </section>

@@ -19,6 +19,7 @@ import WishlistItemsToolbar from './WishlistItemsToolbar/WishlistItemsToolbar';
 import CalendarProvider from '../../providers/CalendarProvider';
 import WishlistItemsSelectionContainer from './WishlistItemsSelectionContainer/WishlistItemsSelectionContainer';
 import WishlistItemsProvider from './providers/WishlistItemsProvider';
+import ViewModeProvider from '../../providers/ViewModeProvider';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -93,29 +94,31 @@ export default function Wishlist(): JSX.Element {
     <>
       <Head title='Wishlist - Muninnfy' />
 
-      {isLoaded && initialWishlistProviderData ? (
-        <WishlistProvider {...initialWishlistProviderData}>
-          <main className='py-4 grid gap-2'>
-            <WishlistItemsProvider
-              initialWishlistItems={initialWishlistProviderData.initialWishlistItems}
-            >
-              <WishlistHeaderProvider>
-                <WishlistHeader />
-              </WishlistHeaderProvider>
+      {isLoaded || <LoadingSkeleton />}
 
-              <NewWishlistItemFormContainer />
+      {isLoaded && initialWishlistProviderData && (
+        <ViewModeProvider inViewMode={false}>
+          <WishlistProvider {...initialWishlistProviderData}>
+            <main className='py-4 grid gap-2'>
+              <WishlistItemsProvider
+                initialWishlistItems={initialWishlistProviderData.initialWishlistItems}
+              >
+                <WishlistHeaderProvider>
+                  <WishlistHeader />
+                </WishlistHeaderProvider>
 
-              <CalendarProvider>
-                <WishlistItemsToolbar inViewMode={false} />
-              </CalendarProvider>
+                <NewWishlistItemFormContainer />
 
-              <WishlistItemsSelectionContainer />
-              <WishlistItems inViewMode={false} />
-            </WishlistItemsProvider>
-          </main>
-        </WishlistProvider>
-      ) : (
-        <LoadingSkeleton />
+                <CalendarProvider>
+                  <WishlistItemsToolbar />
+                </CalendarProvider>
+
+                <WishlistItemsSelectionContainer />
+                <WishlistItems />
+              </WishlistItemsProvider>
+            </main>
+          </WishlistProvider>
+        </ViewModeProvider>
       )}
     </>
   );

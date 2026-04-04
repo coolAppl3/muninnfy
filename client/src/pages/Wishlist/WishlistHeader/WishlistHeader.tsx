@@ -20,11 +20,7 @@ export default function WishlistHeader(): JSX.Element {
   return (
     <header>
       <Container>
-        <div
-          className={`bg-secondary p-2 pb-0 rounded-sm shadow-simple-tiny grid transition-[grid] gap-2 ${
-            editMode ? 'grid-rows-[auto_1fr] !pb-2' : 'grid-rows-[auto_0fr]'
-          }`}
-        >
+        <div className='bg-secondary p-2 rounded-sm shadow-simple-tiny'>
           <div>
             <WishlistHeaderContent />
 
@@ -75,10 +71,12 @@ export default function WishlistHeader(): JSX.Element {
             </div>
           </div>
 
-          <div className='overflow-hidden relative z-0'>
-            <div className='h-line mb-[1.4rem]'></div>
-            <WishlistHeaderEditingContainer />
-          </div>
+          {editMode && (
+            <>
+              <div className='h-line my-[1.4rem]'></div>
+              <WishlistHeaderEditingContainer />
+            </>
+          )}
         </div>
       </Container>
     </header>

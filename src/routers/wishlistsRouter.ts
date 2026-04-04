@@ -111,7 +111,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     const wishlistId: string = generateCryptoUuid();
     const currentTimestamp: number = Date.now();
 
-    await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute(
       `INSERT INTO wishlists (
         wishlist_id,
         account_id,
@@ -251,14 +251,12 @@ wishlistsRouter.get('/crossWishlistSearch', async (req: Request, res: Response) 
   try {
     type AccountDetails = {
       target_account_id: number;
-      is_private: boolean;
       is_following: boolean;
     };
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
         account_id AS target_account_id,
-        is_private,
         
         EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
       FROM
@@ -272,11 +270,6 @@ wishlistsRouter.get('/crossWishlistSearch', async (req: Request, res: Response) 
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-      return;
-    }
-
-    if (accountDetails.is_private && !accountDetails.is_following) {
-      res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
       return;
     }
 
@@ -400,144 +393,6 @@ wishlistsRouter.get('/all', async (req: Request, res: Response) => {
         latest_interaction_timestamp DESC
       LIMIT ?;`,
       [accountId, TOTAL_WISHLISTS_LIMIT]
-    );
-
-    const combinedWishlistsStatistics: {
-      totalItemsCount: number;
-      totalPurchasedItemsCount: number;
-      totalWishlistsWorth: number;
-      totalWishlistsSpent: number;
-      totalWishlistsToComplete: number;
-    } = {
-      totalItemsCount: 0,
-      totalPurchasedItemsCount: 0,
-      totalWishlistsWorth: 0,
-      totalWishlistsSpent: 0,
-      totalWishlistsToComplete: 0,
-    };
-
-    for (const wishlist of wishlists as Wishlist[]) {
-      combinedWishlistsStatistics.totalItemsCount += wishlist.items_count;
-      combinedWishlistsStatistics.totalPurchasedItemsCount += wishlist.purchased_items_count;
-      combinedWishlistsStatistics.totalWishlistsWorth += wishlist.total_items_price;
-      combinedWishlistsStatistics.totalWishlistsSpent +=
-        wishlist.total_items_price - wishlist.price_to_complete;
-      combinedWishlistsStatistics.totalWishlistsToComplete += wishlist.price_to_complete;
-    }
-
-    res.json({ combinedWishlistsStatistics, wishlists: wishlists as Wishlist[] });
-  } catch (err: unknown) {
-    console.log(err);
-
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
-    }
-
-    res.status(500).json({ message: 'Internal server error.' });
-    await logUnexpectedError(req, err);
-  }
-});
-
-wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res, false);
-  const accountId: number | null = !authSessionId
-    ? null
-    : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
-
-  const publicAccountId: string | undefined = req.params.publicAccountId;
-
-  if (!publicAccountId || !isValidUuid(publicAccountId)) {
-    res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-    return;
-  }
-
-  try {
-    type AccountDetails = {
-      target_account_id: number;
-      is_private: boolean;
-      is_following: boolean;
-    };
-
-    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
-      `SELECT
-        account_id AS target_account_id,
-        is_private,
-        
-        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
-      FROM
-        accounts
-      WHERE
-        public_account_id = ?;`,
-      [accountId, publicAccountId]
-    );
-
-    const accountDetails = accountRows[0] as AccountDetails | undefined;
-
-    if (!accountDetails) {
-      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
-      return;
-    }
-
-    if (accountDetails.is_private && !accountDetails.is_following) {
-      res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
-      return;
-    }
-
-    type Wishlist = {
-      wishlist_id: string;
-      title: string;
-      created_on_timestamp: number;
-      items_count: number;
-      purchased_items_count: number;
-      total_items_price: number;
-      price_to_complete: number;
-    };
-
-    const [wishlists] = await dbPool.execute<RowDataPacket[]>(
-      `SELECT
-        wishlists.wishlist_id,
-        wishlists.title,
-        wishlists.created_on_timestamp,
-
-        COUNT(wishlist_items.item_id) AS items_count,
-        COALESCE(SUM(
-          CASE
-            WHEN wishlist_items.purchased_on_timestamp IS NULL
-              THEN 0
-            ELSE 1
-          END
-        ), 0)AS purchased_items_count,
-        COALESCE(SUM(wishlist_items.price), 0) AS total_items_price,
-        COALESCE(SUM(
-          CASE
-            WHEN wishlist_items.purchased_on_timestamp IS NULL
-              THEN wishlist_items.price
-            ELSE 0
-          END
-        ), 0) AS price_to_complete
-      FROM
-        wishlists
-      LEFT JOIN
-        wishlist_items USING(wishlist_id)
-      WHERE
-        wishlists.account_id = :targetAccountId AND
-        (
-          privacy_level = :publicPrivacyLevel OR
-          (privacy_level = :followersPrivacyLevel AND :isFollowing)
-        )
-      GROUP BY
-        wishlists.wishlist_id
-      ORDER BY
-        created_on_timestamp DESC
-      LIMIT :totalWishlistsLimit;`,
-      {
-        targetAccountId: accountDetails.target_account_id,
-        isFollowing: accountDetails.is_following,
-        totalWishlistsLimit: TOTAL_WISHLISTS_LIMIT,
-        publicPrivacyLevel: PUBLIC_WISHLIST_PRIVACY_LEVEL,
-        followersPrivacyLevel: FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
-      }
     );
 
     const combinedWishlistsStatistics: {
@@ -1038,7 +893,7 @@ wishlistsRouter.delete('/empty', async (req: Request, res: Response) => {
   }
 
   try {
-    await dbPool.execute<ResultSetHeader>(
+    await dbPool.execute(
       `DELETE FROM
         wishlists
       WHERE
@@ -1149,7 +1004,6 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
-      is_favorited: boolean;
       owner_public_account_id: string;
       owner_username: string;
       owner_display_name: string;
@@ -1162,7 +1016,6 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
         wishlists.privacy_level,
         wishlists.title,
         wishlists.created_on_timestamp,
-        wishlists.is_favorited,
 
         accounts.public_account_id AS owner_public_account_id,
         accounts.username AS owner_username,
@@ -1274,6 +1127,147 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       },
       viewWishlistDetails: { title, created_on_timestamp },
       wishlistItems: mappedWishlistItems,
+    });
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+  }
+});
+
+wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Response) => {
+  const authSessionId: string | null = getAuthSessionId(req, res, false);
+  const accountId: number | null = !authSessionId
+    ? null
+    : await getAccountIdByAuthSessionId(authSessionId, req, res, false);
+
+  const publicAccountId: string | undefined = req.params.publicAccountId;
+
+  if (!publicAccountId || !isValidUuid(publicAccountId)) {
+    res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+    return;
+  }
+
+  try {
+    type AccountDetails = {
+      target_account_id: number;
+      owner_username: string;
+      owner_display_name: string;
+      is_following: boolean;
+    };
+
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        account_id AS target_account_id,
+        username AS owner_username,
+        display_name AS owner_display_name,
+        
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
+      FROM
+        accounts
+      WHERE
+        public_account_id = ?;`,
+      [accountId, publicAccountId]
+    );
+
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
+
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    type Wishlist = {
+      wishlist_id: string;
+      title: string;
+      created_on_timestamp: number;
+      items_count: number;
+      purchased_items_count: number;
+      total_items_price: number;
+      price_to_complete: number;
+    };
+
+    const [wishlists] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
+        wishlists.wishlist_id,
+        wishlists.title,
+        wishlists.created_on_timestamp,
+
+        COUNT(wishlist_items.item_id) AS items_count,
+        COALESCE(SUM(
+          CASE
+            WHEN wishlist_items.purchased_on_timestamp IS NULL
+              THEN 0
+            ELSE 1
+          END
+        ), 0)AS purchased_items_count,
+        COALESCE(SUM(wishlist_items.price), 0) AS total_items_price,
+        COALESCE(SUM(
+          CASE
+            WHEN wishlist_items.purchased_on_timestamp IS NULL
+              THEN wishlist_items.price
+            ELSE 0
+          END
+        ), 0) AS price_to_complete
+      FROM
+        wishlists
+      LEFT JOIN
+        wishlist_items USING(wishlist_id)
+      WHERE
+        wishlists.account_id = :targetAccountId AND
+        (
+          privacy_level = :publicPrivacyLevel OR
+          (privacy_level = :followersPrivacyLevel AND :isFollowing)
+        )
+      GROUP BY
+        wishlists.wishlist_id
+      ORDER BY
+        created_on_timestamp DESC
+      LIMIT :totalWishlistsLimit;`,
+      {
+        targetAccountId: accountDetails.target_account_id,
+        isFollowing: accountDetails.is_following,
+        totalWishlistsLimit: TOTAL_WISHLISTS_LIMIT,
+        publicPrivacyLevel: PUBLIC_WISHLIST_PRIVACY_LEVEL,
+        followersPrivacyLevel: FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+      }
+    );
+
+    const combinedWishlistsStatistics: {
+      totalItemsCount: number;
+      totalPurchasedItemsCount: number;
+      totalWishlistsWorth: number;
+      totalWishlistsSpent: number;
+      totalWishlistsToComplete: number;
+    } = {
+      totalItemsCount: 0,
+      totalPurchasedItemsCount: 0,
+      totalWishlistsWorth: 0,
+      totalWishlistsSpent: 0,
+      totalWishlistsToComplete: 0,
+    };
+
+    for (const wishlist of wishlists as Wishlist[]) {
+      combinedWishlistsStatistics.totalItemsCount += wishlist.items_count;
+      combinedWishlistsStatistics.totalPurchasedItemsCount += wishlist.purchased_items_count;
+      combinedWishlistsStatistics.totalWishlistsWorth += wishlist.total_items_price;
+      combinedWishlistsStatistics.totalWishlistsSpent +=
+        wishlist.total_items_price - wishlist.price_to_complete;
+      combinedWishlistsStatistics.totalWishlistsToComplete += wishlist.price_to_complete;
+    }
+
+    const { owner_username, owner_display_name } = accountDetails;
+
+    res.json({
+      ownerDetails: { owner_username, owner_display_name },
+      combinedWishlistsStatistics,
+      wishlists: wishlists as Wishlist[],
     });
   } catch (err: unknown) {
     console.log(err);

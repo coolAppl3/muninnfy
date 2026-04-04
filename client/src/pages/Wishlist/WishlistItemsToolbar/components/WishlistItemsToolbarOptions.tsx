@@ -5,23 +5,24 @@ import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../hooks/useWishlistItems';
 import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionStore';
 import { useShallow } from 'zustand/react/shallow';
+import useViewMode from '../../../../hooks/useViewMode';
 
-type WishlistItemsToolbarOptionsProps = {
-  inViewMode: boolean;
-};
-
-export default function WishlistItemsToolbarOptions({ inViewMode }: WishlistItemsToolbarOptionsProps): JSX.Element {
+export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { expandedItemsIdsSet, expandAllWishlistItems, collapseAllWishlistItems } = useWishlistItemsExpansionStore(
-    useShallow(({ expandedItemsIdsSet, expandAllWishlistItems, collapseAllWishlistItems }) => ({
-      expandedItemsIdsSet,
-      expandAllWishlistItems,
-      collapseAllWishlistItems,
-    }))
-  );
-
+  const { inViewMode } = useViewMode();
   const { wishlistItems, selectionModeActive, setSelectionModeActive } = useWishlistItems();
+  const { expandedItemsIdsSet, expandAllWishlistItems, collapseAllWishlistItems } =
+    useWishlistItemsExpansionStore(
+      useShallow(
+        ({ expandedItemsIdsSet, expandAllWishlistItems, collapseAllWishlistItems }) => ({
+          expandedItemsIdsSet,
+          expandAllWishlistItems,
+          collapseAllWishlistItems,
+        })
+      )
+    );
+
   const { displayPopupMessage } = usePopupMessage();
 
   const allItemsExpanded: boolean = expandedItemsIdsSet.size === wishlistItems.length;
@@ -44,10 +45,14 @@ export default function WishlistItemsToolbarOptions({ inViewMode }: WishlistItem
         title={`${isOpen ? 'Hide' : 'View'} context menu`}
         aria-label={`${isOpen ? 'Hide' : 'View'} context menu`}
       >
-        <TripleDotMenuIcon className={`w-2 h-2 transition-colors ${isOpen ? 'text-cta' : ''}`} />
+        <TripleDotMenuIcon
+          className={`w-2 h-2 transition-colors ${isOpen ? 'text-cta' : ''}`}
+        />
       </button>
 
-      <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
+      <div
+        className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}
+      >
         {inViewMode || (
           <button
             type='button'
@@ -81,7 +86,9 @@ export default function WishlistItemsToolbarOptions({ inViewMode }: WishlistItem
               return;
             }
 
-            expandAllWishlistItems(wishlistItems.map(({ item_id }: WishlistItemType) => item_id));
+            expandAllWishlistItems(
+              wishlistItems.map(({ item_id }: WishlistItemType) => item_id)
+            );
             displayPopupMessage('Items expanded.', 'success');
           }}
         >

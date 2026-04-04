@@ -74,9 +74,7 @@ export default function AccountNavMenu(): JSX.Element {
 
         <Link
           to={
-            inViewMode && publicAccountId
-              ? `/view/wishlists/${publicAccountId}`
-              : '/account/wishlists'
+            inViewMode && publicAccountId ? `/view/wishlists/${publicAccountId}` : '/wishlists'
           }
           className='nav-menu-btn py-[1.6rem] px-2 text-start border-b-1 border-b-secondary'
         >

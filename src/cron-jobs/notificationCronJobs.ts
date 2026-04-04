@@ -2,7 +2,7 @@ import { dbPool } from '../db/db';
 import { dayMilliseconds } from '../util/constants/globalConstants';
 
 export async function deleteStaleNotificationsCron(currentTimestamp: number): Promise<void> {
-  const cutoffTimestamp: number = currentTimestamp - dayMilliseconds * 30;
+  const cutoffTimestamp: number = currentTimestamp - dayMilliseconds * 14;
 
   try {
     await dbPool.execute(

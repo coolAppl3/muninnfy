@@ -9,11 +9,11 @@ import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionS
 import { useShallow } from 'zustand/react/shallow';
 import useWishlistItemsSelectionStore from '../../stores/wishlistItemsSelectionStore';
 import StatisticItem from '../../../../components/StatisticItem/StatisticItem';
+import useViewMode from '../../../../hooks/useViewMode';
 
 type WishlistItemProps = {
   wishlistItem: WishlistItemType;
   selectionModeActive: boolean;
-  inViewMode: boolean;
   setWishlistItems: Dispatch<SetStateAction<WishlistItemType[]>>;
 };
 
@@ -21,10 +21,10 @@ export default memo(WishlistItem);
 function WishlistItem({
   wishlistItem,
   selectionModeActive,
-  inViewMode,
   setWishlistItems,
 }: WishlistItemProps): JSX.Element {
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const { inViewMode } = useViewMode();
 
   const { toggleWishlistItemExpansion, isExpanded } = useWishlistItemsExpansionStore(
     useShallow(({ toggleWishlistItemExpansion, expandedItemsIdsSet }) => ({

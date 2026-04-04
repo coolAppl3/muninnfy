@@ -4,18 +4,21 @@ import Container from '../../../components/Container/Container';
 import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import { CombinedWishlistsStatistics } from '../../../services/wishlistServices';
 import Button from '../../../components/Button/Button';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import useWishlists from '../hooks/useWishlists';
 import useViewMode from '../../../hooks/useViewMode';
+import { ViewWishlistOwnerDetails } from '../../../types/wishlistTypes';
 
 type WishlistsHeaderProps = {
   combinedWishlistsStatistics: CombinedWishlistsStatistics;
+  ownerDetails?: Omit<ViewWishlistOwnerDetails, 'owner_public_account_id'>;
 };
 
 export default function WishlistsHeader({
   combinedWishlistsStatistics,
+  ownerDetails,
 }: WishlistsHeaderProps): JSX.Element {
-  const { inViewMode } = useViewMode();
+  const { inViewMode, publicAccountId } = useViewMode();
   const { wishlists } = useWishlists();
   const navigate: NavigateFunction = useNavigate();
 
@@ -30,6 +33,18 @@ export default function WishlistsHeader({
   return (
     <header>
       <Container className='w-full'>
+        {inViewMode && ownerDetails && (
+          <p className='text-description text-xs font-medium mb-[4px]'>
+            Owned by <span className='text-title'>{ownerDetails.owner_display_name}</span>{' '}
+            <Link
+              to={`/view/account/${publicAccountId}`}
+              className='link break-all'
+            >
+              @{ownerDetails.owner_username}
+            </Link>
+          </p>
+        )}
+
         <div className='p-2 bg-secondary rounded-sm shadow-simple-tiny border-transparent'>
           <h3 className='text-title font-medium wrap-anywhere'>Combined statistics</h3>
 

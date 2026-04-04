@@ -4,11 +4,7 @@ import WishlistItem from './WishlistItem/WishlistItem';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
 import useWishlistItems from '../hooks/useWishlistItems';
 
-type WishlistItemsProps = {
-  inViewMode: boolean;
-};
-
-export default function WishlistItems({ inViewMode = false }: WishlistItemsProps): JSX.Element {
+export default function WishlistItems(): JSX.Element {
   const {
     wishlistItems,
     selectionModeActive,
@@ -75,7 +71,6 @@ export default function WishlistItems({ inViewMode = false }: WishlistItemsProps
                 key={item.item_id}
                 wishlistItem={item}
                 selectionModeActive={selectionModeActive}
-                inViewMode={inViewMode}
                 setWishlistItems={setWishlistItems}
               />
             ))

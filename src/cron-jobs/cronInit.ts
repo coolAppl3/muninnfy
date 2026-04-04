@@ -56,7 +56,7 @@ export function initCronJobs(): void {
 
     await removeLightRateAbusersCron(currentTimestamp);
     await clearErrorLogsCron(currentTimestamp);
-    await deleteStaleNotificationsCron;
+    await deleteStaleNotificationsCron(currentTimestamp);
   });
 
   console.log('CRON jobs started.');

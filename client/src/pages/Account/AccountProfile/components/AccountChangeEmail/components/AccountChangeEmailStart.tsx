@@ -133,6 +133,10 @@ export default function AccountChangeEmailStart(): JSX.Element {
         removeLoadingOverlay();
       }}
     >
+      <p className='text-description text-sm'>
+        Current email: <span className='break-all text-title'>{accountDetails.email}</span>
+      </p>
+
       <DefaultFormGroup
         id='new-email'
         label='New email'

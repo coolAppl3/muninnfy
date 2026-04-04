@@ -796,6 +796,9 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
       created_on_timestamp: number;
       is_private: boolean;
       approve_follow_requests: boolean;
+      followers_count: number;
+      following_count: number;
+      wishlists_count: number;
     };
 
     type OngoingAccountRequest = {
@@ -812,7 +815,11 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
         display_name,
         created_on_timestamp,
         is_private,
-        approve_follow_requests
+        approve_follow_requests,
+
+        (SELECT COUNT(*) FROM followers WHERE account_id = :accountId) AS followers_count,
+        (SELECT COUNT(*) FROM followers WHERE follower_account_id = :accountId) AS following_count,
+        (SELECT COUNT(*) FROM wishlists WHERE account_id = :accountId) AS wishlists_count
       FROM
         accounts
       WHERE
@@ -968,12 +975,14 @@ accountsRouter.get('/:publicAccountId', async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({
-      viewAccountDetails: {
-        ...viewAccountDetails,
-        is_owner: Boolean(viewAccountDetails.is_owner),
-      },
-    });
+    if (viewAccountDetails.is_owner) {
+      res.status(409).json({ message: 'Account owner.', reason: 'accountOwner' });
+      return;
+    }
+
+    const { is_owner, ...rest } = viewAccountDetails;
+
+    res.json({ viewAccountDetails: rest });
   } catch (err: unknown) {
     console.log(err);
 

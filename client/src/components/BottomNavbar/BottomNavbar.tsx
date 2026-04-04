@@ -26,7 +26,7 @@ export default function BottomNavbar(): JSX.Element {
         </NavLink>
 
         <NavLink
-          to='/account/wishlists'
+          to='/wishlists'
           className={({ isActive }) =>
             isActive ? `text-cta ${navLinkClassname}` : navLinkClassname
           }

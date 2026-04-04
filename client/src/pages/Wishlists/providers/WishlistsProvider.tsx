@@ -39,6 +39,7 @@ export default function WishlistsProvider({
         totalItemsPriceTo,
         priceToCompleteFrom,
         priceToCompleteTo,
+        privacyLevel,
         isFavorited,
         titleQuery,
         crossWishlistQueryIdSet,
@@ -83,6 +84,14 @@ export default function WishlistsProvider({
       }
 
       if (priceToCompleteTo !== null && wishlist.price_to_complete > priceToCompleteTo) {
+        return false;
+      }
+
+      if (
+        privacyLevel !== null &&
+        'privacy_level' in wishlist &&
+        wishlist.privacy_level !== privacyLevel
+      ) {
         return false;
       }
 
@@ -206,6 +215,7 @@ const defaultWishlistsFilterConfig: WishlistsFilterConfigType = {
   priceToCompleteFrom: null,
   priceToCompleteTo: null,
 
+  privacyLevel: null,
   isFavorited: null,
   titleQuery: '',
 

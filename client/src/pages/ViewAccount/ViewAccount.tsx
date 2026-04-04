@@ -18,6 +18,7 @@ import ViewAccountContent from './components/ViewAccountContent/ViewAccountConte
 import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDetailsProvider';
 import ViewModeProvider from '../../providers/ViewModeProvider';
 import ViewAccountDetailsProvider from './provider/ViewAccountDetailsProvider';
+import usePopupMessage from '../../hooks/usePopupMessage';
 
 export default function ViewAccount(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -30,6 +31,7 @@ export default function ViewAccount(): JSX.Element {
   const { publicAccountId } = useParams();
   const navigate: NavigateFunction = useNavigate();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
+  const { displayPopupMessage } = usePopupMessage();
 
   useEffect(() => {
     if (!publicAccountId || !isValidUuid) {
@@ -45,11 +47,6 @@ export default function ViewAccount(): JSX.Element {
           await getViewAccountDetailsService(publicAccountId, abortController.signal)
         ).data;
 
-        if (viewAccountDetails.is_owner) {
-          navigate('/account');
-          return;
-        }
-
         setViewAccountDetails(viewAccountDetails);
         setIsLoaded(true);
       } catch (err: unknown) {
@@ -61,6 +58,13 @@ export default function ViewAccount(): JSX.Element {
         const { isHandled, status } = handleAsyncError(err);
 
         if (isHandled) {
+          return;
+        }
+
+        if (status === 409) {
+          displayPopupMessage('Loading your account.', 'success');
+          navigate('/account', { replace: true });
+
           return;
         }
 
@@ -80,6 +84,7 @@ export default function ViewAccount(): JSX.Element {
     navigate,
     setAuthStatus,
     handleAsyncError,
+    displayPopupMessage,
   ]);
 
   return (

@@ -12,17 +12,21 @@ export async function handleWebSocketUpgrade(
   head: Buffer
 ): Promise<void> {
   socket.on('error', (err) => {
-    if ('errno' in err && err.errno === -4077) {
+    if (!('code' in err)) {
       socket.end();
       return;
     }
 
-    console.log(err, err.stack);
+    if (err.code === 'ECONNRESET') {
+      return;
+    }
 
-    socket.write(`HTTP/1.1 ${http.STATUS_CODES[500]}\r\n\r\n`);
-    socket.write('Internal server error\r\n');
+    console.log(err);
 
-    socket.end();
+    if (!socket.destroyed) {
+      socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+      socket.end();
+    }
   });
 
   const memoryUsageMegabytes: number = process.memoryUsage().rss / Math.pow(1024, 2);

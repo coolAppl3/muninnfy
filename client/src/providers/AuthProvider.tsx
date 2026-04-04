@@ -2,7 +2,10 @@ import { JSX, ReactNode, useEffect, useMemo, useState } from 'react';
 import AuthContext, { AuthContextType, AuthStatus } from '../contexts/AuthContext';
 import { checkForAuthSessionService } from '../services/authServices';
 import { CanceledError } from 'axios';
-import { connectAccountNotificationsWebSocket } from '../services/websockets/accountNotificationsWebsSocket';
+import {
+  connectAccountNotificationsWebSocket,
+  disconnectAccountNotificationsWebSocket,
+} from '../services/websockets/accountNotificationsWebsSocket';
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -36,6 +39,17 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
     checkForAuthSession();
     return () => abortController.abort();
   }, []);
+
+  useEffect(() => {
+    if (authStatus === 'authenticated') {
+      connectAccountNotificationsWebSocket();
+      return;
+    }
+
+    if (authStatus === 'unauthenticated') {
+      disconnectAccountNotificationsWebSocket();
+    }
+  }, [authStatus]);
 
   const contextValue: AuthContextType = useMemo(
     () => ({ authStatus, setAuthStatus }),

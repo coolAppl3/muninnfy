@@ -36,11 +36,11 @@ export default function ViewWishlistHeader({
           </Link>
         </p>
         <div className='bg-secondary p-2 rounded-sm shadow-simple-tiny'>
-          <h3 className='text-title font-medium mb-1 leading-none wrap-anywhere'>
+          <h3 className='text-title font-medium leading-none wrap-anywhere'>
             {viewWishlistDetails.title}
           </h3>
 
-          <div className='h-line mb-1 mt-[4px]'></div>
+          <div className='h-line my-1'></div>
 
           <div className='text-sm text-description grid grid-cols-3 mb-2 relative z-0'>
             <StatisticItem

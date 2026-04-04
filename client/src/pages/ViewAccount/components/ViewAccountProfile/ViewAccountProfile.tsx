@@ -130,7 +130,7 @@ export default function ViewAccountProfile(): JSX.Element {
       console.log(err);
       const { status } = handleAsyncError(err);
 
-      if (status === 400) {
+      if (status === 400 || status === 500) {
         displayPopupMessage('Something went wrong.', 'error');
       }
     } finally {
@@ -215,7 +215,10 @@ export default function ViewAccountProfile(): JSX.Element {
 
         <button
           className='w-fit text-start cursor-pointer hover:text-cta'
-          onClick={() => setAccountLocation('social')}
+          onClick={() => {
+            setAccountLocation('social');
+            setSocialSection('followers');
+          }}
         >
           <StatisticItem
             title='Followers'

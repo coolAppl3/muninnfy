@@ -6,6 +6,9 @@ export type AccountDetailsType = {
   created_on_timestamp: number;
   is_private: boolean;
   approve_follow_requests: boolean;
+  followers_count: number;
+  following_count: number;
+  wishlists_count: number;
 };
 
 export type OngoingAccountRequest = {
@@ -14,10 +17,6 @@ export type OngoingAccountRequest = {
 };
 
 export type ViewAccountDetailsType = Omit<AccountDetailsType, 'email'> & {
-  is_owner: boolean;
   follow_id: number | null;
   follow_request_id: number | null;
-  followers_count: number;
-  following_count: number;
-  wishlists_count: number;
 };

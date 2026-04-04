@@ -16,6 +16,7 @@ import WishlistItemsToolbar from '../Wishlist/WishlistItemsToolbar/WishlistItems
 import WishlistItems from '../Wishlist/WishlistItems/WishlistItems';
 import useAuth from '../../hooks/useAuth';
 import ViewWishlistHeader from './components/ViewWishlistHeader';
+import ViewModeProvider from '../../providers/ViewModeProvider';
 
 export default function ViewWishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -105,22 +106,27 @@ export default function ViewWishlist(): JSX.Element {
 
       {isLoaded || <LoadingSkeleton />}
 
-      {isLoaded && ownerDetails && viewWishlistDetails && (
-        <main className='py-4 grid gap-2'>
-          <WishlistItemsProvider initialWishlistItems={wishlistItems}>
-            <ViewWishlistHeader
-              ownerDetails={ownerDetails}
-              viewWishlistDetails={viewWishlistDetails}
-            />
+      <ViewModeProvider
+        inViewMode={true}
+        publicAccountId={ownerDetails?.owner_public_account_id}
+      >
+        {isLoaded && ownerDetails && viewWishlistDetails && (
+          <main className='py-4 grid gap-2'>
+            <WishlistItemsProvider initialWishlistItems={wishlistItems}>
+              <ViewWishlistHeader
+                ownerDetails={ownerDetails}
+                viewWishlistDetails={viewWishlistDetails}
+              />
 
-            <CalendarProvider>
-              <WishlistItemsToolbar inViewMode={true} />
-            </CalendarProvider>
+              <CalendarProvider>
+                <WishlistItemsToolbar />
+              </CalendarProvider>
 
-            <WishlistItems inViewMode={true} />
-          </WishlistItemsProvider>
-        </main>
-      )}
+              <WishlistItems />
+            </WishlistItemsProvider>
+          </main>
+        )}
+      </ViewModeProvider>
     </>
   );
 }
