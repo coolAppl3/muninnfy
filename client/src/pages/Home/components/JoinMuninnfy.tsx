@@ -14,12 +14,12 @@ export default function JoinMuninnfy(): JSX.Element {
           <div className='content md:!max-w-1/2'>
             <h2 className='text-title text-4xl font-bold mb-2'>Join Muninnfy.</h2>
             <p className='text-description font-medium mb-1'>
-              Muninnfy is completely free — crafted to deliver a truly personalized experience
-              that comes alive when you sign up.
+              Muninnfy is completely free and is crafted to deliver a truly personalized
+              experience that comes alive when you sign up.
             </p>
             <p className='text-description font-medium mb-2'>
-              Try it out as a guest with a temporary wishlist, but to unlock its full power and
-              make it truly yours, create an account.
+              Your data is safely secured and you can delete your account at any time if you
+              change your mind.
             </p>
 
             <div className='btn-container flex flex-col gap-1 sm:flex-row-reverse justify-end'>
@@ -31,9 +31,9 @@ export default function JoinMuninnfy(): JSX.Element {
               </Button>
               <Button
                 className='bg-secondary/50 border-title text-title w-full sm:w-fit'
-                onClick={() => navigate('/guest/wishlist/new')}
+                onClick={() => navigate('/privacy-policy')}
               >
-                Try it as a guest
+                View Privacy Policy
               </Button>
             </div>
           </div>
