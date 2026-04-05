@@ -18,6 +18,7 @@ import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
 import AccountRecovery from '../pages/AccountRecovery/AccountRecovery';
 import ViewAccount from '../pages/ViewAccount/ViewAccount';
 import ViewWishlists from '../pages/ViewWishlists/ViewWishlists';
+import TermsOfService from '../pages/TermsOfService/TermsOfService';
 
 type RouteDetails = {
   path: string;
@@ -42,10 +43,11 @@ export default function Router(): JSX.Element {
   ];
 
   const publicRoutes: RouteDetails[] = [
-    { path: '/home', element: <Home /> },
     { path: '/view/wishlist/:wishlistId', element: <ViewWishlist /> },
     { path: '/view/wishlists/:publicAccountId', element: <ViewWishlists /> },
     { path: '/view/account/:publicAccountId', element: <ViewAccount /> },
+    { path: '/home', element: <Home /> },
+    { path: '/terms-of-service', element: <TermsOfService /> },
     { path: '*', element: <NotFound /> },
   ];
 
