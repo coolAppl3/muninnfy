@@ -121,4 +121,26 @@
       @apply !text-danger last:border-t-1 last:border-t-description/50;
     }
   }
+
+  article {
+    h2 {
+      @apply text-title text-2xl font-medium mb-[4px];
+    }
+
+    h3 {
+      @apply text-title text-xl font-medium mb-1 mt-3;
+    }
+
+    p {
+      @apply mb-1;
+    }
+
+    ul {
+      @apply list-disc pl-3 space-y-1 mb-1;
+
+      li {
+        @apply !list-item;
+      }
+    }
+  }
 }
