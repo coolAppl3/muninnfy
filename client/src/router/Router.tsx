@@ -19,6 +19,7 @@ import AccountRecovery from '../pages/AccountRecovery/AccountRecovery';
 import ViewAccount from '../pages/ViewAccount/ViewAccount';
 import ViewWishlists from '../pages/ViewWishlists/ViewWishlists';
 import TermsOfService from '../pages/TermsOfService/TermsOfService';
+import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 
 type RouteDetails = {
   path: string;
@@ -48,6 +49,7 @@ export default function Router(): JSX.Element {
     { path: '/view/account/:publicAccountId', element: <ViewAccount /> },
     { path: '/home', element: <Home /> },
     { path: '/terms-of-service', element: <TermsOfService /> },
+    { path: '/privacy-policy', element: <PrivacyPolicy /> },
     { path: '*', element: <NotFound /> },
   ];
 
