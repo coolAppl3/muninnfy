@@ -20,6 +20,7 @@ import ViewAccount from '../pages/ViewAccount/ViewAccount';
 import ViewWishlists from '../pages/ViewWishlists/ViewWishlists';
 import TermsOfService from '../pages/TermsOfService/TermsOfService';
 import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
+import CookiePolicy from '../pages/CookiePolicy/CookiePolicy';
 
 type RouteDetails = {
   path: string;
@@ -50,6 +51,7 @@ export default function Router(): JSX.Element {
     { path: '/home', element: <Home /> },
     { path: '/terms-of-service', element: <TermsOfService /> },
     { path: '/privacy-policy', element: <PrivacyPolicy /> },
+    { path: '/cookie-policy', element: <CookiePolicy /> },
     { path: '*', element: <NotFound /> },
   ];
 
