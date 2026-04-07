@@ -1,6 +1,7 @@
 import express, { Router, Request, Response } from 'express';
 import { undefinedValuesDetected } from '../util/validation/requestValidation';
 import {
+  isValidDateOfBirthTimestamp,
   isValidDisplayName,
   isValidEmail,
   isValidNewPassword,
@@ -63,6 +64,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   }
 
   type RequestData = {
+    dateOfBirthTimestamp: number;
     email: string;
     username: string;
     password: string;
@@ -71,13 +73,24 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
   const requestData: RequestData = req.body;
 
-  const expectedKeys: string[] = ['email', 'username', 'password', 'displayName'];
+  const expectedKeys: string[] = [
+    'dateOfBirthTimestamp',
+    'email',
+    'username',
+    'password',
+    'displayName',
+  ];
   if (undefinedValuesDetected(requestData, expectedKeys)) {
     res.status(400).json({ message: 'Invalid request data.' });
     return;
   }
 
-  const { email, username, password, displayName } = requestData;
+  const { dateOfBirthTimestamp, email, username, password, displayName } = requestData;
+
+  if (!isValidDateOfBirthTimestamp(dateOfBirthTimestamp)) {
+    res.status(400).json({ message: 'Invalid date of birth.', reason: 'invalidDateOfBirth' });
+    return;
+  }
 
   if (!isValidEmail(email)) {
     res.status(400).json({ message: 'Invalid email.', reason: 'invalidEmail' });
@@ -159,6 +172,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
     const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO accounts (
         public_account_id,
+        date_of_birth_timestamp,
         email,
         hashed_password,
         username,
@@ -168,7 +182,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
         failed_sign_in_attempts,
         is_private,
         approve_follow_requests
-      ) VALUES (${generatePlaceHolders(10)});`,
+      ) VALUES (${generatePlaceHolders(11)});`,
       [
         publicAccountId,
         email,

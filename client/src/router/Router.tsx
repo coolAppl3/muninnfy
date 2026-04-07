@@ -21,6 +21,7 @@ import ViewWishlists from '../pages/ViewWishlists/ViewWishlists';
 import TermsOfService from '../pages/TermsOfService/TermsOfService';
 import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 import CookiePolicy from '../pages/CookiePolicy/CookiePolicy';
+import CalendarProvider from '../providers/CalendarProvider';
 
 type RouteDetails = {
   path: string;
@@ -39,7 +40,14 @@ export default function Router(): JSX.Element {
 
   const nonAuthOnlyRoutes: RouteDetails[] = [
     { path: '/account/recovery', element: <AccountRecovery /> },
-    { path: '/sign-up', element: <SignUp /> },
+    {
+      path: '/sign-up',
+      element: (
+        <CalendarProvider>
+          <SignUp />
+        </CalendarProvider>
+      ),
+    },
     { path: '/sign-up/verification', element: <AccountVerification /> },
     { path: '/sign-in', element: <SignIn /> },
   ];
