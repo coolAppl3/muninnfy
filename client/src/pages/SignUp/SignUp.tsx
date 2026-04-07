@@ -16,6 +16,7 @@ import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHa
 import useCalendar from '../../hooks/useCalendar';
 import { getFullDateString } from '../../utils/globalUtils';
 import { validateDateOfBirthTimestamp } from '../../utils/validation/userValidation';
+import CheckboxFormGroup from '../../components/CheckboxFormGroup/CheckboxFormGroup';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -24,8 +25,9 @@ export default function SignUp(): JSX.Element {
     initialSignUpFormValidationState
   );
 
-  const [dateOfBirthErrorMessage, setDateOfBirthErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [dateOfBirthErrorMessage, setDateOfBirthErrorMessage] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
 
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
@@ -47,6 +49,12 @@ export default function SignUp(): JSX.Element {
 
   async function handleSubmit(): Promise<void> {
     if (!dateOfBirthTimestamp) {
+      displayPopupMessage('You must confirm your age.', 'error');
+      return;
+    }
+
+    if (!acceptedTerms) {
+      displayPopupMessage('You must accept our Terms of Service.', 'error');
       return;
     }
 
@@ -99,6 +107,11 @@ export default function SignUp(): JSX.Element {
         displayPopupMessage(errorMessage, 'error');
         return false;
       }
+    }
+
+    if (!acceptedTerms) {
+      displayPopupMessage('You must accept our Terms of Service.', 'error');
+      return false;
     }
 
     return true;
@@ -209,6 +222,25 @@ export default function SignUp(): JSX.Element {
                   dispatch({ type: 'validateField', payload: e })
                 }
                 errorMessage={formErrors.confirmPassword}
+              />
+
+              <CheckboxFormGroup
+                id='accepted-terms'
+                label={
+                  <>
+                    I have read and agree to Muninnfy's{' '}
+                    <Link
+                      className='link relative'
+                      to='/terms-of-service'
+                      target='_blank'
+                    >
+                      Terms of Service
+                    </Link>
+                    .
+                  </>
+                }
+                isChecked={acceptedTerms}
+                onClick={() => setAcceptedTerms((prev) => !prev)}
               />
 
               <Button
