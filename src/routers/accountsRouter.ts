@@ -185,6 +185,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       ) VALUES (${generatePlaceHolders(11)});`,
       [
         publicAccountId,
+        dateOfBirthTimestamp,
         email,
         hashedPassword,
         username,
