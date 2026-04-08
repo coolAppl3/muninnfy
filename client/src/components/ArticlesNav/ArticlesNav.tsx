@@ -14,6 +14,7 @@ export default function ArticlesNav(): JSX.Element {
       >
         Terms of Service
       </NavLink>
+
       <NavLink
         to={'/privacy-policy'}
         className={({ isActive }) =>
@@ -22,11 +23,21 @@ export default function ArticlesNav(): JSX.Element {
       >
         Privacy Policy
       </NavLink>
+
       <NavLink
         to={'/cookie-policy'}
-        className={({ isActive }) => `${styling} ${isActive ? 'text-cta' : ''}`}
+        className={({ isActive }) =>
+          `${styling} border-b-1 border-b-light-gray ${isActive ? 'text-cta' : ''}`
+        }
       >
         Cookie Policy
+      </NavLink>
+
+      <NavLink
+        to={'/faq'}
+        className={({ isActive }) => `${styling} ${isActive ? 'text-cta' : ''}`}
+      >
+        FAQ
       </NavLink>
     </nav>
   );
