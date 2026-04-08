@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import Container from '../../components/Container/Container';
 import PrivacyPolicyMdx from './PrivacyPolicy.mdx';
 import Head from '../../components/Head/Head';
-import { ArticlesNav } from '../../components/ArticlesNav/ArticlesNav';
+import ArticlesNav from '../../components/ArticlesNav/ArticlesNav';
 
 export default function PrivacyPolicy(): JSX.Element {
   return (

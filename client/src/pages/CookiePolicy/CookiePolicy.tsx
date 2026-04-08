@@ -2,8 +2,7 @@ import { JSX } from 'react';
 import Container from '../../components/Container/Container';
 import CookiePolicyMdx from './CookiePolicy.mdx';
 import Head from '../../components/Head/Head';
-import { NavLink } from 'react-router-dom';
-import { ArticlesNav } from '../../components/ArticlesNav/ArticlesNav';
+import ArticlesNav from '../../components/ArticlesNav/ArticlesNav';
 
 export default function CookiePolicy(): JSX.Element {
   return (

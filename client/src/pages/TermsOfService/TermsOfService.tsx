@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import Container from '../../components/Container/Container';
 import TermsOfServiceMdx from './TermsOfService.mdx';
 import Head from '../../components/Head/Head';
-import { ArticlesNav } from '../../components/ArticlesNav/ArticlesNav';
+import ArticlesNav from '../../components/ArticlesNav/ArticlesNav';
 
 export default function TermsOfService(): JSX.Element {
   return (

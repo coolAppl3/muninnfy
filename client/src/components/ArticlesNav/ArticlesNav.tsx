@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import { NavLink } from 'react-router-dom';
 
-export function ArticlesNav(): JSX.Element {
+export default function ArticlesNav(): JSX.Element {
   const styling: string = 'block p-2 bg-secondary transition-[filter] hover:brightness-75';
 
   return (
