@@ -22,6 +22,7 @@ import TermsOfService from '../pages/TermsOfService/TermsOfService';
 import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 import CookiePolicy from '../pages/CookiePolicy/CookiePolicy';
 import CalendarProvider from '../providers/CalendarProvider';
+import Faq from '../pages/Faq/Faq';
 
 type RouteDetails = {
   path: string;
@@ -60,6 +61,7 @@ export default function Router(): JSX.Element {
     { path: '/terms-of-service', element: <TermsOfService /> },
     { path: '/privacy-policy', element: <PrivacyPolicy /> },
     { path: '/cookie-policy', element: <CookiePolicy /> },
+    { path: '/faq', element: <Faq /> },
     { path: '*', element: <NotFound /> },
   ];
 
