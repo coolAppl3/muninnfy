@@ -1,9 +1,9 @@
-import { JSX, useState } from 'react';
+import { JSX, ReactNode, useState } from 'react';
 import ChevronIcon from '../../../assets/svg/ChevronIcon.svg?react';
 
 type AccordionItemProps = {
   question: string;
-  answer: string;
+  answer: ReactNode;
   isLastItem?: boolean;
 };
 
@@ -18,7 +18,7 @@ export default function AccordionItem({ question, answer }: AccordionItemProps):
         onClick={() => setIsExpanded((prev) => !prev)}
       >
         <span className='text-start font-medium'>{question}</span>
-        <div className='shrink-0 pt-[6px]'>
+        <div className='shrink-0 pt-[4px]'>
           <ChevronIcon
             className={`shrink-0 ml-1 w-[1.6rem] h-[1.6rem] transition-transform duration-300 ${
               isExpanded ? 'rotate-180' : ''
