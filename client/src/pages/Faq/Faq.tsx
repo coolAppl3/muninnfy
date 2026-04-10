@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 export default function Faq(): JSX.Element {
   return (
     <>
-      <Head title='Privacy Policy - Muninnfy' />
+      <Head title='FAQ - Muninnfy' />
 
       <main className='py-4'>
         <Container>
