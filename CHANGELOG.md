@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1] (2026-04-11)
+
+### Changes
+
+- Change license.
+
+
 ## [0.5.0] (2026-04-11)
 
 ### Features
