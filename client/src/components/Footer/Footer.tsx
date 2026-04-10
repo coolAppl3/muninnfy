@@ -29,7 +29,7 @@ export default function Footer(): JSX.Element {
               { title: 'Home', path: '/home' },
               {
                 title: 'New wishlist',
-                path: authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new',
+                path: authStatus === 'authenticated' ? '/wishlist/new' : '/sign-up',
               },
               { title: 'Sign up', path: '/sign-up' },
               { title: 'Sign in', path: '/sign-in' },

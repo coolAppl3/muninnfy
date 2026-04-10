@@ -1,6 +1,6 @@
 {
   "name": "muninnfy",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "license": "GPL-3.0",
   "description": "Muninnfy is a single-page application meant to function as a flexible wishlist.",
   "author": "Yanal Mohsen",
@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mdx-js/rollup": "^3.1.1",
     "axios": "^1.11.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@eslint/js": "^9.30.1",
     "@tailwindcss/vite": "^4.1.11",
+    "@types/mdx": "^2.0.13",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@types/react-router-dom": "^5.3.3",
@@ -32,6 +34,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "rollup-plugin-visualizer": "^7.0.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.4.0",
     "typescript-eslint": "^8.39.1",

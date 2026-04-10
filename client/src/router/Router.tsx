@@ -18,6 +18,11 @@ import LoadingSkeleton from '../components/LoadingSkeleton/LoadingSkeleton';
 import AccountRecovery from '../pages/AccountRecovery/AccountRecovery';
 import ViewAccount from '../pages/ViewAccount/ViewAccount';
 import ViewWishlists from '../pages/ViewWishlists/ViewWishlists';
+import TermsOfService from '../pages/TermsOfService/TermsOfService';
+import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
+import CookiePolicy from '../pages/CookiePolicy/CookiePolicy';
+import CalendarProvider from '../providers/CalendarProvider';
+import Faq from '../pages/Faq/Faq';
 
 type RouteDetails = {
   path: string;
@@ -36,16 +41,27 @@ export default function Router(): JSX.Element {
 
   const nonAuthOnlyRoutes: RouteDetails[] = [
     { path: '/account/recovery', element: <AccountRecovery /> },
-    { path: '/sign-up', element: <SignUp /> },
+    {
+      path: '/sign-up',
+      element: (
+        <CalendarProvider>
+          <SignUp />
+        </CalendarProvider>
+      ),
+    },
     { path: '/sign-up/verification', element: <AccountVerification /> },
     { path: '/sign-in', element: <SignIn /> },
   ];
 
   const publicRoutes: RouteDetails[] = [
-    { path: '/home', element: <Home /> },
     { path: '/view/wishlist/:wishlistId', element: <ViewWishlist /> },
     { path: '/view/wishlists/:publicAccountId', element: <ViewWishlists /> },
     { path: '/view/account/:publicAccountId', element: <ViewAccount /> },
+    { path: '/home', element: <Home /> },
+    { path: '/terms-of-service', element: <TermsOfService /> },
+    { path: '/privacy-policy', element: <PrivacyPolicy /> },
+    { path: '/cookie-policy', element: <CookiePolicy /> },
+    { path: '/faq', element: <Faq /> },
     { path: '*', element: <NotFound /> },
   ];
 

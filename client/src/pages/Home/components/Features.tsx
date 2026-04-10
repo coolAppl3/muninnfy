@@ -4,8 +4,8 @@ import EyeIcon from '../../../assets/svg/EyeIcon.svg?react';
 import MagnifyingGlassIcon from '../../../assets/svg/MagnifyingGlassIcon.svg?react';
 import SlidersIcon from '../../../assets/svg/SlidersIcon.svg?react';
 import CheckBoxIcon from '../../../assets/svg/CheckBoxIcon.svg?react';
-import HashtagIcon from '../../../assets/svg/HashtagIcon.svg?react';
 import MultipleWishlistsIcon from '../../../assets/svg/MultipleWishlistsIcon.svg?react';
+import TagIcon from '../../../assets/svg/TagIcon.svg?react';
 
 export default function Features(): JSX.Element {
   return (
@@ -22,7 +22,7 @@ export default function Features(): JSX.Element {
 
           <FeatureCard
             title='Control Visibility'
-            description='Keep wishlists private or share them with your followers — you decide who sees what.'
+            description={`Control each wishlist's privacy individually — you decide who sees what.`}
             Icon={EyeIcon}
           />
 
@@ -46,8 +46,8 @@ export default function Features(): JSX.Element {
 
           <FeatureCard
             title='Smart Tagging System'
-            description='Add your own tags to items and filter across wishlists for easy organization and discovery.'
-            Icon={HashtagIcon}
+            description='Add your own tags to items for easier filtering and categorization.'
+            Icon={TagIcon}
           />
         </div>
       </Container>

@@ -119,7 +119,9 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
 
   function navigateCalendar(direction: 1 | -1): void {
     if (renderMode === 'years') {
-      setSelectedYear((prev) => prev + direction * 10);
+      const remainsAboveZero: boolean = selectedYear + direction * 10 >= 0;
+      remainsAboveZero && setSelectedYear((prev) => prev + direction * 10);
+
       return;
     }
 
@@ -128,14 +130,14 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
       return;
     }
 
-    if (selectedMonth === 11 && direction === 1) {
+    if (selectedMonth === 11 && direction > 0) {
       setSelecteDMonth(0);
       setSelectedYear((prev) => prev + 1);
 
       return;
     }
 
-    if (selectedMonth === 0 && direction === -1) {
+    if (selectedMonth === 0 && direction < 0) {
       setSelecteDMonth(11);
       setSelectedYear((prev) => prev - 1);
 

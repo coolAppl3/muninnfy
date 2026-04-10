@@ -25,10 +25,10 @@ export default function Hero(): JSX.Element {
             className='bg-cta border-cta text-dark mt-1 w-full xs:w-fit'
             onClick={() =>
               authStatus === 'loading' ||
-              navigate(authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new')
+              navigate(authStatus === 'authenticated' ? '/wishlist/new' : '/sign-up')
             }
           >
-            Create a wishlist
+            Get started
           </Button>
         </div>
       </Container>

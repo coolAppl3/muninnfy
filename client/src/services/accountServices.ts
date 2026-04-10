@@ -7,6 +7,7 @@ import {
 } from '../types/accountTypes';
 
 type SignUpServicePayload = {
+  dateOfBirthTimestamp: number;
   email: string;
   username: string;
   password: string;

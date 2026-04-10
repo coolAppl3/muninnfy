@@ -42,6 +42,7 @@ async function createAccountsTable(): Promise<void> {
       `CREATE TABLE IF NOT EXISTS accounts (
         account_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         public_account_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+        date_of_birth_timestamp BIGINT UNSIGNED NOT NULL,
         email VARCHAR(254) NOT NULL UNIQUE,
         hashed_password VARCHAR(128) NOT NULL,
         username VARCHAR(40) NOT NULL UNIQUE,

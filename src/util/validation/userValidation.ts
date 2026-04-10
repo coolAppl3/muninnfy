@@ -1,3 +1,4 @@
+import { dayMilliseconds } from '../constants/globalConstants';
 import { containsInvalidWhitespace } from '../globalUtils';
 
 export function isValidEmail(value: any): boolean {
@@ -57,4 +58,28 @@ export function isValidDisplayName(value: any): boolean {
 
   const regex: RegExp = /^(?=.{1,25}$)(?!.*  )[A-Za-z]+(?: [A-Za-z]+)*$/;
   return regex.test(value);
+}
+
+export function isValidDateOfBirthTimestamp(timestamp: number): boolean {
+  if (!Number.isInteger(timestamp)) {
+    return false;
+  }
+
+  const dateObj: Date = new Date();
+  const youngestTimestamp: number = new Date(
+    dateObj.getFullYear(),
+    dateObj.getMonth(),
+    dateObj.getDate()
+  ).getTime();
+
+  if (timestamp > youngestTimestamp) {
+    return false;
+  }
+
+  const yearMilliseconds: number = 365.25 * dayMilliseconds;
+  if (dateObj.getTime() - timestamp >= 125 * yearMilliseconds) {
+    return false;
+  }
+
+  return true;
 }

@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.5.0] (2026-04-11)
+
+### Features
+
+- Added `TagIcon` SVG.
+- Added and implemented the following page components:
+  - `TermsIfService`.
+  - `PrivacyPolicy`.
+  - `CookiePolicy`.
+  - `Faq`.
+- Added mdx support and the following mdx files:
+  - `TermsIfService`.
+  - `PrivacyPolicy`.
+  - `CookiePolicy`.
+- Added `ArticlesNav` component.
+- Added `date_of_birth_timestamp` column to `accounts` table.
+- Users must now disclose their date of birth when signing up.
+- Implemented a checkbox for users to explicitly accept the Terms of Service.
+- Added `AccordionItem` component.
+
+
+### Changes
+
+- Replaced `HashtagIcon` with `TagIcon` in `Features`.
+- Abolished the vision to include guest functionality and removed relevant placeholders for it.
+
+
+### Improvements
+
+- Changed `label` prop in `CheckboxFormGroupProps` to `ReactNode`.
+
+
+### Bug Fixes
+
+- Fixed `Calendar` allowing negative years.
+
+
+### Build Changes
+
+- Added `rollup-plugin-visualizer.`
+- Added `*.css` module declaration in `vite-env`.
+
+
+### Chore Changes
+
+- Audited packages.
+
+
 ## [0.4.1] (2026-04-04)
 
 ### Features

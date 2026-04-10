@@ -74,7 +74,7 @@ export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps
           My account
         </NavLink>
         <NavLink
-          to={authStatus === 'authenticated' ? '/wishlist/new' : '/guest/wishlist/new'}
+          to={authStatus === 'authenticated' ? '/wishlist/new' : '/sign-up'}
           className={({ isActive }) =>
             `context-menu-btn bg-secondary ${isActive ? 'text-cta' : ''}`
           }

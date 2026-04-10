@@ -1,4 +1,4 @@
-import { ChangeEvent, SubmitEvent, JSX, useReducer, useState } from 'react';
+import { ChangeEvent, SubmitEvent, JSX, useReducer, useState, useEffect } from 'react';
 import Head from '../../components/Head/Head';
 import Container from '../../components/Container/Container';
 import Button from '../../components/Button/Button';
@@ -13,6 +13,10 @@ import PasswordFormGroup from '../../components/PasswordFormGroup/PasswordFormGr
 import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup';
 import useAuth from '../../hooks/useAuth';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
+import useCalendar from '../../hooks/useCalendar';
+import { getFullDateString } from '../../utils/globalUtils';
+import { validateDateOfBirthTimestamp } from '../../utils/validation/userValidation';
+import CheckboxFormGroup from '../../components/CheckboxFormGroup/CheckboxFormGroup';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -20,19 +24,45 @@ export default function SignUp(): JSX.Element {
     signUpFormValidationReducer,
     initialSignUpFormValidationState
   );
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [dateOfBirthErrorMessage, setDateOfBirthErrorMessage] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
 
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayPopupMessage } = usePopupMessage();
+  const { startTimestampsMap, displayCalendar } = useCalendar();
+
+  const dateOfBirthTimestamp: number | undefined = startTimestampsMap.get('dateOfBirth');
+
+  useEffect(() => {
+    if (!dateOfBirthTimestamp) {
+      return;
+    }
+
+    const newDateOfBirthErrorMessage: string | null =
+      validateDateOfBirthTimestamp(dateOfBirthTimestamp);
+    setDateOfBirthErrorMessage(newDateOfBirthErrorMessage);
+  }, [dateOfBirthTimestamp]);
 
   async function handleSubmit(): Promise<void> {
+    if (!dateOfBirthTimestamp) {
+      displayPopupMessage('You must confirm your age.', 'error');
+      return;
+    }
+
+    if (!acceptedTerms) {
+      displayPopupMessage('You must accept our Terms of Service.', 'error');
+      return;
+    }
+
     const { displayName, username, email, password } = formData;
 
     try {
       const publicAccountId: string = (
-        await signUpService({ displayName, username, email, password })
+        await signUpService({ displayName, username, email, password, dateOfBirthTimestamp })
       ).data.publicAccountId;
       navigate(`/sign-up/verification?publicAccountId=${publicAccountId}`);
 
@@ -63,11 +93,25 @@ export default function SignUp(): JSX.Element {
       { type: 'validateAllFields', payload: null }
     );
 
+    const newDateOfBirthErrorMessage: string | null =
+      validateDateOfBirthTimestamp(dateOfBirthTimestamp);
+    setDateOfBirthErrorMessage(newDateOfBirthErrorMessage);
+
+    if (newDateOfBirthErrorMessage) {
+      displayPopupMessage(newDateOfBirthErrorMessage, 'error');
+      return false;
+    }
+
     for (const errorMessage of Object.values(newState.formErrors)) {
       if (errorMessage) {
         displayPopupMessage(errorMessage, 'error');
         return false;
       }
+    }
+
+    if (!acceptedTerms) {
+      displayPopupMessage('You must accept our Terms of Service.', 'error');
+      return false;
     }
 
     return true;
@@ -103,6 +147,30 @@ export default function SignUp(): JSX.Element {
                 removeLoadingOverlay();
               }}
             >
+              <div className='flex flex-col justify-center items-start gap-[6px] '>
+                <label
+                  htmlFor='date-of-birth'
+                  className='text-sm font-medium text-title'
+                >
+                  Date of birth
+                </label>
+
+                <button
+                  type='button'
+                  id='date-of-birth'
+                  onClick={() => displayCalendar('start', 'dateOfBirth')}
+                  className={`w-full h-4 p-1 rounded border-1 hover:border-cta outline-0 text-description text-start text-sm transition-colors cursor-pointer ${dateOfBirthErrorMessage ? 'border-danger' : 'border-description/75'}`}
+                >
+                  {dateOfBirthTimestamp && getFullDateString(dateOfBirthTimestamp)}
+                </button>
+
+                <span
+                  className={`text-[12px] font-medium text-danger leading-[1.2] break-words ${dateOfBirthErrorMessage ? 'block' : 'hidden'}`}
+                >
+                  {dateOfBirthErrorMessage}
+                </span>
+              </div>
+
               <DefaultFormGroup
                 id='displayName'
                 label='Display name'
@@ -154,6 +222,25 @@ export default function SignUp(): JSX.Element {
                   dispatch({ type: 'validateField', payload: e })
                 }
                 errorMessage={formErrors.confirmPassword}
+              />
+
+              <CheckboxFormGroup
+                id='accepted-terms'
+                label={
+                  <>
+                    I have read and agree to Muninnfy's{' '}
+                    <Link
+                      className='link relative'
+                      to='/terms-of-service'
+                      target='_blank'
+                    >
+                      Terms of Service
+                    </Link>
+                    .
+                  </>
+                }
+                isChecked={acceptedTerms}
+                onClick={() => setAcceptedTerms((prev) => !prev)}
               />
 
               <Button

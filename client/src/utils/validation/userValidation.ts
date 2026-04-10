@@ -110,3 +110,28 @@ export function validateDisplayName(value: string): string | null {
 
   return null;
 }
+
+export function validateDateOfBirthTimestamp(timestamp: number | undefined): string | null {
+  if (!timestamp || !Number.isInteger(timestamp)) {
+    return 'A valid date of birth is required.';
+  }
+
+  const dateObj: Date = new Date();
+  const youngestTimestamp: number = new Date(
+    dateObj.getFullYear() - 13,
+    dateObj.getMonth(),
+    dateObj.getDate()
+  ).getTime();
+
+  // calendar floors the timestamp - no need to account for time between days
+  if (timestamp > youngestTimestamp) {
+    return 'You must be 13 years or older to sign up.';
+  }
+
+  const yearMilliseconds: number = 365.25 * 24 * 60 * 60 * 1000;
+  if (dateObj.getTime() - timestamp >= 125 * yearMilliseconds) {
+    return 'A valid date of birth is required.';
+  }
+
+  return null;
+}

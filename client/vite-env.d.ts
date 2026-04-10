@@ -1,4 +1,5 @@
 /// <reference types="vite-plugin-svgr/client" />
+declare module '*.css';
 
 interface ImportMetaEnv {
   readonly MODE: string;
@@ -12,4 +13,10 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+}
+
+declare module '*.mdx' {
+  import { ComponentType } from 'react';
+  const MDXComponent: ComponentType<any>;
+  export default MDXComponent;
 }
