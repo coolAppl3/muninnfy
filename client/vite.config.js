@@ -5,7 +5,6 @@ import svgr from 'vite-plugin-svgr';
 import mdx from '@mdx-js/rollup';
 import { visualizer } from 'rollup-plugin-visualizer';
 
-// https://vite.dev/config/
 export default defineConfig({
   define: {
     'process.env.NODE_ENV': '"production"',
@@ -27,9 +26,9 @@ export default defineConfig({
     }),
 
     visualizer({
-      open: true, // automatically opens the report
-      gzipSize: true, // shows gzip sizes
-      brotliSize: true, // shows brotli sizes
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
     }),
   ],
 

@@ -4,13 +4,13 @@
   "license": "UNLICENSED",
   "description": "Muninnfy is a single-page application meant to function as a flexible wishlist.",
   "author": "Yanal Mohsen",
-  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@mdx-js/rollup": "^3.1.1",
