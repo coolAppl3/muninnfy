@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import svgr from 'vite-plugin-svgr';
 import mdx from '@mdx-js/rollup';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { playwright } from '@vitest/browser-playwright';
 
 export default defineConfig({
   define: {
@@ -34,5 +35,16 @@ export default defineConfig({
 
   server: {
     port: 3000,
+  },
+
+  test: {
+    browser: {
+      enabled: true,
+      provider: playwright(),
+      headless: true,
+      instances: [{ browser: 'chromium' }],
+      clearMocks: true,
+      screenshots: false,
+    },
   },
 });
