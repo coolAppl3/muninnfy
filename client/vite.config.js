@@ -38,13 +38,15 @@ export default defineConfig({
   },
 
   test: {
+    clearMocks: true,
+    testTimeout: 3000,
+
     browser: {
       enabled: true,
       provider: playwright(),
       headless: true,
       instances: [{ browser: 'chromium' }],
-      clearMocks: true,
-      screenshots: false,
+      screenshotFailures: false,
     },
   },
 });
