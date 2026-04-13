@@ -40,6 +40,7 @@ export default defineConfig({
   test: {
     clearMocks: true,
     testTimeout: 3000,
+    setupFiles: ['./tests/setup.ts'],
 
     browser: {
       enabled: true,
