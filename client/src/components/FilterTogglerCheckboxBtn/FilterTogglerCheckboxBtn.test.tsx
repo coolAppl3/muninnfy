@@ -1,0 +1,49 @@
+import { describe, expect, it, vi } from 'vitest';
+import { render } from 'vitest-browser-react';
+import FilterTogglerCheckboxBtn from './FilterTogglerCheckboxBtn';
+import { userEvent } from 'vitest/browser';
+
+describe('FilterTogglerCheckboxBtn', () => {
+  it('should render a span with the title prop', async () => {
+    const { getByText } = await render(
+      <FilterTogglerCheckboxBtn
+        title='someTitle'
+        isChecked={true}
+        onClick={() => {}}
+      />
+    );
+
+    const span = getByText('someTitle');
+    await expect.element(span).toBeVisible();
+  });
+
+  it('should render a button with type of button', async () => {
+    const { getByRole } = await render(
+      <FilterTogglerCheckboxBtn
+        title='someTitle'
+        isChecked={true}
+        onClick={() => {}}
+      />
+    );
+
+    const btn = getByRole('button');
+    await expect.element(btn).toBeVisible();
+  });
+
+  it('should call onClick when the button is clicked', async () => {
+    const onClick = vi.fn();
+
+    const { getByRole } = await render(
+      <FilterTogglerCheckboxBtn
+        title='someTitle'
+        isChecked={true}
+        onClick={onClick}
+      />
+    );
+
+    const btn = getByRole('button');
+
+    await userEvent.click(btn);
+    expect(onClick).toHaveBeenCalled();
+  });
+});
