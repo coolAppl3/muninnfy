@@ -5,7 +5,7 @@ import { render } from 'vitest-browser-react';
 import { page } from 'vitest/browser';
 
 describe('ArticlesNav', () => {
-  it('should render 4 Link components if the screen size is above 830px', async () => {
+  it('should render 4 Link components with the correct href attribute if the screen size is above 830px', async () => {
     await page.viewport(831, 720);
 
     const { getByRole } = await render(
@@ -15,16 +15,25 @@ describe('ArticlesNav', () => {
     );
 
     const allLinks = getByRole('link');
+
     const termsOfServiceLink = getByRole('link', { name: 'Terms of Service' });
     const privacyPolicyLink = getByRole('link', { name: 'Privacy Policy' });
     const cookiePolicyLink = getByRole('link', { name: 'Cookie Policy' });
     const faqLink = getByRole('link', { name: 'FAQ' });
 
     await expect.element(allLinks).toHaveLength(4);
+
     await expect.element(termsOfServiceLink).toBeVisible();
+    await expect.element(termsOfServiceLink).toHaveAttribute('href', '/terms-of-service');
+
     await expect.element(privacyPolicyLink).toBeVisible();
+    await expect.element(privacyPolicyLink).toHaveAttribute('href', '/privacy-policy');
+
     await expect.element(cookiePolicyLink).toBeVisible();
+    await expect.element(cookiePolicyLink).toHaveAttribute('href', '/cookie-policy');
+
     await expect.element(faqLink).toBeVisible();
+    await expect.element(faqLink).toHaveAttribute('href', '/faq');
   });
 
   it('should not render if the viewport width is 830px or lower', async () => {
