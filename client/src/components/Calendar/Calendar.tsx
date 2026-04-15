@@ -58,10 +58,13 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
       return;
     }
 
-    const newSelectedMonth: string = e.target.textContent;
-    const monthIndex: number = monthsArr.findIndex(
-      (month) => month.slice(0, 3) === newSelectedMonth
-    );
+    const indexAttribute: string | null = e.target.getAttribute('data-month-index');
+
+    if (!indexAttribute || !Number.isInteger(+indexAttribute)) {
+      return;
+    }
+
+    const monthIndex: number = +indexAttribute;
 
     if (monthIndex < 0 || monthIndex > 11) {
       return;
@@ -264,6 +267,7 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
                   isCurrentMonth(index) ? 'bg-cta/10' : 'bg-dark'
                 }`}
                 key={index}
+                data-month-index={index}
               >
                 {monthsArr[index]?.slice(0, 3)}
               </button>
