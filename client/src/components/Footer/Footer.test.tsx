@@ -22,7 +22,6 @@ describe('Footer', () => {
     const { getByRole } = await render(<Footer />, { wrapper: TestWrapper });
 
     const allLinks = getByRole('link');
-    await expect.element(allLinks).toHaveLength(10);
 
     const firstsHomeLink = getByRole('link', { name: 'Muninnfy' });
     const secondHomeLink = getByRole('link', { name: 'home' });
@@ -34,6 +33,8 @@ describe('Footer', () => {
     const termsOfServiceLink = getByRole('link', { name: 'Terms of Service' });
     const privacyPolicyLink = getByRole('link', { name: 'Privacy Policy' });
     const cookiePolicyLLink = getByRole('link', { name: 'Cookie policy' });
+
+    await expect.element(allLinks).toHaveLength(10);
 
     await expect.element(firstsHomeLink).toBeVisible();
     await expect.element(firstsHomeLink).toHaveAttribute('href', '/home');
