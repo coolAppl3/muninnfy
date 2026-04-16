@@ -4,8 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 import svgr from 'vite-plugin-svgr';
 import mdx from '@mdx-js/rollup';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { playwright } from '@vitest/browser-playwright';
 
-// https://vite.dev/config/
 export default defineConfig({
   define: {
     'process.env.NODE_ENV': '"production"',
@@ -27,13 +27,27 @@ export default defineConfig({
     }),
 
     visualizer({
-      open: true, // automatically opens the report
-      gzipSize: true, // shows gzip sizes
-      brotliSize: true, // shows brotli sizes
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
     }),
   ],
 
   server: {
     port: 3000,
+  },
+
+  test: {
+    clearMocks: true,
+    testTimeout: 3000,
+    setupFiles: ['./tests/setup.ts'],
+
+    browser: {
+      enabled: true,
+      provider: playwright(),
+      headless: true,
+      instances: [{ browser: 'chromium' }],
+      screenshotFailures: false,
+    },
   },
 });
