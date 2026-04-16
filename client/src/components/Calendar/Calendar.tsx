@@ -276,32 +276,44 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
         )}
 
         {renderMode === 'dates' && (
-          <div
-            className='grid grid-cols-7'
-            onClick={handleDatesClick}
-          >
-            {Array.from({ length: daysArr.length + getEmptyDaysCount() }, (_, index) => {
-              if (index < getEmptyDaysCount()) {
-                return <span key={index}></span>;
-              }
+          <>
+            <div className='w-full grid grid-cols-7 mb-1 text-xs text-title bg-dark py-[4px] rounded-pill text-center'>
+              <span>M</span>
+              <span>T</span>
+              <span>W</span>
+              <span>T</span>
+              <span>F</span>
+              <span className='text-title/75'>S</span>
+              <span className='text-title/75'>S</span>
+            </div>
 
-              const date: number = index + 1 - getEmptyDaysCount();
+            <div
+              className='grid grid-cols-7'
+              onClick={handleDatesClick}
+            >
+              {Array.from({ length: daysArr.length + getEmptyDaysCount() }, (_, index) => {
+                if (index < getEmptyDaysCount()) {
+                  return <span key={index}></span>;
+                }
 
-              return (
-                <button
-                  type='button'
-                  className={`py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
-                    isCurrentMonth(selectedMonth) && date === dateObject.getDate()
-                      ? 'bg-cta/10'
-                      : 'bg-dark'
-                  }`}
-                  key={index}
-                >
-                  {date}
-                </button>
-              );
-            })}
-          </div>
+                const date: number = index + 1 - getEmptyDaysCount();
+
+                return (
+                  <button
+                    type='button'
+                    className={`py-[1.6rem] text-sm text-description cursor-pointer transition-[filter] hover:brightness-75 ${
+                      isCurrentMonth(selectedMonth) && date === dateObject.getDate()
+                        ? 'bg-cta/10'
+                        : 'bg-dark'
+                    }`}
+                    key={index}
+                  >
+                    {date}
+                  </button>
+                );
+              })}
+            </div>
+          </>
         )}
 
         <Button
