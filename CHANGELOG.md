@@ -7,9 +7,15 @@
 - Add `data-` attribute to strengthen month index traction in `Calendar`.
 
 
+### Bug Fixes
+
+- Remove accidental `generateHexCode()` call in GET `auth/session`.
+- Added missing day header in `Calendar`.
+
+
 ### Tests
 
-- Set up test `vitest` testing environment.
+- Set up `vitest` testing environment.
 - Add test suites for the following components:
   - `Button`.
   - `Container`.
@@ -21,12 +27,6 @@
   - `Footer`.
   - `Head`.
   - `Calendar`.
-
-
-### Bug Fixes
-
-- Remove accidental `generateHexCode()` call in GET `auth/session`.
-- Added missing day header in `Calendar`.
 
 
 ## [0.5.1] (2026-04-11)
