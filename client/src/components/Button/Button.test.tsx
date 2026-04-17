@@ -33,14 +33,14 @@ describe('Button', () => {
     const { getByRole } = await render(<Button>someText</Button>);
 
     const btn: Locator = getByRole('button');
-    await expect.element(btn).not.toHaveAttribute('disabled');
+    await expect.element(btn).not.toBeDisabled();
   });
 
   it('should render a disabled button if disabled prop is set to true', async () => {
     const { getByRole } = await render(<Button disabled={true}>someText</Button>);
 
     const btn: Locator = getByRole('button');
-    await expect.element(btn).toHaveAttribute('disabled');
+    await expect.element(btn).toBeDisabled();
   });
 
   it('should include include different class names depending on whether or not it is disabled', async () => {
