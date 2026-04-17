@@ -1,20 +1,22 @@
 import { JSX, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import Button from '../Button/Button';
 
-export type ConfirmModalProps = {
-  title?: string;
-  description?: string;
-
+type MandatoryConfirmModalProps = {
   confirmBtnTitle: string;
   cancelBtnTitle: string;
-  extraBtnTitle?: string;
-
-  isDangerous: boolean;
 
   onConfirm: MouseEventHandler<HTMLButtonElement>;
   onCancel: MouseEventHandler<HTMLButtonElement>;
-  onExtraAction?: MouseEventHandler<HTMLButtonElement>;
+
+  isDangerous: boolean;
 };
+
+export type ConfirmModalProps = MandatoryConfirmModalProps &
+  ({ title: string; description?: string } | { title?: string; description: string }) &
+  (
+    | { extraBtnTitle: string; onExtraAction: MouseEventHandler<HTMLButtonElement> }
+    | { extraBtnTitle?: undefined; onExtraAction?: undefined }
+  );
 
 export default function ConfirmModal({
   title,
