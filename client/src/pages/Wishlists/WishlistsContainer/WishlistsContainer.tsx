@@ -1,7 +1,7 @@
 import { JSX, useMemo } from 'react';
 import Container from '../../../components/Container/Container';
 import useWishlists from '../hooks/useWishlists';
-import WishlistCard from '../../../components/WishlistCard/WishlistCard';
+import WishlistCard from './components/WishlistCard/WishlistCard';
 import { ExtendedWishlistDetailsType, ViewWishlistDetails } from '../../../types/wishlistTypes';
 
 export default function WishlistsContainer(): JSX.Element {

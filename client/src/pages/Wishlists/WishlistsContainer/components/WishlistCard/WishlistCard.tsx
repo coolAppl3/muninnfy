@@ -1,13 +1,16 @@
 import { JSX, memo } from 'react';
-import { getFormattedPrice } from '../../utils/wishlistUtils';
-import { getFullDateString } from '../../utils/globalUtils';
+import { getFormattedPrice } from '../../../../../utils/wishlistUtils';
+import { getFullDateString } from '../../../../../utils/globalUtils';
 import { Link } from 'react-router-dom';
-import WishlistPrivacyLevelIcon from '../WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
-import { ExtendedWishlistDetailsType, ViewWishlistDetails } from '../../types/wishlistTypes';
-import StatisticItem from '../StatisticItem/StatisticItem';
+import WishlistPrivacyLevelIcon from '../../../../../components/WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
+import {
+  ExtendedWishlistDetailsType,
+  ViewWishlistDetails,
+} from '../../../../../types/wishlistTypes';
+import StatisticItem from '../../../../../components/StatisticItem/StatisticItem';
 import ArrowIcon from '../../assets/svg/ArrowIcon.svg?react';
 import HeartIcon from '../../assets/svg/HeartIcon.svg?react';
-import useViewMode from '../../hooks/useViewMode';
+import useViewMode from '../../../../../hooks/useViewMode';
 
 type WishlistCardProps = {
   wishlist: ExtendedWishlistDetailsType | ViewWishlistDetails;
