@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import CheckboxFormGroup from './CheckboxFormGroup';
-import { userEvent } from 'vitest/browser';
+import { Locator, userEvent } from 'vitest/browser';
 
 describe('CheckboxFormGroup', () => {
   it('should render a label with text', async () => {
@@ -14,7 +14,7 @@ describe('CheckboxFormGroup', () => {
       />
     );
 
-    const label = getByText('someLabel');
+    const label: Locator = getByText('someLabel');
     await expect.element(label).toBeVisible();
   });
 
@@ -28,7 +28,7 @@ describe('CheckboxFormGroup', () => {
       />
     );
 
-    const span = getByText('someSpan');
+    const span: Locator = getByText('someSpan');
     await expect.element(span).toBeVisible();
   });
 
@@ -42,7 +42,7 @@ describe('CheckboxFormGroup', () => {
       />
     );
 
-    const label = getByText('someLabel');
+    const label: Locator = getByText('someLabel');
     await expect.element(label).toHaveAttribute('for', 'someId');
   });
 
@@ -56,7 +56,7 @@ describe('CheckboxFormGroup', () => {
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toHaveAttribute('type', 'button');
   });
 
@@ -70,7 +70,7 @@ describe('CheckboxFormGroup', () => {
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toHaveAttribute('id', 'someId');
   });
 
@@ -84,7 +84,7 @@ describe('CheckboxFormGroup', () => {
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toHaveAttribute('title', 'Check');
     await expect.element(btn).toHaveAttribute('aria-label', 'Check');
   });
@@ -99,7 +99,7 @@ describe('CheckboxFormGroup', () => {
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toHaveAttribute('title', 'Uncheck');
     await expect.element(btn).toHaveAttribute('aria-label', 'Uncheck');
   });
@@ -116,7 +116,7 @@ describe('CheckboxFormGroup', () => {
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
 
     await userEvent.click(btn);
     expect(onClick).toHaveBeenCalled();

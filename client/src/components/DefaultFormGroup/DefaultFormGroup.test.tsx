@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import DefaultFormGroup from './DefaultFormGroup';
-import { userEvent } from 'vitest/browser';
+import { Locator, userEvent } from 'vitest/browser';
 
 describe('DefaultFormGroup', () => {
   describe('CheckboxFormGroup', () => {
@@ -17,7 +17,7 @@ describe('DefaultFormGroup', () => {
         />
       );
 
-      const label = getByText('someLabel');
+      const label: Locator = getByText('someLabel');
       await expect.element(label).toBeVisible();
     });
 
@@ -33,7 +33,7 @@ describe('DefaultFormGroup', () => {
         />
       );
 
-      const label = getByText('someLabel');
+      const label: Locator = getByText('someLabel');
       await expect.element(label).toHaveAttribute('for', 'someId');
     });
 
@@ -49,7 +49,7 @@ describe('DefaultFormGroup', () => {
         />
       );
 
-      const span = getByText('someErrorMessage');
+      const span: Locator = getByText('someErrorMessage');
       await expect.element(span).toBeVisible();
     });
 
@@ -65,7 +65,7 @@ describe('DefaultFormGroup', () => {
         />
       );
 
-      const input = getByRole('textbox', { name: 'someLabel' });
+      const input: Locator = getByRole('textbox', { name: 'someLabel' });
       await expect.element(input).toBeVisible();
     });
   });
@@ -82,7 +82,7 @@ describe('DefaultFormGroup', () => {
       />
     );
 
-    const input = getByRole('textbox', { name: 'someLabel' });
+    const input: Locator = getByRole('textbox', { name: 'someLabel' });
     await expect.element(input).toHaveAttribute('id', 'someId');
   });
 
@@ -98,7 +98,7 @@ describe('DefaultFormGroup', () => {
       />
     );
 
-    const input = getByRole('textbox', { name: 'someLabel' });
+    const input: Locator = getByRole('textbox', { name: 'someLabel' });
     await expect.element(input).toHaveAttribute('autocomplete', 'name');
   });
 
@@ -115,7 +115,7 @@ describe('DefaultFormGroup', () => {
       />
     );
 
-    const input = getByRole('textbox', { name: 'someLabel' });
+    const input: Locator = getByRole('textbox', { name: 'someLabel' });
     await expect.element(input).toHaveAttribute('placeholder', 'somePlaceholder');
   });
 
@@ -134,7 +134,7 @@ describe('DefaultFormGroup', () => {
       />
     );
 
-    const input = getByRole('textbox', { name: 'someLabel' });
+    const input: Locator = getByRole('textbox', { name: 'someLabel' });
 
     await userEvent.type(input, 'someText');
     expect(onChange).toHaveBeenCalled();

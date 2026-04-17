@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import FilterTogglerCheckboxBtn from './FilterTogglerCheckboxBtn';
-import { userEvent } from 'vitest/browser';
+import { Locator, userEvent } from 'vitest/browser';
 
 describe('FilterTogglerCheckboxBtn', () => {
   it('should render a span with the title prop', async () => {
@@ -13,7 +13,7 @@ describe('FilterTogglerCheckboxBtn', () => {
       />
     );
 
-    const span = getByText('someTitle');
+    const span: Locator = getByText('someTitle');
     await expect.element(span).toBeVisible();
   });
 
@@ -26,7 +26,7 @@ describe('FilterTogglerCheckboxBtn', () => {
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toBeVisible();
   });
 
@@ -41,7 +41,7 @@ describe('FilterTogglerCheckboxBtn', () => {
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
 
     await userEvent.click(btn);
     expect(onClick).toHaveBeenCalled();

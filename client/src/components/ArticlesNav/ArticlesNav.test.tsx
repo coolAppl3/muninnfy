@@ -2,7 +2,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import ArticlesNav from './ArticlesNav';
 import { render } from 'vitest-browser-react';
-import { page } from 'vitest/browser';
+import { Locator, page } from 'vitest/browser';
 
 describe('ArticlesNav', () => {
   it('should render 4 Link components with the correct href attribute if the screen size is above 830px', async () => {
@@ -14,12 +14,12 @@ describe('ArticlesNav', () => {
       </MemoryRouter>
     );
 
-    const allLinks = getByRole('link');
+    const allLinks: Locator = getByRole('link');
 
-    const termsOfServiceLink = getByRole('link', { name: 'Terms of Service' });
-    const privacyPolicyLink = getByRole('link', { name: 'Privacy Policy' });
-    const cookiePolicyLink = getByRole('link', { name: 'Cookie Policy' });
-    const faqLink = getByRole('link', { name: 'FAQ' });
+    const termsOfServiceLink: Locator = getByRole('link', { name: 'Terms of Service' });
+    const privacyPolicyLink: Locator = getByRole('link', { name: 'Privacy Policy' });
+    const cookiePolicyLink: Locator = getByRole('link', { name: 'Cookie Policy' });
+    const faqLink: Locator = getByRole('link', { name: 'FAQ' });
 
     await expect.element(allLinks).toHaveLength(4);
 
@@ -45,7 +45,7 @@ describe('ArticlesNav', () => {
       </MemoryRouter>
     );
 
-    const nav = getByRole('navigation', { includeHidden: true });
+    const nav: Locator = getByRole('navigation', { includeHidden: true });
     await expect.element(nav).not.toBeVisible();
   });
 
@@ -56,7 +56,7 @@ describe('ArticlesNav', () => {
       </MemoryRouter>
     );
 
-    const link = getByRole('link', { name: 'FAQ' });
+    const link: Locator = getByRole('link', { name: 'FAQ' });
     await expect.element(link).toHaveClass('text-cta');
   });
 });
