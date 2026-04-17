@@ -8,8 +8,8 @@ import {
   ViewWishlistDetails,
 } from '../../../../../types/wishlistTypes';
 import StatisticItem from '../../../../../components/StatisticItem/StatisticItem';
-import ArrowIcon from '../../assets/svg/ArrowIcon.svg?react';
-import HeartIcon from '../../assets/svg/HeartIcon.svg?react';
+import ArrowIcon from '../../../../../assets/svg/ArrowIcon.svg?react';
+import HeartIcon from '../../../../../assets/svg/HeartIcon.svg?react';
 import useViewMode from '../../../../../hooks/useViewMode';
 
 type WishlistCardProps = {
