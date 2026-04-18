@@ -2,7 +2,7 @@ import { FocusEvent, JSX, useState } from 'react';
 import useAuthSession from '../../hooks/useAuthSession';
 import useConfirmModal from '../../hooks/useConfirmModal';
 import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
 type NavbarAccountMenuProps = {
