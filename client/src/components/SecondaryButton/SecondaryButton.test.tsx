@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import SecondaryButton from './SecondaryButton';
-import { userEvent } from 'vitest/browser';
+import { Locator, userEvent } from 'vitest/browser';
 
 describe('SecondaryButton', () => {
   it('should render a button', async () => {
@@ -9,7 +9,7 @@ describe('SecondaryButton', () => {
       <SecondaryButton onClick={() => {}}>someText</SecondaryButton>
     );
 
-    const btn = getByRole('button', { name: 'someText' });
+    const btn: Locator = getByRole('button', { name: 'someText' });
     await expect.element(btn).toBeVisible();
   });
 
@@ -18,7 +18,7 @@ describe('SecondaryButton', () => {
       <SecondaryButton onClick={() => {}}>someText</SecondaryButton>
     );
 
-    const btn = getByRole('button', { name: 'someText' });
+    const btn: Locator = getByRole('button', { name: 'someText' });
     await expect.element(btn).toHaveAttribute('type', 'button');
   });
 
@@ -32,7 +32,7 @@ describe('SecondaryButton', () => {
       </SecondaryButton>
     );
 
-    const btn = getByRole('button', { name: 'someText' });
+    const btn: Locator = getByRole('button', { name: 'someText' });
     await expect.element(btn).toBeDisabled();
   });
 
@@ -46,7 +46,7 @@ describe('SecondaryButton', () => {
       </SecondaryButton>
     );
 
-    const btn = getByRole('button', { name: 'someText' });
+    const btn: Locator = getByRole('button', { name: 'someText' });
     await expect.element(btn).not.toBeDisabled();
   });
 
@@ -60,7 +60,7 @@ describe('SecondaryButton', () => {
       </SecondaryButton>
     );
 
-    const btn = getByRole('button', { name: 'someOtherText' });
+    const btn: Locator = getByRole('button', { name: 'someOtherText' });
     await expect.element(btn).not.toBeDisabled();
   });
 
@@ -76,7 +76,7 @@ describe('SecondaryButton', () => {
       </SecondaryButton>
     );
 
-    const btn = getByRole('button', { name: 'someOtherText' });
+    const btn: Locator = getByRole('button', { name: 'someOtherText' });
     await userEvent.click(btn);
     expect(onClick).toHaveBeenCalled();
   });

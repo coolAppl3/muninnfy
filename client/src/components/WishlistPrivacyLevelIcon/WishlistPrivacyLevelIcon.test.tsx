@@ -6,6 +6,7 @@ import {
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
   PUBLIC_WISHLIST_PRIVACY_LEVEL,
 } from '../../utils/constants/wishlistConstants';
+import { Locator } from 'vitest/browser';
 
 describe('WishlistPrivacyLevelIcon', () => {
   it('should render a span with the title or Private and an aria-label of Private wishlist if the privacyLevel prop is private', async () => {
@@ -13,7 +14,7 @@ describe('WishlistPrivacyLevelIcon', () => {
       <WishlistPrivacyLevelIcon privacyLevel={PRIVATE_WISHLIST_PRIVACY_LEVEL} />
     );
 
-    const span = getByTitle('Private');
+    const span: Locator = getByTitle('Private');
     await expect.element(span).toBeVisible();
   });
 
@@ -22,7 +23,7 @@ describe('WishlistPrivacyLevelIcon', () => {
       <WishlistPrivacyLevelIcon privacyLevel={FOLLOWERS_WISHLIST_PRIVACY_LEVEL} />
     );
 
-    const span = getByTitle('Followers');
+    const span: Locator = getByTitle('Followers');
     await expect.element(span).toBeVisible();
   });
 
@@ -31,7 +32,7 @@ describe('WishlistPrivacyLevelIcon', () => {
       <WishlistPrivacyLevelIcon privacyLevel={PUBLIC_WISHLIST_PRIVACY_LEVEL} />
     );
 
-    const span = getByTitle('public');
+    const span: Locator = getByTitle('public');
     await expect.element(span).toBeVisible();
   });
 });

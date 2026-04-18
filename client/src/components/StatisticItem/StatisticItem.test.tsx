@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
 import StatisticItem from './StatisticItem';
+import { Locator } from 'vitest/browser';
 
 describe('StatisticItem', () => {
   it('should render a span with the title prop', async () => {
@@ -11,7 +12,7 @@ describe('StatisticItem', () => {
       />
     );
 
-    const span = getByText('someTitle');
+    const span: Locator = getByText('someTitle');
     await expect.element(span).toBeVisible();
   });
 
@@ -23,7 +24,7 @@ describe('StatisticItem', () => {
       />
     );
 
-    const span = getByText('someValue');
+    const span: Locator = getByText('someValue');
     await expect.element(span).toBeVisible();
   });
 });
