@@ -31,19 +31,19 @@ describe('FilterTogglerCheckboxBtn', () => {
   });
 
   it('should call onClick when the button is clicked', async () => {
-    const onClick = vi.fn();
+    const onClickMock = vi.fn();
 
     const { getByRole } = await render(
       <FilterTogglerCheckboxBtn
         title='someTitle'
         isChecked={true}
-        onClick={onClick}
+        onClick={onClickMock}
       />
     );
 
     const btn: Locator = getByRole('button');
 
     await userEvent.click(btn);
-    expect(onClick).toHaveBeenCalled();
+    expect(onClickMock).toHaveBeenCalled();
   });
 });

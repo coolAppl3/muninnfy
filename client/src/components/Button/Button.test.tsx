@@ -73,11 +73,11 @@ describe('Button', () => {
   });
 
   it('should call onClick when clicked', async () => {
-    const onClick = vi.fn();
-    const { getByRole } = await render(<Button onClick={onClick}>someText</Button>);
+    const onClickMock = vi.fn();
+    const { getByRole } = await render(<Button onClick={onClickMock}>someText</Button>);
 
     const btn: Locator = getByRole('button');
     await userEvent.click(btn);
-    expect(onClick).toHaveBeenCalled();
+    expect(onClickMock).toHaveBeenCalled();
   });
 });

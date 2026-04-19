@@ -47,19 +47,19 @@ describe('InfoModal', () => {
   });
 
   it('should call onClick when the button is clicked', async () => {
-    const onClick = vi.fn();
+    const onClickMock = vi.fn();
 
     const { getByRole } = await render(
       <InfoModal
         title='someTitle'
         description='someDescription'
         btnTitle='Okay'
-        onClick={onClick}
+        onClick={onClickMock}
       />
     );
 
     const btn: Locator = getByRole('button', { name: 'Okay' });
     await userEvent.click(btn);
-    expect(onClick).toHaveBeenCalled();
+    expect(onClickMock).toHaveBeenCalled();
   });
 });

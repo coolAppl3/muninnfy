@@ -120,7 +120,7 @@ describe('DefaultFormGroup', () => {
   });
 
   it('should cal the onChange handler when a change event is triggered in the input by the user', async () => {
-    const onChange = vi.fn();
+    const onChangeMock = vi.fn();
 
     const { getByRole } = await render(
       <DefaultFormGroup
@@ -128,7 +128,7 @@ describe('DefaultFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={onChange}
+        onChange={onChangeMock}
         autoComplete='name'
         placeholder='somePlaceholder'
       />
@@ -137,6 +137,6 @@ describe('DefaultFormGroup', () => {
     const input: Locator = getByRole('textbox', { name: 'someLabel' });
 
     await userEvent.type(input, 'someText');
-    expect(onChange).toHaveBeenCalled();
+    expect(onChangeMock).toHaveBeenCalled();
   });
 });

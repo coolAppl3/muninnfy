@@ -143,7 +143,7 @@ describe('PasswordFormGroup', () => {
   });
 
   it('should call onClick when the input is changed by user action', async () => {
-    const onChange = vi.fn();
+    const onChangeMock = vi.fn();
 
     const { getByRole } = await render(
       <PasswordFormGroup
@@ -151,13 +151,13 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={onChange}
+        onChange={onChangeMock}
       />
     );
 
     const input: Locator = getByRole('textbox', { name: 'someLabel' });
     await userEvent.type(input, 'someText');
-    expect(onChange).toHaveBeenCalled();
+    expect(onChangeMock).toHaveBeenCalled();
   });
 
   it('should render a password toggle button with a title attribute of Reveal password by default', async () => {

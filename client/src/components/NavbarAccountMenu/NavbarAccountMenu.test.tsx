@@ -99,13 +99,13 @@ describe('NavbarAccountMenu', () => {
     await expect.element(signOutBtn).toHaveAttribute('type', 'button');
   });
 
-  const displayConfirmModal = vi.fn();
-  const removeConfirmModal = vi.fn();
+  const displayConfirmModalMock = vi.fn();
+  const removeConfirmModalMock = vi.fn();
 
   it('should call displayConfirmModal if the sign out button is clicked', async () => {
     vi.mocked(useConfirmModal).mockImplementation(() => ({
-      displayConfirmModal,
-      removeConfirmModal,
+      displayConfirmModal: displayConfirmModalMock,
+      removeConfirmModal: removeConfirmModalMock,
     }));
 
     const { getByRole } = await render(<NavbarAccountMenu navbarType='top' />, {
@@ -118,19 +118,19 @@ describe('NavbarAccountMenu', () => {
     const signOutBtn: Locator = getByRole('button', { name: 'Sign out' });
     await userEvent.click(signOutBtn);
 
-    expect(displayConfirmModal).toHaveBeenCalled();
+    expect(displayConfirmModalMock).toHaveBeenCalled();
   });
 
   it('should call removeConfirmModal and signOut if the sign out action is confirmed', async () => {
-    const signOut = vi.fn();
+    const signOutMock = vi.fn();
 
     vi.mocked(useConfirmModal).mockImplementation(() => ({
-      displayConfirmModal,
-      removeConfirmModal,
+      displayConfirmModal: displayConfirmModalMock,
+      removeConfirmModal: removeConfirmModalMock,
     }));
 
     vi.mocked(useAuthSession).mockImplementation(() => ({
-      signOut,
+      signOut: signOutMock,
     }));
 
     const { getByRole } = await render(<NavbarAccountMenu navbarType='top' />, {
@@ -143,19 +143,19 @@ describe('NavbarAccountMenu', () => {
     const signOutBtn: Locator = getByRole('button', { name: 'Sign out' });
     await userEvent.click(signOutBtn);
 
-    const modalConfig = displayConfirmModal.mock.calls[0]![0] as {
+    const modalConfig = displayConfirmModalMock.mock.calls[0]![0] as {
       onConfirm: () => Promise<void>;
     };
     await modalConfig.onConfirm();
 
-    expect(removeConfirmModal).toHaveBeenCalled();
-    expect(signOut).toHaveBeenCalled();
+    expect(removeConfirmModalMock).toHaveBeenCalled();
+    expect(signOutMock).toHaveBeenCalled();
   });
 
   it('should call removeConfirmModal if the sign out action is cancelled', async () => {
     vi.mocked(useConfirmModal).mockImplementation(() => ({
-      displayConfirmModal,
-      removeConfirmModal,
+      displayConfirmModal: displayConfirmModalMock,
+      removeConfirmModal: removeConfirmModalMock,
     }));
 
     const { getByRole } = await render(<NavbarAccountMenu navbarType='top' />, {
@@ -168,11 +168,11 @@ describe('NavbarAccountMenu', () => {
     const signOutBtn: Locator = getByRole('button', { name: 'Sign out' });
     await userEvent.click(signOutBtn);
 
-    const modalConfig = displayConfirmModal.mock.calls[0]![0] as {
+    const modalConfig = displayConfirmModalMock.mock.calls[0]![0] as {
       onCancel: () => void;
     };
     modalConfig.onCancel();
 
-    expect(removeConfirmModal).toHaveBeenCalled();
+    expect(removeConfirmModalMock).toHaveBeenCalled();
   });
 });

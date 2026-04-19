@@ -82,7 +82,7 @@ describe('InstructionCard', () => {
   });
 
   it('should call onClick when the button is clicked', async () => {
-    const onClick = vi.fn();
+    const onClickMock = vi.fn();
 
     const { getByRole } = await render(
       <InstructionCard
@@ -90,12 +90,12 @@ describe('InstructionCard', () => {
         description='someDescription'
         btnTitle='someBtnTitle'
         btnDisabled={false}
-        onClick={onClick}
+        onClick={onClickMock}
       />
     );
 
     const btn: Locator = getByRole('button', { name: 'someBtnTitle' });
     await userEvent.click(btn);
-    await expect(onClick).toHaveBeenCalled();
+    expect(onClickMock).toHaveBeenCalled();
   });
 });

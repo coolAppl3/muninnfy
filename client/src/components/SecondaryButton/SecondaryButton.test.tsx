@@ -65,12 +65,12 @@ describe('SecondaryButton', () => {
   });
 
   it('should call onClick when the button is clicked', async () => {
-    const onClick = vi.fn();
+    const onClickMock = vi.fn();
 
     const { getByRole } = await render(
       <SecondaryButton
         disabled={false}
-        onClick={onClick}
+        onClick={onClickMock}
       >
         someOtherText
       </SecondaryButton>
@@ -78,6 +78,6 @@ describe('SecondaryButton', () => {
 
     const btn: Locator = getByRole('button', { name: 'someOtherText' });
     await userEvent.click(btn);
-    expect(onClick).toHaveBeenCalled();
+    expect(onClickMock).toHaveBeenCalled();
   });
 });

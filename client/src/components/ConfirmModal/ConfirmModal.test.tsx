@@ -56,7 +56,7 @@ describe('ConfirmModal', () => {
   });
 
   it('should call onConfirm when the confirm button is clicked', async () => {
-    const onConfirm = vi.fn();
+    const onConfirmMock = vi.fn();
 
     const { getByRole } = await render(
       <ConfirmModal
@@ -65,14 +65,14 @@ describe('ConfirmModal', () => {
         confirmBtnTitle='Confirm'
         cancelBtnTitle='Cancel'
         isDangerous={false}
-        onConfirm={onConfirm}
+        onConfirm={onConfirmMock}
         onCancel={vi.fn()}
       />
     );
 
     const btn: Locator = getByRole('button', { name: 'Confirm' });
     await userEvent.click(btn);
-    expect(onConfirm).toHaveBeenCalled();
+    expect(onConfirmMock).toHaveBeenCalled();
   });
 
   it('should render a cancel button with the cancelBtnTitle prop', async () => {
@@ -93,7 +93,7 @@ describe('ConfirmModal', () => {
   });
 
   it('should call onCancel when the cancel button is clicked', async () => {
-    const onCancel = vi.fn();
+    const onCancelMock = vi.fn();
 
     const { getByRole } = await render(
       <ConfirmModal
@@ -103,13 +103,13 @@ describe('ConfirmModal', () => {
         cancelBtnTitle='Cancel'
         isDangerous={false}
         onConfirm={vi.fn()}
-        onCancel={onCancel}
+        onCancel={onCancelMock}
       />
     );
 
     const btn: Locator = getByRole('button', { name: 'Cancel' });
     await userEvent.click(btn);
-    expect(onCancel).toHaveBeenCalled();
+    expect(onCancelMock).toHaveBeenCalled();
   });
 
   it('should render a extra button with the extraBtnTitle prop', async () => {
@@ -132,7 +132,7 @@ describe('ConfirmModal', () => {
   });
 
   it('should call onExtraAction when the cancel button is clicked', async () => {
-    const onExtraAction = vi.fn();
+    const onExtraActionMock = vi.fn();
 
     const { getByRole } = await render(
       <ConfirmModal
@@ -144,13 +144,13 @@ describe('ConfirmModal', () => {
         isDangerous={false}
         onConfirm={vi.fn()}
         onCancel={vi.fn()}
-        onExtraAction={onExtraAction}
+        onExtraAction={onExtraActionMock}
       />
     );
 
     const btn: Locator = getByRole('button', { name: 'Extra' });
     await userEvent.click(btn);
-    expect(onExtraAction).toHaveBeenCalled();
+    expect(onExtraActionMock).toHaveBeenCalled();
   });
 
   it('should render a confirm button with the bg-danger border-danger class names if isDangerous is true', async () => {
