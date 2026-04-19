@@ -5,7 +5,7 @@ import { Locator, userEvent } from 'vitest/browser';
 
 describe('DefaultFormGroup', () => {
   describe('CheckboxFormGroup', () => {
-    it('should render a label with text', async () => {
+    it('should render a label with the label prop text', async () => {
       const { getByText } = await render(
         <DefaultFormGroup
           id='someId'
