@@ -1,10 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('../../hooks/useAuth');
-vi.mock('../NavbarAccountMenu/NavbarAccountMenu', () => ({
-  default: () => <div data-testId='account-menu'></div>,
-}));
-
 import { MemoryRouter } from 'react-router-dom';
 import BottomNavbar from './BottomNavbar';
 import { render } from 'vitest-browser-react';
@@ -12,6 +6,11 @@ import AuthProvider from '../../providers/AuthProvider';
 import { Locator, page } from 'vitest/browser';
 import useAuth from '../../hooks/useAuth';
 import { JSX, ReactNode } from 'react';
+
+vi.mock('../../hooks/useAuth');
+vi.mock('../NavbarAccountMenu/NavbarAccountMenu', () => ({
+  default: () => <div data-testId='account-menu'></div>,
+}));
 
 function TestWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (

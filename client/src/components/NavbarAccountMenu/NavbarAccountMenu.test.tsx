@@ -1,9 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('../../hooks/useAuth');
-vi.mock('../../hooks/useConfirmModal');
-vi.mock('../../hooks/useAuthSession');
-
 import { render } from 'vitest-browser-react';
 import NavbarAccountMenu from './NavbarAccountMenu';
 import { Locator, userEvent } from 'vitest/browser';
@@ -15,6 +10,10 @@ import Providers from '../../Providers';
 import useAuth from '../../hooks/useAuth';
 import useConfirmModal from '../../hooks/useConfirmModal';
 import useAuthSession from '../../hooks/useAuthSession';
+
+vi.mock('../../hooks/useAuth');
+vi.mock('../../hooks/useConfirmModal');
+vi.mock('../../hooks/useAuthSession');
 
 function TestWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (

@@ -1,7 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-
-vi.mock('../../hooks/useAuth');
-
 import { render } from 'vitest-browser-react';
 import Footer from './Footer';
 import useAuth from '../../hooks/useAuth';
@@ -9,6 +6,8 @@ import AuthProvider from '../../providers/AuthProvider';
 import { MemoryRouter } from 'react-router-dom';
 import { JSX, ReactNode } from 'react';
 import { Locator } from 'vitest/browser';
+
+vi.mock('../../hooks/useAuth');
 
 function TestWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
