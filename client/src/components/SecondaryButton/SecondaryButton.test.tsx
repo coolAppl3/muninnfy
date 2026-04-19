@@ -6,7 +6,7 @@ import { Locator, userEvent } from 'vitest/browser';
 describe('SecondaryButton', () => {
   it('should render a button', async () => {
     const { getByRole } = await render(
-      <SecondaryButton onClick={() => {}}>someText</SecondaryButton>
+      <SecondaryButton onClick={vi.fn()}>someText</SecondaryButton>
     );
 
     const btn: Locator = getByRole('button', { name: 'someText' });
@@ -15,7 +15,7 @@ describe('SecondaryButton', () => {
 
   it('should render a button with a type of button', async () => {
     const { getByRole } = await render(
-      <SecondaryButton onClick={() => {}}>someText</SecondaryButton>
+      <SecondaryButton onClick={vi.fn()}>someText</SecondaryButton>
     );
 
     const btn: Locator = getByRole('button', { name: 'someText' });
@@ -26,7 +26,7 @@ describe('SecondaryButton', () => {
     const { getByRole } = await render(
       <SecondaryButton
         disabled={true}
-        onClick={() => {}}
+        onClick={vi.fn()}
       >
         someText
       </SecondaryButton>
@@ -40,7 +40,7 @@ describe('SecondaryButton', () => {
     const { getByRole } = await render(
       <SecondaryButton
         disabled={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       >
         someText
       </SecondaryButton>
@@ -54,7 +54,7 @@ describe('SecondaryButton', () => {
     const { getByRole } = await render(
       <SecondaryButton
         disabled={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       >
         someOtherText
       </SecondaryButton>

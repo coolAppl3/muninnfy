@@ -12,8 +12,8 @@ describe('ConfirmModal', () => {
         confirmBtnTitle='Confirm'
         cancelBtnTitle='Cancel'
         isDangerous={false}
-        onConfirm={() => {}}
-        onCancel={() => {}}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
       />
     );
 
@@ -29,8 +29,8 @@ describe('ConfirmModal', () => {
         confirmBtnTitle='Confirm'
         cancelBtnTitle='Cancel'
         isDangerous={false}
-        onConfirm={() => {}}
-        onCancel={() => {}}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
       />
     );
 
@@ -46,8 +46,8 @@ describe('ConfirmModal', () => {
         confirmBtnTitle='Confirm'
         cancelBtnTitle='Cancel'
         isDangerous={false}
-        onConfirm={() => {}}
-        onCancel={() => {}}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
       />
     );
 
@@ -66,7 +66,7 @@ describe('ConfirmModal', () => {
         cancelBtnTitle='Cancel'
         isDangerous={false}
         onConfirm={onConfirm}
-        onCancel={() => {}}
+        onCancel={vi.fn()}
       />
     );
 
@@ -83,8 +83,8 @@ describe('ConfirmModal', () => {
         confirmBtnTitle='Confirm'
         cancelBtnTitle='Cancel'
         isDangerous={false}
-        onConfirm={() => {}}
-        onCancel={() => {}}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
       />
     );
 
@@ -102,7 +102,7 @@ describe('ConfirmModal', () => {
         confirmBtnTitle='Confirm'
         cancelBtnTitle='Cancel'
         isDangerous={false}
-        onConfirm={() => {}}
+        onConfirm={vi.fn()}
         onCancel={onCancel}
       />
     );
@@ -121,9 +121,9 @@ describe('ConfirmModal', () => {
         cancelBtnTitle='Cancel'
         extraBtnTitle='Extra'
         isDangerous={false}
-        onConfirm={() => {}}
-        onCancel={() => {}}
-        onExtraAction={() => {}}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+        onExtraAction={vi.fn()}
       />
     );
 
@@ -142,8 +142,8 @@ describe('ConfirmModal', () => {
         cancelBtnTitle='Cancel'
         extraBtnTitle='Extra'
         isDangerous={false}
-        onConfirm={() => {}}
-        onCancel={() => {}}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
         onExtraAction={onExtraAction}
       />
     );
@@ -161,8 +161,8 @@ describe('ConfirmModal', () => {
         confirmBtnTitle='Confirm'
         cancelBtnTitle='Cancel'
         isDangerous={true}
-        onConfirm={() => {}}
-        onCancel={() => {}}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
       />
     );
 

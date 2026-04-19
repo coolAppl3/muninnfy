@@ -11,7 +11,7 @@ describe('InstructionCard', () => {
         description='someDescription'
         btnTitle='someBtnTitle'
         btnDisabled={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -26,7 +26,7 @@ describe('InstructionCard', () => {
         description='someDescription'
         btnTitle='someBtnTitle'
         btnDisabled={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -41,7 +41,7 @@ describe('InstructionCard', () => {
         description='someDescription'
         btnTitle='someBtnTitle'
         btnDisabled={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -56,7 +56,7 @@ describe('InstructionCard', () => {
         description='someDescription'
         btnTitle='someBtnTitle'
         btnDisabled={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -72,7 +72,7 @@ describe('InstructionCard', () => {
         description='someDescription'
         btnTitle='someBtnTitle'
         btnDisabled={true}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 

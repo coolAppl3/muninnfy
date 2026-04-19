@@ -10,7 +10,7 @@ describe('InfoModal', () => {
         title='someTitle'
         description='someDescription'
         btnTitle='Okay'
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -24,7 +24,7 @@ describe('InfoModal', () => {
         title='someTitle'
         description='someDescription'
         btnTitle='Okay'
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -38,7 +38,7 @@ describe('InfoModal', () => {
         title='someTitle'
         description='someDescription'
         btnTitle='Okay'
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 

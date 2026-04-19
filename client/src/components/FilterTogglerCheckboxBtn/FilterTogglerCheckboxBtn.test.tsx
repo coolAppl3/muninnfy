@@ -9,7 +9,7 @@ describe('FilterTogglerCheckboxBtn', () => {
       <FilterTogglerCheckboxBtn
         title='someTitle'
         isChecked={true}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -22,7 +22,7 @@ describe('FilterTogglerCheckboxBtn', () => {
       <FilterTogglerCheckboxBtn
         title='someTitle'
         isChecked={true}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 

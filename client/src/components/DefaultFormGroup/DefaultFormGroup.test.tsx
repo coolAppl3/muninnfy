@@ -12,7 +12,7 @@ describe('DefaultFormGroup', () => {
           label='someLabel'
           value='someValue'
           errorMessage={null}
-          onChange={() => {}}
+          onChange={vi.fn()}
           autoComplete='name'
         />
       );
@@ -28,7 +28,7 @@ describe('DefaultFormGroup', () => {
           label='someLabel'
           value='someValue'
           errorMessage={null}
-          onChange={() => {}}
+          onChange={vi.fn()}
           autoComplete='name'
         />
       );
@@ -44,7 +44,7 @@ describe('DefaultFormGroup', () => {
           label='someLabel'
           value='someValue'
           errorMessage={'someErrorMessage'}
-          onChange={() => {}}
+          onChange={vi.fn()}
           autoComplete='name'
         />
       );
@@ -60,7 +60,7 @@ describe('DefaultFormGroup', () => {
           label='someLabel'
           value='someValue'
           errorMessage={null}
-          onChange={() => {}}
+          onChange={vi.fn()}
           autoComplete='name'
         />
       );
@@ -77,7 +77,7 @@ describe('DefaultFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
         autoComplete='name'
       />
     );
@@ -93,7 +93,7 @@ describe('DefaultFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
         autoComplete='name'
       />
     );
@@ -109,7 +109,7 @@ describe('DefaultFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
         autoComplete='name'
         placeholder='somePlaceholder'
       />

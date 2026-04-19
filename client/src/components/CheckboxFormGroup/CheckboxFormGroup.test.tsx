@@ -10,7 +10,7 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -24,7 +24,7 @@ describe('CheckboxFormGroup', () => {
         label={<span>someSpan</span>}
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -38,7 +38,7 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -52,7 +52,7 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -66,7 +66,7 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -80,7 +80,7 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
@@ -95,7 +95,7 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={true}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 

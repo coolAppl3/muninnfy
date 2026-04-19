@@ -11,7 +11,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -26,7 +26,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -41,7 +41,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -56,7 +56,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -71,7 +71,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -86,7 +86,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -101,7 +101,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -116,7 +116,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -131,7 +131,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -167,7 +167,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -183,7 +183,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -202,7 +202,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -217,7 +217,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
@@ -236,7 +236,7 @@ describe('PasswordFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={'someErrorMessage'}
-        onChange={() => {}}
+        onChange={vi.fn()}
       />
     );
 
