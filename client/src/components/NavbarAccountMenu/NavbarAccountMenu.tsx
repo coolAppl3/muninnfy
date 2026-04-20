@@ -2,8 +2,7 @@ import { FocusEvent, JSX, useState } from 'react';
 import useAuthSession from '../../hooks/useAuthSession';
 import useConfirmModal from '../../hooks/useConfirmModal';
 import ChevronIcon from '../../assets/svg/ChevronIcon.svg?react';
-import { Link, NavLink } from 'react-router-dom';
-import useAuth from '../../hooks/useAuth';
+import { NavLink } from 'react-router-dom';
 
 type NavbarAccountMenuProps = {
   navbarType: 'top' | 'bottom';
@@ -13,7 +12,6 @@ export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
-  const { authStatus } = useAuth();
   const { signOut } = useAuthSession();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
@@ -74,7 +72,7 @@ export default function NavbarAccountMenu({ navbarType }: NavbarAccountMenuProps
           My account
         </NavLink>
         <NavLink
-          to={authStatus === 'authenticated' ? '/wishlist/new' : '/sign-up'}
+          to='/wishlist/new'
           className={({ isActive }) =>
             `context-menu-btn bg-secondary ${isActive ? 'text-cta' : ''}`
           }

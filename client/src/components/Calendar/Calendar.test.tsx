@@ -1,7 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-
-vi.mock('../../hooks/useCalendar');
-
 import { render } from 'vitest-browser-react';
 import Calendar from './Calendar';
 import CalendarProvider from '../../providers/CalendarProvider';
@@ -10,6 +7,8 @@ import { MemoryRouter } from 'react-router-dom';
 import PopupMessageProvider from '../../providers/PopupMessageProvider';
 import { Locator, userEvent } from 'vitest/browser';
 import useCalendar from '../../hooks/useCalendar';
+
+vi.mock('../../hooks/useCalendar');
 
 function TestWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (

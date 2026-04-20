@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import CheckboxFormGroup from './CheckboxFormGroup';
-import { userEvent } from 'vitest/browser';
+import { Locator, userEvent } from 'vitest/browser';
 
 describe('CheckboxFormGroup', () => {
   it('should render a label with text', async () => {
@@ -10,11 +10,11 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
-    const label = getByText('someLabel');
+    const label: Locator = getByText('someLabel');
     await expect.element(label).toBeVisible();
   });
 
@@ -24,11 +24,11 @@ describe('CheckboxFormGroup', () => {
         label={<span>someSpan</span>}
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
-    const span = getByText('someSpan');
+    const span: Locator = getByText('someSpan');
     await expect.element(span).toBeVisible();
   });
 
@@ -38,11 +38,11 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
-    const label = getByText('someLabel');
+    const label: Locator = getByText('someLabel');
     await expect.element(label).toHaveAttribute('for', 'someId');
   });
 
@@ -52,11 +52,11 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toHaveAttribute('type', 'button');
   });
 
@@ -66,11 +66,11 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toHaveAttribute('id', 'someId');
   });
 
@@ -80,11 +80,11 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toHaveAttribute('title', 'Check');
     await expect.element(btn).toHaveAttribute('aria-label', 'Check');
   });
@@ -95,30 +95,30 @@ describe('CheckboxFormGroup', () => {
         label='someLabel'
         id='someId'
         isChecked={true}
-        onClick={() => {}}
+        onClick={vi.fn()}
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
     await expect.element(btn).toHaveAttribute('title', 'Uncheck');
     await expect.element(btn).toHaveAttribute('aria-label', 'Uncheck');
   });
 
   it('should call onClick when clicked', async () => {
-    const onClick = vi.fn();
+    const onClickMock = vi.fn();
 
     const { getByRole } = await render(
       <CheckboxFormGroup
         label='someLabel'
         id='someId'
         isChecked={false}
-        onClick={onClick}
+        onClick={onClickMock}
       />
     );
 
-    const btn = getByRole('button');
+    const btn: Locator = getByRole('button');
 
     await userEvent.click(btn);
-    expect(onClick).toHaveBeenCalled();
+    expect(onClickMock).toHaveBeenCalled();
   });
 });

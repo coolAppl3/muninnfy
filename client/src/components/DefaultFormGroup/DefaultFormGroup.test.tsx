@@ -1,23 +1,23 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import DefaultFormGroup from './DefaultFormGroup';
-import { userEvent } from 'vitest/browser';
+import { Locator, userEvent } from 'vitest/browser';
 
 describe('DefaultFormGroup', () => {
   describe('CheckboxFormGroup', () => {
-    it('should render a label with text', async () => {
+    it('should render a label with the label prop text', async () => {
       const { getByText } = await render(
         <DefaultFormGroup
           id='someId'
           label='someLabel'
           value='someValue'
           errorMessage={null}
-          onChange={() => {}}
+          onChange={vi.fn()}
           autoComplete='name'
         />
       );
 
-      const label = getByText('someLabel');
+      const label: Locator = getByText('someLabel');
       await expect.element(label).toBeVisible();
     });
 
@@ -28,12 +28,12 @@ describe('DefaultFormGroup', () => {
           label='someLabel'
           value='someValue'
           errorMessage={null}
-          onChange={() => {}}
+          onChange={vi.fn()}
           autoComplete='name'
         />
       );
 
-      const label = getByText('someLabel');
+      const label: Locator = getByText('someLabel');
       await expect.element(label).toHaveAttribute('for', 'someId');
     });
 
@@ -44,12 +44,12 @@ describe('DefaultFormGroup', () => {
           label='someLabel'
           value='someValue'
           errorMessage={'someErrorMessage'}
-          onChange={() => {}}
+          onChange={vi.fn()}
           autoComplete='name'
         />
       );
 
-      const span = getByText('someErrorMessage');
+      const span: Locator = getByText('someErrorMessage');
       await expect.element(span).toBeVisible();
     });
 
@@ -60,12 +60,12 @@ describe('DefaultFormGroup', () => {
           label='someLabel'
           value='someValue'
           errorMessage={null}
-          onChange={() => {}}
+          onChange={vi.fn()}
           autoComplete='name'
         />
       );
 
-      const input = getByRole('textbox', { name: 'someLabel' });
+      const input: Locator = getByRole('textbox', { name: 'someLabel' });
       await expect.element(input).toBeVisible();
     });
   });
@@ -77,12 +77,12 @@ describe('DefaultFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
         autoComplete='name'
       />
     );
 
-    const input = getByRole('textbox', { name: 'someLabel' });
+    const input: Locator = getByRole('textbox', { name: 'someLabel' });
     await expect.element(input).toHaveAttribute('id', 'someId');
   });
 
@@ -93,12 +93,12 @@ describe('DefaultFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
         autoComplete='name'
       />
     );
 
-    const input = getByRole('textbox', { name: 'someLabel' });
+    const input: Locator = getByRole('textbox', { name: 'someLabel' });
     await expect.element(input).toHaveAttribute('autocomplete', 'name');
   });
 
@@ -109,18 +109,18 @@ describe('DefaultFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={() => {}}
+        onChange={vi.fn()}
         autoComplete='name'
         placeholder='somePlaceholder'
       />
     );
 
-    const input = getByRole('textbox', { name: 'someLabel' });
+    const input: Locator = getByRole('textbox', { name: 'someLabel' });
     await expect.element(input).toHaveAttribute('placeholder', 'somePlaceholder');
   });
 
   it('should cal the onChange handler when a change event is triggered in the input by the user', async () => {
-    const onChange = vi.fn();
+    const onChangeMock = vi.fn();
 
     const { getByRole } = await render(
       <DefaultFormGroup
@@ -128,15 +128,15 @@ describe('DefaultFormGroup', () => {
         label='someLabel'
         value='someValue'
         errorMessage={null}
-        onChange={onChange}
+        onChange={onChangeMock}
         autoComplete='name'
         placeholder='somePlaceholder'
       />
     );
 
-    const input = getByRole('textbox', { name: 'someLabel' });
+    const input: Locator = getByRole('textbox', { name: 'someLabel' });
 
     await userEvent.type(input, 'someText');
-    expect(onChange).toHaveBeenCalled();
+    expect(onChangeMock).toHaveBeenCalled();
   });
 });

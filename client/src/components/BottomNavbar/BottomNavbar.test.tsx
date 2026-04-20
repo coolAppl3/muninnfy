@@ -1,17 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import BottomNavbar from './BottomNavbar';
+import { render } from 'vitest-browser-react';
+import AuthProvider from '../../providers/AuthProvider';
+import { Locator, page } from 'vitest/browser';
+import useAuth from '../../hooks/useAuth';
+import { JSX, ReactNode } from 'react';
 
 vi.mock('../../hooks/useAuth');
 vi.mock('../NavbarAccountMenu/NavbarAccountMenu', () => ({
   default: () => <div data-testId='account-menu'></div>,
 }));
-
-import { MemoryRouter } from 'react-router-dom';
-import BottomNavbar from './BottomNavbar';
-import { render } from 'vitest-browser-react';
-import AuthProvider from '../../providers/AuthProvider';
-import { page } from 'vitest/browser';
-import useAuth from '../../hooks/useAuth';
-import { JSX, ReactNode } from 'react';
 
 function TestWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
@@ -27,7 +26,7 @@ describe('BottomNavbar', () => {
 
     const { getByRole } = await render(<BottomNavbar />, { wrapper: TestWrapper });
 
-    const nav = getByRole('navigation', { includeHidden: true });
+    const nav: Locator = getByRole('navigation', { includeHidden: true });
     await expect.element(nav).not.toBeVisible();
   });
 
@@ -36,7 +35,7 @@ describe('BottomNavbar', () => {
 
     const { getByRole } = await render(<BottomNavbar />, { wrapper: TestWrapper });
 
-    const nav = getByRole('navigation', { includeHidden: true });
+    const nav: Locator = getByRole('navigation', { includeHidden: true });
     await expect.element(nav).toBeVisible();
   });
 
@@ -47,8 +46,8 @@ describe('BottomNavbar', () => {
   it('should render the Home and Wishlists links', async () => {
     const { getByRole } = await render(<BottomNavbar />, { wrapper: TestWrapper });
 
-    const homeLink = getByRole('link', { name: 'Home' });
-    const wishlistsLink = getByRole('link', { name: 'Wishlists' });
+    const homeLink: Locator = getByRole('link', { name: 'Home' });
+    const wishlistsLink: Locator = getByRole('link', { name: 'Wishlists' });
 
     await expect.element(homeLink).toBeVisible();
     await expect.element(wishlistsLink).toBeVisible();
@@ -64,7 +63,7 @@ describe('BottomNavbar', () => {
       wrapper: TestWrapper,
     });
 
-    const menuBtn = getByTestId('account-menu');
+    const menuBtn: Locator = getByTestId('account-menu');
     await expect.element(menuBtn).toBeVisible();
   });
 
@@ -78,7 +77,7 @@ describe('BottomNavbar', () => {
       wrapper: TestWrapper,
     });
 
-    const signInLink = getByRole('link', { name: 'Sign in' });
+    const signInLink: Locator = getByRole('link', { name: 'Sign in' });
     await expect.element(signInLink).toBeVisible();
   });
 });

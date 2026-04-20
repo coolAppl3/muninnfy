@@ -1,9 +1,10 @@
 import { JSX, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import Button from '../Button/Button';
 
-export type InfoModalProps = {
-  title?: string;
-  description?: string;
+export type InfoModalProps = (
+  | { title: string; description?: string }
+  | { title?: string; description: string }
+) & {
   btnTitle: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
 };

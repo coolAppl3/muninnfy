@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import Container from './Container';
+import { Locator } from 'vitest/browser';
 
 describe('Container', () => {
   it('should render a react node', async () => {
@@ -10,14 +11,14 @@ describe('Container', () => {
       </Container>
     );
 
-    const span = getByText('someText');
+    const span: Locator = getByText('someText');
     await expect.element(span).toBeInTheDocument();
   });
 
   it('includes custom class names', async () => {
     const { getByText } = await render(<Container className='someClass'>someText</Container>);
 
-    const container = getByText('someText');
+    const container: Locator = getByText('someText');
     await expect.element(container).toHaveClass('someClass');
   });
 });

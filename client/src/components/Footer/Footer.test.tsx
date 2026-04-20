@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-
-vi.mock('../../hooks/useAuth');
-
 import { render } from 'vitest-browser-react';
 import Footer from './Footer';
 import useAuth from '../../hooks/useAuth';
 import AuthProvider from '../../providers/AuthProvider';
 import { MemoryRouter } from 'react-router-dom';
 import { JSX, ReactNode } from 'react';
+import { Locator } from 'vitest/browser';
+
+vi.mock('../../hooks/useAuth');
 
 function TestWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
@@ -21,18 +21,18 @@ describe('Footer', () => {
   it('should render all 10 links with the correct href attribute', async () => {
     const { getByRole } = await render(<Footer />, { wrapper: TestWrapper });
 
-    const allLinks = getByRole('link');
+    const allLinks: Locator = getByRole('link');
 
-    const firstsHomeLink = getByRole('link', { name: 'Muninnfy' });
-    const secondHomeLink = getByRole('link', { name: 'home' });
-    const newWishlistsLink = getByRole('link', { name: 'New wishlist' });
-    const signUpLink = getByRole('link', { name: 'Sign up' });
-    const signInLink = getByRole('link', { name: 'Sign in' });
-    const accountRecoveryLink = getByRole('link', { name: 'Account recovery' });
-    const faqLink = getByRole('link', { name: 'FAQ' });
-    const termsOfServiceLink = getByRole('link', { name: 'Terms of Service' });
-    const privacyPolicyLink = getByRole('link', { name: 'Privacy Policy' });
-    const cookiePolicyLLink = getByRole('link', { name: 'Cookie policy' });
+    const firstsHomeLink: Locator = getByRole('link', { name: 'Muninnfy' });
+    const secondHomeLink: Locator = getByRole('link', { name: 'home' });
+    const newWishlistsLink: Locator = getByRole('link', { name: 'New wishlist' });
+    const signUpLink: Locator = getByRole('link', { name: 'Sign up' });
+    const signInLink: Locator = getByRole('link', { name: 'Sign in' });
+    const accountRecoveryLink: Locator = getByRole('link', { name: 'Account recovery' });
+    const faqLink: Locator = getByRole('link', { name: 'FAQ' });
+    const termsOfServiceLink: Locator = getByRole('link', { name: 'Terms of Service' });
+    const privacyPolicyLink: Locator = getByRole('link', { name: 'Privacy Policy' });
+    const cookiePolicyLLink: Locator = getByRole('link', { name: 'Cookie policy' });
 
     await expect.element(allLinks).toHaveLength(10);
 
@@ -75,10 +75,10 @@ describe('Footer', () => {
 
     const { getByRole } = await render(<Footer />, { wrapper: TestWrapper });
 
-    const allLinks = getByRole('link');
+    const allLinks: Locator = getByRole('link');
     await expect.element(allLinks).toHaveLength(10);
 
-    const newWishlistsLink = getByRole('link', { name: 'New wishlist' });
+    const newWishlistsLink: Locator = getByRole('link', { name: 'New wishlist' });
     await expect.element(newWishlistsLink).toHaveAttribute('href', '/wishlist/new');
   });
 });

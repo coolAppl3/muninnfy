@@ -12,7 +12,7 @@ export default function InfoModalProvider({ children }: InfoModalProviderProps):
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [InfoModalState, setInfoModalState] = useState<InfoModalProps>({
-    title: undefined,
+    title: '',
     description: undefined,
     btnTitle: 'Okay',
     onClick: () => {},
@@ -26,7 +26,7 @@ export default function InfoModalProvider({ children }: InfoModalProviderProps):
   const removeInfoModal = useCallback(() => {
     setIsVisible(false);
     setInfoModalState({
-      title: undefined,
+      title: '',
       description: undefined,
       btnTitle: 'Okay',
       onClick: () => {},
@@ -47,14 +47,7 @@ export default function InfoModalProvider({ children }: InfoModalProviderProps):
     <InfoModalContext value={contextValue}>
       {children}
 
-      {isVisible && (
-        <InfoModal
-          title={title}
-          description={description}
-          btnTitle={btnTitle}
-          onClick={onClick}
-        />
-      )}
+      {isVisible && <InfoModal {...InfoModalState} />}
     </InfoModalContext>
   );
 }

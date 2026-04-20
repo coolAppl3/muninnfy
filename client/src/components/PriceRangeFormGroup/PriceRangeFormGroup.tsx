@@ -15,8 +15,8 @@ export default function PriceRangeFormGroup({
   maxPrice,
   className,
 }: PriceRangeFormGroupProps): JSX.Element {
-  const [priceFrom, setLocalPriceFromValue] = useState<string>('');
-  const [priceTo, setLocalPriceToValue] = useState<string>('');
+  const [priceFrom, setPriceFrom] = useState<string>('');
+  const [priceTo, setPriceTo] = useState<string>('');
 
   const [priceFromErrorMessage, setPriceFromErrorMessage] = useState<string | null>(null);
   const [priceToErrorMessage, setPriceToErrorMessage] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export default function PriceRangeFormGroup({
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
-          setLocalPriceFromValue(newValue);
+          setPriceFrom(newValue);
           validateRange(newValue, priceTo);
         }}
       />
@@ -72,7 +72,7 @@ export default function PriceRangeFormGroup({
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue: string = e.target.value;
 
-          setLocalPriceToValue(newValue);
+          setPriceTo(newValue);
           validateRange(priceFrom, newValue);
         }}
       />

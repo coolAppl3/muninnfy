@@ -1,5 +1,52 @@
 # Changelog
 
+## [0.5.3] (2026-04-21)
+
+### Improvements
+
+- Restricted the types of `ConfirmModalProps` and `InfoModalProps` to protect against unwanted variations.
+
+
+### Bug Fixes
+
+- Fixed non-authenticated logic being used in `NavbarAccountMenu` despite it only rendering in authenticated environments.
+- Fixed `validateItemTag()` in `WishlistItemTagsFormGroup` using the incorrect length property during validation.
+
+
+### Tests
+
+- Improved test setup.
+- Improved standardization, consistency, and approach for existing test suites.
+- Added test suites for the following components:
+  - `InstructionCard`.
+  - `SecondaryButton`.
+  - `StatisticItem`.
+  - `WishlistPrivacyLevelIcon`.
+  - `ConfirmModal`.
+  - `InfoModal`.
+  - `PasswordFormGroup`.
+  - `NavbarAccountMenu`.
+  - `PopupMessage`.
+  - `PriceRangeFormGroup`.
+  - `TextareaFormGroup`.
+  - `TimeWindowContainer`.
+  - `ToggleSwitch`.
+  - `TopNavbar`.
+  - `WishlistItemTagsFormGroup`.
+
+
+### Code Refactoring
+
+- Moved `WishlistCard` under the `Wishlists` page component directory as it's not a shared component.
+- Refactored `TimeWindowContainer` to improve readability.
+- Other minor refactors.
+
+
+### Documentation Changes
+
+- Fixed a few typos in the last patch and rearranged hierarchy.
+
+
 ## [0.5.2] (2026-04-16)
 
 ### Improvements
@@ -7,10 +54,16 @@
 - Add `data-` attribute to strengthen month index traction in `Calendar`.
 
 
+### Bug Fixes
+
+- Remove accidental `generateHexCode()` call in GET `auth/session`.
+- Added missing day header in `Calendar`.
+
+
 ### Tests
 
-- Set up test `vitest` testing environment.
-- Add test suites for the following components:
+- Set up `vitest` testing environment.
+- Added test suites for the following components:
   - `Button`.
   - `Container`.
   - `ArticlesNav`.
@@ -21,12 +74,6 @@
   - `Footer`.
   - `Head`.
   - `Calendar`.
-
-
-### Bug Fixes
-
-- Remove accidental `generateHexCode()` call in GET `auth/session`.
-- Added missing day header in `Calendar`.
 
 
 ## [0.5.1] (2026-04-11)

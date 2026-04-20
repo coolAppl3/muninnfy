@@ -14,7 +14,7 @@ export default function ConfirmModalProvider({
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [confirmModalState, setConfirmModalState] = useState<ConfirmModalProps>({
-    title: undefined,
+    title: '',
     description: undefined,
 
     confirmBtnTitle: 'Confirm',
@@ -25,7 +25,7 @@ export default function ConfirmModalProvider({
 
     onConfirm: () => {},
     onCancel: () => {},
-    onExtraAction: () => {},
+    onExtraAction: undefined,
   });
 
   const displayConfirmModal = useCallback((props: ConfirmModalProps) => {
@@ -36,7 +36,7 @@ export default function ConfirmModalProvider({
   const removeConfirmModal = useCallback(() => {
     setIsVisible(false);
     setConfirmModalState({
-      title: undefined,
+      title: '',
       description: undefined,
 
       confirmBtnTitle: 'Confirm',
@@ -47,7 +47,7 @@ export default function ConfirmModalProvider({
 
       onConfirm: () => {},
       onCancel: () => {},
-      onExtraAction: () => {},
+      onExtraAction: undefined,
     });
   }, []);
 
