@@ -59,7 +59,7 @@ export default function WishlistItemTagsFormGroup({
   function validateItemTag(value: string): string | null {
     const regex: RegExp = /^[A-Za-z0-9_]{1,50}$/;
 
-    if (length > 50) {
+    if (value.length > 50) {
       return 'Tag must not exceed 50 characters.';
     }
 
