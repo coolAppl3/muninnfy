@@ -8,6 +8,7 @@ import usePopupMessage from '../../../hooks/usePopupMessage';
 import { confirmAccountVerificationService } from '../../../services/accountServices';
 import { CanceledError } from 'axios';
 import InstructionCard from '../../../components/InstructionCard/InstructionCard';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 type ConfirmAccountVerificationProps = {
   publicAccountId: string;
@@ -31,7 +32,7 @@ export default function ConfirmAccountVerification({
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   const confirmAccountVerification = useCallback(
     async (abortSignal: AbortSignal = new AbortController().signal) => {

@@ -3,12 +3,13 @@ import SortIcon from '../../../../assets/svg/SortIcon.svg?react';
 import { ItemsSortingMode } from '../../contexts/WishlistItemsContext';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import useWishlistItems from '../../hooks/useWishlistItems';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function WishlistItemsToolbarSort(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { itemsSortingMode, setItemsSortingMode, sortWishlistItems } = useWishlistItems();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   function handleSortBtnClick(sortingMode: ItemsSortingMode): void {
     setItemsSortingMode(sortingMode);
@@ -39,7 +40,9 @@ export default function WishlistItemsToolbarSort(): JSX.Element {
         <SortIcon className={`w-2 h-2 transition-colors ${isOpen ? 'text-cta' : ''}`} />
       </button>
 
-      <div className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}>
+      <div
+        className={`absolute top-0 right-[4.4rem] rounded-sm overflow-hidden shadow-centered-tiny ${isOpen ? 'block' : 'hidden'}`}
+      >
         <button
           type='button'
           className={`context-menu-btn ${itemsSortingMode === 'newest' ? 'text-cta' : ''}`}

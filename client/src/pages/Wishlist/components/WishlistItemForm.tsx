@@ -35,6 +35,7 @@ import useWishlistItemsExpansionStore from '../stores/wishlistItemsExpansionStor
 import { useShallow } from 'zustand/react/shallow';
 import { validatePrice } from '../../../utils/validation/sharedValidation';
 import { WISHLIST_ITEM_MAX_PRICE } from '../../../utils/constants/wishlistItemConstants';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 type WishlistItemFromProps = {
   formMode: 'newItem' | 'editItem';
@@ -94,7 +95,7 @@ export default function WishlistItemForm({
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   const titleInputRef = useRef<HTMLInputElement | null>(null);
 

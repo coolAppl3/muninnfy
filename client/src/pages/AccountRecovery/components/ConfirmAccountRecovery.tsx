@@ -12,6 +12,7 @@ import { getDateAndTimeString } from '../../../utils/globalUtils';
 import useAuth from '../../../hooks/useAuth';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import InstructionCard from '../../../components/InstructionCard/InstructionCard';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 type ConfirmAccountRecoveryProps = {
   publicAccountId: string;
@@ -46,7 +47,7 @@ export default function ConfirmAccountRecovery({
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function confirmAccountRecovery(): Promise<void> {
     const newPassword: string = password;

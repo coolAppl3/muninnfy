@@ -17,6 +17,7 @@ import useHandleAsyncError, {
   HandleAsyncErrorFunction,
 } from '../../../../hooks/useHandleAsyncError';
 import Button from '../../../../components/Button/Button';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function EditPrivacyLevelContainer(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
@@ -26,7 +27,7 @@ export default function EditPrivacyLevelContainer(): JSX.Element {
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   async function changeWishlistPrivacyLevel(newPrivacyLevel: number): Promise<void> {

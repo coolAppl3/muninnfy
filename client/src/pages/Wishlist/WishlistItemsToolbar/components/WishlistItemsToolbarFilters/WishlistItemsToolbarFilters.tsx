@@ -10,25 +10,42 @@ import CheckboxFormGroup from '../../../../../components/CheckboxFormGroup/Check
 import PriceRangeFormGroup from '../../../../../components/PriceRangeFormGroup/PriceRangeFormGroup';
 import { WISHLIST_ITEM_MAX_PRICE } from '../../../../../utils/constants/wishlistItemConstants';
 import WishlistItemsFilterToggler from './components/WishlistItemsFilterToggler';
-import wishlistItemsToolbarFiltersReducer, { initialWishlistItemsToolbarFiltersState } from './wishlistItemsToolbarFiltersReducer';
+import wishlistItemsToolbarFiltersReducer, {
+  initialWishlistItemsToolbarFiltersState,
+} from './wishlistItemsToolbarFiltersReducer';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 type WishlistItemsToolbarFiltersProps = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: WishlistItemsToolbarFiltersProps): JSX.Element {
+export default function WishlistItemsToolbarFilters({
+  isOpen,
+  setIsOpen,
+}: WishlistItemsToolbarFiltersProps): JSX.Element {
   const { itemsFilterConfig, setItemsFilterConfig } = useWishlistItems();
-  const { calendarKey, startTimestampsMap, endTimestampsMap, setStartTimestampsMap, setEndTimestampsMap } = useCalendar();
-  const unselectAllWishlistItems: () => void = useWishlistItemsSelectionStore((store) => store.unselectAllWishlistItems);
+  const {
+    calendarKey,
+    startTimestampsMap,
+    endTimestampsMap,
+    setStartTimestampsMap,
+    setEndTimestampsMap,
+  } = useCalendar();
+  const unselectAllWishlistItems: () => void = useWishlistItemsSelectionStore(
+    (store) => store.unselectAllWishlistItems
+  );
 
-  const [state, dispatch] = useReducer(wishlistItemsToolbarFiltersReducer, initialWishlistItemsToolbarFiltersState);
+  const [state, dispatch] = useReducer(
+    wishlistItemsToolbarFiltersReducer,
+    initialWishlistItemsToolbarFiltersState
+  );
   const { tagsSet, priceRangeValid, ...filters } = state;
 
   const addedTimestampsKey: string = 'addedTimestamps';
   const purchasedTimestampsKey: string = 'purchasedTimestamps';
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   useEffect(() => {
     if (calendarKey === addedTimestampsKey) {
@@ -139,7 +156,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       <div>
         <WishlistItemTagsFormGroup
           tagsSet={tagsSet}
-          setTagsSet={(newSet: Set<string>) => dispatch({ type: 'setTagsSet', payload: { newSet } })}
+          setTagsSet={(newSet: Set<string>) =>
+            dispatch({ type: 'setTagsSet', payload: { newSet } })
+          }
           label='Tags'
         />
 
@@ -147,7 +166,12 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
           id='require-all-tags'
           label='Require all tags'
           isChecked={state.requireAllFilterTags}
-          onClick={() => dispatch({ type: 'setRequireAllFilterTags', payload: { newValue: !state.requireAllFilterTags } })}
+          onClick={() =>
+            dispatch({
+              type: 'setRequireAllFilterTags',
+              payload: { newValue: !state.requireAllFilterTags },
+            })
+          }
           className='mt-1'
         />
       </div>
@@ -155,7 +179,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
       <div className='grid gap-1'>
         <WishlistItemsFilterToggler
           filterBy={state.filterByIsPurchased}
-          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'setFilterByIsPurchased', payload: { newValue } })}
+          setFilterBy={(newValue: boolean | null) =>
+            dispatch({ type: 'setFilterByIsPurchased', payload: { newValue } })
+          }
           title='Purchase status'
           positiveFilterTitle='Purchased'
           negativeFilterTitle='Unpurchased'
@@ -172,7 +198,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
         <WishlistItemsFilterToggler
           filterBy={state.filterByPrice}
-          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'setFilterByPrice', payload: { newValue } })}
+          setFilterBy={(newValue: boolean | null) =>
+            dispatch({ type: 'setFilterByPrice', payload: { newValue } })
+          }
           title='Price'
           positiveFilterTitle='Has a price'
           negativeFilterTitle={`Doesn't have a price`}
@@ -183,7 +211,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
             setRangeValue={(mewRange: { fromValue: number | null; toValue: number | null }) =>
               dispatch({ type: 'setItemPriceRange', payload: { ...mewRange } })
             }
-            setRangeIsValid={(newValue: boolean) => dispatch({ type: 'setItemPriceRangeValid', payload: { newValue } })}
+            setRangeIsValid={(newValue: boolean) =>
+              dispatch({ type: 'setItemPriceRangeValid', payload: { newValue } })
+            }
             maxPrice={WISHLIST_ITEM_MAX_PRICE}
             className='mb-1'
           />
@@ -191,7 +221,9 @@ export default function WishlistItemsToolbarFilters({ isOpen, setIsOpen }: Wishl
 
         <WishlistItemsFilterToggler
           filterBy={state.filterByLink}
-          setFilterBy={(newValue: boolean | null) => dispatch({ type: 'setFilterByLink', payload: { newValue } })}
+          setFilterBy={(newValue: boolean | null) =>
+            dispatch({ type: 'setFilterByLink', payload: { newValue } })
+          }
           title='Link'
           positiveFilterTitle='Contains a link'
           negativeFilterTitle={`Doesn't contain a link`}

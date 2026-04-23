@@ -9,12 +9,13 @@ import useHandleAsyncError, {
 } from '../../../../../hooks/useHandleAsyncError';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../../../hooks/useHistory';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 export default function WishlistHeaderContentFavorite(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();

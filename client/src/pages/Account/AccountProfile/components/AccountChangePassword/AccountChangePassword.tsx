@@ -14,6 +14,7 @@ import useAuth from '../../../../../hooks/useAuth';
 import PasswordFormGroup from '../../../../../components/PasswordFormGroup/PasswordFormGroup';
 import { updatePasswordService } from '../../../../../services/accountServices';
 import useAccountDetails from '../../../hooks/useAccountDetails';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 export default function AccountChangePassword(): JSX.Element {
   const { accountDetails } = useAccountDetails();
@@ -35,7 +36,7 @@ export default function AccountChangePassword(): JSX.Element {
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function updateDisplayName(): Promise<void> {
     const password: string = currentPasswordValue;

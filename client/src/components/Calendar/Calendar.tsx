@@ -4,6 +4,7 @@ import usePopupMessage from '../../hooks/usePopupMessage';
 import useCalendar from '../../hooks/useCalendar';
 import { CalendarMode } from '../../contexts/CalendarContext';
 import Button from '../Button/Button';
+import { DisplayPopupMessageFunction } from '../../contexts/PopupMessageContext';
 
 type CalendarProps = {
   calendarMode: CalendarMode;
@@ -27,7 +28,7 @@ export default function Calendar({ calendarMode }: CalendarProps): JSX.Element {
   const [selectedYear, setSelectedYear] = useState<number>(dateObject.getFullYear());
   const [selectedMonth, setSelecteDMonth] = useState<number>(dateObject.getMonth());
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   const yearsArr: number[] = Array.from(
     { length: 12 },

@@ -20,6 +20,7 @@ import { debounce } from '../../../../../utils/debounce';
 import { CanceledError } from 'axios';
 import Button from '../../../../../components/Button/Button';
 import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/ContentLoadingSkeleton';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 export default function AccountSocialFollowRequests(): JSX.Element {
   const {
@@ -47,7 +48,7 @@ export default function AccountSocialFollowRequests(): JSX.Element {
   const [fetchingAdditionalFollowRequests, setFetchingAdditionalFollowRequests] =
     useState<boolean>(false);
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
   const renderArray: FollowRequest[] =

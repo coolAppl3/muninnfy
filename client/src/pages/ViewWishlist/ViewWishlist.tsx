@@ -17,6 +17,7 @@ import WishlistItems from '../Wishlist/WishlistItems/WishlistItems';
 import useAuth from '../../hooks/useAuth';
 import ViewWishlistHeader from './components/ViewWishlistHeader';
 import ViewModeProvider from '../../providers/ViewModeProvider';
+import { DisplayPopupMessageFunction } from '../../contexts/PopupMessageContext';
 
 export default function ViewWishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -31,7 +32,7 @@ export default function ViewWishlist(): JSX.Element {
   const { referrerLocation } = useHistory();
   const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   useEffect(() => {
     if (isLoaded) {

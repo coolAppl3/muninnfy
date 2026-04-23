@@ -4,13 +4,14 @@ import usePopupMessage from '../../../../hooks/usePopupMessage';
 import SortIcon from '../../../../assets/svg/SortIcon.svg?react';
 import { WishlistsSortingMode } from '../../contexts/WishlistsContext';
 import useViewMode from '../../../../hooks/useViewMode';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function WishlistsToolbarSort(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { inViewMode } = useViewMode();
   const { wishlistsSortingMode, setWishlistsSortingMode, sortWishlists } = useWishlists();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   function handleSortBtnClick(sortingMode: WishlistsSortingMode): void {
     setWishlistsSortingMode(sortingMode);

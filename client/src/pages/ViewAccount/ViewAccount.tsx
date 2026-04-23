@@ -19,6 +19,7 @@ import AccountSocialDetailsProvider from '../Account/providers/AccountSocialDeta
 import ViewModeProvider from '../../providers/ViewModeProvider';
 import ViewAccountDetailsProvider from './provider/ViewAccountDetailsProvider';
 import usePopupMessage from '../../hooks/usePopupMessage';
+import { DisplayPopupMessageFunction } from '../../contexts/PopupMessageContext';
 
 export default function ViewAccount(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -31,7 +32,7 @@ export default function ViewAccount(): JSX.Element {
   const { publicAccountId } = useParams();
   const navigate: NavigateFunction = useNavigate();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   useEffect(() => {
     if (!publicAccountId || !isValidUuid) {

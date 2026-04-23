@@ -14,6 +14,7 @@ import {
   deleteWishlistItemService,
   setWishlistItemIsPurchasedService,
 } from '../../../../../services/wishlistItemServices';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 type WishlistItemButtonContainerProps = {
   wishlistItem: WishlistItemType;
@@ -34,7 +35,7 @@ function WishlistItemButtonContainer({
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
 
   // workaround to avoid consuming WishlistProvider

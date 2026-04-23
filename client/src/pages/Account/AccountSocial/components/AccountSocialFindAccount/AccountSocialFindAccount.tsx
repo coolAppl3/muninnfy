@@ -10,6 +10,7 @@ import ContentLoadingSkeleton from '../../../components/ContentLoadingSkeleton/C
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import AccountLinkCard from './components/AccountLinkCard';
 import { BasicSocialData } from '../../../../../types/socialTypes';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 export default function AccountSocialFindAccount(): JSX.Element {
   const [results, setResults] = useState<BasicSocialData[]>([]);
@@ -24,7 +25,7 @@ export default function AccountSocialFindAccount(): JSX.Element {
   const isIdenticalSearchQuery: boolean = value === lastSearchQuery;
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function findAccounts(): Promise<void> {
     const searchQuery: string = value;

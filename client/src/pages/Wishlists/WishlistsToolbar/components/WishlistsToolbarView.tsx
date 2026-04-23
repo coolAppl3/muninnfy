@@ -3,10 +3,11 @@ import useWishlists from '../../hooks/useWishlists';
 import usePopupMessage from '../../../../hooks/usePopupMessage';
 import DoubleColumnGridIcon from '../../../../assets/svg/DoubleColumnGridIcon.svg?react';
 import SingleColumnGridIcon from '../../../../assets/svg/SingleColumnGridIcon.svg?react';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function WishlistsToolbarView(): JSX.Element {
   const { isSingleColumnView, setIsSingleColumnView } = useWishlists();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   return (
     <button
@@ -17,7 +18,10 @@ export default function WishlistsToolbarView(): JSX.Element {
         isSingleColumnView ? 'after:translate-x-full' : ''
       }`}
       onClick={() => {
-        displayPopupMessage(`${isSingleColumnView ? 'Double' : 'Single'} column view.`, 'success');
+        displayPopupMessage(
+          `${isSingleColumnView ? 'Double' : 'Single'} column view.`,
+          'success'
+        );
         setIsSingleColumnView((prev) => !prev);
       }}
     >

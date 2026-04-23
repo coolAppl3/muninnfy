@@ -25,6 +25,7 @@ import useAccountLocation from '../../../hooks/useAccountLocation';
 import useAuth from '../../../../../hooks/useAuth';
 import useHistory from '../../../../../hooks/useHistory';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 export default function AccountSocialFollowers(): JSX.Element {
   const {
@@ -58,7 +59,7 @@ export default function AccountSocialFollowers(): JSX.Element {
   const [fetchingAdditionalFollowers, setFetchingAdditionalFollowers] =
     useState<boolean>(false);
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
   const renderArray: FollowDetails[] = renderMode === 'local' ? followers : searchQueryResults;

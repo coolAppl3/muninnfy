@@ -1,6 +1,7 @@
 import { ChangeEvent, JSX, KeyboardEvent, MouseEvent, useRef, useState } from 'react';
 import { WISHLIST_ITEM_TAGS_LIMIT } from '../../utils/constants/wishlistItemConstants';
 import usePopupMessage from '../../hooks/usePopupMessage';
+import { DisplayPopupMessageFunction } from '../../contexts/PopupMessageContext';
 
 type WishlistItemTagsFormGroupProps = {
   tagsSet: Set<string>;
@@ -19,7 +20,7 @@ export default function WishlistItemTagsFormGroup({
   const [inputFocused, setInputFocused] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   function handleChange(e: ChangeEvent<HTMLInputElement>): void {
     const newValue: string = e.target.value;

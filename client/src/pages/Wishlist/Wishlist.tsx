@@ -20,6 +20,7 @@ import CalendarProvider from '../../providers/CalendarProvider';
 import WishlistItemsSelectionContainer from './WishlistItemsSelectionContainer/WishlistItemsSelectionContainer';
 import WishlistItemsProvider from './providers/WishlistItemsProvider';
 import ViewModeProvider from '../../providers/ViewModeProvider';
+import { DisplayPopupMessageFunction } from '../../contexts/PopupMessageContext';
 
 export default function Wishlist(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -34,7 +35,7 @@ export default function Wishlist(): JSX.Element {
   const { referrerLocation } = useHistory();
   const urlParams = useParams();
   const navigate: NavigateFunction = useNavigate();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   useEffect(() => {
     if (isLoaded) {

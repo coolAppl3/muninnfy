@@ -20,6 +20,7 @@ import useHistory from '../../../hooks/useHistory';
 import useWishlistItems from '../hooks/useWishlistItems';
 import { useShallow } from 'zustand/react/shallow';
 import useWishlistItemsSelectionStore from '../stores/wishlistItemsSelectionStore';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 type SelectedActionType = 'mark_as_purchased' | 'mark_as_unpurchased' | 'delete';
 
@@ -50,7 +51,7 @@ export default function WishlistItemsSelectionContainer(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 

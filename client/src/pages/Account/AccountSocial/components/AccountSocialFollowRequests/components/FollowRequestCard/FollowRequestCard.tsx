@@ -16,6 +16,7 @@ import {
   declineFollowRequestService,
 } from '../../../../../../../services/socialServices';
 import useInfoModal from '../../../../../../../hooks/useInfoModal';
+import { DisplayPopupMessageFunction } from '../../../../../../../contexts/PopupMessageContext';
 
 type FollowRequestCardProps = {
   followRequest: FollowRequest;
@@ -40,7 +41,7 @@ function FollowRequestCard({
   const [actionLoading, setActionLoading] = useState<boolean>(false);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
   async function acceptFollowRequest(): Promise<void> {

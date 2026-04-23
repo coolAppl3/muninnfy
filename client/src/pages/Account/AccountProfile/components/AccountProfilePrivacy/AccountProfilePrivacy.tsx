@@ -9,6 +9,7 @@ import useHandleAsyncError, {
 } from '../../../../../hooks/useHandleAsyncError';
 import { updateAccountPrivacyService } from '../../../../../services/accountServices';
 import useAccountProfile from '../../../hooks/useAccountProfile';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 export default function AccountProfilePrivacy(): JSX.Element {
   const { setProfileSection } = useAccountProfile();
@@ -22,7 +23,7 @@ export default function AccountProfilePrivacy(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
 
   const changesDetected: boolean =

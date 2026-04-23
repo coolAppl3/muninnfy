@@ -6,6 +6,7 @@ import useWishlistItems from '../../hooks/useWishlistItems';
 import useWishlistItemsExpansionStore from '../../stores/wishlistItemsExpansionStore';
 import { useShallow } from 'zustand/react/shallow';
 import useViewMode from '../../../../hooks/useViewMode';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function WishlistItemsToolbarOptions(): JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -23,7 +24,7 @@ export default function WishlistItemsToolbarOptions(): JSX.Element {
       )
     );
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   const allItemsExpanded: boolean = expandedItemsIdsSet.size === wishlistItems.length;
 

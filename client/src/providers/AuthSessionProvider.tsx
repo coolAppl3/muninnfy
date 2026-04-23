@@ -4,6 +4,7 @@ import useAuth from '../hooks/useAuth';
 import useLoadingOverlay from '../hooks/useLoadingOverlay';
 import usePopupMessage from '../hooks/usePopupMessage';
 import { signOutService } from '../services/authServices';
+import { DisplayPopupMessageFunction } from '../contexts/PopupMessageContext';
 
 type AuthSessionProviderProps = {
   children: ReactNode;
@@ -14,7 +15,7 @@ export default function AuthSessionProvider({
 }: AuthSessionProviderProps): JSX.Element {
   const { setAuthStatus } = useAuth();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   const signOut = useCallback(async () => {
     displayLoadingOverlay();

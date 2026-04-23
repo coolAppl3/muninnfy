@@ -11,6 +11,7 @@ import useHandleAsyncError, {
   HandleAsyncErrorFunction,
 } from '../../../../../hooks/useHandleAsyncError';
 import useAuth from '../../../../../hooks/useAuth';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 export default function AccountChangeDisplayName(): JSX.Element {
   const { accountDetails, setAccountDetails } = useAccountDetails();
@@ -22,7 +23,7 @@ export default function AccountChangeDisplayName(): JSX.Element {
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function updateDisplayName(): Promise<void> {
     const newDisplayName: string = value;

@@ -11,6 +11,7 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { startAccountRecoveryService } from '../../../services/accountServices';
 import { getDateAndTimeString } from '../../../utils/globalUtils';
 import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 export default function StartAccountRecovery(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -20,7 +21,7 @@ export default function StartAccountRecovery(): JSX.Element {
   const { setAuthStatus } = useAuth();
   const navigate: NavigateFunction = useNavigate();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   async function startAccountRecovery(): Promise<void> {
