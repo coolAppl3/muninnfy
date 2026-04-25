@@ -22,11 +22,8 @@ export default function AuthProvider({ children }: AuthProviderProps): JSX.Eleme
         const isValidAuthSession: boolean = (
           await checkForAuthSessionService(abortController.signal)
         ).data.isValidAuthSession;
-        setAuthStatus(isValidAuthSession ? 'authenticated' : 'unauthenticated');
 
-        if (isValidAuthSession) {
-          connectAccountNotificationsWebSocket();
-        }
+        setAuthStatus(isValidAuthSession ? 'authenticated' : 'unauthenticated');
       } catch (err: unknown) {
         if (err instanceof CanceledError) {
           return;
