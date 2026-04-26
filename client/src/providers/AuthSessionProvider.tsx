@@ -24,7 +24,7 @@ export default function AuthSessionProvider({
       await signOutService();
       setAuthStatus('unauthenticated');
 
-      displayPopupMessage('Signed out', 'success');
+      displayPopupMessage('Signed out.', 'success');
     } catch (err: unknown) {
       console.log(err);
       displayPopupMessage('Failed to sign out.', 'error');
