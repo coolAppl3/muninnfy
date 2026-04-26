@@ -35,14 +35,14 @@ vi.mock('../hooks/usePopupMessage', () => ({
   default: () => displayPopupMessageMock,
 }));
 
-function TestComponent() {
+function TestComponent(): JSX.Element {
   const { signOut } = useAuthSession();
 
   useEffect(() => {
     signOut();
   }, [signOut]);
 
-  return null;
+  return <></>;
 }
 
 function TestWrapper({ children }: { children: ReactNode }): JSX.Element {
