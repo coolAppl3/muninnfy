@@ -13,11 +13,16 @@ type AuthSessionProviderProps = {
 export default function AuthSessionProvider({
   children,
 }: AuthSessionProviderProps): JSX.Element {
-  const { setAuthStatus } = useAuth();
+  const { authStatus, setAuthStatus } = useAuth();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
   const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   const signOut = useCallback(async () => {
+    if (authStatus === 'unauthenticated') {
+      displayPopupMessage('Already signed out.', 'success');
+      return;
+    }
+
     displayLoadingOverlay();
 
     try {
@@ -31,7 +36,13 @@ export default function AuthSessionProvider({
     } finally {
       removeLoadingOverlay();
     }
-  }, [setAuthStatus, displayLoadingOverlay, removeLoadingOverlay, displayPopupMessage]);
+  }, [
+    authStatus,
+    setAuthStatus,
+    displayLoadingOverlay,
+    removeLoadingOverlay,
+    displayPopupMessage,
+  ]);
 
   const contextValue: AuthSessionContextType = useMemo(() => ({ signOut }), [signOut]);
   return <AuthSessionContext value={contextValue}>{children}</AuthSessionContext>;
