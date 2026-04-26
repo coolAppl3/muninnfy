@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import * as authServices from '../services/authServices';
 import * as accountNotificationsWebsSocket from '../services/websockets/accountNotificationsWebsSocket';
@@ -8,8 +8,6 @@ vi.mock('../services/authServices', { spy: true });
 vi.mock('../services/websockets/accountNotificationsWebsSocket', { spy: true });
 
 describe('AuthProvider', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('should call checkForAuthSessionService with an abort signal on mount', async () => {
     await render(
       <AuthProvider>
