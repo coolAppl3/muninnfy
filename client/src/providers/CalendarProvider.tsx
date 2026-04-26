@@ -30,13 +30,6 @@ export default function CalendarProvider({ children }: CalendarProviderProps): J
 
   const removeCalendar = useCallback(() => setCalendarMode(null), []);
 
-  const clearCalendar = useCallback(() => {
-    setCalendarMode(null);
-
-    setStartTimestampsMap(new Map<string, number>());
-    setEndTimestampsMap(new Map<string, number>());
-  }, []);
-
   useEffect(() => {
     return removeCalendar;
   }, [routerLocation, removeCalendar]);
@@ -53,22 +46,14 @@ export default function CalendarProvider({ children }: CalendarProviderProps): J
 
       displayCalendar,
       removeCalendar,
-      clearCalendar,
     }),
-    [
-      calendarKey,
-      startTimestampsMap,
-      endTimestampsMap,
-      displayCalendar,
-      removeCalendar,
-      clearCalendar,
-    ]
+    [calendarKey, startTimestampsMap, endTimestampsMap, displayCalendar, removeCalendar]
   );
 
   return (
     <CalendarContext value={contextValue}>
       {children}
-      {calendarMode ? <Calendar calendarMode={calendarMode} /> : null}
+      {calendarMode && <Calendar calendarMode={calendarMode} />}
     </CalendarContext>
   );
 }

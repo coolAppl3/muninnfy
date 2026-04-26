@@ -308,7 +308,6 @@ describe('Calendar', () => {
       endTimestampsMap: new Map<string, number>(),
       setStartTimestampsMap: vi.fn(),
       setEndTimestampsMap: vi.fn(),
-      clearCalendar: vi.fn(),
       displayCalendar: vi.fn(),
       removeCalendar: removeCalendarMock,
     }));
