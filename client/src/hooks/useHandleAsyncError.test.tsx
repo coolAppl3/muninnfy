@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from 'vitest-browser-react';
 import useHandleAsyncError from './useHandleAsyncError';
 import AuthProvider from '../providers/AuthProvider';
@@ -8,8 +8,6 @@ import InfoModalProvider from '../providers/InfoModalProvider';
 import { MemoryRouter } from 'react-router-dom';
 import * as errorUtils from '../utils/errorUtils';
 import * as axios from 'axios';
-import useAuth from './useAuth';
-import useInfoModal from './useInfoModal';
 
 const displayPopupMessageMock = vi.fn();
 const setAuthStatusMock = vi.fn();
