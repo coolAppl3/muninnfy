@@ -1,5 +1,5 @@
-import { JSX, ReactNode } from 'react';
-import ViewModeContext from '../contexts/ViewModeContext';
+import { JSX, ReactNode, useMemo } from 'react';
+import ViewModeContext, { ViewModeContextType } from '../contexts/ViewModeContext';
 
 type ViewModeProviderProps = {
   inViewMode: boolean;
@@ -14,5 +14,10 @@ export default function ViewModeProvider({
 
   children,
 }: ViewModeProviderProps): JSX.Element {
-  return <ViewModeContext value={{ inViewMode, publicAccountId }}>{children}</ViewModeContext>;
+  const contextValue: ViewModeContextType = useMemo(
+    () => ({ inViewMode, publicAccountId }),
+    [inViewMode, publicAccountId]
+  );
+
+  return <ViewModeContext value={contextValue}>{children}</ViewModeContext>;
 }
