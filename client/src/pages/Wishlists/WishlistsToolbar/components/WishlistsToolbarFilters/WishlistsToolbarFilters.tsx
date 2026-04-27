@@ -38,6 +38,7 @@ import useViewMode from '../../../../../hooks/useViewMode';
 import useAuth from '../../../../../hooks/useAuth';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHistory from '../../../../../hooks/useHistory';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 type WishlistsToolbarFiltersProps = {
   isOpen: boolean;
@@ -85,7 +86,7 @@ export default function WishlistsToolbarFilters({
     itemsCountRangeValid && totalItemsPriceRangeValid && priceToCompleteRangeValid;
   const createdTimestampsKey: string = 'createdTimestamps';
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   useEffect(() => {
     dispatch({

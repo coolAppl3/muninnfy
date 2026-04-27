@@ -15,6 +15,7 @@ import {
   NOTIFICATIONS_RENDER_BATCH_SIZE,
 } from '../../../utils/constants/notificationsConstants';
 import Button from '../../../components/Button/Button';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 export default function AccountNotifications(): JSX.Element {
   const { notifications, initialFetchCompleted, setNotifications, setInitialFetchCompleted } =
@@ -28,7 +29,7 @@ export default function AccountNotifications(): JSX.Element {
   const allNotificationsRendered: boolean = renderLimit >= notifications.length;
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   const getNotificationsBatch = useCallback(
     async (offset: number, abortSignal: AbortSignal) => {

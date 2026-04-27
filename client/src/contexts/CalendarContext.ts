@@ -12,7 +12,6 @@ export type CalendarContextType = {
 
   displayCalendar: (calendarMode: CalendarMode, calendarKey: string) => void;
   removeCalendar: () => void;
-  clearCalendar: () => void;
 };
 
 const CalendarContext = createContext<CalendarContextType | null>(null);

@@ -12,13 +12,14 @@ import useHandleAsyncError, {
   HandleAsyncErrorFunction,
 } from '../../../../hooks/useHandleAsyncError';
 import useLoadingOverlay from '../../../../hooks/useLoadingOverlay';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function WishlistsToolbarOptions(): JSX.Element {
   const { wishlists, setWishlists } = useWishlists();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 

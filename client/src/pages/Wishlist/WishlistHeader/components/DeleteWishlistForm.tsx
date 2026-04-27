@@ -11,6 +11,7 @@ import useWishlist from '../../hooks/useWishlist';
 import useHandleAsyncError, {
   HandleAsyncErrorFunction,
 } from '../../../../hooks/useHandleAsyncError';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function DeleteWishlistForm(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();
@@ -22,7 +23,7 @@ export default function DeleteWishlistForm(): JSX.Element {
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   async function deleteWishlist(): Promise<void> {

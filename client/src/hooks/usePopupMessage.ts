@@ -1,8 +1,10 @@
 import { useContext } from 'react';
-import PopupMessageContext, { PopupMessageContextType } from '../contexts/PopupMessageContext';
+import PopupMessageContext, {
+  DisplayPopupMessageFunction,
+} from '../contexts/PopupMessageContext';
 
-export default function usePopupMessage(): PopupMessageContextType {
-  const context = useContext<PopupMessageContextType | null>(PopupMessageContext);
+export default function usePopupMessage(): DisplayPopupMessageFunction {
+  const context = useContext<DisplayPopupMessageFunction | null>(PopupMessageContext);
 
   if (!context) {
     throw new Error('usePopupMessage must be used within a PopupMessageProvider.');

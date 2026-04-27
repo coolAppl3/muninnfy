@@ -16,6 +16,7 @@ import {
   resendEmailUpdateEmailService,
 } from '../../../../../../services/accountServices';
 import { resDataContainsExpiryTimestamp } from '../../../util/AccountProfileUtils';
+import { DisplayPopupMessageFunction } from '../../../../../../contexts/PopupMessageContext';
 
 export default function AccountChangeEmailConfirm(): JSX.Element {
   const { setAccountDetails } = useAccountDetails();
@@ -31,7 +32,7 @@ export default function AccountChangeEmailConfirm(): JSX.Element {
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function confirmEmailUpdate(): Promise<void> {
     if (!ongoingEmailUpdateRequest) {

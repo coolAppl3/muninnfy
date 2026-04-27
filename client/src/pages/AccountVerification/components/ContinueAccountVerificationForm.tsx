@@ -10,6 +10,7 @@ import { validateEmail } from '../../../utils/validation/userValidation';
 import { continueAccountVerificationService } from '../../../services/accountServices';
 import DefaultFormGroup from '../../../components/DefaultFormGroup/DefaultFormGroup';
 import Button from '../../../components/Button/Button';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 export default function ContinueAccountVerificationForm(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -21,7 +22,7 @@ export default function ContinueAccountVerificationForm(): JSX.Element {
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function continueAccountVerification(): Promise<void> {
     const email: string = value;

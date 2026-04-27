@@ -14,6 +14,7 @@ import usePopupMessage from '../../hooks/usePopupMessage';
 import { createWishlistAsAccountService } from '../../services/wishlistServices';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
+import { DisplayPopupMessageFunction } from '../../contexts/PopupMessageContext';
 
 export default function NewWishlist(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -27,7 +28,7 @@ export default function NewWishlist(): JSX.Element {
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function handleSubmit(): Promise<void> {
     const title: string = titleValue.trimEnd();

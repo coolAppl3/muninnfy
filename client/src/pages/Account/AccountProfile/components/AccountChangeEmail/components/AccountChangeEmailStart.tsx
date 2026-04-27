@@ -18,6 +18,7 @@ import { startEmailUpdateService } from '../../../../../../services/accountServi
 import useAccountOngoingRequests from '../../../../hooks/useAccountOngoingRequests';
 import { OngoingAccountRequest } from '../../../../../../types/accountTypes';
 import { isValidOngoingRequestData } from '../../../util/AccountProfileUtils';
+import { DisplayPopupMessageFunction } from '../../../../../../contexts/PopupMessageContext';
 
 export default function AccountChangeEmailStart(): JSX.Element {
   const { accountDetails } = useAccountDetails();
@@ -33,7 +34,7 @@ export default function AccountChangeEmailStart(): JSX.Element {
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function startEmailUpdate(): Promise<void> {
     const newEmail: string = emailValue;

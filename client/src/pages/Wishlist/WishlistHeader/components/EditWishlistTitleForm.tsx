@@ -12,6 +12,7 @@ import useWishlist from '../../hooks/useWishlist';
 import useHandleAsyncError, {
   HandleAsyncErrorFunction,
 } from '../../../../hooks/useHandleAsyncError';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function EditWishlistTitleForm(): JSX.Element {
   const { wishlistId, wishlistDetails, setWishlistDetails } = useWishlist();
@@ -23,7 +24,7 @@ export default function EditWishlistTitleForm(): JSX.Element {
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   const titleRef = useRef<HTMLInputElement | null>(null);

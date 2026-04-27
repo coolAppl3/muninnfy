@@ -8,6 +8,7 @@ import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import usePopupMessage from '../../../hooks/usePopupMessage';
 import { resendAccountVerificationEmailService } from '../../../services/accountServices';
 import InstructionCard from '../../../components/InstructionCard/InstructionCard';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 type ResendAccountVerificationEmailProps = {
   publicAccountId: string;
@@ -31,7 +32,7 @@ export default function ResendAccountVerificationEmail({
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const navigate: NavigateFunction = useNavigate();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function resendAccountVerificationEmail(): Promise<void> {
     try {

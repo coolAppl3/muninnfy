@@ -17,6 +17,7 @@ import useCalendar from '../../hooks/useCalendar';
 import { getFullDateString } from '../../utils/globalUtils';
 import { validateDateOfBirthTimestamp } from '../../utils/validation/userValidation';
 import CheckboxFormGroup from '../../components/CheckboxFormGroup/CheckboxFormGroup';
+import { DisplayPopupMessageFunction } from '../../contexts/PopupMessageContext';
 
 export default function SignUp(): JSX.Element {
   const navigate: NavigateFunction = useNavigate();
@@ -32,7 +33,7 @@ export default function SignUp(): JSX.Element {
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { startTimestampsMap, displayCalendar } = useCalendar();
 
   const dateOfBirthTimestamp: number | undefined = startTimestampsMap.get('dateOfBirth');

@@ -12,6 +12,7 @@ import PasswordFormGroup from '../../../../../../components/PasswordFormGroup/Pa
 import { startAccountDeletionService } from '../../../../../../services/accountServices';
 import useAccountOngoingRequests from '../../../../hooks/useAccountOngoingRequests';
 import { isValidOngoingRequestData } from '../../../util/AccountProfileUtils';
+import { DisplayPopupMessageFunction } from '../../../../../../contexts/PopupMessageContext';
 
 export default function AccountDeletionStart(): JSX.Element {
   const { setOngoingAccountDeletionRequest } = useAccountOngoingRequests();
@@ -23,7 +24,7 @@ export default function AccountDeletionStart(): JSX.Element {
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function startAccountDeletion(): Promise<void> {
     const password: string = value;

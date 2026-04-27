@@ -9,6 +9,7 @@ import useLoadingOverlay from '../../../hooks/useLoadingOverlay';
 import { getDateAndTimeString } from '../../../utils/globalUtils';
 import useAuth from '../../../hooks/useAuth';
 import InstructionCard from '../../../components/InstructionCard/InstructionCard';
+import { DisplayPopupMessageFunction } from '../../../contexts/PopupMessageContext';
 
 type ResendAccountRecoveryEmailProps = {
   publicAccountId: string;
@@ -31,7 +32,7 @@ export default function ResendAccountRecoveryEmail({
   const { setAuthStatus } = useAuth();
   const navigate: NavigateFunction = useNavigate();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
 
   async function resendAccountRecoveryEmail(): Promise<void> {

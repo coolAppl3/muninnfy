@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.5.4] (2026-04-28)
+
+### Improvements
+
+- Added aria-label to `LoadingOverlay` for better accessibility.
+
+
+### Bug Fixes
+
+- Fixed `connectAccountNotificationsWebSocket()` being called twice if the user is authenticated in `AuthProvider`.
+- Fixed add missing period at the end of the `Signed out` message in `AuthProvider`.
+- Fixed add missing logic to handle already unauthenticated users `AuthSessionProvider`.
+- Fixed unmemoized context value being passed in `ViewModeProvider`.
+
+
+### Tests
+
+- Added test suites for the following:
+  - `useHandleAsyncError`.
+  - `AuthProvider`.
+  - `AuthSessionProvider`.
+  - `CalendarProvider`.
+  - `ConfirmModalProvider`.
+  - `InfoModalProvider`.
+  - `HistoryProvider`.
+  - `LoadingOverlayProvider`.
+  - `PopupMessageProvider`.
+
+
+### Code Refactoring
+
+- Refactored `usePopupMessage` hook to return a function directly instead of an object containing it.
+- Removed unused `clearCalendar` from `CalendarContext`.
+
+
 ## [0.5.3] (2026-04-21)
 
 ### Improvements

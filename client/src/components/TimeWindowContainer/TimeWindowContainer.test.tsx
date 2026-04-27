@@ -101,7 +101,6 @@ describe('TimeWindowContainer', () => {
 
       displayCalendar: vi.fn(),
       removeCalendar: vi.fn(),
-      clearCalendar: vi.fn(),
     }));
 
     const { getByRole } = await render(
@@ -133,7 +132,6 @@ describe('TimeWindowContainer', () => {
 
       displayCalendar: vi.fn(),
       removeCalendar: vi.fn(),
-      clearCalendar: vi.fn(),
     }));
 
     const { getByRole } = await render(
@@ -165,7 +163,6 @@ describe('TimeWindowContainer', () => {
 
       displayCalendar: displayCalendarMock,
       removeCalendar: vi.fn(),
-      clearCalendar: vi.fn(),
     }));
 
     const { getByRole } = await render(
@@ -196,7 +193,6 @@ describe('TimeWindowContainer', () => {
 
       displayCalendar: displayCalendarMock,
       removeCalendar: vi.fn(),
-      clearCalendar: vi.fn(),
     }));
 
     const { getByRole } = await render(
@@ -228,7 +224,6 @@ describe('TimeWindowContainer', () => {
 
       displayCalendar: vi.fn(),
       removeCalendar: vi.fn(),
-      clearCalendar: vi.fn(),
     }));
 
     const { getByRole } = await render(
@@ -265,7 +260,6 @@ describe('TimeWindowContainer', () => {
 
       displayCalendar: vi.fn(),
       removeCalendar: vi.fn(),
-      clearCalendar: vi.fn(),
     }));
 
     const { getByRole } = await render(

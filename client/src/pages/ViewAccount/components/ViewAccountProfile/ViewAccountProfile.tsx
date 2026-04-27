@@ -19,6 +19,7 @@ import useHandleAsyncError, {
 import useHistory from '../../../../hooks/useHistory';
 import useInfoModal from '../../../../hooks/useInfoModal';
 import useConfirmModal from '../../../../hooks/useConfirmModal';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function ViewAccountProfile(): JSX.Element {
   const { setAccountLocation } = useAccountLocation();
@@ -30,7 +31,7 @@ export default function ViewAccountProfile(): JSX.Element {
   const { authStatus } = useAuth();
   const { referrerLocation } = useHistory();
   const navigate: NavigateFunction = useNavigate();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
   const { displayConfirmModal, removeConfirmModal } = useConfirmModal();

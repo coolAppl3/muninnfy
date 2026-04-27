@@ -3,13 +3,14 @@ import { AsyncErrorData, getAsyncErrorData } from '../utils/errorUtils';
 import useAuth from './useAuth';
 import useInfoModal from './useInfoModal';
 import usePopupMessage from './usePopupMessage';
+import { DisplayPopupMessageFunction } from '../contexts/PopupMessageContext';
 
 type HandleAsyncErrorData = AsyncErrorData & { isHandled: boolean };
 export type HandleAsyncErrorFunction = (err: unknown) => HandleAsyncErrorData;
 
 export default function useHandleAsyncError(): HandleAsyncErrorFunction {
   const { setAuthStatus } = useAuth();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
   const { displayInfoModal, removeInfoModal } = useInfoModal();
 
   const handleAsyncError = useCallback(

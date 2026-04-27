@@ -16,6 +16,7 @@ import {
   resendAccountDeletionEmailService,
 } from '../../../../../../services/accountServices';
 import { resDataContainsExpiryTimestamp } from '../../../util/AccountProfileUtils';
+import { DisplayPopupMessageFunction } from '../../../../../../contexts/PopupMessageContext';
 
 export default function AccountDeletionConfirm(): JSX.Element {
   const { accountDetails } = useAccountDetails();
@@ -31,7 +32,7 @@ export default function AccountDeletionConfirm(): JSX.Element {
   const { setAuthStatus } = useAuth();
   const handleAsyncError: HandleAsyncErrorFunction = useHandleAsyncError();
   const { displayLoadingOverlay, removeLoadingOverlay } = useLoadingOverlay();
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   async function confirmAccountDeletion(): Promise<void> {
     if (ongoingAccountDeletionRequest?.is_suspended) {

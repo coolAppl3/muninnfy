@@ -5,12 +5,13 @@ import useWishlistHeader from '../context/useWishlistHeader';
 import { copyToClipboard } from '../../../../utils/globalUtils';
 import useWishlist from '../../hooks/useWishlist';
 import WishlistHeaderContentFavorite from './components/WishlistHeaderContentFavorite';
+import { DisplayPopupMessageFunction } from '../../../../contexts/PopupMessageContext';
 
 export default function WishlistHeaderContent(): JSX.Element {
   const { wishlistId, wishlistDetails } = useWishlist();
   const { setEditMode, menuIsOpen, setMenuIsOpen } = useWishlistHeader();
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   return (
     <div

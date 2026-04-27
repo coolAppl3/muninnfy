@@ -6,13 +6,14 @@ import useAccountSocialDetails from '../../../hooks/useAccountSocialDetails';
 import { copyToClipboard } from '../../../../../utils/globalUtils';
 import usePopupMessage from '../../../../../hooks/usePopupMessage';
 import useViewMode from '../../../../../hooks/useViewMode';
+import { DisplayPopupMessageFunction } from '../../../../../contexts/PopupMessageContext';
 
 export default function AccountSocialHeader(): JSX.Element {
   const { menuIsOpen, socialSection, setMenuIsOpen, setSocialSection } = useAccountSocial();
   const { socialCounts } = useAccountSocialDetails();
   const { inViewMode, publicAccountId } = useViewMode();
 
-  const { displayPopupMessage } = usePopupMessage();
+  const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   return (
     <header>
