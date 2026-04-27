@@ -71,7 +71,7 @@ describe('AuthSessionProvider', () => {
     });
   });
 
-  it('(signOut) should, assuming signOutService resolves, call displayLoadingOverlay, removeLoadingOverlay, setAuthStatus, and displayPopupMessage', async () => {
+  it('should, assuming signOutService resolves, call displayLoadingOverlay, removeLoadingOverlay, setAuthStatus, and displayPopupMessage', async () => {
     vi.mocked(authServices.signOutService).mockResolvedValueOnce({ data: {} } as any);
 
     await render(
@@ -92,7 +92,7 @@ describe('AuthSessionProvider', () => {
     });
   });
 
-  it('(signOut) should, assuming signOutService rejects, call displayLoadingOverlay, removeLoadingOverlay, and displayPopupMessage', async () => {
+  it('should, assuming signOutService rejects, call displayLoadingOverlay, removeLoadingOverlay, and displayPopupMessage', async () => {
     vi.mocked(authServices.signOutService).mockRejectedValue({ data: {} } as any);
 
     await render(
@@ -111,7 +111,7 @@ describe('AuthSessionProvider', () => {
     });
   });
 
-  it('(signOut) should, if the authStatus is already unauthenticated, call displayPopupMessage', async () => {
+  it('should, if the authStatus is already unauthenticated, call displayPopupMessage', async () => {
     vi.mocked(useAuth).mockImplementation(() => ({
       authStatus: 'unauthenticated',
       setAuthStatus: vi.fn(),
