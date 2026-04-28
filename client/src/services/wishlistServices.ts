@@ -60,7 +60,7 @@ export async function viewCrossWishlistSearchService(
   publicAccountId?: string
 ): Promise<AxiosResponse<string[]>> {
   return axiosInstance.get('/wishlists/crossWishlistSearch', {
-    params: { publicAccountId, itemTitleQuery },
+    params: { itemTitleQuery, publicAccountId },
   });
 }
 
