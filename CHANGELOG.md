@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.5.5] (2026-04-30)
+
+### Bug Fixes
+
+- Fixed node environment mismatch causing vite issues with the building of the production bundle.
+- Fixed the start command for the server targeting `app` instead of `server`.
+
+
+### Tests
+
+- Added test suites for the following:
+  - `accountServices`.
+  - `authServices`.
+  - `notificationServices`.
+  - `socialServices`.
+  - `wishlistItemServices`.
+  - `wishlistServices`.
+  - `debounce`.
+  - `getAsyncErrorData`.
+
+
+### Code Refactoring
+
+- Renamed `delay` parameter in `debounce()` to `delayMilliseconds`.
+
+
 ## [0.5.4] (2026-04-28)
 
 ### Improvements
