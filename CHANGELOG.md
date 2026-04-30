@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.6] (2026-04-30)
+
+### Bug Fixes
+
+- Added missing `is_private` row in `accounts` table.
+- Removed accidental and malformed foreign key constraint in `accounts` table.
+- Fixed `main` in `package.json` having referring to `app` instead of `server`.
+
+
 ## [0.5.5] (2026-04-30)
 
 ### Bug Fixes
