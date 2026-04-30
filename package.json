@@ -1,13 +1,13 @@
 {
   "name": "muninnfy",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "license": "UNLICENSED",
   "description": "Muninnfy is a single-page application meant to function as a flexible wishlist.",
   "author": "Yanal Mohsen",
   "main": "app.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node ./dist/app.js",
+    "start": "node ./dist/server.js",
     "dev-nodemon": "nodemon ./dist/server.js",
     "dev-ts": "tsc --watch",
     "ts-clean": "tsc --build --clean",

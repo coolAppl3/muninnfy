@@ -7,10 +7,6 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { playwright } from '@vitest/browser-playwright';
 
 export default defineConfig({
-  define: {
-    'process.env.NODE_ENV': '"production"',
-  },
-
   plugins: [
     {
       enforce: 'pre',
