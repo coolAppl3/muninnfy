@@ -50,8 +50,8 @@ async function createAccountsTable(): Promise<void> {
         created_on_timestamp BIGINT UNSIGNED NOT NULL,
         is_verified BOOLEAN NOT NULL,
         failed_sign_in_attempts TINYINT UNSIGNED NOT NULL CHECK(failed_sign_in_attempts <= ?),
-        approve_follow_requests BOOLEAN NOT NULL,
-        FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
+        is_private BOOLEAN NOT NULL,
+        approve_follow_requests BOOLEAN NOT NULL
       );`,
       [ACCOUNT_FAILED_SIGN_IN_LIMIT]
     );
