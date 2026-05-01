@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.5.7] (2026-05-01)
+
+### Features
+
+- Adjusted `Head` to allow for inserting meta description tags.
+- Added meta description tags to all pages.
+- Added `sitemap` file.
+- Added `robots` file.
+
+
+### Improvements
+
+- Changed `h4` to `h2` in the log within `Footer` to improve accessibility.
+
+
+### Chore Changes
+
+- Audit packages.
+
+
 ## [0.5.6] (2026-04-30)
 
 ### Bug Fixes
