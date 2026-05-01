@@ -1,0 +1,20 @@
+User-agent: *
+
+Disallow: /account
+Disallow: /wishlists
+Disallow: /wishlist/
+
+Allow: /
+Allow: /home
+Allow: /view/wishlist/
+Allow: /view/wishlists/
+Allow: /view/account/
+Allow: /faq
+Allow: /terms-of-service
+Allow: /privacy-policy
+Allow: /cookie-policy
+Allow: /sign-up
+Allow: /sign-in
+Allow: /account/recovery
+
+Sitemap: https://muninnfy.com/sitemap.xml
