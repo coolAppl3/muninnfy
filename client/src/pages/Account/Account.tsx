@@ -76,7 +76,10 @@ export default function Account(): JSX.Element {
 
   return (
     <>
-      <Head title='Account - Muninnfy' />
+      <Head
+        title='Account - Muninnfy'
+        metaDescription='My wishlists, personal details, and more.'
+      />
 
       <ViewModeProvider inViewMode={false}>
         <AccountLocationProvider>

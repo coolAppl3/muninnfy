@@ -93,7 +93,10 @@ export default function Wishlist(): JSX.Element {
 
   return (
     <>
-      <Head title='Wishlist - Muninnfy' />
+      <Head
+        title='Wishlist - Muninnfy'
+        metaDescription='Add, remove, or adjust your wishlist items.'
+      />
 
       {isLoaded || <LoadingSkeleton />}
 

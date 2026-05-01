@@ -103,7 +103,10 @@ export default function ViewWishlist(): JSX.Element {
 
   return (
     <>
-      <Head title='View Wishlist - Muninnfy' />
+      <Head
+        title='View Wishlist - Muninnfy'
+        metaDescription={`Explore what ${ownerDetails?.owner_display_name || 'this user'} has wishlisted.`}
+      />
 
       {isLoaded || <LoadingSkeleton />}
 

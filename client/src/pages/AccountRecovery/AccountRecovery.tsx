@@ -21,7 +21,10 @@ export default function AccountRecovery(): JSX.Element {
 
   return (
     <>
-      <Head title='Account Recovery - Muninnfy' />
+      <Head
+        title='Account Recovery - Muninnfy'
+        metaDescription='Recovery your Muninnfy account.'
+      />
 
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>

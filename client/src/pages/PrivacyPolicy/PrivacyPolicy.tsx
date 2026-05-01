@@ -7,7 +7,10 @@ import ArticlesNav from '../../components/ArticlesNav/ArticlesNav';
 export default function PrivacyPolicy(): JSX.Element {
   return (
     <>
-      <Head title='Privacy Policy - Muninnfy' />
+      <Head
+        title='Privacy Policy - Muninnfy'
+        metaDescription='Muninnfy Privacy Policy.'
+      />
 
       <main className='py-4'>
         <Container>
