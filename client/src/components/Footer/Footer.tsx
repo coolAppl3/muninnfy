@@ -16,7 +16,7 @@ export default function Footer(): JSX.Element {
             <Link to='/home'>
               <div className='w-fit flex justify-center items-center gap-1 mb-1 xs:mb-[1.4rem]'>
                 <Logo className='w-3 h-3' />
-                <h4 className='text-title font-bold text-xl'>Muninnfy</h4>
+                <h2 className='text-title font-bold text-xl'>Muninnfy</h2>
               </div>
             </Link>
 

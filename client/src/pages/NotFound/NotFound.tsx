@@ -11,7 +11,10 @@ export default function NotFound(): JSX.Element {
 
   return (
     <>
-      <Head title='Not Found - Muninnfy' />
+      <Head
+        title='Not Found - Muninnfy'
+        metaDescription='Page not found. Click to go back.'
+      />
 
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>

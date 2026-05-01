@@ -21,7 +21,10 @@ export default function AccountVerification(): JSX.Element {
 
   return (
     <>
-      <Head title='Account Verification - Muninnfy' />
+      <Head
+        title='Account Verification - Muninnfy'
+        metaDescription='Verify your email address to unlock the ultimate experience.'
+      />
 
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>

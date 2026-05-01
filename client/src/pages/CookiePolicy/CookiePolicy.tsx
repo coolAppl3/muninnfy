@@ -7,7 +7,10 @@ import ArticlesNav from '../../components/ArticlesNav/ArticlesNav';
 export default function CookiePolicy(): JSX.Element {
   return (
     <>
-      <Head title='Cookie Policy - Muninnfy' />
+      <Head
+        title='Cookie Policy - Muninnfy'
+        metaDescription='Muninnfy Cookie Policy.'
+      />
 
       <main className='py-4'>
         <Container>

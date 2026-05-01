@@ -68,7 +68,10 @@ export default function NewWishlist(): JSX.Element {
 
   return (
     <>
-      <Head title='New Wishlist - Muninnfy' />
+      <Head
+        title='New Wishlist - Muninnfy'
+        metaDescription='someDescription.'
+      />
 
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>

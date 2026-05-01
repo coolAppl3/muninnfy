@@ -90,7 +90,10 @@ export default function ViewAccount(): JSX.Element {
 
   return (
     <>
-      <Head title='View Account - Muninnfy' />
+      <Head
+        title='View Account - Muninnfy'
+        metaDescription={`Account details for ${viewAccountDetails?.display_name || 'this user'}.`}
+      />
 
       <ViewModeProvider
         inViewMode={true}

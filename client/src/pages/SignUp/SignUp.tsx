@@ -120,7 +120,10 @@ export default function SignUp(): JSX.Element {
 
   return (
     <>
-      <Head title='Sign Up - Muninnfy' />
+      <Head
+        title='Sign Up - Muninnfy'
+        metaDescription='Sign up and get started. Muninnfy is completely free.'
+      />
 
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>

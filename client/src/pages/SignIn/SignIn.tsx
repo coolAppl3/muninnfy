@@ -111,7 +111,10 @@ export default function SignIn(): JSX.Element {
 
   return (
     <>
-      <Head title='Sign In - Muninnfy' />
+      <Head
+        title='Sign In - Muninnfy'
+        metaDescription='Sign in to your Muninnfy account.'
+      />
 
       <main className='py-4 h-available flex justify-center items-center'>
         <Container>

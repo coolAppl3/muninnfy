@@ -7,7 +7,10 @@ import ArticlesNav from '../../components/ArticlesNav/ArticlesNav';
 export default function TermsOfService(): JSX.Element {
   return (
     <>
-      <Head title='Terms of Service - Muninnfy' />
+      <Head
+        title='Terms of Service - Muninnfy'
+        metaDescription='Muninnfy Terms of Service.'
+      />
 
       <main className='py-4'>
         <Container>
