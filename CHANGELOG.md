@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.8] (2026-05-05)
+
+### Documentation Changes
+
+- Update `README` file.
+- Changed`getAsyncErrorData` to `errorUtils` in previous patch notes.
+
+
 ## [0.5.7] (2026-05-01)
 
 ### Features
@@ -47,7 +55,7 @@
   - `wishlistItemServices`.
   - `wishlistServices`.
   - `debounce`.
-  - `getAsyncErrorData`.
+  - `errorUtils`.
 
 
 ### Code Refactoring
