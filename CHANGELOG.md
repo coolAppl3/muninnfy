@@ -47,7 +47,7 @@
   - `wishlistItemServices`.
   - `wishlistServices`.
   - `debounce`.
-  - `getAsyncErrorData`.
+  - `errorUtils`.
 
 
 ### Code Refactoring
