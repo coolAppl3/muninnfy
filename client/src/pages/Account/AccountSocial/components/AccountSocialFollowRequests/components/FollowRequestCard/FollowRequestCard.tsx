@@ -10,7 +10,7 @@ import useHandleAsyncError, {
 import usePopupMessage from '../../../../../../../hooks/usePopupMessage';
 import Button from '../../../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
-import { getFullDateString } from '../../../../../../../utils/globalUtils';
+import { getDateString } from '../../../../../../../utils/globalUtils';
 import {
   acceptFollowRequestService,
   declineFollowRequestService,
@@ -184,7 +184,7 @@ function FollowRequestCard({
         </div>
         <div className='text-description/50 text-xs'>
           <p className='leading-none mb-[4px]'>
-            Requested on {getFullDateString(request_timestamp)}
+            Requested on {getDateString(request_timestamp)}
           </p>
           <p className='leading-none'>{public_account_id}</p>
         </div>

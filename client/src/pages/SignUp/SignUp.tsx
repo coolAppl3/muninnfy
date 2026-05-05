@@ -14,7 +14,7 @@ import DefaultFormGroup from '../../components/DefaultFormGroup/DefaultFormGroup
 import useAuth from '../../hooks/useAuth';
 import useHandleAsyncError, { HandleAsyncErrorFunction } from '../../hooks/useHandleAsyncError';
 import useCalendar from '../../hooks/useCalendar';
-import { getFullDateString } from '../../utils/globalUtils';
+import { getDateString } from '../../utils/globalUtils';
 import { validateDateOfBirthTimestamp } from '../../utils/validation/userValidation';
 import CheckboxFormGroup from '../../components/CheckboxFormGroup/CheckboxFormGroup';
 import { DisplayPopupMessageFunction } from '../../contexts/PopupMessageContext';
@@ -165,7 +165,7 @@ export default function SignUp(): JSX.Element {
                   onClick={() => displayCalendar('start', 'dateOfBirth')}
                   className={`w-full h-4 p-1 rounded border-1 hover:border-cta outline-0 text-description text-start text-sm transition-colors cursor-pointer ${dateOfBirthErrorMessage ? 'border-danger' : 'border-description/75'}`}
                 >
-                  {dateOfBirthTimestamp && getFullDateString(dateOfBirthTimestamp)}
+                  {dateOfBirthTimestamp && getDateString(dateOfBirthTimestamp)}
                 </button>
 
                 <span

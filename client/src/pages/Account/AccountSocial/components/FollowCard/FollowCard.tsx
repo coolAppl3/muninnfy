@@ -1,6 +1,6 @@
 import { Dispatch, JSX, memo, SetStateAction, useState } from 'react';
 import { FollowDetails, SocialCounts } from '../../../../../types/socialTypes';
-import { getFullDateString } from '../../../../../utils/globalUtils';
+import { getDateString } from '../../../../../utils/globalUtils';
 import RemoveIcon from '../../../../../assets/svg/RemoveIcon.svg?react';
 import Button from '../../../../../components/Button/Button';
 import { Link } from 'react-router-dom';
@@ -167,7 +167,7 @@ function FollowCard({
       </div>
 
       <div className='text-description/50 text-xs'>
-        <p className='leading-none mb-[4px]'>Since {getFullDateString(follow_timestamp)}</p>
+        <p className='leading-none mb-[4px]'>Since {getDateString(follow_timestamp)}</p>
         <p className='leading-none'>{public_account_id}</p>
       </div>
     </div>

@@ -8,22 +8,13 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
-export function getFullDateString(timestamp: number): string {
+export function getDateString(timestamp: number, shortenedMonthName: boolean = false): string {
   const dateObject: Date = new Date(timestamp);
 
+  const monthName: string = shortenedMonthName
+    ? getShortMonthName(dateObject)
+    : getMonthName(dateObject);
   const date: number = dateObject.getDate();
-  const monthName: string = getMonthName(dateObject);
-  const ordinalSuffix: string = getDateOrdinalSuffix(date);
-  const year: number = dateObject.getFullYear();
-
-  return `${monthName} ${date}${ordinalSuffix}, ${year}`;
-}
-
-export function getShortenedDateString(timestamp: number): string {
-  const dateObject: Date = new Date(timestamp);
-
-  const date: number = dateObject.getDate();
-  const monthName: string = getShortMonthName(dateObject);
   const ordinalSuffix: string = getDateOrdinalSuffix(date);
   const year: number = dateObject.getFullYear();
 

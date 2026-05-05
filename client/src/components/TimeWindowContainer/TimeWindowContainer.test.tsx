@@ -115,7 +115,7 @@ describe('TimeWindowContainer', () => {
     const btn: Locator = getByRole('button', { name: 'someStartLabel' });
     await expect.element(btn).toHaveTextContent('January 1st, 2026');
 
-    expect(globalUtils.getFullDateString).toHaveBeenCalledWith(startTimestamp);
+    expect(globalUtils.getDateString).toHaveBeenCalledWith(startTimestamp);
   });
 
   it('should call getFullDateString and render out the date in time end button if the endTimestampsMap contains a timestamp related to the calendarKey prop', async () => {
@@ -146,7 +146,7 @@ describe('TimeWindowContainer', () => {
     const btn: Locator = getByRole('button', { name: 'someEndLabel' });
     await expect.element(btn).toHaveTextContent('January 1st, 2026');
 
-    expect(globalUtils.getFullDateString).toHaveBeenCalledWith(endTimestamp);
+    expect(globalUtils.getDateString).toHaveBeenCalledWith(endTimestamp);
   });
 
   it('should call displayCalendar with start and the calendarKey prop if the time start button is clicked', async () => {
