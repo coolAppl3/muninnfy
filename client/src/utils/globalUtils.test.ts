@@ -98,4 +98,10 @@ describe('containsInvalidWhitespace', () => {
     expect(containsInvalidWhitespace('someText \n someText')).toBe(true);
     expect(containsInvalidWhitespace('someText\n \nsomeText')).toBe(true);
   });
+
+  it('should return false if no invalid whitespace is found', async () => {
+    expect(containsInvalidWhitespace('someText someText')).toBe(false);
+    expect(containsInvalidWhitespace('someText\nsomeText')).toBe(false);
+    expect(containsInvalidWhitespace('someTextSomeText')).toBe(false);
+  });
 });
