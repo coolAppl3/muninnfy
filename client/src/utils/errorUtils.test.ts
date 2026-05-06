@@ -3,11 +3,11 @@ import { AsyncErrorData, getAsyncErrorData } from './errorUtils';
 import { AxiosError } from 'axios';
 
 describe('getAsyncErrorData', () => {
-  it('should return null if the err provided is not an axios error', async () => {
+  it('should return null if the err provided is not an axios error', () => {
     expect(getAsyncErrorData({ someKey: 23 })).toBeNull();
   });
 
-  it('should return null if the err provided does not have a status', async () => {
+  it('should return null if the err provided does not have a status', () => {
     const axiosErrorMock = {
       isAxiosError: true,
       status: undefined,
@@ -22,7 +22,7 @@ describe('getAsyncErrorData', () => {
     expect(result).toBeNull();
   });
 
-  it('should return null if the err provided does not have a response object', async () => {
+  it('should return null if the err provided does not have a response object', () => {
     const axiosErrorMock = {
       isAxiosError: true,
       status: 400,
@@ -32,7 +32,7 @@ describe('getAsyncErrorData', () => {
     expect(result).toBeNull();
   });
 
-  it('should return an object containing the status, errMessage, errReason, and errResData within the err provided', async () => {
+  it('should return an object containing the status, errMessage, errReason, and errResData within the err provided', () => {
     const axiosErrorMock = {
       isAxiosError: true,
       status: 400,

@@ -37,7 +37,7 @@ describe('copyToClipboard', () => {
 });
 
 describe('getDateString', () => {
-  it('should, using the provided timestamp, provide a full date string with the Month DDnth, YYYY format', async () => {
+  it('should, using the provided timestamp, provide a full date string with the Month DDnth, YYYY format', () => {
     const result1: string = getDateString(new Date(2026, 1, 1).getTime());
     const result2: string = getDateString(new Date(2013, 7, 26).getTime());
 
@@ -45,7 +45,7 @@ describe('getDateString', () => {
     expect(result2).toBe('August 26th, 2013');
   });
 
-  it('should shorten the month to 3 characters if shortenedMonthName is true', async () => {
+  it('should shorten the month to 3 characters if shortenedMonthName is true', () => {
     const result1: string = getDateString(new Date(2026, 1, 1).getTime(), true);
     const result2: string = getDateString(new Date(2013, 7, 26).getTime(), true);
 
@@ -55,7 +55,7 @@ describe('getDateString', () => {
 });
 
 describe('getDateAndTimeString', () => {
-  it('should, using the provided timestamp, provide a date and time string with the Month DDnth, HH:MM format', async () => {
+  it('should, using the provided timestamp, provide a date and time string with the Month DDnth, HH:MM format', () => {
     const result1: string = getDateAndTimeString(new Date(2026, 1, 1).getTime());
     const result2: string = getDateAndTimeString(new Date(2013, 7, 26).getTime());
 
@@ -63,7 +63,7 @@ describe('getDateAndTimeString', () => {
     expect(result2).toBe('August 26th, 00:00');
   });
 
-  it('should, using the provided timestamp, provide a date and time string with the Month DDnth, YYYY — HH:MM format if the includeYear parameter is true', async () => {
+  it('should, using the provided timestamp, provide a date and time string with the Month DDnth, YYYY — HH:MM format if the includeYear parameter is true', () => {
     const result1: string = getDateAndTimeString(new Date(2026, 1, 1).getTime(), true);
     const result2: string = getDateAndTimeString(new Date(2013, 7, 26).getTime(), true);
 
@@ -73,7 +73,7 @@ describe('getDateAndTimeString', () => {
 });
 
 describe('containsInvalidWhitespace', () => {
-  it('should return true if the string starts with any whitespace', async () => {
+  it('should return true if the string starts with any whitespace', () => {
     expect(containsInvalidWhitespace(' someText')).toBe(true);
     expect(containsInvalidWhitespace('  someText')).toBe(true);
     expect(containsInvalidWhitespace('\nsomeText')).toBe(true);
@@ -81,7 +81,7 @@ describe('containsInvalidWhitespace', () => {
     expect(containsInvalidWhitespace('\n someText')).toBe(true);
   });
 
-  it('should return true if the string ends with any whitespace', async () => {
+  it('should return true if the string ends with any whitespace', () => {
     expect(containsInvalidWhitespace('someText ')).toBe(true);
     expect(containsInvalidWhitespace('someText  ')).toBe(true);
     expect(containsInvalidWhitespace('someText\n')).toBe(true);
@@ -89,7 +89,7 @@ describe('containsInvalidWhitespace', () => {
     expect(containsInvalidWhitespace('someText \n')).toBe(true);
   });
 
-  it('should return true if the string contains two or more consecutive instances of whitespace', async () => {
+  it('should return true if the string contains two or more consecutive instances of whitespace', () => {
     expect(containsInvalidWhitespace('someText  someText')).toBe(true);
     expect(containsInvalidWhitespace('someText   someText')).toBe(true);
     expect(containsInvalidWhitespace('someText\n\nsomeText')).toBe(true);
@@ -99,7 +99,7 @@ describe('containsInvalidWhitespace', () => {
     expect(containsInvalidWhitespace('someText\n \nsomeText')).toBe(true);
   });
 
-  it('should return false if no invalid whitespace is found', async () => {
+  it('should return false if no invalid whitespace is found', () => {
     expect(containsInvalidWhitespace('someText someText')).toBe(false);
     expect(containsInvalidWhitespace('someText\nsomeText')).toBe(false);
     expect(containsInvalidWhitespace('someTextSomeText')).toBe(false);

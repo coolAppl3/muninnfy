@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { debounce } from './debounce';
 
 describe('debounce', () => {
-  it('should return a debounced function that calls the function passed in only if the delay amount has passed', async () => {
+  it('should return a debounced function that calls the function passed in only if the delay amount has passed', () => {
     const mockFunction = vi.fn();
     const debounceDelayMilliseconds: number = 200;
     const debouncedMockFunction = debounce(mockFunction, debounceDelayMilliseconds);
