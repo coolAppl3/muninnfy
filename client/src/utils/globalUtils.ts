@@ -31,7 +31,7 @@ export function getDateAndTimeString(timestamp: number, includeYear: boolean = f
 
   const time = new Intl.DateTimeFormat('en-GB', { timeStyle: 'short' }).format(dateObject);
 
-  return `${monthName} ${date}${ordinalSuffix}${includeYear ? `, ${year} -` : ','} ${time}`;
+  return `${monthName} ${date}${ordinalSuffix}${includeYear ? `, ${year} —` : ','} ${time}`;
 }
 
 function getMonthName(date: Date): string {
