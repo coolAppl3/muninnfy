@@ -44,7 +44,7 @@ export function validateHexCode(hexCode: string): string | null {
     return 'Code must be 8 characters long.';
   }
 
-  if (hexCode.includes(' ')) {
+  if (/\s/.test(hexCode)) {
     return 'Code must not contain any whitespace';
   }
 

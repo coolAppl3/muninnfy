@@ -27,7 +27,7 @@ export function isValidPassword(value: any): boolean {
     return false;
   }
 
-  if (value.trim() === '' || value.includes(' ')) {
+  if (value.trim() === '' || /\s/.test(value)) {
     return false;
   }
 
