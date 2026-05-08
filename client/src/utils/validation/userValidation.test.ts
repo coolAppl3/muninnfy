@@ -72,13 +72,7 @@ describe('validateNewPassword', () => {
   });
 
   it('should return an error message if the value provided is more than 40 characters long', () => {
-    let longPassword: string = '';
-
-    for (let i = 0; i < 41; i++) {
-      longPassword += 'a';
-    }
-
-    expect(validateNewPassword(longPassword)).toBe('Password must not exceed 40 characters.');
+    expect(validateNewPassword('a'.repeat(41))).toBe('Password must not exceed 40 characters.');
   });
 
   it('should return an error message if the value provided contains anything but English letters, numbers, or the following symbols: _.!#$&', () => {
@@ -123,13 +117,7 @@ describe('validatePassword', () => {
   });
 
   it('should return an error message if the value provided is more than 40 characters long', () => {
-    let longPassword: string = '';
-
-    for (let i = 0; i < 41; i++) {
-      longPassword += 'a';
-    }
-
-    expect(validatePassword(longPassword)).toBe('Password must not exceed 40 characters.');
+    expect(validatePassword('a'.repeat(41))).toBe('Password must not exceed 40 characters.');
   });
 
   it('should return null if a the value provided is a valid password (less strict than validateNewPassword)', () => {
@@ -166,13 +154,7 @@ describe('validateUsername', () => {
   });
 
   it('should return an error message if the value provided is longer than 25 characters', () => {
-    let longUsername: string = '';
-
-    for (let i = 0; i < 26; i++) {
-      longUsername += 'a';
-    }
-
-    expect(validateUsername(longUsername)).toBe('Username must not exceed 25 characters.');
+    expect(validateUsername('a'.repeat(26))).toBe('Username must not exceed 25 characters.');
   });
 
   it('should return an error message if the value provided uses characters other than English letters, numbers, underscores, and periods', () => {
@@ -250,13 +232,7 @@ describe('validateDisplayName', () => {
   });
 
   it('should return an error message if the value provided is longer than 25 characters', () => {
-    let longDisplayName: string = '';
-
-    for (let i = 0; i < 26; i++) {
-      longDisplayName += 'a';
-    }
-
-    expect(validateDisplayName(longDisplayName)).toBe(
+    expect(validateDisplayName('a'.repeat(26))).toBe(
       'Display name must not exceed 25 characters.'
     );
   });
