@@ -21,7 +21,7 @@ export function validateWishlistTitle(value: string): string | null {
 
   const regex: RegExp = /^(?=.{1,50}$)(?!.*  )[\x00-\x7F]+(?: [\x00-\x7F]+)*$/;
   if (!regex.test(value)) {
-    return 'Only standard letters, numbers, and symbols are allowed.';
+    return 'Only standard English letters, numbers, and symbols are allowed.';
   }
 
   return null;
