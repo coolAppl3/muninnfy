@@ -1,7 +1,7 @@
 import { isValidUuid } from './generalValidation';
 
 export function validateSocialSearchQuery(value: string): string | null {
-  if (value.length === 0) {
+  if (value === '') {
     return null;
   }
 
@@ -22,7 +22,7 @@ export function validateSocialSearchQuery(value: string): string | null {
 }
 
 export function validateSocialFindQuery(value: string): string | null {
-  if (value.length === 0) {
+  if (value === '') {
     return 'A valid search query is required.';
   }
 
