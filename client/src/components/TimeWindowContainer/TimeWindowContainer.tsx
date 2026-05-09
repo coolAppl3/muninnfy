@@ -1,6 +1,6 @@
 import { Dispatch, JSX, MouseEventHandler, SetStateAction } from 'react';
 import useCalendar from '../../hooks/useCalendar';
-import { getFullDateString } from '../../utils/globalUtils';
+import { getDateString } from '../../utils/globalUtils';
 import CrossIcon from '../../assets/svg/CrossIcon.svg?react';
 
 type TimeWindowContainerProps = {
@@ -54,7 +54,7 @@ export default function TimeWindowContainer({
           onClick={() => displayCalendar('start', calendarKey)}
           className='w-full h-4 p-1 rounded border-1 border-description/75 hover:border-cta outline-0 text-description text-start text-sm transition-colors cursor-pointer'
         >
-          {startTimestamp && getFullDateString(startTimestamp)}
+          {startTimestamp && getDateString(startTimestamp)}
         </button>
 
         {startTimestamp && (
@@ -76,7 +76,7 @@ export default function TimeWindowContainer({
           onClick={() => displayCalendar('end', calendarKey)}
           className='w-full h-4 p-1 rounded border-1 border-description/75 hover:border-cta outline-0 text-description text-start text-sm transition-colors cursor-pointer'
         >
-          {endTimestamp && getFullDateString(endTimestamp)}
+          {endTimestamp && getDateString(endTimestamp)}
         </button>
 
         {endTimestamp && (

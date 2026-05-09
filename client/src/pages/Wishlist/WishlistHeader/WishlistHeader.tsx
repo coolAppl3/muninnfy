@@ -1,6 +1,6 @@
 import { JSX } from 'react';
 import Container from '../../../components/Container/Container';
-import { getFullDateString } from '../../../utils/globalUtils';
+import { getDateString } from '../../../utils/globalUtils';
 import { getFormattedPrice } from '../../../utils/wishlistUtils';
 import useWishlistHeader from './context/useWishlistHeader';
 import WishlistHeaderEditingContainer from './components/WishlistHeaderEditingContainer';
@@ -56,7 +56,7 @@ export default function WishlistHeader(): JSX.Element {
 
             <div className='text-description flex justify-between items-center'>
               <p className='text-sm font-medium'>
-                {getFullDateString(wishlistDetails.created_on_timestamp)}
+                {getDateString(wishlistDetails.created_on_timestamp)}
               </p>
               {wishlistDetails.is_favorited && (
                 <span

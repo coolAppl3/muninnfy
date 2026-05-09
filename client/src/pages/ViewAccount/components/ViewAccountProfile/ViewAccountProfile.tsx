@@ -1,6 +1,6 @@
 import { JSX, useState } from 'react';
 import StatisticItem from '../../../../components/StatisticItem/StatisticItem';
-import { getFullDateString } from '../../../../utils/globalUtils';
+import { getDateString } from '../../../../utils/globalUtils';
 import useAccountLocation from '../../../Account/hooks/useAccountLocation';
 import useAccountSocial from '../../../Account/hooks/useAccountSocial';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -251,7 +251,7 @@ export default function ViewAccountProfile(): JSX.Element {
 
       <div className='text-description/50 text-xs'>
         <p className='leading-none mb-[4px]'>
-          Created on {getFullDateString(created_on_timestamp)}
+          Created on {getDateString(created_on_timestamp)}
         </p>
         <p className='leading-none'>{public_account_id}</p>
       </div>

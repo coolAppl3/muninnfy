@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.5.9] (2026-05-09)
+
+### Improvements
+
+- Replaced hyphen with em-dash in `getDateAndTimeString()` in `globalUtils`.
+- Strengthened whitespace checks in a few locations.
+- Reworked email validation regex to be less strict, as the main validator is the verification process.
+- Improved the phrasing for error messages where all ASCII characters are allowed.
+- Simplified the implementation of `generatePlaceholders()`.
+
+
+### Bug Fixes
+
+- Fixed missing period in error message in `validateHexCode()`.
+
+
+### Tests
+
+- Added test suites for the following:
+  - `globalUtils`.
+  - `wishlistUtils`.
+  - `containsInvalidWhitespace()`.
+  - `generalValidation`.
+  - `sharedValidation`.
+  - `userValidation`.
+  - `wishlistItemValidation`.
+  - `wishlistValidation`.
+  - `socialValidation`.
+
+
+### Code Refactoring
+
+- Consolidated `getShortenedDateString()` and `getFullDateString()` into one function named `getDateString()`.
+
+
 ## [0.5.8] (2026-05-05)
 
 ### Documentation Changes

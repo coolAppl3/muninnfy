@@ -3,7 +3,7 @@ import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import AccountProfileHeader from './components/AccountProfileHeader/AccountProfileHeader';
 import AccountProfilePrivacy from './components/AccountProfilePrivacy/AccountProfilePrivacy';
 import useAccountDetails from '../hooks/useAccountDetails';
-import { getFullDateString } from '../../../utils/globalUtils';
+import { getDateString } from '../../../utils/globalUtils';
 import { AccountProfileSection } from '../contexts/AccountProfileContext';
 import useAccountProfile from '../hooks/useAccountProfile';
 import AccountOngoingRequests from './components/AccountOngoingRequests/AccountOngoingRequests';
@@ -84,7 +84,7 @@ export function AccountProfile(): JSX.Element {
 
       <div className='text-description/50 text-xs relative z-0 mb-auto'>
         <p className='leading-none mb-[4px]'>
-          Created on {getFullDateString(created_on_timestamp)}
+          Created on {getDateString(created_on_timestamp)}
         </p>
         <p className='leading-none'>{public_account_id}</p>
       </div>

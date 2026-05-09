@@ -1,6 +1,6 @@
 import { JSX, memo } from 'react';
 import { getFormattedPrice } from '../../../../../utils/wishlistUtils';
-import { getFullDateString } from '../../../../../utils/globalUtils';
+import { getDateString } from '../../../../../utils/globalUtils';
 import { Link } from 'react-router-dom';
 import WishlistPrivacyLevelIcon from '../../../../../components/WishlistPrivacyLevelIcon/WishlistPrivacyLevelIcon';
 import {
@@ -53,7 +53,7 @@ function WishlistCard({ wishlist }: WishlistCardProps): JSX.Element {
       </div>
 
       <div className='text-description flex justify-between items-center'>
-        <p className='text-sm font-medium mr-auto'>{getFullDateString(created_on_timestamp)}</p>
+        <p className='text-sm font-medium mr-auto'>{getDateString(created_on_timestamp)}</p>
 
         {!inViewMode && 'is_favorited' in wishlist && wishlist.is_favorited && (
           <span

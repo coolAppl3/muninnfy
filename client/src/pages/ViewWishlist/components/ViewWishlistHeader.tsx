@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import useWishlistItems from '../../Wishlist/hooks/useWishlistItems';
 import Container from '../../../components/Container/Container';
-import { getFullDateString } from '../../../utils/globalUtils';
+import { getDateString } from '../../../utils/globalUtils';
 import { getFormattedPrice } from '../../../utils/wishlistUtils';
 import StatisticItem from '../../../components/StatisticItem/StatisticItem';
 import { WishlistItemType } from '../../../types/wishlistItemTypes';
@@ -71,7 +71,7 @@ export default function ViewWishlistHeader({
           </div>
 
           <p className='text-description text-sm font-medium'>
-            {getFullDateString(viewWishlistDetails.created_on_timestamp)}
+            {getDateString(viewWishlistDetails.created_on_timestamp)}
           </p>
         </div>
       </Container>

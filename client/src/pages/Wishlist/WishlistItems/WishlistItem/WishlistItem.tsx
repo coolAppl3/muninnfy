@@ -1,5 +1,5 @@
 import { Dispatch, JSX, memo, SetStateAction, useState } from 'react';
-import { getShortenedDateString } from '../../../../utils/globalUtils';
+import { getDateString } from '../../../../utils/globalUtils';
 import ChevronIcon from '../../../../assets/svg/ChevronIcon.svg?react';
 import WishlistItemForm from '../../components/WishlistItemForm';
 import { WishlistItemType } from '../../../../types/wishlistItemTypes';
@@ -107,13 +107,13 @@ function WishlistItem({
               <div className='pr-1 whitespace-nowrap overflow-hidden grid grid-cols-1 3xs:grid-cols-2 gap-[10px]'>
                 <StatisticItem
                   title='Added'
-                  value={getShortenedDateString(wishlistItem.added_on_timestamp)}
+                  value={getDateString(wishlistItem.added_on_timestamp, true)}
                 />
 
                 {wishlistItem.purchased_on_timestamp && (
                   <StatisticItem
                     title='Purchased'
-                    value={getShortenedDateString(wishlistItem.purchased_on_timestamp)}
+                    value={getDateString(wishlistItem.purchased_on_timestamp, true)}
                   />
                 )}
 
