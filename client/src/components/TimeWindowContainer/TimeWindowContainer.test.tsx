@@ -115,7 +115,7 @@ describe('TimeWindowContainer', () => {
     const btn: Locator = getByRole('button', { name: 'someStartLabel' });
     await expect.element(btn).toHaveTextContent('January 1st, 2026');
 
-    expect(globalUtils.getDateString).toHaveBeenCalledWith(startTimestamp);
+    expect(globalUtils.getDateString).toHaveBeenCalledExactlyOnceWith(startTimestamp);
   });
 
   it('should call getFullDateString and render out the date in time end button if the endTimestampsMap contains a timestamp related to the calendarKey prop', async () => {
@@ -146,7 +146,7 @@ describe('TimeWindowContainer', () => {
     const btn: Locator = getByRole('button', { name: 'someEndLabel' });
     await expect.element(btn).toHaveTextContent('January 1st, 2026');
 
-    expect(globalUtils.getDateString).toHaveBeenCalledWith(endTimestamp);
+    expect(globalUtils.getDateString).toHaveBeenCalledExactlyOnceWith(endTimestamp);
   });
 
   it('should call displayCalendar with start and the calendarKey prop if the time start button is clicked', async () => {
@@ -176,7 +176,7 @@ describe('TimeWindowContainer', () => {
 
     const btn: Locator = getByRole('button', { name: 'someStartLabel' });
     await userEvent.click(btn);
-    expect(displayCalendarMock).toHaveBeenCalledWith('start', 'someKey');
+    expect(displayCalendarMock).toHaveBeenCalledExactlyOnceWith('start', 'someKey');
   });
 
   it('should call displayCalendar with end and the calendarKey prop if the time end button is clicked', async () => {
@@ -206,7 +206,7 @@ describe('TimeWindowContainer', () => {
 
     const btn: Locator = getByRole('button', { name: 'someEndLabel' });
     await userEvent.click(btn);
-    expect(displayCalendarMock).toHaveBeenCalledWith('end', 'someKey');
+    expect(displayCalendarMock).toHaveBeenCalledExactlyOnceWith('end', 'someKey');
   });
 
   it('should render a remove date button if the startTimestampsMap contains a timestamp related to the calendarKey prop, which if clicked, calls setStartTimestampsMap', async () => {

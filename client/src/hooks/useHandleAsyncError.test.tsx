@@ -248,7 +248,7 @@ describe('useHandleAsyncError', () => {
 
     const response: HandleAsyncErrorData = result.current(axiosErrorMock);
     expect(response).toHaveProperty('isHandled', true);
-    expect(setAuthStatusMock).toHaveBeenCalledWith('unauthenticated');
+    expect(setAuthStatusMock).toHaveBeenCalledExactlyOnceWith('unauthenticated');
   });
 
   it('should, assuming a valid axios error is provided, set isHandled to true in HandleAsyncErrorData if the error has a status of 429, calling displayInfoModal in the process', async () => {
@@ -270,7 +270,7 @@ describe('useHandleAsyncError', () => {
 
     const response: HandleAsyncErrorData = result.current(axiosErrorMock);
     expect(response).toHaveProperty('isHandled', true);
-    expect(displayInfoModalMock).toHaveBeenCalledWith(
+    expect(displayInfoModalMock).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({
         title: 'Please slow down.',
         description: `You're making too many requests and have been suspended.\nYou'll be allowed to make requests again within 30-60 seconds.`,

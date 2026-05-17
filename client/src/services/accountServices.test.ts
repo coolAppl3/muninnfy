@@ -37,7 +37,7 @@ describe('signUpService', () => {
   it('should call post on the axios instance with the correct endpoint and request body', async () => {
     await signUpService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith('/accounts/signUp', mockBody);
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith('/accounts/signUp', mockBody);
   });
 });
 
@@ -45,7 +45,7 @@ describe('continueAccountVerificationService', () => {
   it('should call post on the axios instance with the correct endpoint and request body', async () => {
     await continueAccountVerificationService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith(
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith(
       '/accounts/verification/continue',
       mockBody
     );
@@ -56,7 +56,7 @@ describe('resendAccountVerificationEmailService', () => {
   it('should call patch on the axios instance with the correct endpoint and request body', async () => {
     await resendAccountVerificationEmailService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith(
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
       '/accounts/verification/resendEmail',
       mockBody
     );
@@ -69,7 +69,7 @@ describe('confirmAccountVerificationService', () => {
 
     await confirmAccountVerificationService(mockBody as any, abortSignal);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith(
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
       '/accounts/verification/confirm',
       mockBody,
       { signal: abortSignal }
@@ -81,7 +81,7 @@ describe('signInService', () => {
   it('should call post on the axios instance with the correct endpoint and request body', async () => {
     await signInService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith('/accounts/signIn', mockBody);
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith('/accounts/signIn', mockBody);
   });
 });
 
@@ -91,7 +91,9 @@ describe('getAccountDetailsService', () => {
 
     await getAccountDetailsService(abortSignal);
     expect(axiosInstance.get).toHaveBeenCalledOnce();
-    expect(axiosInstance.get).toHaveBeenCalledWith('/accounts', { signal: abortSignal });
+    expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/accounts', {
+      signal: abortSignal,
+    });
   });
 });
 
@@ -101,7 +103,7 @@ describe('getViewAccountDetailsService', () => {
 
     await getViewAccountDetailsService('somePublicAccountId', abortSignal);
     expect(axiosInstance.get).toHaveBeenCalledOnce();
-    expect(axiosInstance.get).toHaveBeenCalledWith('/accounts/somePublicAccountId', {
+    expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/accounts/somePublicAccountId', {
       signal: abortSignal,
     });
   });
@@ -111,7 +113,10 @@ describe('updateAccountPrivacyService', () => {
   it('should call patch on the axios instance with the correct endpoint and request body', async () => {
     await updateAccountPrivacyService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith('/accounts/details/privacy', mockBody);
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/details/privacy',
+      mockBody
+    );
   });
 });
 
@@ -119,7 +124,10 @@ describe('updateDisplayNameService', () => {
   it('should call patch on the axios instance with the correct endpoint and request body', async () => {
     await updateDisplayNameService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith('/accounts/details/displayName', mockBody);
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/details/displayName',
+      mockBody
+    );
   });
 });
 
@@ -127,7 +135,10 @@ describe('updatePasswordService', () => {
   it('should call patch on the axios instance with the correct endpoint and request body', async () => {
     await updatePasswordService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith('/accounts/details/password', mockBody);
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/details/password',
+      mockBody
+    );
   });
 });
 
@@ -135,7 +146,10 @@ describe('startEmailUpdateService', () => {
   it('should call post on the axios instance with the correct endpoint and request body', async () => {
     await startEmailUpdateService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith('/accounts/details/email/start', mockBody);
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/details/email/start',
+      mockBody
+    );
   });
 });
 
@@ -143,7 +157,9 @@ describe('resendEmailUpdateEmailService', () => {
   it('should call patch on the axios instance with the correct endpoint', async () => {
     await resendEmailUpdateEmailService();
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith('/accounts/details/email/resendEmail');
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/details/email/resendEmail'
+    );
   });
 });
 
@@ -151,7 +167,7 @@ describe('confirmEmailUpdateService', () => {
   it('should call patch on the axios instance with the correct endpoint and request body', async () => {
     await confirmEmailUpdateService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith(
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
       '/accounts/details/email/confirm',
       mockBody
     );
@@ -162,7 +178,10 @@ describe('startAccountRecoveryService', () => {
   it('should call post on the axios instance with the correct endpoint and request body', async () => {
     await startAccountRecoveryService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith('/accounts/recovery/start', mockBody);
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/recovery/start',
+      mockBody
+    );
   });
 });
 
@@ -170,7 +189,7 @@ describe('resendAccountRecoveryEmailService', () => {
   it('should call patch on the axios instance with the correct endpoint and request body', async () => {
     await resendAccountRecoveryEmailService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith(
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
       '/accounts/recovery/resendEmail',
       mockBody
     );
@@ -181,7 +200,10 @@ describe('confirmAccountRecoveryService', () => {
   it('should call patch on the axios instance with the correct endpoint and request body', async () => {
     await confirmAccountRecoveryService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith('/accounts/recovery/confirm', mockBody);
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/recovery/confirm',
+      mockBody
+    );
   });
 });
 
@@ -189,7 +211,10 @@ describe('startAccountDeletionService', () => {
   it('should call post on the axios instance with the correct endpoint and request body', async () => {
     await startAccountDeletionService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith('/accounts/deletion/start', mockBody);
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/deletion/start',
+      mockBody
+    );
   });
 });
 
@@ -197,7 +222,9 @@ describe('resendAccountDeletionEmailService', () => {
   it('should call patch on the axios instance with the correct endpoint', async () => {
     await resendAccountDeletionEmailService();
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith('/accounts/deletion/resendEmail');
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/deletion/resendEmail'
+    );
   });
 });
 
@@ -205,6 +232,8 @@ describe('confirmAccountDeletionService', () => {
   it('should call delete on the axios instance with the confirmation code', async () => {
     await confirmAccountDeletionService('AAAAAA');
     expect(axiosInstance.delete).toHaveBeenCalledOnce();
-    expect(axiosInstance.delete).toHaveBeenCalledWith('/accounts/deletion/confirm/AAAAAA');
+    expect(axiosInstance.delete).toHaveBeenCalledExactlyOnceWith(
+      '/accounts/deletion/confirm/AAAAAA'
+    );
   });
 });

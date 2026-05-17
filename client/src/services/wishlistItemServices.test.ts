@@ -24,7 +24,7 @@ describe('addWishlistItemService', () => {
   it('should call post on the axios instance with the correct endpoint and body', async () => {
     await addWishlistItemService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith('/wishlistItems', mockBody);
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith('/wishlistItems', mockBody);
   });
 });
 
@@ -32,7 +32,7 @@ describe('editWishlistItemService', () => {
   it('should call patch on the axios instance with the correct endpoint and body', async () => {
     await editWishlistItemService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith('/wishlistItems', mockBody);
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith('/wishlistItems', mockBody);
   });
 });
 
@@ -40,7 +40,7 @@ describe('deleteWishlistItemService', () => {
   it('should call delete on the axios instance with the correct endpoint, wishlist ID, and item ID as parameters', async () => {
     await deleteWishlistItemService('someWishlistId', 23);
     expect(axiosInstance.delete).toHaveBeenCalledOnce();
-    expect(axiosInstance.delete).toHaveBeenCalledWith('/wishlistItems', {
+    expect(axiosInstance.delete).toHaveBeenCalledExactlyOnceWith('/wishlistItems', {
       params: {
         wishlistId: 'someWishlistId',
         itemId: 23,
@@ -53,7 +53,7 @@ describe('bulkDeleteWishlistItemsService', () => {
   it('should call delete on the axios instance with the correct endpoint and body', async () => {
     await bulkDeleteWishlistItemsService(mockBody as any);
     expect(axiosInstance.delete).toHaveBeenCalledOnce();
-    expect(axiosInstance.delete).toHaveBeenCalledWith('/wishlistItems/bulk', {
+    expect(axiosInstance.delete).toHaveBeenCalledExactlyOnceWith('/wishlistItems/bulk', {
       data: mockBody,
     });
   });
@@ -63,7 +63,10 @@ describe('setWishlistItemIsPurchasedService', () => {
   it('should call patch on the axios instance with the correct endpoint and body', async () => {
     await setWishlistItemIsPurchasedService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith('/wishlistItems/purchaseStatus', mockBody);
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/wishlistItems/purchaseStatus',
+      mockBody
+    );
   });
 });
 
@@ -71,7 +74,7 @@ describe('bulkSetWishlistItemIsPurchasedService', () => {
   it('should call patch on the axios instance with the correct endpoint and body', async () => {
     await bulkSetWishlistItemIsPurchasedService(mockBody as any);
     expect(axiosInstance.patch).toHaveBeenCalledOnce();
-    expect(axiosInstance.patch).toHaveBeenCalledWith(
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
       '/wishlistItems/purchaseStatus/bulk',
       mockBody
     );

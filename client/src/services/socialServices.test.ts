@@ -30,7 +30,7 @@ describe('getAccountSocialDetailsService', () => {
 
     await getAccountSocialDetailsService(abortSignal, 'somePublicAccountId');
     expect(axiosInstance.get).toHaveBeenCalledOnce();
-    expect(axiosInstance.get).toHaveBeenCalledWith('/social', {
+    expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/social', {
       signal: abortSignal,
       params: { publicAccountId: 'somePublicAccountId' },
     });
@@ -41,7 +41,7 @@ describe('getSocialBatchService', () => {
   it('should call get on the axios instance with the correct endpoint, a SocialSectionType, an offset, and an optional publicAccountId parameter', async () => {
     await getSocialBatchService('followers', 0, 'somePublicAccountId');
     expect(axiosInstance.get).toHaveBeenCalledOnce();
-    expect(axiosInstance.get).toHaveBeenCalledWith('/social/followers', {
+    expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/social/followers', {
       params: { offset: 0, publicAccountId: 'somePublicAccountId' },
     });
   });
@@ -59,7 +59,7 @@ describe('searchSocialService', () => {
       'somePublicAccountId'
     );
     expect(axiosInstance.get).toHaveBeenCalledOnce();
-    expect(axiosInstance.get).toHaveBeenCalledWith('/social/followers/search', {
+    expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/social/followers/search', {
       signal: abortSignal,
       params: {
         searchQuery: 'someSearchQuery',
@@ -74,7 +74,10 @@ describe('acceptFollowRequestService', () => {
   it('should call get on the axios instance with the correct endpoint and request body', async () => {
     await acceptFollowRequestService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith('/social/followRequests/accept', mockBody);
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith(
+      '/social/followRequests/accept',
+      mockBody
+    );
   });
 });
 
@@ -82,7 +85,9 @@ describe('declineFollowRequestService', () => {
   it('should call delete on the axios instance with the correct endpoint and request body', async () => {
     await declineFollowRequestService(23);
     expect(axiosInstance.delete).toHaveBeenCalledOnce();
-    expect(axiosInstance.delete).toHaveBeenCalledWith('/social/followRequests/decline/23');
+    expect(axiosInstance.delete).toHaveBeenCalledExactlyOnceWith(
+      '/social/followRequests/decline/23'
+    );
   });
 });
 
@@ -90,7 +95,10 @@ describe('sendFollowRequestService', () => {
   it('should call get on the axios instance with the correct endpoint and request body', async () => {
     await sendFollowRequestService(mockBody as any);
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(axiosInstance.post).toHaveBeenCalledWith('/social/followRequests/send', mockBody);
+    expect(axiosInstance.post).toHaveBeenCalledExactlyOnceWith(
+      '/social/followRequests/send',
+      mockBody
+    );
   });
 });
 
@@ -98,7 +106,9 @@ describe('cancelFollowRequestService', () => {
   it('should call delete on the axios instance with the correct endpoint and request ID', async () => {
     await cancelFollowRequestService(23);
     expect(axiosInstance.delete).toHaveBeenCalledOnce();
-    expect(axiosInstance.delete).toHaveBeenCalledWith('/social/followRequests/cancel/23');
+    expect(axiosInstance.delete).toHaveBeenCalledExactlyOnceWith(
+      '/social/followRequests/cancel/23'
+    );
   });
 });
 
@@ -106,7 +116,9 @@ describe('unfollowService', () => {
   it('should call delete on the axios instance with the correct endpoint and follow ID', async () => {
     await unfollowService(23);
     expect(axiosInstance.delete).toHaveBeenCalledOnce();
-    expect(axiosInstance.delete).toHaveBeenCalledWith('/social/followers/unfollow/23');
+    expect(axiosInstance.delete).toHaveBeenCalledExactlyOnceWith(
+      '/social/followers/unfollow/23'
+    );
   });
 });
 
@@ -114,7 +126,7 @@ describe('removeFollowerService', () => {
   it('should call delete on the axios instance with the correct endpoint and follow ID', async () => {
     await removeFollowerService(23);
     expect(axiosInstance.delete).toHaveBeenCalledOnce();
-    expect(axiosInstance.delete).toHaveBeenCalledWith('/social/followers/remove/23');
+    expect(axiosInstance.delete).toHaveBeenCalledExactlyOnceWith('/social/followers/remove/23');
   });
 });
 
@@ -122,6 +134,6 @@ describe('findAccountsService', () => {
   it('should call get on the axios instance with the correct endpoint and a search query', async () => {
     await findAccountsService('someSearchQuery');
     expect(axiosInstance.get).toHaveBeenCalledOnce();
-    expect(axiosInstance.get).toHaveBeenCalledWith('/social/find/someSearchQuery');
+    expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/social/find/someSearchQuery');
   });
 });

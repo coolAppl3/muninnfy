@@ -85,10 +85,10 @@ describe('AuthSessionProvider', () => {
       expect(authServices.signOutService).toHaveBeenCalledOnce();
       expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
       expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
-      expect(setAuthStatusMock).toHaveBeenCalledWith('unauthenticated');
+      expect(setAuthStatusMock).toHaveBeenCalledExactlyOnceWith('unauthenticated');
 
       expect(displayPopupMessageMock).toHaveBeenCalledOnce();
-      expect(displayPopupMessageMock).toHaveBeenCalledWith('Signed out.', 'success');
+      expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith('Signed out.', 'success');
     });
   });
 
@@ -107,7 +107,10 @@ describe('AuthSessionProvider', () => {
       expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
       expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
       expect(displayPopupMessageMock).toHaveBeenCalledOnce();
-      expect(displayPopupMessageMock).toHaveBeenCalledWith('Failed to sign out.', 'error');
+      expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith(
+        'Failed to sign out.',
+        'error'
+      );
     });
   });
 
@@ -126,7 +129,10 @@ describe('AuthSessionProvider', () => {
 
     await vi.waitFor(() => {
       expect(displayPopupMessageMock).toHaveBeenCalledOnce();
-      expect(displayPopupMessageMock).toHaveBeenCalledWith('Already signed out.', 'success');
+      expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith(
+        'Already signed out.',
+        'success'
+      );
 
       expect(displayLoadingOverlayMock).not.toHaveBeenCalled();
       expect(removeLoadingOverlayMock).not.toHaveBeenCalled();

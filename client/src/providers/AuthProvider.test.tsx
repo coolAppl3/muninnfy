@@ -17,7 +17,7 @@ describe('AuthProvider', () => {
 
     await vi.waitFor(() => {
       expect(authServices.checkForAuthSessionService).toHaveBeenCalledOnce();
-      expect(authServices.checkForAuthSessionService).toHaveBeenCalledWith(
+      expect(authServices.checkForAuthSessionService).toHaveBeenCalledExactlyOnceWith(
         new AbortController().signal
       );
     });

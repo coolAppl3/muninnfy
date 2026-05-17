@@ -17,7 +17,7 @@ describe('getNotificationsBatchService', () => {
 
     await getNotificationsBatchService(0, abortSignal);
     expect(axiosInstance.get).toHaveBeenCalledOnce();
-    expect(axiosInstance.get).toHaveBeenCalledWith('/notifications/0', {
+    expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/notifications/0', {
       signal: abortSignal,
     });
   });

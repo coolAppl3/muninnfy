@@ -113,7 +113,10 @@ describe('SignIn', () => {
     await userEvent.click(submitBtn);
 
     expect(displayPopupMessageMock).toHaveBeenCalledOnce();
-    expect(displayPopupMessageMock).toHaveBeenCalledWith('A valid email is required.', 'error');
+    expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith(
+      'A valid email is required.',
+      'error'
+    );
 
     const emailErrorSpan: Locator = getByText('A valid email is required.');
     await expect.element(emailErrorSpan).toBeVisible();
@@ -153,17 +156,17 @@ describe('SignIn', () => {
     const submitBtn: Locator = getByRole('button', { name: 'Submit' });
     await userEvent.click(submitBtn);
 
-    expect(accountServices.signInService).toHaveBeenCalledWith({
+    expect(accountServices.signInService).toHaveBeenCalledExactlyOnceWith({
       email,
       password,
       keepSignedIn: true,
     });
 
     expect(setAuthStatusMock).toHaveBeenCalledOnce();
-    expect(setAuthStatusMock).toHaveBeenCalledWith('authenticated');
+    expect(setAuthStatusMock).toHaveBeenCalledExactlyOnceWith('authenticated');
 
     expect(displayPopupMessageMock).toHaveBeenCalledOnce();
-    expect(displayPopupMessageMock).toHaveBeenCalledWith('Signed in.', 'success');
+    expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith('Signed in.', 'success');
 
     expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
     expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
@@ -201,10 +204,10 @@ describe('SignIn', () => {
     await userEvent.click(submitBtn);
 
     expect(console.log).toHaveBeenCalledOnce();
-    expect(console.log).toHaveBeenCalledWith(responseData);
+    expect(console.log).toHaveBeenCalledExactlyOnceWith(responseData);
 
     expect(handleAsyncErrorMock).toHaveBeenCalledOnce();
-    expect(handleAsyncErrorMock).toHaveBeenCalledWith(responseData);
+    expect(handleAsyncErrorMock).toHaveBeenCalledExactlyOnceWith(responseData);
   });
 
   it('should, if a 400 response is received from the server, render an error span with the error message provided', async () => {
@@ -351,10 +354,13 @@ describe('SignIn', () => {
     await userEvent.click(submitBtn);
 
     expect(displayPopupMessageMock).toHaveBeenCalledOnce();
-    expect(displayPopupMessageMock).toHaveBeenCalledWith('Already signed in.', 'success');
+    expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith(
+      'Already signed in.',
+      'success'
+    );
 
     expect(setAuthStatusMock).toHaveBeenCalledOnce();
-    expect(setAuthStatusMock).toHaveBeenCalledWith('authenticated');
+    expect(setAuthStatusMock).toHaveBeenCalledExactlyOnceWith('authenticated');
   });
 
   it('should, if a 403 response with an accountLocked errReason are received from the server, call displayConfirmModal', async () => {
@@ -396,7 +402,7 @@ describe('SignIn', () => {
     await userEvent.click(submitBtn);
 
     expect(displayConfirmModalMock).toHaveBeenCalledOnce();
-    expect(displayConfirmModalMock).toHaveBeenCalledWith({
+    expect(displayConfirmModalMock).toHaveBeenCalledExactlyOnceWith({
       title: 'Account is locked.',
       description: 'You can regain access by following the account recovery process.',
       confirmBtnTitle: 'Recover account',
