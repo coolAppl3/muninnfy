@@ -14,11 +14,19 @@ import useConfirmModal from '../../hooks/useConfirmModal';
 
 const displayPopupMessageMock = vi.fn();
 const handleAsyncErrorMock = vi.fn();
+const displayLoadingOverlayMock = vi.fn();
+const removeLoadingOverlayMock = vi.fn();
 
 vi.mock('../../hooks/usePopupMessage', () => ({
   default: () => displayPopupMessageMock,
 }));
 vi.mock('../../hooks/useAuth');
+vi.mock('../../hooks/useLoadingOverlay', () => ({
+  default: () => ({
+    displayLoadingOverlay: displayLoadingOverlayMock,
+    removeLoadingOverlay: removeLoadingOverlayMock,
+  }),
+}));
 vi.mock('../../hooks/useConfirmModal');
 vi.mock('../../services/accountServices', { spy: true });
 vi.mock('../../hooks/useHandleAsyncError', () => ({
@@ -114,7 +122,7 @@ describe('SignIn', () => {
     await expect.element(passwordErrorSpan).toBeVisible();
   });
 
-  it('should, if valid credentials are provided and confirmed by the server response, set the authStatus to authenticated and call displayPopupMessage', async () => {
+  it('should, if valid credentials are provided and confirmed by the server response, set the authStatus to authenticated and call displayPopupMessage, displayLoadingOverlay, and removeLoadingOverlay', async () => {
     const { getByRole, getByTitle } = await render(<SignIn />, {
       wrapper: TestWrapper,
     });
@@ -156,6 +164,9 @@ describe('SignIn', () => {
 
     expect(displayPopupMessageMock).toHaveBeenCalledTimes(1);
     expect(displayPopupMessageMock).toHaveBeenCalledWith('Signed in.', 'success');
+
+    expect(displayLoadingOverlayMock).toHaveBeenCalledTimes(1);
+    expect(removeLoadingOverlayMock).toHaveBeenCalledTimes(1);
   });
 
   it('should, if an error is returned from the server, log it and call handleAsyncError', async () => {
