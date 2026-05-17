@@ -16,7 +16,6 @@ describe('checkForAuthSessionService', () => {
     const abortSignal: AbortSignal = new AbortController().signal;
 
     await checkForAuthSessionService(abortSignal);
-    expect(axiosInstance.get).toHaveBeenCalledOnce();
     expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/auth/session', {
       signal: abortSignal,
     });
@@ -26,7 +25,6 @@ describe('checkForAuthSessionService', () => {
 describe('signOutService', () => {
   it('should call delete on the axios instance with the correct endpoint', async () => {
     await signOutService();
-    expect(axiosInstance.delete).toHaveBeenCalledOnce();
     expect(axiosInstance.delete).toHaveBeenCalledExactlyOnceWith('/auth/session');
   });
 });

@@ -19,7 +19,6 @@ describe('copyToClipboard', () => {
 
   it('should call navigator.clipboard.writeText with the provided text', async () => {
     await copyToClipboard('some text');
-    expect(clipboardWriteText).toHaveBeenCalledOnce();
     expect(clipboardWriteText).toHaveBeenCalledExactlyOnceWith('some text');
   });
 

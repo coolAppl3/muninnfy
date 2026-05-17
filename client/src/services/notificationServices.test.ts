@@ -16,7 +16,6 @@ describe('getNotificationsBatchService', () => {
     const abortSignal: AbortSignal = new AbortController().signal;
 
     await getNotificationsBatchService(0, abortSignal);
-    expect(axiosInstance.get).toHaveBeenCalledOnce();
     expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith('/notifications/0', {
       signal: abortSignal,
     });
