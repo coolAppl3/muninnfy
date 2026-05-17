@@ -17,6 +17,6 @@ describe('debounce', () => {
 
     debouncedMockFunction();
     vi.advanceTimersByTime(200);
-    expect(mockFunction).toHaveBeenCalledTimes(1);
+    expect(mockFunction).toHaveBeenCalledOnce();
   });
 });

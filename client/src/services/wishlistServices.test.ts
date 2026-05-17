@@ -29,7 +29,7 @@ const mockBody = { someValue: 23 };
 describe('createWishlistAsAccountService', () => {
   it('should call post on the axios instance with the correct endpoint and body', async () => {
     await createWishlistAsAccountService(mockBody as any);
-    expect(axiosInstance.post).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.post).toHaveBeenCalledOnce();
     expect(axiosInstance.post).toHaveBeenCalledWith('/wishlists', mockBody);
   });
 });
@@ -39,7 +39,7 @@ describe('getWishlistDetailsService', () => {
     const abortSignal: AbortSignal = new AbortController().signal;
 
     await getWishlistDetailsService('someWishlistId', abortSignal);
-    expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.get).toHaveBeenCalledOnce();
     expect(axiosInstance.get).toHaveBeenCalledWith('/wishlists/someWishlistId', {
       signal: abortSignal,
     });
@@ -51,7 +51,7 @@ describe('getViewWishlistDetailsService', () => {
     const abortSignal: AbortSignal = new AbortController().signal;
 
     await getViewWishlistDetailsService('someWishlistId', abortSignal);
-    expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.get).toHaveBeenCalledOnce();
     expect(axiosInstance.get).toHaveBeenCalledWith('/wishlists/view/someWishlistId', {
       signal: abortSignal,
     });
@@ -61,7 +61,7 @@ describe('getViewWishlistDetailsService', () => {
 describe('crossWishlistSearchService', () => {
   it('should call get on the axios instance with the correct endpoint and item title query', async () => {
     await crossWishlistSearchService('someItemTitleQuery');
-    expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.get).toHaveBeenCalledOnce();
     expect(axiosInstance.get).toHaveBeenCalledWith(
       '/wishlists/crossWishlistSearch/someItemTitleQuery'
     );
@@ -71,7 +71,7 @@ describe('crossWishlistSearchService', () => {
 describe('viewCrossWishlistSearchService', () => {
   it('should call get on the axios instance with the correct endpoint, item title query, and optional publicAccountId', async () => {
     await viewCrossWishlistSearchService('someItemTitleQuery', 'somePublicAccountId');
-    expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.get).toHaveBeenCalledOnce();
     expect(axiosInstance.get).toHaveBeenCalledWith('/wishlists/crossWishlistSearch', {
       params: { itemTitleQuery: 'someItemTitleQuery', publicAccountId: 'somePublicAccountId' },
     });
@@ -83,7 +83,7 @@ describe('getAllWishlistsService', () => {
     const abortSignal: AbortSignal = new AbortController().signal;
 
     await getAllWishlistsService(abortSignal);
-    expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.get).toHaveBeenCalledOnce();
     expect(axiosInstance.get).toHaveBeenCalledWith('/wishlists/all', {
       signal: abortSignal,
     });
@@ -95,7 +95,7 @@ describe('getAllViewWishlistsService', () => {
     const abortSignal: AbortSignal = new AbortController().signal;
 
     await getAllViewWishlistsService('somePublicAccountId', abortSignal);
-    expect(axiosInstance.get).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.get).toHaveBeenCalledOnce();
     expect(axiosInstance.get).toHaveBeenCalledWith('/wishlists/view/all/somePublicAccountId', {
       signal: abortSignal,
     });
@@ -105,7 +105,7 @@ describe('getAllViewWishlistsService', () => {
 describe('changeWishlistTitleService', () => {
   it('should call patch on the axios instance with the correct endpoint and body', async () => {
     await changeWishlistTitleService(mockBody as any);
-    expect(axiosInstance.patch).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.patch).toHaveBeenCalledOnce();
     expect(axiosInstance.patch).toHaveBeenCalledWith('/wishlists/change/title', mockBody);
   });
 });
@@ -113,7 +113,7 @@ describe('changeWishlistTitleService', () => {
 describe('changeWishlistPrivacyLevelService', () => {
   it('should call patch on the axios instance with the correct endpoint and body', async () => {
     await changeWishlistPrivacyLevelService(mockBody as any);
-    expect(axiosInstance.patch).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.patch).toHaveBeenCalledOnce();
     expect(axiosInstance.patch).toHaveBeenCalledWith(
       '/wishlists/change/privacyLevel',
       mockBody
@@ -124,7 +124,7 @@ describe('changeWishlistPrivacyLevelService', () => {
 describe('setWishlistFavoriteService', () => {
   it('should call patch on the axios instance with the correct endpoint and body', async () => {
     await setWishlistFavoriteService(mockBody as any);
-    expect(axiosInstance.patch).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.patch).toHaveBeenCalledOnce();
     expect(axiosInstance.patch).toHaveBeenCalledWith('/wishlists/change/favorite', mockBody);
   });
 });
@@ -132,7 +132,7 @@ describe('setWishlistFavoriteService', () => {
 describe('deleteEmptyWishlistsService', () => {
   it('should call delete on the axios instance with the correct endpoint', async () => {
     await deleteEmptyWishlistsService();
-    expect(axiosInstance.delete).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.delete).toHaveBeenCalledOnce();
     expect(axiosInstance.delete).toHaveBeenCalledWith('/wishlists/empty');
   });
 });
@@ -140,7 +140,7 @@ describe('deleteEmptyWishlistsService', () => {
 describe('deleteWishlistService', () => {
   it('should call delete on the axios instance with the correct endpoint and wishlist ID', async () => {
     await deleteWishlistService('someWishlistId');
-    expect(axiosInstance.delete).toHaveBeenCalledTimes(1);
+    expect(axiosInstance.delete).toHaveBeenCalledOnce();
     expect(axiosInstance.delete).toHaveBeenCalledWith('/wishlists/someWishlistId');
   });
 });

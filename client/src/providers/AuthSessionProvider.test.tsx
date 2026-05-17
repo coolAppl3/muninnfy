@@ -67,7 +67,7 @@ describe('AuthSessionProvider', () => {
     );
 
     await vi.waitFor(() => {
-      expect(authServices.signOutService).toHaveBeenCalledTimes(1);
+      expect(authServices.signOutService).toHaveBeenCalledOnce();
     });
   });
 
@@ -82,12 +82,12 @@ describe('AuthSessionProvider', () => {
     );
 
     await vi.waitFor(() => {
-      expect(authServices.signOutService).toHaveBeenCalledTimes(1);
-      expect(displayLoadingOverlayMock).toHaveBeenCalledTimes(1);
-      expect(removeLoadingOverlayMock).toHaveBeenCalledTimes(1);
+      expect(authServices.signOutService).toHaveBeenCalledOnce();
+      expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
+      expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
       expect(setAuthStatusMock).toHaveBeenCalledWith('unauthenticated');
 
-      expect(displayPopupMessageMock).toHaveBeenCalledTimes(1);
+      expect(displayPopupMessageMock).toHaveBeenCalledOnce();
       expect(displayPopupMessageMock).toHaveBeenCalledWith('Signed out.', 'success');
     });
   });
@@ -103,10 +103,10 @@ describe('AuthSessionProvider', () => {
     );
 
     await vi.waitFor(() => {
-      expect(authServices.signOutService).toHaveBeenCalledTimes(1);
-      expect(displayLoadingOverlayMock).toHaveBeenCalledTimes(1);
-      expect(removeLoadingOverlayMock).toHaveBeenCalledTimes(1);
-      expect(displayPopupMessageMock).toHaveBeenCalledTimes(1);
+      expect(authServices.signOutService).toHaveBeenCalledOnce();
+      expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
+      expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
+      expect(displayPopupMessageMock).toHaveBeenCalledOnce();
       expect(displayPopupMessageMock).toHaveBeenCalledWith('Failed to sign out.', 'error');
     });
   });
@@ -125,7 +125,7 @@ describe('AuthSessionProvider', () => {
     );
 
     await vi.waitFor(() => {
-      expect(displayPopupMessageMock).toHaveBeenCalledTimes(1);
+      expect(displayPopupMessageMock).toHaveBeenCalledOnce();
       expect(displayPopupMessageMock).toHaveBeenCalledWith('Already signed out.', 'success');
 
       expect(displayLoadingOverlayMock).not.toHaveBeenCalled();

@@ -16,7 +16,7 @@ describe('AuthProvider', () => {
     );
 
     await vi.waitFor(() => {
-      expect(authServices.checkForAuthSessionService).toHaveBeenCalledTimes(1);
+      expect(authServices.checkForAuthSessionService).toHaveBeenCalledOnce();
       expect(authServices.checkForAuthSessionService).toHaveBeenCalledWith(
         new AbortController().signal
       );
@@ -37,7 +37,7 @@ describe('AuthProvider', () => {
     await vi.waitFor(() =>
       expect(
         accountNotificationsWebsSocket.connectAccountNotificationsWebSocket
-      ).toHaveBeenCalledTimes(1)
+      ).toHaveBeenCalledOnce()
     );
   });
 
@@ -55,7 +55,7 @@ describe('AuthProvider', () => {
     await vi.waitFor(() =>
       expect(
         accountNotificationsWebsSocket.disconnectAccountNotificationsWebSocket
-      ).toHaveBeenCalledTimes(1)
+      ).toHaveBeenCalledOnce()
     );
   });
 });
