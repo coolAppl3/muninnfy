@@ -198,7 +198,31 @@ describe('SignUp', () => {
     );
   });
 
-  it('should, assuming valid signup data is provided and a successful response is provided from the server, navigate the user to the verification page, and call displayLoadingOverlay, removeLoadingOverlay, and displayPopupMessage', async () => {
+  it('should call signUpService, displayLoadingOverlay and removeLoadingOverlay when a valid submission is attempted', async () => {
+    const { getByRole, getByTitle } = await render(<SignUp />, {
+      wrapper: TestWrapper,
+    });
+
+    vi.mocked(accountServices.signUpService).mockResolvedValueOnce({
+      data: {
+        publicAccountId: 'somePublicAccountId',
+      },
+    } as any);
+
+    await submitForm(getByRole, getByTitle);
+
+    expect(accountServices.signUpService).toHaveBeenCalledExactlyOnceWith({
+      displayName: 'John Doe',
+      username: 'johnDoe',
+      email: 'johnDoe@example.com',
+      password: 'somePassword',
+      dateOfBirthTimestamp: expect.any(Number),
+    });
+    expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
+    expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
+  });
+
+  it('should, assuming valid signup data is provided and a successful response is provided from the server, navigate the user to the verification page, and call displayPopupMessage', async () => {
     const { getByRole, getByTitle } = await render(<SignUp />, {
       wrapper: TestWrapper,
     });
@@ -214,10 +238,6 @@ describe('SignUp', () => {
     expect(
       location.href.endsWith('/sign-up/verification?publicAccountId=somePublicAccountId')
     ).toBe(true);
-
-    expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
-    expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
-
     expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith(
       'Account created.',
       'success'

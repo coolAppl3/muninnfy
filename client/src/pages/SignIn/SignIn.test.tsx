@@ -124,7 +124,41 @@ describe('SignIn', () => {
     await expect.element(passwordErrorSpan).toBeVisible();
   });
 
-  it('should, if valid credentials are provided and confirmed by the server response, set the authStatus to authenticated and call displayPopupMessage, displayLoadingOverlay, and removeLoadingOverlay', async () => {
+  it('should call signUpService, displayLoadingOverlay and removeLoadingOverlay when a valid submission is attempted', async () => {
+    const { getByRole, getByTitle } = await render(<SignIn />, {
+      wrapper: TestWrapper,
+    });
+
+    vi.mocked(accountServices.signInService).mockResolvedValueOnce(
+      {} as unknown as AxiosResponse
+    );
+
+    const email: string = 'validEmail@xample.com';
+    const password: string = 'validPassword';
+
+    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
+    await userEvent.type(emailInput, email);
+
+    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
+    await userEvent.type(passwordInput, password);
+
+    const keepSignedInBtn: Locator = getByTitle('Check');
+    await userEvent.click(keepSignedInBtn);
+
+    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
+    await userEvent.click(submitBtn);
+
+    expect(accountServices.signInService).toHaveBeenCalledExactlyOnceWith({
+      email,
+      password,
+      keepSignedIn: true,
+    });
+
+    expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
+    expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
+  });
+
+  it('should, if valid credentials are provided and confirmed by the server response, set the authStatus to authenticated and call displayPopupMessage', async () => {
     const { getByRole, getByTitle } = await render(<SignIn />, {
       wrapper: TestWrapper,
     });
@@ -155,17 +189,8 @@ describe('SignIn', () => {
     const submitBtn: Locator = getByRole('button', { name: 'Submit' });
     await userEvent.click(submitBtn);
 
-    expect(accountServices.signInService).toHaveBeenCalledExactlyOnceWith({
-      email,
-      password,
-      keepSignedIn: true,
-    });
-
     expect(setAuthStatusMock).toHaveBeenCalledExactlyOnceWith('authenticated');
     expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith('Signed in.', 'success');
-
-    expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
-    expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
   });
 
   it('should, if an error is returned from the server, log it and call handleAsyncError', async () => {
