@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
-import { Locator, userEvent } from 'vitest/browser';
+import { Locator, LocatorByRoleOptions, LocatorOptions, userEvent } from 'vitest/browser';
 import SignIn from './SignIn';
-import { JSX, ReactNode } from 'react';
+import { AriaRole, JSX, ReactNode } from 'react';
 import AuthProvider from '../../providers/AuthProvider';
 import { BrowserRouter } from 'react-router-dom';
 import Providers from '../../Providers';
@@ -133,24 +133,11 @@ describe('SignIn', () => {
       {} as unknown as AxiosResponse
     );
 
-    const email: string = 'validEmail@xample.com';
-    const password: string = 'validPassword';
-
-    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
-    await userEvent.type(emailInput, email);
-
-    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
-    await userEvent.type(passwordInput, password);
-
-    const keepSignedInBtn: Locator = getByTitle('Check');
-    await userEvent.click(keepSignedInBtn);
-
-    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
-    await userEvent.click(submitBtn);
+    await submitForm(getByRole, getByTitle, true);
 
     expect(accountServices.signInService).toHaveBeenCalledExactlyOnceWith({
-      email,
-      password,
+      email: 'validEmail@example.com',
+      password: 'validPassword',
       keepSignedIn: true,
     });
 
@@ -174,27 +161,14 @@ describe('SignIn', () => {
       setAuthStatus: setAuthStatusMock,
     }));
 
-    const email: string = 'validEmail@xample.com';
-    const password: string = 'validPassword';
-
-    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
-    await userEvent.type(emailInput, email);
-
-    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
-    await userEvent.type(passwordInput, password);
-
-    const keepSignedInBtn: Locator = getByTitle('Check');
-    await userEvent.click(keepSignedInBtn);
-
-    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
-    await userEvent.click(submitBtn);
+    await submitForm(getByRole, getByTitle);
 
     expect(setAuthStatusMock).toHaveBeenCalledExactlyOnceWith('authenticated');
     expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith('Signed in.', 'success');
   });
 
   it('should, if an error is returned from the server, log it and call handleAsyncError', async () => {
-    const { getByRole } = await render(<SignIn />, {
+    const { getByRole, getByTitle } = await render(<SignIn />, {
       wrapper: TestWrapper,
     });
 
@@ -215,21 +189,14 @@ describe('SignIn', () => {
       errMessage: 'Internal server error.',
     });
 
-    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
-    await userEvent.type(emailInput, 'validEmail@xample.com');
-
-    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
-    await userEvent.type(passwordInput, 'validPassword');
-
-    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
-    await userEvent.click(submitBtn);
+    await submitForm(getByRole, getByTitle);
 
     expect(console.log).toHaveBeenCalledExactlyOnceWith(responseData);
     expect(handleAsyncErrorMock).toHaveBeenCalledExactlyOnceWith(responseData);
   });
 
   it('should, if a 400 response is received from the server, render an error span with the error message provided', async () => {
-    const { getByRole, getByText } = await render(<SignIn />, {
+    const { getByRole, getByText, getByTitle } = await render(<SignIn />, {
       wrapper: TestWrapper,
     });
 
@@ -250,21 +217,14 @@ describe('SignIn', () => {
       ...getAsyncErrorData(responseData),
     });
 
-    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
-    await userEvent.type(emailInput, 'validEmail@xample.com');
-
-    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
-    await userEvent.type(passwordInput, 'validPassword');
-
-    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
-    await userEvent.click(submitBtn);
+    await submitForm(getByRole, getByTitle);
 
     const errorSpan: Locator = getByText('Invalid email address.');
     await expect.element(errorSpan).toBeVisible();
   });
 
   it('should, if a 401 response is received from the server, render an error span with the error message provided', async () => {
-    const { getByRole, getByText } = await render(<SignIn />, {
+    const { getByRole, getByText, getByTitle } = await render(<SignIn />, {
       wrapper: TestWrapper,
     });
 
@@ -285,21 +245,14 @@ describe('SignIn', () => {
       ...getAsyncErrorData(responseData),
     });
 
-    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
-    await userEvent.type(emailInput, 'validEmail@xample.com');
-
-    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
-    await userEvent.type(passwordInput, 'validPassword');
-
-    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
-    await userEvent.click(submitBtn);
+    await submitForm(getByRole, getByTitle);
 
     const errorSpan: Locator = getByText('Incorrect password.');
     await expect.element(errorSpan).toBeVisible();
   });
 
   it('should, if a 404 response is received from the server, render an error span with the error message provided', async () => {
-    const { getByRole, getByText } = await render(<SignIn />, {
+    const { getByRole, getByText, getByTitle } = await render(<SignIn />, {
       wrapper: TestWrapper,
     });
 
@@ -320,21 +273,14 @@ describe('SignIn', () => {
       ...getAsyncErrorData(responseData),
     });
 
-    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
-    await userEvent.type(emailInput, 'validEmail@xample.com');
-
-    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
-    await userEvent.type(passwordInput, 'validPassword');
-
-    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
-    await userEvent.click(submitBtn);
+    await submitForm(getByRole, getByTitle);
 
     const errorSpan: Locator = getByText('Account not found.');
     await expect.element(errorSpan).toBeVisible();
   });
 
   it('should, if a 403 response with an alreadySignedIn errReason are received from the server, call displayPopupMessage as a successful operation and set the authStatus to authenticated', async () => {
-    const { getByRole } = await render(<SignIn />, {
+    const { getByRole, getByTitle } = await render(<SignIn />, {
       wrapper: TestWrapper,
     });
 
@@ -362,14 +308,7 @@ describe('SignIn', () => {
       setAuthStatus: setAuthStatusMock,
     }));
 
-    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
-    await userEvent.type(emailInput, 'validEmail@xample.com');
-
-    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
-    await userEvent.type(passwordInput, 'validPassword');
-
-    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
-    await userEvent.click(submitBtn);
+    await submitForm(getByRole, getByTitle);
 
     expect(setAuthStatusMock).toHaveBeenCalledExactlyOnceWith('authenticated');
     expect(displayPopupMessageMock).toHaveBeenCalledExactlyOnceWith(
@@ -379,7 +318,7 @@ describe('SignIn', () => {
   });
 
   it('should, if a 403 response with an accountLocked errReason are received from the server, call displayConfirmModal', async () => {
-    const { getByRole } = await render(<SignIn />, {
+    const { getByRole, getByTitle } = await render(<SignIn />, {
       wrapper: TestWrapper,
     });
 
@@ -407,14 +346,7 @@ describe('SignIn', () => {
       removeConfirmModal: vi.fn(),
     }));
 
-    const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
-    await userEvent.type(emailInput, 'validEmail@xample.com');
-
-    const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
-    await userEvent.type(passwordInput, 'validPassword');
-
-    const submitBtn: Locator = getByRole('button', { name: 'Submit' });
-    await userEvent.click(submitBtn);
+    await submitForm(getByRole, getByTitle);
 
     expect(displayConfirmModalMock).toHaveBeenCalledExactlyOnceWith({
       title: 'Account is locked.',
@@ -427,3 +359,21 @@ describe('SignIn', () => {
     });
   });
 });
+
+async function submitForm(
+  getByRole: (role: AriaRole | ({} & string), options?: LocatorByRoleOptions) => Locator,
+  getByTitle: (text: string | RegExp, options?: LocatorOptions | undefined) => Locator,
+  keepSignedIn: boolean = false
+): Promise<void> {
+  const emailInput: Locator = getByRole('textbox', { name: 'Email address' });
+  await userEvent.type(emailInput, 'validEmail@example.com');
+
+  const passwordInput: Locator = getByRole('textbox', { name: 'Password' });
+  await userEvent.type(passwordInput, 'validPassword');
+
+  const keepSignedInBtn: Locator = getByTitle('Check');
+  keepSignedIn && (await userEvent.click(keepSignedInBtn));
+
+  const submitBtn: Locator = getByRole('button', { name: 'Submit' });
+  await userEvent.click(submitBtn);
+}
