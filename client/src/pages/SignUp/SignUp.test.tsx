@@ -222,7 +222,7 @@ describe('SignUp', () => {
     expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
   });
 
-  it('should, assuming valid signup data is provided and a successful response is provided from the server, navigate the user to the verification page, and call displayPopupMessage', async () => {
+  it('should, assuming valid signup data is provided and a successful response is received from the server, navigate the user to the verification page, and call displayPopupMessage', async () => {
     const { getByRole, getByTitle } = await render(<SignUp />, {
       wrapper: TestWrapper,
     });
