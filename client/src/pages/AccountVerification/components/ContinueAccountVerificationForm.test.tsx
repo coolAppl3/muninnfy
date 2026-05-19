@@ -55,7 +55,9 @@ describe('ContinueAccountVerificationForm', () => {
 
     await submitForm(getByRole);
 
-    expect(accountServices.continueAccountVerificationService).toHaveBeenCalledOnce();
+    expect(accountServices.continueAccountVerificationService).toHaveBeenCalledExactlyOnceWith({
+      email: 'validEmail@example.com',
+    });
     expect(displayLoadingOverlayMock).toHaveBeenCalledOnce();
     expect(removeLoadingOverlayMock).toHaveBeenCalledOnce();
   });
