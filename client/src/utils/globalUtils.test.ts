@@ -19,8 +19,7 @@ describe('copyToClipboard', () => {
 
   it('should call navigator.clipboard.writeText with the provided text', async () => {
     await copyToClipboard('some text');
-    expect(clipboardWriteText).toHaveBeenCalledTimes(1);
-    expect(clipboardWriteText).toHaveBeenCalledWith('some text');
+    expect(clipboardWriteText).toHaveBeenCalledExactlyOnceWith('some text');
   });
 
   it('should return true if the text is successfully copied', async () => {
