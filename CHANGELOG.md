@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.5.10] (2026-05-21)
+
+### Tests
+
+- Added the following test suites:
+  - `SignIn`.
+  - `SignUp`.
+  - `zContinueAccountVerificationForm`.
+- Refactored `toHaveBeenCalledTimes(1)` calls with `toHaveBeenCalledOnce()` and `toHaveBeenCalledWith()` calls with `toHaveBeenCalledExactlyOnceWith()` for better readability.
+- Minor improvements in efficiency to existing test suites.
+
+
+### Chore Changes
+
+- Audited packages.
+
+
+
 ## [0.5.9] (2026-05-09)
 
 ### Improvements
