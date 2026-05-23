@@ -7,7 +7,7 @@
 - Added the following test suites:
   - `SignIn`.
   - `SignUp`.
-  - `zContinueAccountVerificationForm`.
+  - `ContinueAccountVerificationForm`.
 - Refactored `toHaveBeenCalledTimes(1)` calls with `toHaveBeenCalledOnce()` and `toHaveBeenCalledWith()` calls with `toHaveBeenCalledExactlyOnceWith()` for better readability.
 - Minor improvements in efficiency to existing test suites.
 
