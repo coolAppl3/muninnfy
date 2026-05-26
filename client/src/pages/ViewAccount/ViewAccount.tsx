@@ -35,7 +35,7 @@ export default function ViewAccount(): JSX.Element {
   const displayPopupMessage: DisplayPopupMessageFunction = usePopupMessage();
 
   useEffect(() => {
-    if (!publicAccountId || !isValidUuid) {
+    if (!publicAccountId || !isValidUuid(publicAccountId)) {
       navigate(referrerLocation || (authStatus === 'authenticated' ? '/account' : '/home'));
       return;
     }
