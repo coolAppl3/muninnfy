@@ -108,7 +108,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   }
 
   if (!isValidDisplayName(displayName)) {
-    res.status(400).json({ message: 'Invalid display name', reason: 'invalidDisplayName' });
+    res.status(400).json({ message: 'Invalid display name.', reason: 'invalidDisplayName' });
     return;
   }
 
@@ -249,7 +249,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(500).json({ message: 'Internal server error.' });
+    res.status(503).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
   } finally {
     connection?.release();
