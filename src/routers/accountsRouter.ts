@@ -219,7 +219,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     await sendAccountVerificationEmailService({
       receiver: email,
-      displayName: displayName,
+      displayName,
       publicAccountId,
       verificationToken,
     });
