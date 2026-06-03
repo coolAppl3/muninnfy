@@ -255,7 +255,7 @@ describe('POST /signUp', () => {
     });
   });
 
-  it('should accept the request if valid, non-taken credentials are provided, returning the public account ID of the account created and calling sendAccountVerificationEmailService', async () => {
+  it('should resolve the request if valid, non-taken credentials are provided, returning the public account ID of the account created and calling sendAccountVerificationEmailService', async () => {
     vi.mocked(mockConnection.execute).mockResolvedValueOnce([
       [
         {
