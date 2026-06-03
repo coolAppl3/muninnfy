@@ -1,4 +1,9 @@
 import { beforeEach, vi } from 'vitest';
+import { NextFunction, Request, Response } from 'express';
+
+vi.mock('../middleware/rateLimiter', () => ({
+  rateLimiter: (req: Request, res: Response, next: NextFunction) => next(),
+}));
 
 vi.mock('../db/db', () => ({
   dbPool: {
