@@ -4,6 +4,8 @@ import { app } from '../app';
 import * as userValidation from '../util/validation/userValidation';
 import { mockConnection } from '../tests/setup';
 import * as emailServices from '../util/email/emailServices';
+import { dbPool } from '../db/db';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 vi.mock('../util/validation/userValidation', { spy: true });
 vi.mock('../util/email/emailServices', { spy: true });
@@ -287,5 +289,102 @@ describe('POST /signUp', () => {
     expect(res.body.publicAccountId).toBeTypeOf('string');
 
     expect(emailServices.sendAccountVerificationEmailService).toHaveBeenCalledOnce();
+  });
+});
+
+describe('POST /verification/continue', () => {
+  const endpoint: string = '/api/accounts/verification/continue';
+
+  it('should reject the request if the user is signed in', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=someAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'You must must sign out before proceeding.',
+      reason: 'signedIn',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      email: 'example@example.com',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app).post(endpoint).send(reqBody1);
+    const res2 = await request(app).post(endpoint).send(reqBody2);
+    const res3 = await request(app).post(endpoint).send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid email is provided', async () => {
+    const res = await request(app).post(endpoint).send({
+      email: 'invalidEmail',
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid email.',
+      reason: 'invalidEmail',
+    });
+  });
+
+  it('should reject the request if the account is verified', async () => {
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 3,
+          public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+          is_verified: true,
+          verification_request_exists: 1,
+        },
+      ],
+      [],
+    ] as any);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Verification request not found.',
+      reason: 'requestNotFound',
+    });
+  });
+
+  it(`should resolve the request and return the public account ID`, async () => {
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 3,
+          public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+          is_verified: false,
+          verification_request_exists: 1,
+        },
+      ],
+      [],
+    ] as any);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
   });
 });
