@@ -298,7 +298,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
         accounts.public_account_id,
         accounts.is_verified,
 
-        (SELECT 1 FROM account_verification WHERE account_id = accounts.account_id) AS verification_request_exists
+        EXISTS (SELECT 1 FROM account_verification WHERE account_id = accounts.account_id) AS verification_request_exists
       FROM
         accounts
       WHERE
@@ -308,19 +308,14 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
-    if (!accountDetails || accountDetails.is_verified) {
+    if (
+      !accountDetails ||
+      accountDetails.is_verified ||
+      !accountDetails.verification_request_exists
+    ) {
       res
         .status(404)
         .json({ message: 'Verification request not found.', reason: 'requestNotFound' });
-      return;
-    }
-
-    if (!accountDetails.verification_request_exists) {
-      await deleteAccountById(accountDetails.account_id, dbPool, req);
-      res
-        .status(404)
-        .json({ message: 'Verification request not found.', reason: 'requestNotFound' });
-
       return;
     }
 
