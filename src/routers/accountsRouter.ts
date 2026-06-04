@@ -621,6 +621,7 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
       dbPool,
       req
     );
+
     res
       .status(401)
       .json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken' });
