@@ -11,11 +11,13 @@ import {
 } from '../util/constants/accountConstants';
 import * as accountDbHelpers from '../db/helpers/accountDbHelpers';
 import * as errorLogger from '../logs/errorLogger';
+import * as isSqlError from '../util/sqlUtils/isSqlError';
 
 vi.mock('../util/validation/userValidation', { spy: true });
 vi.mock('../util/email/emailServices');
 vi.mock('../db/helpers/accountDbHelpers');
 vi.mock('../logs/errorLogger');
+vi.mock('../util/sqlUtils/isSqlError');
 
 describe('POST /signUp', () => {
   const endpoint: string = '/api/accounts/signUp';
@@ -180,6 +182,22 @@ describe('POST /signUp', () => {
     });
   });
 
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    await request(app)
+      .post(endpoint)
+      .send({
+        dateOfBirthTimestamp: new Date(2001, 1, 1).getTime(),
+        email: 'example@example.com',
+        username: 'johnDoe',
+        password: 'somePassword',
+        displayName: 'John Doe',
+      });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
   it('should reject the request if the email provided is taken', async () => {
     vi.mocked(mockConnection.execute).mockResolvedValueOnce([
       [
@@ -197,10 +215,11 @@ describe('POST /signUp', () => {
         dateOfBirthTimestamp: new Date(2001, 1, 1).getTime(),
         email: 'example@example.com',
         username: 'johnDoe',
-        password: 'somePAssword',
+        password: 'somePassword',
         displayName: 'John Doe',
       });
 
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
     expect(res.status).toBe(409);
     expect(res.body).toStrictEqual({
       message: 'Email is taken.',
@@ -225,10 +244,11 @@ describe('POST /signUp', () => {
         dateOfBirthTimestamp: new Date(2001, 1, 1).getTime(),
         email: 'example@example.com',
         username: 'johnDoe',
-        password: 'somePAssword',
+        password: 'somePassword',
         displayName: 'John Doe',
       });
 
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
     expect(res.status).toBe(409);
     expect(res.body).toStrictEqual({
       message: 'Email is taken.',
@@ -253,10 +273,11 @@ describe('POST /signUp', () => {
         dateOfBirthTimestamp: new Date(2001, 1, 1).getTime(),
         email: 'example@example.com',
         username: 'johnDoe',
-        password: 'somePAssword',
+        password: 'somePassword',
         displayName: 'John Doe',
       });
 
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
     expect(res.status).toBe(409);
     expect(res.body).toStrictEqual({
       message: 'Username is taken.',
@@ -287,15 +308,105 @@ describe('POST /signUp', () => {
         dateOfBirthTimestamp: new Date(2001, 1, 1).getTime(),
         email: 'example@example.com',
         username: 'johnDoe',
-        password: 'somePAssword',
+        password: 'somePassword',
         displayName: 'John Doe',
       });
 
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('publicAccountId');
     expect(res.body.publicAccountId).toBeTypeOf('string');
 
     expect(emailServices.sendAccountVerificationEmailService).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if an expected error occurs and log it', async () => {
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .post(endpoint)
+      .send({
+        dateOfBirthTimestamp: new Date(2001, 1, 1).getTime(),
+        email: 'example@example.com',
+        username: 'johnDoe',
+        password: 'somePassword',
+        displayName: 'John Doe',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+
+  it('should reject the request if an SqlError is thrown indicating that the email is taken', async () => {
+    vi.mocked(isSqlError.isSqlError).mockReturnValueOnce(true);
+
+    const unexpectedError = {
+      errno: 1062,
+      sqlMessage: `Duplicate entry for key 'email'`,
+    };
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .post(endpoint)
+      .send({
+        dateOfBirthTimestamp: new Date(2001, 1, 1).getTime(),
+        email: 'example@example.com',
+        username: 'johnDoe',
+        password: 'somePassword',
+        displayName: 'John Doe',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Email is taken.',
+      reason: 'emailTaken',
+    });
+  });
+
+  it('should reject the request if an SqlError is thrown indicating that the username is taken', async () => {
+    vi.mocked(isSqlError.isSqlError).mockReturnValueOnce(true);
+
+    const unexpectedError = {
+      errno: 1062,
+      sqlMessage: `Duplicate entry for key 'username'`,
+    };
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .post(endpoint)
+      .send({
+        dateOfBirthTimestamp: new Date(2001, 1, 1).getTime(),
+        email: 'example@example.com',
+        username: 'johnDoe',
+        password: 'somePassword',
+        displayName: 'John Doe',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Username is taken.',
+      reason: 'usernameTaken',
+    });
   });
 });
 
@@ -392,6 +503,28 @@ describe('POST /verification/continue', () => {
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
     });
   });
+
+  it('should reject the request if an expected error occurs and log it', async () => {
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
 });
 
 describe('PATCH /verification/resendEmail', () => {
@@ -443,13 +576,14 @@ describe('PATCH /verification/resendEmail', () => {
     });
   });
 
-  it('should request a connection and begin a transaction', async () => {
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
     await request(app).patch(endpoint).send({
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
     });
 
     expect(dbPool.getConnection).toHaveBeenCalledOnce();
     expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
   });
 
   it('should reject the request if the account is not found', async () => {
