@@ -59,7 +59,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   if (isSignedIn) {
     res
       .status(403)
-      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+      .json({ message: 'You must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -261,7 +261,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
   if (isSignedIn) {
     res
       .status(403)
-      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+      .json({ message: 'You must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -338,7 +338,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
   if (isSignedIn) {
     res
       .status(403)
-      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+      .json({ message: 'You must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -478,7 +478,7 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
   if (isSignedIn) {
     res
       .status(403)
-      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+      .json({ message: 'You must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 

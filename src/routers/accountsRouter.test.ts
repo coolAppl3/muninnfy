@@ -21,7 +21,7 @@ describe('POST /signUp', () => {
 
     expect(res.status).toBe(403);
     expect(res.body).toStrictEqual({
-      message: 'You must must sign out before proceeding.',
+      message: 'You must sign out before proceeding.',
       reason: 'signedIn',
     });
   });
@@ -303,7 +303,7 @@ describe('POST /verification/continue', () => {
 
     expect(res.status).toBe(403);
     expect(res.body).toStrictEqual({
-      message: 'You must must sign out before proceeding.',
+      message: 'You must sign out before proceeding.',
       reason: 'signedIn',
     });
   });
