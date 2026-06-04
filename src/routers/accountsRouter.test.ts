@@ -5,10 +5,17 @@ import * as userValidation from '../util/validation/userValidation';
 import { mockConnection } from '../tests/setup';
 import * as emailServices from '../util/email/emailServices';
 import { dbPool } from '../db/db';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import {
+  ACCOUNT_EMAILS_SENT_LIMIT,
+  ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+} from '../util/constants/accountConstants';
+import * as accountDbHelpers from '../db/helpers/accountDbHelpers';
+import * as errorLogger from '../logs/errorLogger';
 
 vi.mock('../util/validation/userValidation', { spy: true });
-vi.mock('../util/email/emailServices', { spy: true });
+vi.mock('../util/email/emailServices');
+vi.mock('../db/helpers/accountDbHelpers');
+vi.mock('../logs/errorLogger');
 
 describe('POST /signUp', () => {
   const endpoint: string = '/api/accounts/signUp';
@@ -351,7 +358,6 @@ describe('POST /verification/continue', () => {
           verification_request_exists: 1,
         },
       ],
-      [],
     ] as any);
 
     const res = await request(app).post(endpoint).send({
@@ -375,7 +381,6 @@ describe('POST /verification/continue', () => {
           verification_request_exists: 1,
         },
       ],
-      [],
     ] as any);
 
     const res = await request(app).post(endpoint).send({
@@ -386,5 +391,270 @@ describe('POST /verification/continue', () => {
     expect(res.body).toStrictEqual({
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
     });
+  });
+});
+
+describe('PATCH /verification/resendEmail', () => {
+  const endpoint: string = '/api/accounts/verification/resendEmail';
+
+  it('should reject the request if the user is signed in', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=someAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'You must sign out before proceeding.',
+      reason: 'signedIn',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      publicAccountId: 'somePublicAccountId',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app).patch(endpoint).send(reqBody1);
+    const res2 = await request(app).patch(endpoint).send(reqBody2);
+    const res3 = await request(app).patch(endpoint).send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid public account ID is provided', async () => {
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: 'someInvalidPublicAccountId',
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid account ID.',
+      reason: 'invalidPublicAccountId',
+    });
+  });
+
+  it('should request a connection and begin a transaction', async () => {
+    await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the account is verified', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: 1,
+          verification_request_id: null,
+          verification_token: null,
+          emails_sent: null,
+          failed_attempts: null,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Account is already verified.',
+      reason: 'alreadyVerified',
+    });
+  });
+
+  it('should reject the request and call deleteAccountById if the verification request is not found', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: 0,
+          verification_request_id: null,
+          verification_token: null,
+          emails_sent: null,
+          failed_attempts: null,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+
+    expect(accountDbHelpers.deleteAccountById).toHaveBeenCalledExactlyOnceWith(
+      1,
+      expect.any(Object),
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request and call deleteAccountById if all the verification attempts have been exhausted', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: 0,
+          verification_request_id: 1,
+          verification_token: 'someVerificationToken',
+          emails_sent: 1,
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+
+    expect(accountDbHelpers.deleteAccountById).toHaveBeenCalledExactlyOnceWith(
+      1,
+      expect.any(Object),
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if the emails sent limit has been reached', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: 0,
+          verification_request_id: 1,
+          verification_token: 'someVerificationToken',
+          emails_sent: ACCOUNT_EMAILS_SENT_LIMIT,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Sent verification emails limit reached.',
+      reason: 'emailsSentLimitReached',
+    });
+  });
+
+  it('should resolve the request, and call both incrementAccountRequestEmailsSent and sendAccountVerificationEmailService', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: 0,
+          verification_request_id: 1,
+          verification_token: 'someVerificationToken',
+          emails_sent: 1,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(accountDbHelpers.incrementAccountRequestEmailsSent).toHaveBeenCalledExactlyOnceWith(
+      'account_verification',
+      1,
+      mockConnection,
+      expect.any(Object)
+    );
+
+    expect(emailServices.sendAccountVerificationEmailService).toHaveBeenCalledExactlyOnceWith({
+      receiver: 'example@example.com',
+      displayName: 'John Doe',
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      verificationToken: 'someVerificationToken',
+    });
+  });
+
+  it('should reject the request if an expected error occurs and log it', async () => {
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
   });
 });
