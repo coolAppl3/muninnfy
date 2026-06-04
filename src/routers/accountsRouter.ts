@@ -545,7 +545,7 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
 
     if (!accountDetails) {
       await connection.rollback();
-      res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
       return;
     }
@@ -566,7 +566,7 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
       await connection.rollback();
 
       await deleteAccountById(accountDetails.account_id, dbPool, req);
-      res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
       return;
     }
