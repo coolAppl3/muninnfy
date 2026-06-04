@@ -319,7 +319,12 @@ describe('POST /signUp', () => {
     expect(res.body).toHaveProperty('publicAccountId');
     expect(res.body.publicAccountId).toBeTypeOf('string');
 
-    expect(emailServices.sendAccountVerificationEmailService).toHaveBeenCalledOnce();
+    expect(emailServices.sendAccountVerificationEmailService).toHaveBeenCalledExactlyOnceWith({
+      receiver: 'example@example.com',
+      displayName: 'John Doe',
+      publicAccountId: expect.any(String),
+      verificationToken: expect.any(String),
+    });
   });
 
   it('should reject the request if an expected error occurs and log it', async () => {
