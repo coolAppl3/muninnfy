@@ -761,14 +761,6 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     if (accountDetails.failed_sign_in_attempts > 0) {
       await resetFailedSignInAttempts(accountDetails.account_id, dbPool, req);
     }
-
-    await dbPool.execute(
-      `DELETE FROM
-        account_recovery
-      WHERE
-        account_id = ?;`,
-      [accountDetails.account_id]
-    );
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();
