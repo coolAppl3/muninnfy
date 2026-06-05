@@ -67,7 +67,7 @@ export function isValidDateOfBirthTimestamp(timestamp: number): boolean {
 
   const dateObj: Date = new Date();
   const youngestTimestamp: number = new Date(
-    dateObj.getFullYear(),
+    dateObj.getFullYear() - 13,
     dateObj.getMonth(),
     dateObj.getDate()
   ).getTime();

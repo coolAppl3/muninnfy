@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.5.11] (2026-06-05)
+
+### Changes
+
+- POST `accounts/signIn` will no longer attempt to delete existing account recovery requests.
+
+
+### Bug Fixes
+
+- Fixed `isValidUuid()` not being correctly called in if-statement in `ViewAccount`.
+- Fixed `youngestTimestamp` being incorrectly calculated in `isValidDateOfBirthTimestamp()` in `userValidation`.
+- Fixed a number of typos in backend endpoints.
+
+
+### Tests
+
+- Added test suites for the following components:
+  - `ResendAccountVerificationEmail`.
+  - `ConfirmAccountVerification`.
+  - `Account`.
+- Added test suites for the following endpoints:
+  - POST `accounts/signUp`.
+  - POST `accounts/verification/continue`.
+  - PATCH `accounts/verification/resendEmail`.
+  - PATCH `accounts/verification/confirm`.
+  - POST `accounts/signIn`.
+
+
+### Documentation Changes
+
+- Fixed a typo in the last patch.
+
+
 ## [0.5.10] (2026-05-21)
 
 ### Tests
@@ -7,7 +40,7 @@
 - Added the following test suites:
   - `SignIn`.
   - `SignUp`.
-  - `zContinueAccountVerificationForm`.
+  - `ContinueAccountVerificationForm`.
 - Refactored `toHaveBeenCalledTimes(1)` calls with `toHaveBeenCalledOnce()` and `toHaveBeenCalledWith()` calls with `toHaveBeenCalledExactlyOnceWith()` for better readability.
 - Minor improvements in efficiency to existing test suites.
 
@@ -15,7 +48,6 @@
 ### Chore Changes
 
 - Audited packages.
-
 
 
 ## [0.5.9] (2026-05-09)

@@ -59,7 +59,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   if (isSignedIn) {
     res
       .status(403)
-      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+      .json({ message: 'You must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -108,7 +108,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
   }
 
   if (!isValidDisplayName(displayName)) {
-    res.status(400).json({ message: 'Invalid display name', reason: 'invalidDisplayName' });
+    res.status(400).json({ message: 'Invalid display name.', reason: 'invalidDisplayName' });
     return;
   }
 
@@ -219,7 +219,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
 
     await sendAccountVerificationEmailService({
       receiver: email,
-      displayName: displayName,
+      displayName,
       publicAccountId,
       verificationToken,
     });
@@ -249,7 +249,7 @@ accountsRouter.post('/signUp', async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(500).json({ message: 'Internal server error.' });
+    res.status(503).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
   } finally {
     connection?.release();
@@ -261,7 +261,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
   if (isSignedIn) {
     res
       .status(403)
-      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+      .json({ message: 'You must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -298,7 +298,7 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
         accounts.public_account_id,
         accounts.is_verified,
 
-        (SELECT 1 FROM account_verification WHERE account_id = accounts.account_id) AS verification_request_exists
+        EXISTS (SELECT 1 FROM account_verification WHERE account_id = accounts.account_id) AS verification_request_exists
       FROM
         accounts
       WHERE
@@ -308,19 +308,14 @@ accountsRouter.post('/verification/continue', async (req: Request, res: Response
 
     const accountDetails = accountRows[0] as AccountDetails | undefined;
 
-    if (!accountDetails || accountDetails.is_verified) {
+    if (
+      !accountDetails ||
+      accountDetails.is_verified ||
+      !accountDetails.verification_request_exists
+    ) {
       res
         .status(404)
         .json({ message: 'Verification request not found.', reason: 'requestNotFound' });
-      return;
-    }
-
-    if (!accountDetails.verification_request_exists) {
-      await deleteAccountById(accountDetails.account_id, dbPool, req);
-      res
-        .status(404)
-        .json({ message: 'Verification request not found.', reason: 'requestNotFound' });
-
       return;
     }
 
@@ -343,7 +338,7 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
   if (isSignedIn) {
     res
       .status(403)
-      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+      .json({ message: 'You must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -483,7 +478,7 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
   if (isSignedIn) {
     res
       .status(403)
-      .json({ message: 'You must must sign out before proceeding.', reason: 'signedIn' });
+      .json({ message: 'You must sign out before proceeding.', reason: 'signedIn' });
     return;
   }
 
@@ -550,7 +545,7 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
 
     if (!accountDetails) {
       await connection.rollback();
-      res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
       return;
     }
@@ -571,7 +566,7 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
       await connection.rollback();
 
       await deleteAccountById(accountDetails.account_id, dbPool, req);
-      res.status(404).json({ message: 'Account not found.', reason: 'accountNotfound' });
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
 
       return;
     }
@@ -626,6 +621,7 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
       dbPool,
       req
     );
+
     res
       .status(401)
       .json({ message: 'Incorrect verification token.', reason: 'incorrectVerificationToken' });
@@ -765,14 +761,6 @@ accountsRouter.post('/signIn', async (req: Request, res: Response) => {
     if (accountDetails.failed_sign_in_attempts > 0) {
       await resetFailedSignInAttempts(accountDetails.account_id, dbPool, req);
     }
-
-    await dbPool.execute(
-      `DELETE FROM
-        account_recovery
-      WHERE
-        account_id = ?;`,
-      [accountDetails.account_id]
-    );
   } catch (err: unknown) {
     console.log(err);
     await connection?.rollback();

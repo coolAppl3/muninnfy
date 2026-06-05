@@ -94,7 +94,7 @@ describe('ContinueAccountVerificationForm', () => {
       status: 403,
       response: {
         data: {
-          message: 'You must must sign out before proceeding.',
+          message: 'You must sign out before proceeding.',
           reason: 'signedIn',
         },
       },

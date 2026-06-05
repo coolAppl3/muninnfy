@@ -1,6 +1,6 @@
 {
   "name": "muninnfy",
-  "version": "0.5.10",
+  "version": "0.5.11",
   "license": "UNLICENSED",
   "description": "Muninnfy is a single-page application meant to function as a flexible wishlist.",
   "author": "Yanal Mohsen",
@@ -10,9 +10,7 @@
     "start": "node ./dist/server.js",
     "dev-nodemon": "nodemon ./dist/server.js",
     "dev-ts": "tsc --watch",
-    "ts-clean": "tsc --build --clean",
-    "test": "jest --runInBand",
-    "test-watch": "jest --runInBand --watch"
+    "ts-clean": "tsc --build --clean"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -23,10 +21,13 @@
     "@types/node": "^20.14.2",
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.16",
+    "@types/supertest": "^7.2.0",
     "@types/ws": "^8.18.1",
     "nodemon": "^3.1.0",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^4.1.7"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
