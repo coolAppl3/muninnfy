@@ -616,7 +616,7 @@ describe('PATCH /verification/resendEmail', () => {
           public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
           email: 'example@example.com',
           display_name: 'John Doe',
-          is_verified: 1,
+          is_verified: true,
           verification_request_id: null,
           verification_token: null,
           emails_sent: null,
@@ -645,7 +645,7 @@ describe('PATCH /verification/resendEmail', () => {
           public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
           email: 'example@example.com',
           display_name: 'John Doe',
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: null,
           verification_token: null,
           emails_sent: null,
@@ -680,7 +680,7 @@ describe('PATCH /verification/resendEmail', () => {
           public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
           email: 'example@example.com',
           display_name: 'John Doe',
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: 1,
           verification_token: 'someVerificationToken',
           emails_sent: 1,
@@ -715,7 +715,7 @@ describe('PATCH /verification/resendEmail', () => {
           public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
           email: 'example@example.com',
           display_name: 'John Doe',
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: 1,
           verification_token: 'someVerificationToken',
           emails_sent: ACCOUNT_EMAILS_SENT_LIMIT,
@@ -744,7 +744,7 @@ describe('PATCH /verification/resendEmail', () => {
           public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb6',
           email: 'example@example.com',
           display_name: 'John Doe',
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: 1,
           verification_token: 'someVerificationToken',
           emails_sent: 1,
@@ -896,7 +896,7 @@ describe('PATCH /verification/confirm', () => {
       [
         {
           account_id: 1,
-          is_verified: 1,
+          is_verified: true,
           verification_request_id: 1,
           verification_token: '818db302-cec8-4fe1-84df-01e2aa505cb7',
           failed_attempts: 0,
@@ -922,7 +922,7 @@ describe('PATCH /verification/confirm', () => {
       [
         {
           account_id: 1,
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: null,
           verification_token: null,
           failed_attempts: null,
@@ -954,7 +954,7 @@ describe('PATCH /verification/confirm', () => {
       [
         {
           account_id: 1,
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: 1,
           verification_token: '818db302-cec8-4fe1-84df-01e2aa505cb7',
           failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT,
@@ -986,7 +986,7 @@ describe('PATCH /verification/confirm', () => {
       [
         {
           account_id: 1,
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: 1,
           verification_token: '818db302-cec8-4fe1-84df-01e2aa505cb7',
           failed_attempts: 0,
@@ -1026,7 +1026,7 @@ describe('PATCH /verification/confirm', () => {
       [
         {
           account_id: 1,
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: 1,
           verification_token: '818db302-cec8-4fe1-84df-01e2aa505cb7',
           failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT - 1,
@@ -1058,7 +1058,7 @@ describe('PATCH /verification/confirm', () => {
       [
         {
           account_id: 1,
-          is_verified: 0,
+          is_verified: false,
           verification_request_id: 1,
           verification_token: '818db302-cec8-4fe1-84df-01e2aa505cb7',
           failed_attempts: 0,
