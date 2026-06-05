@@ -8,18 +8,21 @@ import { dbPool } from '../db/db';
 import {
   ACCOUNT_EMAILS_SENT_LIMIT,
   ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+  ACCOUNT_FAILED_SIGN_IN_LIMIT,
 } from '../util/constants/accountConstants';
 import * as accountDbHelpers from '../db/helpers/accountDbHelpers';
 import * as errorLogger from '../logs/errorLogger';
 import * as isSqlError from '../util/sqlUtils/isSqlError';
 import * as authSessions from '../auth/authSessions';
+import * as bcrypt from 'bcrypt';
 
 vi.mock('../util/validation/userValidation', { spy: true });
 vi.mock('../util/email/emailServices');
-vi.mock('../db/helpers/accountDbHelpers');
+vi.mock('../db/helpers/accountDbHelpers', { spy: true });
 vi.mock('../logs/errorLogger');
 vi.mock('../util/sqlUtils/isSqlError');
 vi.mock('../auth/authSessions');
+vi.mock('bcrypt');
 
 describe('POST /signUp', () => {
   const endpoint: string = '/api/accounts/signUp';
@@ -1093,6 +1096,288 @@ describe('PATCH /verification/confirm', () => {
     const res = await request(app).patch(endpoint).send({
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
       verificationToken: '818db302-cec8-4fe1-84df-01e2aa505cb7',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
+
+describe('POST /signIn', () => {
+  const endpoint: string = '/api/accounts/signIn';
+
+  it('should reject the request if the user is signed in', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=someAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Already signed in.',
+      reason: 'alreadySignedIn',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app).post(endpoint).send(reqBody1);
+    const res2 = await request(app).post(endpoint).send(reqBody2);
+    const res3 = await request(app).post(endpoint).send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid email is provided', async () => {
+    const res = await request(app).post(endpoint).send({
+      email: 'invalid email',
+      password: 'somePassword',
+      keepSignedIn: false,
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid email.',
+      reason: 'invalidEmail',
+    });
+  });
+
+  it('should reject the request if an invalid password is provided', async () => {
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'invalid password',
+      keepSignedIn: false,
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid password.',
+      reason: 'invalidPassword',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
+    });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found or is unverified.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the account is unverified', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          hashed_password: 'someHashedPassword',
+          is_verified: false,
+          failed_sign_in_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found or is unverified.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the failed sign in attempts limit has been reached', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          hashed_password: 'someHashedPassword',
+          is_verified: true,
+          failed_sign_in_attempts: ACCOUNT_FAILED_SIGN_IN_LIMIT,
+        },
+      ],
+    ]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Account is locked.',
+      reason: 'accountLocked',
+    });
+  });
+
+  it('should reject the request if the password provided is incorrect and call handleIncorrectPassword', async () => {
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(false as any);
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          hashed_password: 'someHashedPassword',
+          is_verified: true,
+          failed_sign_in_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect password.',
+      reason: 'incorrectPassword',
+    });
+
+    expect(accountDbHelpers.handleIncorrectPassword).toHaveBeenCalledExactlyOnceWith(
+      1,
+      0,
+      dbPool,
+      expect.any(Object),
+      expect.any(Object)
+    );
+  });
+
+  it('should call createAuthSession if the password is correct, but reject the request if an auth session is not created', async () => {
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+    vi.mocked(authSessions.createAuthSession).mockResolvedValueOnce(false);
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          hashed_password: 'someHashedPassword',
+          is_verified: true,
+          failed_sign_in_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(authSessions.createAuthSession).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      mockConnection,
+      1,
+      false
+    );
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      null,
+      'Failed to create authSession.'
+    );
+  });
+
+  it('should resolve the request if the password is correct and an auth session is created, calling resetFailedSignInAttempts if failed sign in attempts are above 0', async () => {
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+    vi.mocked(authSessions.createAuthSession).mockResolvedValueOnce(true);
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          hashed_password: 'someHashedPassword',
+          is_verified: true,
+          failed_sign_in_attempts: 1,
+        },
+      ],
+    ]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
+    });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(accountDbHelpers.resetFailedSignInAttempts).toHaveBeenCalledExactlyOnceWith(
+      1,
+      dbPool,
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if an expected error occurs and log it', async () => {
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+      password: 'somePassword',
+      keepSignedIn: false,
     });
 
     expect(mockConnection.rollback).toHaveBeenCalledOnce();
