@@ -14,6 +14,7 @@ import * as accountDbHelpers from '../db/helpers/accountDbHelpers';
 import * as errorLogger from '../logs/errorLogger';
 import * as isSqlError from '../util/sqlUtils/isSqlError';
 import * as authSessions from '../auth/authSessions';
+import * as authDbHelpers from '../db/helpers/authDbHelpers';
 import * as bcrypt from 'bcrypt';
 
 vi.mock('../util/validation/userValidation', { spy: true });
@@ -22,6 +23,7 @@ vi.mock('../db/helpers/accountDbHelpers', { spy: true });
 vi.mock('../logs/errorLogger');
 vi.mock('../util/sqlUtils/isSqlError');
 vi.mock('../auth/authSessions');
+vi.mock('../db/helpers/authDbHelpers');
 vi.mock('bcrypt');
 
 describe('POST /signUp', () => {
@@ -1381,6 +1383,121 @@ describe('POST /signIn', () => {
     });
 
     expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
+
+describe('GET /', () => {
+  const endpoint: string = '/api/accounts';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).get(endpoint);
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.query).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .get(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it(`should resolve the request and return the account's details, converting binary-based boolean into true/false booleans`, async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const accountDetails = {
+      public_account_id: 'somePublicAccountId',
+      email: 'example@example.com',
+      username: 'johnDoe',
+      display_name: 'John Doe',
+      created_on_timestamp: 1.77e12,
+      is_private: true,
+      approve_follow_requests: true,
+      followers_count: 0,
+      following_count: 0,
+      wishlists_count: 0,
+    };
+
+    const ongoingEmailUpdateRequest = {
+      request_id: 1,
+      new_email: 'new@example.com',
+      is_suspended: 0,
+      expiry_timestamp: 1.771e12,
+    };
+
+    const ongoingAccountDeletionRequest = {
+      request_id: 1,
+      is_suspended: 0,
+      expiry_timestamp: 1.771e12,
+    };
+
+    vi.mocked(dbPool.query).mockResolvedValueOnce([
+      [
+        [{ ...accountDetails }],
+        [{ ...ongoingEmailUpdateRequest }],
+        [{ ...ongoingAccountDeletionRequest }],
+      ] as any,
+      [],
+    ]);
+
+    const res = await request(app)
+      .get(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      accountDetails,
+      ongoingEmailUpdateRequest: { ...ongoingEmailUpdateRequest, is_suspended: false },
+      ongoingAccountDeletionRequest: { ...ongoingAccountDeletionRequest, is_suspended: false },
+    });
+  });
+
+  it('should reject the request if an expected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.query).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .get(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
     expect(res.status).toBe(500);
     expect(res.body).toStrictEqual({
       message: 'Internal server error.',
