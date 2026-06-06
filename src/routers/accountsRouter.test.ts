@@ -1772,3 +1772,213 @@ describe('PATCH /details/privacy', () => {
     );
   });
 });
+
+describe('PATCH /details/displayName', () => {
+  const endpoint: string = '/api/accounts/details/displayName';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).patch(endpoint).send({
+      newDisplayName: 'Sara Smith',
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({
+        newDisplayName: 'Sara Smith',
+      });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      newDisplayName: 'Sara Smith',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody1);
+
+    const res2 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody2);
+
+    const res3 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid display name is provided', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newDisplayName: '!nvalid name 23',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid display name.',
+      reason: 'invalidDisplayName',
+    });
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newDisplayName: 'Sara Smith',
+      });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the new display name is identical to the existing one', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          display_name: 'Sara Smith',
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newDisplayName: 'Sara Smith',
+      });
+
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Account already has this display name.',
+      reason: 'duplicateDisplayName',
+    });
+  });
+
+  it('should reject the request and log an error if the server fails to update the database', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          display_name: 'Sara Smith',
+        } as any,
+      ],
+      [],
+    ]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      {
+        affectedRows: 0,
+      } as any,
+      [],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newDisplayName: 'John Doe',
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({ message: 'Internal server error.' });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      null,
+      'Failed to update display_name.'
+    );
+  });
+
+  it('should resolve the request if a valid new display name is provided and the database is successfully updated', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          display_name: 'Sara Smith',
+        } as any,
+      ],
+      [],
+    ]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      {
+        affectedRows: 1,
+      } as any,
+      [],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newDisplayName: 'John Doe',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+  });
+
+  it('should reject the request if an expected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newDisplayName: 'John Doe',
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
