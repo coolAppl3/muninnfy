@@ -1509,3 +1509,108 @@ describe('GET /', () => {
     );
   });
 });
+
+describe('GET /:publicAccountId', () => {
+  function setEndpoint(publicAccountId: string): string {
+    return `/api/accounts/${publicAccountId}`;
+  }
+
+  it('should reject the request if it does not contain an publicAccountId parameter', async () => {
+    const res = await request(app).get(setEndpoint('someInvalidPublicAccountId'));
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid account ID.',
+      reason: 'invalidPublicAccountId',
+    });
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app).get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb9'));
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the requester is the account owner', async () => {
+    const viewAccountDetails = {
+      public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb9',
+      username: 'johnDoe',
+      display_name: 'John Doe',
+      created_on_timestamp: 1.77e12,
+      is_private: true,
+      approve_follow_requests: true,
+      is_owner: 1,
+
+      follow_id: null,
+      follow_request_id: null,
+
+      followers_count: 0,
+      following_count: 0,
+    };
+
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[{ ...viewAccountDetails } as any], []]);
+
+    const res = await request(app).get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb9'));
+
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Account owner.',
+      reason: 'accountOwner',
+    });
+  });
+
+  it('should resolve the request and send back the account details', async () => {
+    const viewAccountDetails = {
+      public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb9',
+      username: 'johnDoe',
+      display_name: 'John Doe',
+      created_on_timestamp: 1.77e12,
+      is_private: true,
+      approve_follow_requests: true,
+      is_owner: 0,
+
+      follow_id: null,
+      follow_request_id: null,
+
+      followers_count: 0,
+      following_count: 0,
+    };
+
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[{ ...viewAccountDetails } as any], []]);
+
+    const res = await request(app).get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb9'));
+
+    const { is_owner, ...rest } = viewAccountDetails;
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({ viewAccountDetails: rest });
+  });
+
+  it('should reject the request if an expected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app).get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb9'));
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
