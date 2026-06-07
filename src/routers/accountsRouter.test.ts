@@ -332,7 +332,7 @@ describe('POST /signUp', () => {
     });
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
 
     vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
@@ -516,7 +516,7 @@ describe('POST /verification/continue', () => {
     });
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
 
     vi.mocked(dbPool.execute).mockImplementationOnce(() => {
@@ -781,7 +781,7 @@ describe('PATCH /verification/resendEmail', () => {
     });
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
 
     vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
@@ -1088,7 +1088,7 @@ describe('PATCH /verification/confirm', () => {
     ).toHaveBeenCalledExactlyOnceWith('account_verification', 1, dbPool, expect.any(Object));
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
 
     vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
@@ -1369,7 +1369,7 @@ describe('POST /signIn', () => {
     );
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
 
     vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
@@ -1485,7 +1485,7 @@ describe('GET /', () => {
     });
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
@@ -1592,7 +1592,7 @@ describe('GET /:publicAccountId', () => {
     expect(res.body).toStrictEqual({ viewAccountDetails: rest });
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
@@ -1744,7 +1744,7 @@ describe('PATCH /details/privacy', () => {
     expect(res.body).toStrictEqual({});
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
@@ -1955,7 +1955,7 @@ describe('PATCH /details/displayName', () => {
     expect(res.body).toStrictEqual({});
   });
 
-  it('should reject the request if an expected error occurs and log it', async () => {
+  it('should reject the request if an unexpected error occurs and log it', async () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
@@ -1971,6 +1971,343 @@ describe('PATCH /details/displayName', () => {
         newDisplayName: 'John Doe',
       });
 
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
+
+describe('PATCH /details/password', () => {
+  const endpoint: string = '/api/accounts/details/password';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).patch(endpoint).send({
+      password: 'somePassword',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({
+        password: 'somePassword',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      password: 'somePassword',
+      newPassword: 'someNewPassword',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody1);
+
+    const res2 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody2);
+
+    const res3 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid password is provided', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'invalid password',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid current password.',
+      reason: 'invalidCurrentPassword',
+    });
+  });
+
+  it('should reject the request if an invalid new password is provided', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'invalid new password',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid new password.',
+      reason: 'invalidNewPassword',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the new password is identical to the username', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          username: 'johnDoe123',
+          hashed_password: 'someHashedPassword',
+          failed_sign_in_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'johnDoe123',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: `Username and password can't match.`,
+      reason: 'newPasswordMatchesUsername',
+    });
+  });
+
+  it('should reject the request if the password provided is incorrect and call handleIncorrectPassword', async () => {
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(false as any);
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          username: 'johnDoe',
+          hashed_password: 'someHashedPassword',
+          failed_sign_in_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect password.',
+      reason: 'incorrectPassword',
+    });
+
+    expect(accountDbHelpers.handleIncorrectPassword).toHaveBeenCalledExactlyOnceWith(
+      1,
+      0,
+      dbPool,
+      expect.any(Object),
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if new password is identical to the existing one', async () => {
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          username: 'johnDoe',
+          hashed_password: 'someHashedPassword',
+          failed_sign_in_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: `New password can't match current password.`,
+      reason: 'newPasswordMatchesUsername',
+    });
+  });
+
+  it('should reject the request and log an error if the server fails to update the database', async () => {
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          username: 'johnDoe',
+          hashed_password: 'someHashedPassword',
+          failed_sign_in_attempts: 0,
+        },
+      ],
+    ]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      {
+        affectedRows: 0,
+      },
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      null,
+      'Failed to update hashed_password.'
+    );
+  });
+
+  it('should resolve the request if the password is correct, the new password is valid, and the database is successfully updated, calling purgeAuthSessions, as well as calling resetFailedSignInAttempts if the failed sign in attempts are greater than 0', async () => {
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          username: 'johnDoe',
+          hashed_password: 'someHashedPassword',
+          failed_sign_in_attempts: 1,
+        },
+      ],
+    ]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      {
+        affectedRows: 1,
+      },
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(authSessions.purgeAuthSessions).toHaveBeenCalledExactlyOnceWith(
+      1,
+      '818db302-cec8-4fe1-84df-01e2aa505cb6'
+    );
+    expect(accountDbHelpers.resetFailedSignInAttempts).toHaveBeenCalledExactlyOnceWith(
+      1,
+      dbPool,
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        password: 'somePassword',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
     expect(res.status).toBe(500);
     expect(res.body).toStrictEqual({
       message: 'Internal server error.',
