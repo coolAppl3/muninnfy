@@ -1263,7 +1263,6 @@ describe('POST /signIn', () => {
 
   it('should reject the request if the password provided is incorrect and call handleIncorrectPassword', async () => {
     vi.mocked(bcrypt.compare).mockResolvedValueOnce(false as any);
-
     vi.mocked(mockConnection.execute).mockResolvedValueOnce([
       [
         {
@@ -2145,7 +2144,6 @@ describe('PATCH /details/password', () => {
   });
 
   it('should reject the request if the password provided is incorrect and call handleIncorrectPassword', async () => {
-    vi.mocked(bcrypt.compare).mockResolvedValueOnce(false as any);
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
     vi.mocked(mockConnection.execute).mockResolvedValueOnce([
       [
@@ -2290,7 +2288,6 @@ describe('PATCH /details/password', () => {
   });
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
-    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
@@ -2317,5 +2314,417 @@ describe('PATCH /details/password', () => {
       expect.any(Object),
       unexpectedError
     );
+  });
+});
+
+describe('POST /details/email/start', () => {
+  const endpoint: string = '/api/accounts/details/email/start';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).post(endpoint).send({
+      newEmail: 'new@example.com',
+      password: 'somePassword',
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      newEmail: 'new@example.com',
+      password: 'somePassword',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody1);
+
+    const res2 = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody2);
+
+    const res3 = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid email is provided', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'invalid email',
+        password: 'somePassword',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid email address.',
+      reason: 'invalidEmail',
+    });
+  });
+
+  it('should reject the request if an invalid password is provided', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'invalid password',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid password.',
+      reason: 'invalidPassword',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the password provided is incorrect and call handleIncorrectPassword', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(false as any);
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          hashed_password: 'someHashedPassword',
+          display_name: 'John Doe',
+          failed_sign_in_attempts: 0,
+
+          request_id: null,
+          new_email: null,
+          expiry_timestamp: null,
+          failed_attempts: null,
+
+          email_taken: 0,
+          email_temporarily_taken: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect password.',
+      reason: 'incorrectPassword',
+    });
+
+    expect(accountDbHelpers.handleIncorrectPassword).toHaveBeenCalledExactlyOnceWith(
+      1,
+      0,
+      dbPool,
+      expect.any(Object),
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if an existing email update request is found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          hashed_password: 'someHashedPassword',
+          display_name: 'John Doe',
+          failed_sign_in_attempts: 0,
+
+          request_id: 1,
+          new_email: 'new@example.com',
+          expiry_timestamp: 1.772e12,
+          failed_attempts: 0,
+
+          email_taken: 0,
+          email_temporarily_taken: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Ongoing email change request found.',
+      reason: 'ongoingRequest',
+      resData: {
+        new_email: 'new@example.com',
+        expiry_timestamp: 1.772e12,
+        is_suspended: false,
+      },
+    });
+  });
+
+  it('should reject the request if the new email is identical to the existing one', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          hashed_password: 'someHashedPassword',
+          display_name: 'John Doe',
+          failed_sign_in_attempts: 0,
+
+          request_id: null,
+          new_email: null,
+          expiry_timestamp: null,
+          failed_attempts: null,
+
+          email_taken: 0,
+          email_temporarily_taken: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'example@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Email already linked to this account.',
+      reason: 'duplicateEmail',
+    });
+  });
+
+  it('should reject the request if the new email is taken', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          hashed_password: 'someHashedPassword',
+          display_name: 'John Doe',
+          failed_sign_in_attempts: 0,
+
+          request_id: null,
+          new_email: null,
+          expiry_timestamp: null,
+          failed_attempts: null,
+
+          email_taken: 1,
+          email_temporarily_taken: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'example@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Email already linked to this account.',
+      reason: 'duplicateEmail',
+    });
+  });
+
+  vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+  it('should resolve the request, call sendEmailUpdateStartEmailService, as well as call resetFailedSignInAttempts if the failed sign in attempts are greater than 0', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(bcrypt.compare).mockResolvedValueOnce(true as any);
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          hashed_password: 'someHashedPassword',
+          display_name: 'John Doe',
+          failed_sign_in_attempts: 1,
+
+          request_id: null,
+          new_email: null,
+          expiry_timestamp: null,
+          failed_attempts: null,
+
+          email_taken: 0,
+          email_temporarily_taken: 0,
+        },
+      ],
+    ]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(201);
+    expect(res.body).toStrictEqual({
+      expiryTimestamp: expect.any(Number),
+    });
+
+    expect(emailServices.sendEmailUpdateStartEmailService).toHaveBeenCalledExactlyOnceWith({
+      receiver: 'new@example.com',
+      confirmationCode: expect.any(String),
+      displayName: 'John Doe',
+    });
+    expect(accountDbHelpers.resetFailedSignInAttempts).toHaveBeenCalledExactlyOnceWith(
+      1,
+      dbPool,
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+
+  it('should reject the request if an SqlError is thrown indicating that the email is taken', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(isSqlError.isSqlError).mockReturnValueOnce(true);
+
+    const unexpectedError = {
+      errno: 1062,
+      sqlMessage: `Duplicate entry for key 'new_email'`,
+    };
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Email is taken.',
+      reason: 'emailTaken',
+    });
   });
 });
