@@ -1391,7 +1391,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       email_temporarily_taken: boolean;
     };
 
-    const [accountRows] = await connection.execute<ResultSetHeader[]>(
+    const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
         accounts.email,
         accounts.hashed_password,
@@ -1491,7 +1491,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
     );
 
     await connection.commit();
-    res.json({ expiryTimestamp });
+    res.status(201).json({ expiryTimestamp });
 
     if (accountDetails.failed_sign_in_attempts > 0) {
       await resetFailedSignInAttempts(accountId, dbPool, req);
