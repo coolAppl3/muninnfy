@@ -2757,3 +2757,230 @@ describe('POST /details/email/start', () => {
     );
   });
 });
+
+describe('PATCH /details/email/resendEmail', () => {
+  const endpoint: string = '/api/accounts/details/email/resendEmail';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).patch(endpoint).send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the email update request is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          display_name: 'John Doe',
+          request_id: null,
+          new_email: null,
+          confirmation_code: null,
+          expiry_timestamp: null,
+          emails_sent: null,
+          failed_attempts: null,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Email change request not found or has expired.',
+      reason: 'requestNotFound',
+    });
+  });
+
+  it('should reject the request the request if the failed attempts count has reached the limit', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          display_name: 'John Doe',
+          request_id: 1,
+          new_email: 'new@example.com',
+          confirmation_code: 'AAAAAA',
+          expiry_timestamp: 1.771e12,
+          emails_sent: 1,
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Email change request suspended.',
+      reason: 'requestSuspended',
+      resData: { expiryTimestamp: 1.771e12 },
+    });
+  });
+
+  it('should reject the request the request if the emails sent limit has been reached', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          display_name: 'John Doe',
+          request_id: 1,
+          new_email: 'new@example.com',
+          confirmation_code: 'AAAAAA',
+          expiry_timestamp: 1.771e12,
+          emails_sent: ACCOUNT_EMAILS_SENT_LIMIT,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: `Sent confirmation emails limit reached.`,
+      reason: 'emailsSentLimitReached',
+    });
+  });
+
+  it('should resolve the request and call both incrementAccountRequestEmailsSent and sendEmailUpdateStartEmailService', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          display_name: 'John Doe',
+          request_id: 1,
+          new_email: 'new@example.com',
+          confirmation_code: 'AAAAAA',
+          expiry_timestamp: 1.771e12,
+          emails_sent: 1,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(accountDbHelpers.incrementAccountRequestEmailsSent).toHaveBeenCalledExactlyOnceWith(
+      'email_update',
+      1,
+      mockConnection,
+      expect.any(Object)
+    );
+
+    expect(emailServices.sendEmailUpdateStartEmailService).toHaveBeenCalledExactlyOnceWith({
+      receiver: 'new@example.com',
+      displayName: 'John Doe',
+      confirmationCode: 'AAAAAA',
+    });
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
