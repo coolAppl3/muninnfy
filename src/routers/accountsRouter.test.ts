@@ -2727,4 +2727,33 @@ describe('POST /details/email/start', () => {
       reason: 'emailTaken',
     });
   });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
 });
