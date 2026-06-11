@@ -9,6 +9,7 @@ import {
   ACCOUNT_EMAILS_SENT_LIMIT,
   ACCOUNT_FAILED_ATTEMPTS_LIMIT,
   ACCOUNT_FAILED_SIGN_IN_LIMIT,
+  ACCOUNT_UPDATE_SUSPENSION_DURATION,
 } from '../util/constants/accountConstants';
 import * as accountDbHelpers from '../db/helpers/accountDbHelpers';
 import * as errorLogger from '../logs/errorLogger';
@@ -16,6 +17,7 @@ import * as isSqlError from '../util/sqlUtils/isSqlError';
 import * as authSessions from '../auth/authSessions';
 import * as authDbHelpers from '../db/helpers/authDbHelpers';
 import * as bcrypt from 'bcrypt';
+import { hourMilliseconds } from '../util/constants/globalConstants';
 
 vi.mock('../util/validation/userValidation', { spy: true });
 vi.mock('../util/email/emailServices');
@@ -2971,6 +2973,290 @@ describe('PATCH /details/email/resendEmail', () => {
       .patch(endpoint)
       .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
       .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
+
+describe('PATCH /details/email/confirm', () => {
+  const endpoint: string = '/api/accounts/details/email/confirm';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).patch(endpoint).send({
+      newEmail: 'new@example.com',
+      password: 'somePassword',
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({
+        newEmail: 'new@example.com',
+        password: 'somePassword',
+      });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      confirmationCode: 'FFFFFFFF',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody1);
+
+    const res2 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody2);
+
+    const res3 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid confirmation code is provided', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        confirmationCode: 'someInvalidCode',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid confirmation code.',
+      reason: 'invalidCode',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        confirmationCode: 'FFFFFFFF',
+      });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if no email update request is found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        confirmationCode: 'FFFFFFFF',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Email change request not found or has expired.',
+      reason: 'requestNotFound',
+    });
+  });
+
+  it('should reject the request if all confirmation attempts have been exhausted', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          request_id: 1,
+          new_email: 'new@example.com',
+          confirmation_code: 'FFFFFFFF',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        confirmationCode: 'FFFFFFFF',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Email change request suspended.',
+      reason: 'requestSuspended',
+      resData: { expiryTimestamp },
+    });
+  });
+
+  it('should reject the request if the confirmation code provided is incorrect, calling incrementFailedAccountRequestAttempts if all attempts are not exhausted', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          request_id: 1,
+          new_email: 'new@example.com',
+          confirmation_code: 'FFFFFFFF',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+    vi.mocked(accountDbHelpers.incrementFailedAccountRequestAttempts).mockResolvedValueOnce(
+      true
+    );
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        confirmationCode: 'AAAAAAAA',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect confirmation code.',
+      reason: 'incorrectCode',
+    });
+
+    expect(
+      accountDbHelpers.incrementFailedAccountRequestAttempts
+    ).toHaveBeenCalledExactlyOnceWith('email_update', 1, dbPool, expect.any(Object));
+  });
+
+  it('should reject the request if the confirmation code provided is incorrect, calling suspendAccountRequest if all attempts are exhausted', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          request_id: 1,
+          new_email: 'new@example.com',
+          confirmation_code: 'FFFFFFFF',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT - 1,
+        },
+      ],
+    ]);
+    vi.mocked(accountDbHelpers.suspendAccountRequest).mockResolvedValueOnce(
+      expiryTimestamp + ACCOUNT_UPDATE_SUSPENSION_DURATION
+    );
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        confirmationCode: 'AAAAAAAA',
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect confirmation code.',
+      reason: 'incorrectCode_suspended',
+      resData: { expiryTimestamp: expiryTimestamp + ACCOUNT_UPDATE_SUSPENSION_DURATION },
+    });
+
+    expect(accountDbHelpers.suspendAccountRequest).toHaveBeenCalledExactlyOnceWith(
+      'email_update',
+      1,
+      dbPool,
+      expect.any(Object)
+    );
+  });
+
+  it('should accept the request if the confirmation code provided is correct', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          request_id: 1,
+          new_email: 'new@example.com',
+          confirmation_code: 'FFFFFFFF',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([{ affectedRows: 1 }]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([{ affectedRows: 1 }]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        confirmationCode: 'FFFFFFFF',
+      });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        confirmationCode: 'FFFFFFFF',
+      });
 
     expect(mockConnection.rollback).toHaveBeenCalledOnce();
     expect(res.status).toBe(500);
