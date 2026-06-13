@@ -3270,3 +3270,209 @@ describe('PATCH /details/email/confirm', () => {
     );
   });
 });
+
+describe('POST /recovery/start', () => {
+  const endpoint: string = '/api/accounts/recovery/start';
+
+  it('should reject the request if the user is signed in', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=someAuthSessionId')
+      .send({
+        email: 'example@example.com',
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: `Can't recover an account while signed in.`,
+      reason: 'signedIn',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      email: 'example@example.com',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app).post(endpoint).send(reqBody1);
+    const res2 = await request(app).post(endpoint).send(reqBody2);
+    const res3 = await request(app).post(endpoint).send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found or is unverified.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the account is unverified', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: 'somePublicAccountId',
+          display_name: 'John Doe',
+          is_verified: false,
+
+          request_id: 1,
+          expiry_timestamp: Date.now() + hourMilliseconds,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found or is unverified.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if all recovery attempts have been exhausted', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: 'somePublicAccountId',
+          display_name: 'John Doe',
+          is_verified: true,
+
+          request_id: 1,
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+        },
+      ],
+    ]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Recovery request suspended.',
+      reason: 'requestSuspended',
+      resData: { expiryTimestamp },
+    });
+  });
+
+  it('should reject the request if an ongoing recovery request is found', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: 'somePublicAccountId',
+          display_name: 'John Doe',
+          is_verified: true,
+
+          request_id: 1,
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Ongoing recovery request found.',
+      reason: 'ongoingRequestFound',
+      resData: { publicAccountId: 'somePublicAccountId' },
+    });
+  });
+
+  it(`should resolve the request if an ongoing recovery request is not found, calling sendAccountRecoveryEmailService, and returning the account's public account ID`, async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          public_account_id: 'somePublicAccountId',
+          display_name: 'John Doe',
+          is_verified: true,
+
+          request_id: null,
+          expiry_timestamp: null,
+          failed_attempts: null,
+        },
+      ],
+    ]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({ publicAccountId: 'somePublicAccountId' });
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app).post(endpoint).send({
+      email: 'example@example.com',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
