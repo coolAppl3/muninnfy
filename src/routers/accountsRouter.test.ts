@@ -1487,8 +1487,6 @@ describe('GET /', () => {
   });
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
-    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
-
     const unexpectedError: Error = new Error('someUnexpectedError');
 
     vi.mocked(dbPool.query).mockImplementationOnce(() => {
@@ -1594,8 +1592,6 @@ describe('GET /:publicAccountId', () => {
   });
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
-    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
-
     const unexpectedError: Error = new Error('someUnexpectedError');
 
     vi.mocked(dbPool.execute).mockImplementationOnce(() => {
