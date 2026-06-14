@@ -3472,3 +3472,265 @@ describe('POST /recovery/start', () => {
     );
   });
 });
+
+describe('PATCH /recovery/resendEmail', () => {
+  const endpoint: string = '/api/accounts/recovery/resendEmail';
+
+  it('should reject the request if the user is signed in', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=someAuthSessionId')
+      .send({
+        publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: `Can't recover an account while signed in.`,
+      reason: 'signedIn',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app).patch(endpoint).send(reqBody1);
+    const res2 = await request(app).patch(endpoint).send(reqBody2);
+    const res3 = await request(app).patch(endpoint).send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid public account ID is provided', async () => {
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: 'someInvalidPublicAccountId',
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid account ID.',
+      reason: 'invalidPublicAccountId',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found or is unverified.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the account is unverified', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: false,
+
+          request_id: null,
+          recovery_token: null,
+          expiry_timestamp: null,
+          emails_sent: null,
+          failed_attempts: null,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found or is unverified.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if no recovery request is found', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: true,
+
+          request_id: null,
+          recovery_token: null,
+          expiry_timestamp: null,
+          emails_sent: null,
+          failed_attempts: null,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Recovery request not found or has expired.',
+      reason: 'requestNotFound',
+    });
+  });
+
+  it('should reject the request if all recovery attempts have been exhausted', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: true,
+
+          request_id: 1,
+          recovery_token: 'someRecoveryToken',
+          expiry_timestamp: expiryTimestamp,
+          emails_sent: 1,
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Recovery request suspended.',
+      reason: 'requestSuspended',
+      resData: { expiryTimestamp },
+    });
+  });
+
+  it('should reject the request if the emails sent limit has been reached', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: true,
+
+          request_id: 1,
+          recovery_token: 'someRecoveryToken',
+          expiry_timestamp: expiryTimestamp,
+          emails_sent: ACCOUNT_EMAILS_SENT_LIMIT,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Sent recovery emails limit reached.',
+      reason: 'emailsSentLimitReached',
+    });
+  });
+
+  it('should resolve the request, calling incrementAccountRequestEmailsSent and sendAccountRecoveryEmailService', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          email: 'example@example.com',
+          display_name: 'John Doe',
+          is_verified: true,
+
+          request_id: 1,
+          recovery_token: 'someRecoveryToken',
+          expiry_timestamp: expiryTimestamp,
+          emails_sent: 1,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(accountDbHelpers.incrementAccountRequestEmailsSent).toHaveBeenCalledExactlyOnceWith(
+      'account_recovery',
+      1,
+      mockConnection,
+      expect.any(Object)
+    );
+    expect(emailServices.sendAccountRecoveryEmailService).toHaveBeenCalledExactlyOnceWith({
+      receiver: 'example@example.com',
+      displayName: 'John Doe',
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: 'someRecoveryToken',
+    });
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
