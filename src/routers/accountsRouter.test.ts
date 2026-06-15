@@ -17,7 +17,7 @@ import * as isSqlError from '../util/sqlUtils/isSqlError';
 import * as authSessions from '../auth/authSessions';
 import * as authDbHelpers from '../db/helpers/authDbHelpers';
 import * as bcrypt from 'bcrypt';
-import { hourMilliseconds } from '../util/constants/globalConstants';
+import { dayMilliseconds, hourMilliseconds } from '../util/constants/globalConstants';
 
 vi.mock('../util/validation/userValidation', { spy: true });
 vi.mock('../util/email/emailServices');
@@ -3720,6 +3720,399 @@ describe('PATCH /recovery/resendEmail', () => {
 
     const res = await request(app).patch(endpoint).send({
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
+
+describe('PATCH /recovery/confirm', () => {
+  const endpoint: string = '/api/accounts/recovery/confirm';
+
+  it('should reject the request if the user is signed in', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=someAuthSessionId')
+      .send({
+        publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+        recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+        newPassword: 'someNewPassword',
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: `Can't recover an account while signed in.`,
+      reason: 'signedIn',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app).patch(endpoint).send(reqBody1);
+    const res2 = await request(app).patch(endpoint).send(reqBody2);
+    const res3 = await request(app).patch(endpoint).send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid public account ID is provided', async () => {
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: 'someInvalidPublicAccountId',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid account ID.',
+      reason: 'invalidPublicAccountId',
+    });
+  });
+
+  it('should reject the request if an invalid recovery Token is provided', async () => {
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: 'invalidRecoveryToken',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid recovery token.',
+      reason: 'invalidRecoveryToken',
+    });
+  });
+
+  it('should reject the request if an invalid recovery Token is provided', async () => {
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'invalid Password',
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid new password.',
+      reason: 'invalidNewPassword',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found or is unverified.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the account is unverified', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          username: 'johnDoe',
+          is_verified: false,
+
+          request_id: null,
+          recovery_token: null,
+          expiry_timestamp: null,
+          failed_attempts: null,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found or is unverified.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if no recovery request is found', async () => {
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          username: 'johnDoe',
+          is_verified: true,
+
+          request_id: null,
+          recovery_token: null,
+          expiry_timestamp: null,
+          failed_attempts: null,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Recovery request not found or has expired.',
+      reason: 'requestNotFound',
+    });
+  });
+
+  it('should reject the request if all recovery attempts have been exhausted', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          username: 'johnDoe',
+          is_verified: true,
+
+          request_id: 1,
+          recovery_token: 'someRecoveryToken',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Recovery request suspended.',
+      reason: 'requestSuspended',
+      resData: { expiryTimestamp },
+    });
+  });
+
+  it('should reject the request if the recovery token is incorrect, calling incrementFailedAccountRequestAttempts if the request is not yet suspended', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          username: 'johnDoe',
+          is_verified: true,
+
+          request_id: 1,
+          recovery_token: 'someRecoveryToken',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+    vi.mocked(accountDbHelpers.incrementFailedAccountRequestAttempts).mockResolvedValueOnce(
+      true
+    );
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect recovery token.',
+      reason: 'incorrectToken',
+    });
+
+    expect(
+      accountDbHelpers.incrementFailedAccountRequestAttempts
+    ).toHaveBeenCalledExactlyOnceWith(
+      'account_recovery',
+      1,
+      expect.any(Object),
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if the recovery token is incorrect, calling suspendAccountRequest if the failed attempts limit has been reached', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          username: 'johnDoe',
+          is_verified: true,
+
+          request_id: 1,
+          recovery_token: 'someRecoveryToken',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT - 1,
+        },
+      ],
+    ]);
+    vi.mocked(accountDbHelpers.suspendAccountRequest).mockResolvedValueOnce(
+      expiryTimestamp + dayMilliseconds
+    );
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect recovery token. Recovery suspended.',
+      reason: 'incorrectToken_suspended',
+      resData: { expiryTimestamp: expiryTimestamp + dayMilliseconds },
+    });
+
+    expect(accountDbHelpers.suspendAccountRequest).toHaveBeenCalledExactlyOnceWith(
+      'account_recovery',
+      1,
+      expect.any(Object),
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if the new password is identical to the username', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          username: 'someNewPassword',
+          is_verified: true,
+
+          request_id: 1,
+          recovery_token: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: `Username and new password can't match.`,
+      reason: 'newPasswordMatchesUsername',
+    });
+  });
+
+  it('should resolve the request, hash the password, call purgeAuthSessions and createAuthSession, and return whether an auth session was successfully created', async () => {
+    const expiryTimestamp: number = Date.now() + hourMilliseconds;
+
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          username: 'johnDoe',
+          is_verified: true,
+
+          request_id: 1,
+          recovery_token: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+          expiry_timestamp: expiryTimestamp,
+          failed_attempts: 0,
+        },
+      ],
+    ]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([{ affectedRows: 1 }]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([{ affectedRows: 1 }]);
+    vi.mocked(authSessions.purgeAuthSessions).mockResolvedValueOnce(undefined);
+    vi.mocked(authSessions.createAuthSession).mockResolvedValueOnce(true);
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'someNewPassword',
+    });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({ authSessionCreated: true });
+
+    expect(authSessions.purgeAuthSessions).toHaveBeenCalledExactlyOnceWith(1);
+    expect(authSessions.createAuthSession).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      mockConnection,
+      1,
+      false
+    );
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app).patch(endpoint).send({
+      publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
+      recoveryToken: '818db302-cec8-4fe1-84df-01e2aa505cb5',
+      newPassword: 'SomeNewPassword',
     });
 
     expect(mockConnection.rollback).toHaveBeenCalledOnce();
