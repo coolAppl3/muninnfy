@@ -4093,6 +4093,7 @@ describe('PATCH /recovery/confirm', () => {
     expect(res.status).toBe(200);
     expect(res.body).toStrictEqual({ authSessionCreated: true });
 
+    expect(bcrypt.hash).toHaveBeenCalledOnce();
     expect(authSessions.purgeAuthSessions).toHaveBeenCalledExactlyOnceWith(1);
     expect(authSessions.createAuthSession).toHaveBeenCalledExactlyOnceWith(
       expect.any(Object),
