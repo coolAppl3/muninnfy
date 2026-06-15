@@ -2193,7 +2193,7 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       return;
     }
 
-    if (!accountDetails.account_id) {
+    if (!accountDetails.request_id) {
       await connection.rollback();
       res.status(404).json({
         message: 'Recovery request not found or has expired.',
