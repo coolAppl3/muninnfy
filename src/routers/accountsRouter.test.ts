@@ -4645,3 +4645,230 @@ describe('PATCH /deletion/resendEmail', () => {
     );
   });
 });
+
+describe('DELETE /deletion/confirm', () => {
+  function setEndpoint(confirmationCode: string): string {
+    return `/api/accounts/deletion/confirm/${confirmationCode}`;
+  }
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app)
+      .delete(setEndpoint('AAAAAAAA'))
+      .set('Cookie', 'authSessionId=someAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .delete(setEndpoint('AAAAAAAA'))
+      .set('Cookie', 'authSessionId=someAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if an invalid confirmation code is provided', async () => {
+    const res = await request(app)
+      .delete(setEndpoint('someCode'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb9')
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid confirmation code.',
+      reason: 'invalidCode',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    await request(app)
+      .delete(setEndpoint('AAAAAAAA'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb9')
+      .send({});
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if no deletion request is found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .delete(setEndpoint('AAAAAAAA'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb9')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Deletion request not found or has expired.',
+      reason: 'requestNotFound',
+    });
+  });
+
+  it('should reject the request if all deletion attempts have been exhausted', async () => {
+    const expiryTimestamp: number = Date.now() + dayMilliseconds;
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          request_kd: 1,
+          confirmation_code: 'AAAAAAAA',
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT,
+          expiry_timestamp: expiryTimestamp,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .delete(setEndpoint('AAAAAAAA'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb9')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(403);
+    expect(res.body).toStrictEqual({
+      message: 'Deletion request suspended.',
+      reason: 'requestSuspended',
+      resData: { expiryTimestamp },
+    });
+  });
+
+  it('should reject the request if an incorrect confirmation code is provided, calling incrementFailedAccountRequestAttempts if the request is not yet to be suspended', async () => {
+    const expiryTimestamp: number = Date.now() + dayMilliseconds;
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          request_id: 1,
+          confirmation_code: 'AAAAAAAA',
+          failed_attempts: 0,
+          expiry_timestamp: expiryTimestamp,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .delete(setEndpoint('BBBBBBBB'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb9')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect confirmation code.',
+      reason: 'incorrectCode',
+    });
+
+    expect(
+      accountDbHelpers.incrementFailedAccountRequestAttempts
+    ).toHaveBeenCalledExactlyOnceWith('account_deletion', 1, dbPool, expect.any(Object));
+  });
+
+  it('should reject the request if an incorrect confirmation code is provided, calling suspendAccountRequest if all deletion attempts have been exhausted', async () => {
+    const expiryTimestamp: number = Date.now() + dayMilliseconds;
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          request_id: 1,
+          confirmation_code: 'AAAAAAAA',
+          failed_attempts: ACCOUNT_FAILED_ATTEMPTS_LIMIT - 1,
+          expiry_timestamp: expiryTimestamp,
+        },
+      ],
+    ]);
+    vi.mocked(accountDbHelpers.suspendAccountRequest).mockResolvedValueOnce(
+      expiryTimestamp + dayMilliseconds
+    );
+
+    const res = await request(app)
+      .delete(setEndpoint('BBBBBBBB'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb9')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Incorrect confirmation code.',
+      reason: 'incorrectCode_suspended',
+      resData: { expiryTimestamp: expiryTimestamp + dayMilliseconds },
+    });
+
+    expect(accountDbHelpers.suspendAccountRequest).toHaveBeenCalledExactlyOnceWith(
+      'account_deletion',
+      1,
+      dbPool,
+      expect.any(Object)
+    );
+  });
+
+  it('should resolve the request if the correct confirmation code is provided', async () => {
+    const expiryTimestamp: number = Date.now() + dayMilliseconds;
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          request_id: 1,
+          confirmation_code: 'AAAAAAAA',
+          failed_attempts: 0,
+          expiry_timestamp: expiryTimestamp,
+        },
+      ],
+    ]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([{ affectedRows: 1 }]);
+
+    const res = await request(app)
+      .delete(setEndpoint('AAAAAAAA'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb9')
+      .send({});
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .delete(setEndpoint('AAAAAAAA'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
