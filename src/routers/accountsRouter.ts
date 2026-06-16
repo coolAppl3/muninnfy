@@ -373,11 +373,20 @@ accountsRouter.patch('/verification/resendEmail', async (req: Request, res: Resp
       email: string;
       display_name: string;
       is_verified: boolean;
-      verification_request_id: number;
-      verification_token: string;
-      emails_sent: number;
-      failed_attempts: number;
-    };
+    } & (
+      | {
+          verification_request_id: number;
+          verification_token: string;
+          emails_sent: number;
+          failed_attempts: number;
+        }
+      | {
+          verification_request_id: null;
+          verification_token: null;
+          emails_sent: null;
+          failed_attempts: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -518,10 +527,18 @@ accountsRouter.patch('/verification/confirm', async (req: Request, res: Response
     type AccountDetails = {
       account_id: number;
       is_verified: boolean;
-      verification_request_id: number;
-      verification_token: string;
-      failed_attempts: number;
-    };
+    } & (
+      | {
+          verification_request_id: number;
+          verification_token: string;
+          failed_attempts: number;
+        }
+      | {
+          verification_request_id: null;
+          verification_token: null;
+          failed_attempts: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -799,6 +816,7 @@ accountsRouter.get('/', async (req: Request, res: Response) => {
       created_on_timestamp: number;
       is_private: boolean;
       approve_follow_requests: boolean;
+
       followers_count: number;
       following_count: number;
       wishlists_count: number;
@@ -1382,14 +1400,22 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       display_name: string;
       failed_sign_in_attempts: number;
 
-      request_id: number;
-      new_email: string;
-      expiry_timestamp: number;
-      failed_attempts: number;
-
       email_taken: boolean;
       email_temporarily_taken: boolean;
-    };
+    } & (
+      | {
+          request_id: number;
+          new_email: string;
+          expiry_timestamp: number;
+          failed_attempts: number;
+        }
+      | {
+          request_id: null;
+          new_email: null;
+          expiry_timestamp: null;
+          failed_attempts: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -1443,7 +1469,7 @@ accountsRouter.post('/details/email/start', async (req: Request, res: Response) 
       return;
     }
 
-    if (accountDetails.request_id) {
+    if (accountDetails.request_id !== null) {
       await connection.rollback();
 
       res.status(409).json({
@@ -1551,13 +1577,24 @@ accountsRouter.patch('/details/email/resendEmail', async (req: Request, res: Res
 
     type AccountDetails = {
       display_name: string;
-      request_id: number;
-      new_email: string;
-      confirmation_code: string;
-      expiry_timestamp: number;
-      emails_sent: number;
-      failed_attempts: number;
-    };
+    } & (
+      | {
+          request_id: number;
+          new_email: string;
+          confirmation_code: string;
+          expiry_timestamp: number;
+          emails_sent: number;
+          failed_attempts: number;
+        }
+      | {
+          request_id: null;
+          new_email: null;
+          confirmation_code: null;
+          expiry_timestamp: null;
+          emails_sent: null;
+          failed_attempts: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -1866,10 +1903,18 @@ accountsRouter.post('/recovery/start', async (req: Request, res: Response) => {
       public_account_id: string;
       display_name: string;
       is_verified: boolean;
-      request_id: number;
-      expiry_timestamp: number;
-      failed_attempts: number;
-    };
+    } & (
+      | {
+          request_id: number;
+          expiry_timestamp: number;
+          failed_attempts: number;
+        }
+      | {
+          request_id: null;
+          expiry_timestamp: null;
+          failed_attempts: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -2001,12 +2046,22 @@ accountsRouter.patch('/recovery/resendEmail', async (req: Request, res: Response
       email: string;
       display_name: string;
       is_verified: boolean;
-      request_id: number;
-      recovery_token: string;
-      expiry_timestamp: number;
-      emails_sent: number;
-      failed_attempts: number;
-    };
+    } & (
+      | {
+          request_id: number;
+          recovery_token: string;
+          expiry_timestamp: number;
+          emails_sent: number;
+          failed_attempts: number;
+        }
+      | {
+          request_id: null;
+          recovery_token: null;
+          expiry_timestamp: null;
+          emails_sent: null;
+          failed_attempts: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -2156,11 +2211,20 @@ accountsRouter.patch('/recovery/confirm', async (req: Request, res: Response) =>
       account_id: number;
       username: string;
       is_verified: boolean;
-      request_id: number;
-      recovery_token: string;
-      expiry_timestamp: number;
-      failed_attempts: number;
-    };
+    } & (
+      | {
+          request_id: number;
+          recovery_token: string;
+          expiry_timestamp: number;
+          failed_attempts: number;
+        }
+      | {
+          request_id: null;
+          recovery_token: null;
+          expiry_timestamp: null;
+          failed_attempts: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -2370,10 +2434,18 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
       display_name: string;
       is_verified: boolean;
       failed_sign_in_attempts: number;
-      request_id: number;
-      expiry_timestamp: number;
-      failed_attempts: number;
-    };
+    } & (
+      | {
+          request_id: number;
+          expiry_timestamp: number;
+          failed_attempts: number;
+        }
+      | {
+          request_id: null;
+          expiry_timestamp: null;
+          failed_attempts: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
@@ -2383,7 +2455,7 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
         accounts.is_verified,
         accounts.failed_sign_in_attempts,
         
-        account_deletion.request_id,
+        account_deletion.request_id !== null,
         account_deletion.expiry_timestamp,
         account_deletion.failed_attempts
       FROM
@@ -2426,7 +2498,7 @@ accountsRouter.post('/deletion/start', async (req: Request, res: Response) => {
       return;
     }
 
-    if (accountDetails.request_id) {
+    if (accountDetails.request_id !== null) {
       await connection.rollback();
 
       res.status(409).json({
@@ -2505,12 +2577,22 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
     type AccountDetails = {
       email: string;
       display_name: string;
-      request_id: number;
-      confirmation_code: string;
-      emails_sent: number;
-      failed_attempts: number;
-      expiry_timestamp: number;
-    };
+    } & (
+      | {
+          request_id: number;
+          confirmation_code: string;
+          emails_sent: number;
+          failed_attempts: number;
+          expiry_timestamp: number;
+        }
+      | {
+          request_id: null;
+          confirmation_code: null;
+          emails_sent: null;
+          failed_attempts: null;
+          expiry_timestamp: null;
+        }
+    );
 
     const [accountRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
