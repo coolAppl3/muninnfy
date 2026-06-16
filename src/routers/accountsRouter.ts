@@ -2694,6 +2694,7 @@ accountsRouter.delete(
             dbPool,
             req
           );
+
           res
             .status(401)
             .json({ message: 'Incorrect confirmation code.', reason: 'incorrectCode' });
