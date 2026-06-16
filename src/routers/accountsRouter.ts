@@ -2545,6 +2545,17 @@ accountsRouter.patch('/deletion/resendEmail', async (req: Request, res: Response
       return;
     }
 
+    if (!accountDetails.request_id) {
+      await connection.rollback();
+
+      res.status(404).json({
+        message: 'Deletion request not found.',
+        reason: 'requestNotFound',
+      });
+
+      return;
+    }
+
     if (accountDetails.failed_attempts >= ACCOUNT_FAILED_ATTEMPTS_LIMIT) {
       await connection.rollback();
 

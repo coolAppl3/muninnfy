@@ -105,6 +105,11 @@ export default function AccountDeletionConfirm(): JSX.Element {
       }
 
       if (status === 404) {
+        if (errReason === 'requestNotFound') {
+          setOngoingAccountDeletionRequest(null);
+          return;
+        }
+
         setAuthStatus('unauthenticated');
         return;
       }
