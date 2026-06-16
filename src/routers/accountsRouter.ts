@@ -2723,9 +2723,9 @@ accountsRouter.delete(
 
       const [resultSetHeader] = await connection.execute<ResultSetHeader>(
         `DELETE FROM
-        accounts
-      WHERE
-        account_id = ?;`,
+          accounts
+        WHERE
+          account_id = ?;`,
         [accountId]
       );
 
