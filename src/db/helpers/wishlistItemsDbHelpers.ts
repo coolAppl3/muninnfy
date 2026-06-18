@@ -11,9 +11,16 @@ export type WishlistItem = {
   link: string | null;
   price: number | null;
   purchased_on_timestamp: number | null;
-  tag_id: number;
-  tag_name: string;
-};
+} & (
+  | {
+      tag_id: number;
+      tag_name: string;
+    }
+  | {
+      tag_id: null;
+      tag_name: null;
+    }
+);
 
 export async function getWishlistItemByTitle(
   itemTitle: string,
@@ -53,10 +60,18 @@ export async function getWishlistItemByTitle(
     const { tag_id: _, tag_name: __, ...rest } = wishlistItemDetails;
     const mappedWishlistItem: MappedWishlistItem = {
       ...rest,
-      tags: (wishlistItemRows as WishlistItem[]).map(({ tag_id, tag_name }: WishlistItem) => ({
-        id: tag_id,
-        name: tag_name,
-      })),
+      tags: (wishlistItemRows as WishlistItem[]).reduce(
+        (acc: { id: number; name: string }[], { tag_id, tag_name }) => {
+          tag_id &&
+            acc.push({
+              id: tag_id,
+              name: tag_name,
+            });
+
+          return acc;
+        },
+        []
+      ),
     };
 
     return mappedWishlistItem;

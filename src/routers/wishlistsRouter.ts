@@ -515,7 +515,7 @@ wishlistsRouter.get('/:wishlistId', async (req: Request, res: Response) => {
       if (item.item_id === currentItemId) {
         const mappedWishlistItem: MappedWishlistItem | undefined =
           mappedWishlistItems[mappedWishlistItems.length - 1];
-        mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
+        tag_id && mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
 
         continue;
       }
@@ -1090,7 +1090,7 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       if (item.item_id === currentItemId) {
         const mappedWishlistItem: MappedWishlistItem | undefined =
           mappedWishlistItems[mappedWishlistItems.length - 1];
-        mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
+        tag_id && mappedWishlistItem?.tags.push({ id: tag_id, name: tag_name });
 
         continue;
       }
