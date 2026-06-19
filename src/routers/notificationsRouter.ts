@@ -41,7 +41,7 @@ notificationsRouter.get('/:offset', async (req: Request, res: Response) => {
         accounts.display_name AS sender_display_name
       FROM
         notifications
-      LEFT JOIN
+      INNER JOIN
         accounts ON notifications.sender_account_id = accounts.account_id
       WHERE
         notifications.receiver_account_id = ?
