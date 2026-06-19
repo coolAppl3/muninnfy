@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.5.12] (2026-06-20)
+
+### Improvements
+
+- Improved typing for a number of JOIN statement for added safety.
+- Changed a few LEFT JOIN statements into INNER JOIN statements for better typing and clearer intentions.
+
+
+### Bug Fixes
+
+- Fixed typecast in POST `accounts/details/email/start` incorrectly using `ResultSetHeader` instead of `RowDataPacket`.
+- Fixed PATCH `accounts/recovery/confirm` and PATCH `accounts/deletion/resendEmail` not handling the request not found.
+- Fixed `WishlistItem` type causing `getWishlistItemByTitle` to send back tag objects with null values.
+
+
+### Tests
+
+- Added test suites for:
+  - GET `accounts`.
+  - GET `accounts/:publicAccountId`.
+  - PATCH `accounts/details/privacy`.
+  - PATCH `accounts/details/displayName`.
+  - PATCH `accounts/details/password`.
+  - POST `accounts/details/email/start`.
+  - POST `accounts/details/email/resendEmail`.
+  - POST `accounts/recovery/start`.
+  - PATCH `accounts/recovery/resendEmail`.
+  - PATCH `accounts/recovery/confirm`.
+  - POST `accounts/deletion/start`.
+  - PATCH `accounts/deletion/resendEmail`.
+  - DELETE `accounts/deletion/confirm/:confirmationCode`.
+
+
 ## [0.5.11] (2026-06-05)
 
 ### Changes
