@@ -1024,7 +1024,7 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
         EXISTS (SELECT 1 FROM followers WHERE account_id = wishlists.account_id AND follower_account_id = ?) AS is_follower
       FROM
         wishlists
-      LEFT JOIN
+      INNER JOIN
         accounts USING(account_id)
       WHERE
         wishlists.wishlist_id = ?;`,
