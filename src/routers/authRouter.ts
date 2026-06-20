@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from 'express';
-import { getRequestCookie, removeRequestCookie } from '../util/cookieUtils';
+import { getRequestCookie, removeRequestCookie, setResponseCookie } from '../util/cookieUtils';
 import { generateCryptoUuid, isValidUuid } from '../util/tokenGenerator';
 import { dbPool } from '../db/db';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
@@ -74,7 +74,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
       const newAuthSessionId: string = generateCryptoUuid();
       const newExpiryTimestamp: number = authSessionDetails.expiry_timestamp + dayMilliseconds;
 
-      await dbPool.execute(
+      const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
         `UPDATE
           auth_sessions
         SET
@@ -85,6 +85,9 @@ authRouter.get('/session', async (req: Request, res: Response) => {
           session_id = ?;`,
         [newAuthSessionId, newExpiryTimestamp, authSessionId]
       );
+
+      resultSetHeader.affectedRows > 0 &&
+        setResponseCookie(res, 'authSessionId', newAuthSessionId, dayMilliseconds, true);
     }
 
     res.json({ isValidAuthSession: true });
