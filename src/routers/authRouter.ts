@@ -100,6 +100,7 @@ authRouter.get('/session', async (req: Request, res: Response) => {
     }
 
     res.json({ isValidAuthSession: false });
+    await logUnexpectedError(req, err);
   }
 });
 
