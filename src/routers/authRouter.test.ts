@@ -154,3 +154,86 @@ describe('GET /session', () => {
     );
   });
 });
+
+describe('DELETE /session', () => {
+  const endpoint: string = '/api/auth/session';
+  it('should call getRequestCookie', async () => {
+    await request(app).delete(endpoint);
+
+    expect(cookieUtils.getRequestCookie).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      'authSessionId'
+    );
+  });
+
+  it('should always resolve the request', async () => {
+    const res1 = await request(app).delete(endpoint);
+    const res2 = await request(app)
+      .delete(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res1.status).toBe(200);
+    expect(res2.status).toBe(200);
+
+    expect(res1.body).toStrictEqual({});
+    expect(res2.body).toStrictEqual({});
+  });
+
+  it('should call removeRequestCookie if an authSessionId cookie is found', async () => {
+    const res1 = await request(app)
+      .delete(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
+    const res2 = await request(app)
+      .delete(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res1.status).toBe(200);
+    expect(res2.status).toBe(200);
+
+    expect(res1.body).toStrictEqual({});
+    expect(res2.body).toStrictEqual({});
+
+    expect(cookieUtils.removeRequestCookie).toHaveBeenCalledTimes(2);
+    expect(cookieUtils.removeRequestCookie).toHaveBeenCalledWith(
+      expect.any(Object),
+      'authSessionId'
+    );
+  });
+
+  it('should attempt to delete the auth session if a valid authSessionId cookie is provided', async () => {
+    const res = await request(app)
+      .delete(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(dbPool.execute).toHaveBeenCalledExactlyOnceWith(
+      `DELETE FROM
+          auth_sessions
+        WHERE
+          session_id = ?;`,
+      ['818db302-cec8-4fe1-84df-01e2aa505cb6']
+    );
+  });
+
+  it('should call logUnexpectedError if an unexpected error is caught when attempting to delete the authSession', async () => {
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .delete(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
