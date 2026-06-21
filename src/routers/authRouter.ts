@@ -112,37 +112,20 @@ authRouter.delete('/session', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!isValidUuid(authSessionId)) {
-    removeRequestCookie(res, 'authSessionId');
-    res.json({});
-
-    return;
-  }
-
   removeRequestCookie(res, 'authSessionId');
   res.json({});
 
   try {
-    const [resultSetHeader] = await dbPool.execute<ResultSetHeader>(
-      `DELETE FROM
-        auth_sessions
-      WHERE
-        session_id = ?;`,
-      [authSessionId]
-    );
-
-    if (resultSetHeader.affectedRows === 0) {
-      await logUnexpectedError(req, null, 'Failed to delete auth_sessions.');
-    }
+    isValidUuid(authSessionId) &&
+      (await dbPool.execute<ResultSetHeader>(
+        `DELETE FROM
+          auth_sessions
+        WHERE
+          session_id = ?;`,
+        [authSessionId]
+      ));
   } catch (err: unknown) {
     console.log(err);
-
-    if (res.headersSent) {
-      await logUnexpectedError(req, err, 'Attempted to send two responses.');
-      return;
-    }
-
-    res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
   }
 });
