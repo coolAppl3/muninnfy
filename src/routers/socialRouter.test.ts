@@ -335,3 +335,85 @@ describe('GET /followers', () => {
     );
   });
 });
+
+describe('GET /following/search', () => {
+  function setEndpoint(searchQuery: string, offset: number = 0): string {
+    return `/api/social/following/search?searchQuery=${searchQuery}&offset=${offset}&publicAccountId=818db302-cec8-4fe1-84df-01e2aa505cb6`;
+  }
+
+  it('should reject the request if an invalid search query is provided', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
+
+    const res = await request(app)
+      .get(setEndpoint(''))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid search query.',
+      reason: 'invalidSearchQuery',
+    });
+  });
+
+  it('should reject the request if an invalid offset is provided', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
+
+    const res = await request(app)
+      .get(setEndpoint('someQuery', 22.5))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid offset.',
+      reason: 'invalidOffset',
+    });
+  });
+
+  it('should resolve the request and return the data', async () => {
+    const follower = {
+      follow_id: 1,
+      follow_timestamp: 1.771e12,
+      public_account_id: 'somePublicAccountId',
+      username: 'johnDoe',
+      display_name: 'John Doe',
+    };
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[follower as any], []]);
+
+    const res = await request(app)
+      .get(setEndpoint('someQuery'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual([follower]);
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .get(setEndpoint('someQuery'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
