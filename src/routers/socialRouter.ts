@@ -412,13 +412,14 @@ socialRouter.get('/following', async (req: Request, res: Response) => {
 
 socialRouter.get('/followRequests/search', async (req: Request, res: Response) => {
   const authSessionId: string | null = getAuthSessionId(req, res);
-  const accountId: number | null = authSessionId
-    ? await getAccountIdByAuthSessionId(authSessionId, req, res)
-    : null;
 
-  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+  if (!authSessionId) {
+    return;
+  }
 
-  if (!targetAccountId) {
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
     return;
   }
 
@@ -448,7 +449,7 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
       INNER JOIN
         accounts ON follow_requests.requester_account_id = accounts.account_id
       WHERE
-        follow_requests.requestee_account_id = :targetAccountId AND (
+        follow_requests.requestee_account_id = :accountId AND (
           accounts.username LIKE CONCAT('%', :searchQuery, '%') OR accounts.display_name LIKE CONCAT('%', :searchQuery, '%')
         )
       ORDER BY
@@ -458,7 +459,7 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { targetAccountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { accountId, searchQuery, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(followRequests as FollowRequest[]);
@@ -476,14 +477,15 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
 });
 
 socialRouter.get('/followRequests', async (req: Request, res: Response) => {
-  const authSessionId: string | null = getAuthSessionId(req, res, false);
-  const accountId: number | null = authSessionId
-    ? await getAccountIdByAuthSessionId(authSessionId, req, res, false)
-    : null;
+  const authSessionId: string | null = getAuthSessionId(req, res);
 
-  const targetAccountId: number | null = await getTargetAccountId(accountId, req, res);
+  if (!authSessionId) {
+    return;
+  }
 
-  if (!targetAccountId) {
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
     return;
   }
 
@@ -507,7 +509,7 @@ socialRouter.get('/followRequests', async (req: Request, res: Response) => {
       INNER JOIN
         accounts ON follow_requests.requester_account_id = accounts.account_id
       WHERE
-        follow_requests.requestee_account_id = :targetAccountId
+        follow_requests.requestee_account_id = :accountId
       ORDER BY
         follow_requests.request_timestamp DESC,
         follow_requests.request_id ASC
@@ -515,7 +517,7 @@ socialRouter.get('/followRequests', async (req: Request, res: Response) => {
         :socialFetchBatchSize
       OFFSET
         :offset;`,
-      { targetAccountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
+      { accountId, offset, socialFetchBatchSize: SOCIAL_FETCH_BATCH_SIZE }
     );
 
     res.json(followRequests as FollowRequest[]);
