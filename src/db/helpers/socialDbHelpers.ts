@@ -51,14 +51,15 @@ export async function getTargetAccountId(
     return null;
   }
 
-  type AccountDetails = {
-    target_account_id: number;
-    is_private: boolean;
-    is_following: boolean;
-  };
+  try {
+    type AccountDetails = {
+      target_account_id: number;
+      is_private: boolean;
+      is_following: boolean;
+    };
 
-  const [accountRows] = await dbPool.execute<RowDataPacket[]>(
-    `SELECT
+    const [accountRows] = await dbPool.execute<RowDataPacket[]>(
+      `SELECT
       account_id AS target_account_id,
       is_private,
       
@@ -67,20 +68,33 @@ export async function getTargetAccountId(
       accounts
     WHERE
       public_account_id = ?;`,
-    [accountId, publicAccountId]
-  );
+      [accountId, publicAccountId]
+    );
 
-  const accountDetails = accountRows[0] as AccountDetails | undefined;
+    const accountDetails = accountRows[0] as AccountDetails | undefined;
 
-  if (!accountDetails) {
-    res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+    if (!accountDetails) {
+      res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return null;
+    }
+
+    if (accountDetails.is_private && !accountDetails.is_following) {
+      res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
+      return null;
+    }
+
+    return accountDetails.target_account_id;
+  } catch (err: unknown) {
+    console.log(err);
+
+    if (res.headersSent) {
+      await logUnexpectedError(req, err, 'Attempted to send two responses.');
+      return null;
+    }
+
+    res.status(500).json({ message: 'Internal server error.' });
+    await logUnexpectedError(req, err);
+
     return null;
   }
-
-  if (accountDetails.is_private && !accountDetails.is_following) {
-    res.status(401).json({ message: 'Account is private.', reason: 'privateAccount' });
-    return null;
-  }
-
-  return accountDetails.target_account_id;
 }

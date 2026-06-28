@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.5.13] (2026-06-28)
+
+### Improvements
+
+- Simplified DELETE `auth/session`.
+
+
+### Bug Fixes
+
+- Fixed GET `auth/session` extending auth sessions in the right conditions but not updating the `authSessionId` cookie.
+- Fixed GET `auth/session` not logging caught errors.
+- Fixed `getTargetAccountId` not having a try-catch block leaving potential for uncaught error.
+- Fixed GET `social/followRequests/search` and GET `social/followRequests` allowing users to view other users' follow requests.
+
+
+### Tests
+
+- Added test suites for the following endpoints:
+  - GET `auth/session`.
+  - DELETE `auth/session`.
+  - GET `notifications/:offset`.
+  - GET `social`.
+  - GET `social/followers/search`.
+  - GET `social/followers`.
+  - GET `social/following/search`.
+  - GET `social/following`.
+
+
 ## [0.5.12] (2026-06-20)
 
 ### Improvements
