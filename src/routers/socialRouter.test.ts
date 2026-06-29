@@ -1097,3 +1097,126 @@ describe('POST /followRequests/send', () => {
     );
   });
 });
+
+describe('DELETE /followRequests/cancel/:requestId', () => {
+  function setEndpoint(requestId: number): string {
+    return `/api/social/followRequests/cancel/${requestId}`;
+  }
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).delete(setEndpoint(22));
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if an invalid request ID is provided', async () => {
+    const res = await request(app)
+      .delete(setEndpoint(22.5))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid request ID.',
+      reason: 'invalidRequestId',
+    });
+  });
+
+  it('should resolve the request if the follow request is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+  });
+
+  it(`should reject the request if a user attempts to delete another user's follow request, logging the event in the process`, async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          requester_account_id: 2,
+          requestee_account_id: 3,
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({ message: 'Internal server error.' });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      null,
+      `Attempt to delete another user's follow request detected.`
+    );
+  });
+
+  it('should resolve the request if the follow request is found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          requester_account_id: 1,
+          requestee_account_id: 2,
+        } as any,
+      ],
+      [],
+    ]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[{ affectedRows: 1 } as any], []]);
+
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
