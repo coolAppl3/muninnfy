@@ -6,6 +6,7 @@ import * as authDbHelpers from '../db/helpers/authDbHelpers';
 import * as authUtils from '../auth/authUtils';
 import * as socialDbHelpers from '../db/helpers/socialDbHelpers';
 import * as errorLogger from '../logs/errorLogger';
+import { FollowDetails } from './socialRouter';
 
 vi.mock('../db/helpers/authDbHelpers');
 vi.mock('../db/helpers/socialDbHelpers', { spy: true });
@@ -223,7 +224,7 @@ describe('GET /followers/search', () => {
   });
 
   it('should resolve the request and return the data', async () => {
-    const follower = {
+    const follower: FollowDetails = {
       follow_id: 1,
       follow_timestamp: 1.771e12,
       public_account_id: 'somePublicAccountId',
@@ -290,7 +291,7 @@ describe('GET /followers', () => {
   });
 
   it('should resolve the request and return the data', async () => {
-    const follower = {
+    const follower: FollowDetails = {
       follow_id: 1,
       follow_timestamp: 1.771e12,
       public_account_id: 'somePublicAccountId',
@@ -372,7 +373,7 @@ describe('GET /following/search', () => {
   });
 
   it('should resolve the request and return the data', async () => {
-    const follower = {
+    const following: FollowDetails = {
       follow_id: 1,
       follow_timestamp: 1.771e12,
       public_account_id: 'somePublicAccountId',
@@ -382,14 +383,14 @@ describe('GET /following/search', () => {
 
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
     vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
-    vi.mocked(dbPool.execute).mockResolvedValueOnce([[follower as any], []]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[following as any], []]);
 
     const res = await request(app)
       .get(setEndpoint('someQuery'))
       .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
 
     expect(res.status).toBe(200);
-    expect(res.body).toStrictEqual([follower]);
+    expect(res.body).toStrictEqual([following]);
   });
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
@@ -439,7 +440,7 @@ describe('GET /following', () => {
   });
 
   it('should resolve the request and return the data', async () => {
-    const follower = {
+    const following: FollowDetails = {
       follow_id: 1,
       follow_timestamp: 1.771e12,
       public_account_id: 'somePublicAccountId',
@@ -449,14 +450,14 @@ describe('GET /following', () => {
 
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
     vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
-    vi.mocked(dbPool.execute).mockResolvedValueOnce([[follower as any], []]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[following as any], []]);
 
     const res = await request(app)
       .get(setEndpoint(0))
       .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
 
     expect(res.status).toBe(200);
-    expect(res.body).toStrictEqual([follower]);
+    expect(res.body).toStrictEqual([following]);
   });
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
