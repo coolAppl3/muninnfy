@@ -631,7 +631,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     }
 
     if (followDetails.follow_id) {
-      await connection.rollback();
+      await connection.commit();
       res.status(201).json({
         followAutoApproved: true,
         insertId: followDetails.follow_id,
@@ -641,7 +641,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     }
 
     if (followDetails.follow_request_id) {
-      await connection.rollback();
+      await connection.commit();
       res.status(201).json({
         followAutoApproved: false,
         insertId: followDetails.follow_request_id,
@@ -650,10 +650,9 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       return;
     }
 
-    if (
-      followDetails.requester_following_count + followDetails.requester_follow_requests_count >=
-      SOCIAL_MAX_FOLLOWING_LIMIT
-    ) {
+    const requesterFollowingSum: number =
+      followDetails.requester_following_count + followDetails.requester_follow_requests_count;
+    if (requesterFollowingSum >= SOCIAL_MAX_FOLLOWING_LIMIT) {
       await connection.rollback();
       res
         .status(409)
@@ -697,6 +696,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
         'new_follower',
         resultSetHeader.insertId
       );
+
       return;
     }
 
