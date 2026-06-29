@@ -764,7 +764,7 @@ socialRouter.delete(
       : undefined;
 
     if (!requestId || !Number.isInteger(requestId)) {
-      res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+      res.status(400).json({ message: 'Invalid request ID.', reason: 'invalidRequestId' });
       return;
     }
 
