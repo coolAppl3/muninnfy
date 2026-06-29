@@ -417,12 +417,6 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
-    return;
-  }
-
   const searchQuery: string = req.query.searchQuery?.toString().trim() || '';
   const offset: number = +(req.query.offset || 0);
 
@@ -433,6 +427,12 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
     return;
   }
 
@@ -483,16 +483,16 @@ socialRouter.get('/followRequests', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
-    return;
-  }
-
   const offset: number = +(req.query.offset || 0);
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
     return;
   }
 
