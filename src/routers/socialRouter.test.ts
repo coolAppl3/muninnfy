@@ -6,7 +6,7 @@ import * as authDbHelpers from '../db/helpers/authDbHelpers';
 import * as authUtils from '../auth/authUtils';
 import * as socialDbHelpers from '../db/helpers/socialDbHelpers';
 import * as errorLogger from '../logs/errorLogger';
-import { FollowDetails } from './socialRouter';
+import { FollowDetails, FollowRequest } from './socialRouter';
 
 vi.mock('../db/helpers/authDbHelpers');
 vi.mock('../db/helpers/socialDbHelpers', { spy: true });
@@ -483,5 +483,77 @@ describe('GET /following', () => {
       expect.any(Object),
       unexpectedError
     );
+  });
+});
+
+describe('GET /followRequests/search', () => {
+  function setEndpoint(searchQuery: string, offset: number = 0): string {
+    return `/api/social/followRequests/search?searchQuery=${searchQuery}&offset=${offset}`;
+  }
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).get(setEndpoint('someSearchQuery'));
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .get(setEndpoint('someSearchQuery'))
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if an invalid search query is provided', async () => {
+    const res = await request(app)
+      .get(setEndpoint('!nval!d query'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid search query.',
+      reason: 'invalidSearchQuery',
+    });
+  });
+
+  it('should reject the request if an invalid offset is provided', async () => {
+    const res = await request(app)
+      .get(setEndpoint('someSearchQuery', 22.5))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid offset.',
+      reason: 'invalidOffset',
+    });
+  });
+
+  it('should resolve the request and return an array of available follow requests', async () => {
+    const followRequest: FollowRequest = {
+      request_id: 1,
+      request_timestamp: 1.771e12,
+      public_account_id: 'somePublicAccountId',
+      username: 'johnDoe',
+      display_name: 'John Doe',
+    };
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[followRequest as any], []]);
+
+    const res = await request(app)
+      .get(setEndpoint('someSearchQuery'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual([followRequest]);
   });
 });
