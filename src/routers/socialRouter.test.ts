@@ -1221,3 +1221,242 @@ describe('DELETE /followRequests/cancel/:requestId', () => {
     );
   });
 });
+
+describe('POST /followRequests/accept', () => {
+  const endpoint: string = '/api/social/followRequests/accept';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).post(endpoint).send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      requestId: 1,
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody1);
+
+    const res2 = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody2);
+
+    const res3 = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid request ID is provided', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        requestId: 'invalidRequestId',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid request ID.',
+      reason: 'invalidRequestId',
+    });
+  });
+
+  it('should request a connection, begin a transaction, and release it at the end', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        requestId: 1,
+      });
+
+    expect(dbPool.getConnection).toHaveBeenCalledOnce();
+    expect(mockConnection.beginTransaction).toHaveBeenCalledOnce();
+    expect(mockConnection.release).toHaveBeenCalledOnce();
+  });
+
+  it('should reject the request if the follow request is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        requestId: 1,
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Follow request not found.',
+      reason: 'requestNotFound',
+    });
+  });
+
+  it('should reject the request if the user is already following the account in question, deleting the follow request in the process by calling deleteFollowRequest', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          requester_account_id: 2,
+          followers_count: 1,
+          requester_already_following: 1,
+        },
+      ],
+    ]);
+    vi.mocked(socialDbHelpers.deleteFollowRequest).mockResolvedValueOnce(true);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        requestId: 1,
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Request already accepted.',
+      reason: 'alreadyAccepted',
+    });
+
+    expect(socialDbHelpers.deleteFollowRequest).toHaveBeenCalledExactlyOnceWith(
+      1,
+      dbPool,
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if the user followers count has reached the limit', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          requester_account_id: 2,
+          followers_count: SOCIAL_MAX_FOLLOWERS_LIMIT,
+          requester_already_following: 0,
+        },
+      ],
+    ]);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        requestId: 1,
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Followers limit reached.',
+      reason: 'followersLimitReached',
+    });
+  });
+
+  it('should resolve the request, create a followers row, and call deleteFollowRequest, returning the follow_id and follow_timestamp', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([
+      [
+        {
+          requester_account_id: 2,
+          followers_count: 1,
+          requester_already_following: 0,
+        },
+      ],
+    ]);
+    vi.mocked(mockConnection.execute).mockResolvedValueOnce([{ insertId: 1 }]);
+    vi.mocked(socialDbHelpers.deleteFollowRequest).mockResolvedValueOnce(true);
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        requestId: 1,
+      });
+
+    expect(mockConnection.commit).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      follow_id: 1,
+      follow_timestamp: expect.any(Number),
+    });
+
+    expect(socialDbHelpers.deleteFollowRequest).toHaveBeenCalledExactlyOnceWith(
+      1,
+      mockConnection,
+      expect.any(Object)
+    );
+    expect(notificationsDbHelpers.addNotification).toHaveBeenCalledExactlyOnceWith(
+      2,
+      1,
+      expect.any(Number),
+      'follow_request_accepted',
+      1
+    );
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        requestId: 1,
+      });
+
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
