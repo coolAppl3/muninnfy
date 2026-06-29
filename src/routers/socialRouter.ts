@@ -800,6 +800,7 @@ socialRouter.delete(
 
       if (requestDetails.requester_account_id !== accountId) {
         res.status(500).json({ message: 'Internal server error.' });
+
         await logUnexpectedError(
           req,
           null,
