@@ -1086,6 +1086,7 @@ describe('POST /followRequests/send', () => {
         publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb9',
       });
 
+    expect(mockConnection.rollback).toHaveBeenCalledOnce();
     expect(res.status).toBe(500);
     expect(res.body).toStrictEqual({
       message: 'Internal server error.',
