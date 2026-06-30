@@ -1642,3 +1642,100 @@ describe('DELETE /followers/unfollow/:followId', () => {
     );
   });
 });
+
+describe('DELETE /followers/remove/:followId', () => {
+  function setEndpoint(followId: number): string {
+    return `/api/social/followers/remove/${followId}`;
+  }
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).delete(setEndpoint(22));
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if an invalid follow ID is provided', async () => {
+    const res = await request(app)
+      .delete(setEndpoint(22.5))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid follow ID.',
+      reason: 'invalidFollowId',
+    });
+  });
+
+  it('should resolve the request and attempt to delete the followers row', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(dbPool.execute).toHaveBeenCalledExactlyOnceWith(
+      `DELETE FROM
+        followers
+      WHERE
+        follow_id = ? AND
+        account_id = ?;`,
+      [22, 1]
+    );
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .delete(setEndpoint(22))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
