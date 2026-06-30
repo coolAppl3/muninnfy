@@ -1739,3 +1739,85 @@ describe('DELETE /followers/remove/:followId', () => {
     );
   });
 });
+
+describe('GET /find/:searchQuery', () => {
+  function setEndpoint(searchQuery: string): string {
+    return `/api/social/find/${searchQuery}`;
+  }
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).get(setEndpoint('someSearchQuery'));
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .get(setEndpoint('someSearchQuery'))
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if an invalid search query is provided', async () => {
+    const res = await request(app)
+      .get(setEndpoint('!nval!d query'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid search query.',
+      reason: 'invalidSearchQuery',
+    });
+  });
+
+  it('should resolve the request and return the results', async () => {
+    const user = {
+      public_account_id: '818db302-cec8-4fe1-84df-01e2aa505cb9',
+      username: 'johnDoe',
+      display_name: 'John Doe',
+    };
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[user as any], []]);
+
+    const res = await request(app)
+      .get(setEndpoint('johnDoe'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual([user]);
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .get(setEndpoint('someSearchQuery'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
