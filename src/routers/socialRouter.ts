@@ -1005,7 +1005,7 @@ socialRouter.delete(
       : undefined;
 
     if (!requestId || !Number.isInteger(requestId)) {
-      res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+      res.status(400).json({ message: 'Invalid request ID.', reason: 'invalidRequestId' });
       return;
     }
 
@@ -1050,7 +1050,7 @@ socialRouter.delete('/followers/unfollow/:followId', async (req: Request, res: R
   const followId: number | undefined = req.params.followId ? +req.params.followId : undefined;
 
   if (!followId || !Number.isInteger(followId)) {
-    res.status(400).json({ messagE: 'Invalid follow ID.', reason: 'invalidFollowId' });
+    res.status(400).json({ message: 'Invalid follow ID.', reason: 'invalidFollowId' });
     return;
   }
 
@@ -1094,7 +1094,7 @@ socialRouter.delete('/followers/remove/:followId', async (req: Request, res: Res
   const followId: number | undefined = req.params.followId ? +req.params.followId : undefined;
 
   if (!followId || !Number.isInteger(followId)) {
-    res.status(400).json({ messagE: 'Invalid follow ID.', reason: 'invalidFollowId' });
+    res.status(400).json({ message: 'Invalid follow ID.', reason: 'invalidFollowId' });
     return;
   }
 
