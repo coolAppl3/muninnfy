@@ -140,7 +140,7 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
 
     if (!wishlistDetails || !wishlistDetails.wishlist_id) {
       await connection.rollback();
-      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound.' });
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
 
       return;
     }
