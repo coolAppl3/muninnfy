@@ -113,39 +113,48 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
   let connection: PoolConnection | null = null;
 
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type WishlistDetails = {
+      wishlist_id: string | null;
       wishlist_items_count: number;
     };
 
-    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+    const [wishlistRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        (SELECT COUNT(*) FROM wishlist_items WHERE wishlist_id = :wishlistId) AS wishlist_items_count
+        wishlists.wishlist_id,
+        COUNT(wishlist_items.item_id) AS wishlist_items_count
       FROM
         wishlists
+      LEFT JOIN
+        wishlist_items USING(wishlist_id)
       WHERE
-        wishlist_id = :wishlistId AND
-        account_id = :accountId;`,
+        wishlists.wishlist_id = :wishlistId AND
+        wishlists.account_id = :accountId
+      FOR UPDATE;`,
       { wishlistId, accountId }
     );
 
     const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
-    if (!wishlistDetails) {
+    if (!wishlistDetails || !wishlistDetails.wishlist_id) {
+      await connection.rollback();
       res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound.' });
+
       return;
     }
 
     if (wishlistDetails.wishlist_items_count >= WISHLIST_ITEMS_LIMIT) {
+      await connection.rollback();
       res
         .status(409)
         .json({ message: 'Wishlist items limit reached.', reason: 'itemLimitReached' });
+
       return;
     }
 
     const currentTimestamp: number = Date.now();
-
-    connection = await dbPool.getConnection();
-    await connection.beginTransaction();
 
     const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO wishlist_items (
