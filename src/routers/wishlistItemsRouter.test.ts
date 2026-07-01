@@ -190,7 +190,7 @@ describe('POST /', () => {
   it('should request a connection, begin a transaction, and release it at the end', async () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
-    const res = await request(app)
+    await request(app)
       .post(endpoint)
       .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
       .send({
