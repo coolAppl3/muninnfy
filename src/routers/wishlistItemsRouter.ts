@@ -513,7 +513,7 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
   }
 
   if (typeof itemId !== 'string' || !Number.isInteger(+itemId)) {
-    res.status(400).json({ message: 'invalid wishlist item ID.', reason: 'invalidItemId' });
+    res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidItemId' });
     return;
   }
 
