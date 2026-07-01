@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.5.14] (2026-07-02)
+
+### Improvements
+
+- Reworked how POST `wishlistItems` checks for the count of existing wishlist items, ensuring it locks the rows and blocks deletions or insertions during the transaction.
+
+
+### Bug Fixes
+
+- Fixed DELETE `social/followRequests/cancel/:requestId` containing a typo in one of the error responses.
+- Fixed a number of minor typos and inconsistencies.
+- Fixed `isValidWishlistItemDescription()` not checking for leading or trailing whitespace when validating.
+
+
+### Tests
+
+- Added test suites for the following endpoints:
+  - GET `social/followRequests/search`.
+  - GET `social/followRequests`.
+  - POST `social/followRequests/send`.
+  - DELETE `social/followRequests/cancel/:requestId`.
+  - POST `/followRequests/accept`.
+  - DELETE `/followRequests/decline/:requestId`.
+  - DELETE `/followers/unfollow/:followId`.
+  - DELETE `/followers/remove/:followId`.
+  - GET `social/find/:searchQuery`.
+  - POST `wishlistItems`.
+  - PATCH `wishlistItems`.
+  - DELETE `wishlistItems`.
+  - DELETE `wishlistItems/bulk`.
+  - PATCH `wishlistItems/purchaseStatus`.
+  - PATCH `wishlistItems/purchaseStatus/bulk`.
+
+
 ## [0.5.13] (2026-06-28)
 
 ### Improvements

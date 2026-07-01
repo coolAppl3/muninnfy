@@ -417,12 +417,6 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
-    return;
-  }
-
   const searchQuery: string = req.query.searchQuery?.toString().trim() || '';
   const offset: number = +(req.query.offset || 0);
 
@@ -433,6 +427,12 @@ socialRouter.get('/followRequests/search', async (req: Request, res: Response) =
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
     return;
   }
 
@@ -483,16 +483,16 @@ socialRouter.get('/followRequests', async (req: Request, res: Response) => {
     return;
   }
 
-  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
-
-  if (!accountId) {
-    return;
-  }
-
   const offset: number = +(req.query.offset || 0);
 
   if (!Number.isInteger(offset)) {
     res.status(400).json({ message: 'Invalid offset.', reason: 'invalidOffset' });
+    return;
+  }
+
+  const accountId: number | null = await getAccountIdByAuthSessionId(authSessionId, req, res);
+
+  if (!accountId) {
     return;
   }
 
@@ -631,7 +631,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     }
 
     if (followDetails.follow_id) {
-      await connection.rollback();
+      await connection.commit();
       res.status(201).json({
         followAutoApproved: true,
         insertId: followDetails.follow_id,
@@ -641,7 +641,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
     }
 
     if (followDetails.follow_request_id) {
-      await connection.rollback();
+      await connection.commit();
       res.status(201).json({
         followAutoApproved: false,
         insertId: followDetails.follow_request_id,
@@ -650,10 +650,9 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
       return;
     }
 
-    if (
-      followDetails.requester_following_count + followDetails.requester_follow_requests_count >=
-      SOCIAL_MAX_FOLLOWING_LIMIT
-    ) {
+    const requesterFollowingSum: number =
+      followDetails.requester_following_count + followDetails.requester_follow_requests_count;
+    if (requesterFollowingSum >= SOCIAL_MAX_FOLLOWING_LIMIT) {
       await connection.rollback();
       res
         .status(409)
@@ -697,6 +696,7 @@ socialRouter.post('/followRequests/send', async (req: Request, res: Response) =>
         'new_follower',
         resultSetHeader.insertId
       );
+
       return;
     }
 
@@ -764,7 +764,7 @@ socialRouter.delete(
       : undefined;
 
     if (!requestId || !Number.isInteger(requestId)) {
-      res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+      res.status(400).json({ message: 'Invalid request ID.', reason: 'invalidRequestId' });
       return;
     }
 
@@ -800,6 +800,7 @@ socialRouter.delete(
 
       if (requestDetails.requester_account_id !== accountId) {
         res.status(500).json({ message: 'Internal server error.' });
+
         await logUnexpectedError(
           req,
           null,
@@ -1004,7 +1005,7 @@ socialRouter.delete(
       : undefined;
 
     if (!requestId || !Number.isInteger(requestId)) {
-      res.status(400).json({ messagE: 'Invalid request ID.', reason: 'invalidRequestId' });
+      res.status(400).json({ message: 'Invalid request ID.', reason: 'invalidRequestId' });
       return;
     }
 
@@ -1049,7 +1050,7 @@ socialRouter.delete('/followers/unfollow/:followId', async (req: Request, res: R
   const followId: number | undefined = req.params.followId ? +req.params.followId : undefined;
 
   if (!followId || !Number.isInteger(followId)) {
-    res.status(400).json({ messagE: 'Invalid follow ID.', reason: 'invalidFollowId' });
+    res.status(400).json({ message: 'Invalid follow ID.', reason: 'invalidFollowId' });
     return;
   }
 
@@ -1093,7 +1094,7 @@ socialRouter.delete('/followers/remove/:followId', async (req: Request, res: Res
   const followId: number | undefined = req.params.followId ? +req.params.followId : undefined;
 
   if (!followId || !Number.isInteger(followId)) {
-    res.status(400).json({ messagE: 'Invalid follow ID.', reason: 'invalidFollowId' });
+    res.status(400).json({ message: 'Invalid follow ID.', reason: 'invalidFollowId' });
     return;
   }
 

@@ -19,6 +19,10 @@ export function isValidWishlistItemDescription(value: any): boolean {
     return false;
   }
 
+  if (value.trim().length !== value.length) {
+    return false;
+  }
+
   const regex: RegExp = /^[\x00-\x7F]{1,500}$/;
   return regex.test(value);
 }

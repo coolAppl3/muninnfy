@@ -113,39 +113,48 @@ wishlistItemsRouter.post('/', async (req: Request, res: Response) => {
   let connection: PoolConnection | null = null;
 
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type WishlistDetails = {
+      wishlist_id: string | null;
       wishlist_items_count: number;
     };
 
-    const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
+    const [wishlistRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        (SELECT COUNT(*) FROM wishlist_items WHERE wishlist_id = :wishlistId) AS wishlist_items_count
+        wishlists.wishlist_id,
+        COUNT(wishlist_items.item_id) AS wishlist_items_count
       FROM
         wishlists
+      LEFT JOIN
+        wishlist_items USING(wishlist_id)
       WHERE
-        wishlist_id = :wishlistId AND
-        account_id = :accountId;`,
+        wishlists.wishlist_id = :wishlistId AND
+        wishlists.account_id = :accountId
+      FOR UPDATE;`,
       { wishlistId, accountId }
     );
 
     const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
-    if (!wishlistDetails) {
-      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound.' });
+    if (!wishlistDetails || !wishlistDetails.wishlist_id) {
+      await connection.rollback();
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
+
       return;
     }
 
     if (wishlistDetails.wishlist_items_count >= WISHLIST_ITEMS_LIMIT) {
+      await connection.rollback();
       res
         .status(409)
         .json({ message: 'Wishlist items limit reached.', reason: 'itemLimitReached' });
+
       return;
     }
 
     const currentTimestamp: number = Date.now();
-
-    connection = await dbPool.getConnection();
-    await connection.beginTransaction();
 
     const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `INSERT INTO wishlist_items (
@@ -351,7 +360,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     if (!wishlistItemDetails) {
       await connection.rollback();
-      res.status(404).json({ message: 'Item not found.', reason: 'itemNotFound' });
+      res.status(404).json({ message: 'Wishlist item not found.', reason: 'itemNotFound' });
 
       return;
     }
@@ -504,7 +513,7 @@ wishlistItemsRouter.delete('/', async (req: Request, res: Response) => {
   }
 
   if (typeof itemId !== 'string' || !Number.isInteger(+itemId)) {
-    res.status(400).json({ message: 'invalid wishlist item ID.', reason: 'invalidItemId' });
+    res.status(400).json({ message: 'Invalid wishlist item ID.', reason: 'invalidItemId' });
     return;
   }
 
@@ -746,12 +755,12 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
     const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
 
     if (!wishlistItemDetails) {
-      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
     if (!wishlistItemDetails.item_exists) {
-      res.status(404).json({ message: 'Wishlist Item not found.', reason: 'itemNotfound' });
+      res.status(404).json({ message: 'Wishlist item not found.', reason: 'itemNotFound' });
       return;
     }
 
@@ -836,13 +845,13 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
   }
 
   if (itemsIdArr.length === 0 || itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
-    res.status(400).json({ message: 'Invalid items selection', reason: 'invalidItemsArr' });
+    res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
     return;
   }
 
   for (const id of itemsIdArr) {
     if (!Number.isInteger(id)) {
-      res.status(400).json({ message: 'Invalid items selection', reason: 'invalidItemsArr' });
+      res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
       return;
     }
   }
