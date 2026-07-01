@@ -656,7 +656,7 @@ describe('PATCH /', () => {
     expect(mockConnection.rollback).toHaveBeenCalledOnce();
     expect(res.status).toBe(404);
     expect(res.body).toStrictEqual({
-      message: 'Item not found.',
+      message: 'Wishlist item not found.',
       reason: 'itemNotFound',
     });
   });

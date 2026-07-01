@@ -360,7 +360,7 @@ wishlistItemsRouter.patch('/', async (req: Request, res: Response) => {
 
     if (!wishlistItemDetails) {
       await connection.rollback();
-      res.status(404).json({ message: 'Item not found.', reason: 'itemNotFound' });
+      res.status(404).json({ message: 'Wishlist item not found.', reason: 'itemNotFound' });
 
       return;
     }
@@ -760,7 +760,7 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
     }
 
     if (!wishlistItemDetails.item_exists) {
-      res.status(404).json({ message: 'Wishlist Item not found.', reason: 'itemNotFound' });
+      res.status(404).json({ message: 'Wishlist item not found.', reason: 'itemNotFound' });
       return;
     }
 
