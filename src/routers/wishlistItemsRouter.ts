@@ -845,13 +845,13 @@ wishlistItemsRouter.patch('/purchaseStatus/bulk', async (req: Request, res: Resp
   }
 
   if (itemsIdArr.length === 0 || itemsIdArr.length > WISHLIST_ITEMS_LIMIT) {
-    res.status(400).json({ message: 'Invalid items selection', reason: 'invalidItemsArr' });
+    res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
     return;
   }
 
   for (const id of itemsIdArr) {
     if (!Number.isInteger(id)) {
-      res.status(400).json({ message: 'Invalid items selection', reason: 'invalidItemsArr' });
+      res.status(400).json({ message: 'Invalid items selection.', reason: 'invalidItemsArr' });
       return;
     }
   }
