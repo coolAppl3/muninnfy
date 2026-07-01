@@ -755,12 +755,12 @@ wishlistItemsRouter.patch('/purchaseStatus', async (req: Request, res: Response)
     const wishlistItemDetails = wishlistItemRows[0] as WishlistItemDetails | undefined;
 
     if (!wishlistItemDetails) {
-      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
     if (!wishlistItemDetails.item_exists) {
-      res.status(404).json({ message: 'Wishlist Item not found.', reason: 'itemNotfound' });
+      res.status(404).json({ message: 'Wishlist Item not found.', reason: 'itemNotFound' });
       return;
     }
 

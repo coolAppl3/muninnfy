@@ -618,7 +618,7 @@ wishlistsRouter.patch('/change/title', async (req: Request, res: Response) => {
     const wishlistDetails = wishlistRows[0] as WishlistDetails | undefined;
 
     if (!wishlistDetails) {
-      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
@@ -952,7 +952,7 @@ wishlistsRouter.delete('/:wishlistId', async (req: Request, res: Response) => {
     );
 
     if (wishlistRows.length === 0) {
-      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotfound' });
+      res.status(404).json({ message: 'Wishlist not found.', reason: 'wishlistNotFound' });
       return;
     }
 
