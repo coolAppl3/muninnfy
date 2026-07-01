@@ -1223,3 +1223,262 @@ describe('DELETE /bulk', () => {
     );
   });
 });
+
+describe('PATCH /purchaseStatus', () => {
+  const endpoint: string = '/api/wishlistItems/purchaseStatus';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).patch(endpoint).send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if its body contains extra keys or does not contain all expected keys', async () => {
+    const reqBody1 = {};
+    const reqBody2 = { someOtherValue: 23 };
+    const reqBody3 = {
+      wishlistId: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+      itemId: 1,
+      markAsPurchased: true,
+
+      someOtherValue: 23,
+    };
+
+    const res1 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody1);
+
+    const res2 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody2);
+
+    const res3 = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send(reqBody3);
+
+    expect(res1.status).toBe(400);
+    expect(res2.status).toBe(400);
+    expect(res3.status).toBe(400);
+
+    expect(res1.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res2.body).toStrictEqual({ message: 'Invalid request data.' });
+    expect(res3.body).toStrictEqual({ message: 'Invalid request data.' });
+  });
+
+  it('should reject the request if an invalid wishlist ID is provided', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        wishlistId: 'someInvalidWishlistId',
+        itemId: 1,
+        markAsPurchased: true,
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid wishlist ID.',
+      reason: 'invalidWishlistId',
+    });
+  });
+
+  it('should reject the request if an invalid wishlist item ID is provided', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        wishlistId: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+        itemId: 12.5,
+        markAsPurchased: true,
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid wishlist item ID.',
+      reason: 'invalidItemId',
+    });
+  });
+
+  it('should reject the request if an invalid markAsPurchased value is provided', async () => {
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        wishlistId: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+        itemId: 1,
+        markAsPurchased: 'someInvalidValue',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid purchase status.',
+      reason: 'invalidPurchaseStatus',
+    });
+  });
+
+  it('should reject the request if the wishlist is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        wishlistId: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+        itemId: 1,
+        markAsPurchased: true,
+      });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Wishlist not found.',
+      reason: 'wishlistNotFound',
+    });
+  });
+
+  it('should reject the request if the wishlist item is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          item_exists: false,
+          purchased_on_timestamp: null,
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        wishlistId: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+        itemId: 1,
+        markAsPurchased: true,
+      });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Wishlist item not found.',
+      reason: 'itemNotFound',
+    });
+  });
+
+  it(`should resolve the request if the item's purchase status matches the requested purchase status`, async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          item_exists: true,
+          purchased_on_timestamp: 1.772e12,
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        wishlistId: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+        itemId: 1,
+        markAsPurchased: true,
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      newPurchasedOnTimestamp: 1.772e12,
+    });
+  });
+
+  it('should resolve the request, returning the newPurchasedOnTimestamp and calling incrementWishlistInteractivityIndex', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          item_exists: true,
+          purchased_on_timestamp: 1.772e12,
+        } as any,
+      ],
+      [],
+    ]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      {
+        affectedRows: 1,
+      } as any,
+      [],
+    ]);
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        wishlistId: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+        itemId: 1,
+        markAsPurchased: false,
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      newPurchasedOnTimestamp: null,
+    });
+
+    expect(
+      wishlistsDbHelpers.incrementWishlistInteractivityIndex
+    ).toHaveBeenCalledExactlyOnceWith(
+      '818db302-cec8-4fe1-84df-01e2aa505cb1',
+      WISHLIST_INTERACTION_GENERAL,
+      dbPool,
+      expect.any(Object)
+    );
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+
+    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
+      throw unexpectedError;
+    });
+
+    const res = await request(app)
+      .patch(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({
+        wishlistId: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+        itemId: 1,
+        markAsPurchased: true,
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
