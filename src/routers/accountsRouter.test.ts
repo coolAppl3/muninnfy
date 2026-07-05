@@ -336,10 +336,7 @@ describe('POST /signUp', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -370,10 +367,7 @@ describe('POST /signUp', () => {
       errno: 1062,
       sqlMessage: `Duplicate entry for key 'email'`,
     };
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -400,10 +394,7 @@ describe('POST /signUp', () => {
       errno: 1062,
       sqlMessage: `Duplicate entry for key 'username'`,
     };
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -520,10 +511,7 @@ describe('POST /verification/continue', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app).post(endpoint).send({
       email: 'example@example.com',
@@ -785,10 +773,7 @@ describe('PATCH /verification/resendEmail', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app).patch(endpoint).send({
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
@@ -1092,10 +1077,7 @@ describe('PATCH /verification/confirm', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app).patch(endpoint).send({
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
@@ -1372,10 +1354,7 @@ describe('POST /signIn', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app).post(endpoint).send({
       email: 'example@example.com',
@@ -1488,10 +1467,7 @@ describe('GET /', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.query).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.query).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(endpoint)
@@ -1593,10 +1569,7 @@ describe('GET /:publicAccountId', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app).get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb9'));
 
@@ -1745,10 +1718,7 @@ describe('PATCH /details/privacy', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -1956,10 +1926,7 @@ describe('PATCH /details/displayName', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -2289,10 +2256,7 @@ describe('PATCH /details/password', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -2672,10 +2636,7 @@ describe('POST /details/email/start', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -2705,10 +2666,7 @@ describe('POST /details/email/start', () => {
       errno: 1062,
       sqlMessage: `Duplicate entry for key 'new_email'`,
     };
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -2730,10 +2688,7 @@ describe('POST /details/email/start', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -2960,10 +2915,7 @@ describe('PATCH /details/email/resendEmail', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -3242,10 +3194,7 @@ describe('PATCH /details/email/confirm', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -3451,10 +3400,7 @@ describe('POST /recovery/start', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app).post(endpoint).send({
       email: 'example@example.com',
@@ -3713,10 +3659,7 @@ describe('PATCH /recovery/resendEmail', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app).patch(endpoint).send({
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
@@ -4105,10 +4048,7 @@ describe('PATCH /recovery/confirm', () => {
 
   it('should reject the request if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app).patch(endpoint).send({
       publicAccountId: '818db302-cec8-4fe1-84df-01e2aa505cb6',
@@ -4399,10 +4339,7 @@ describe('POST /deletion/start', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -4623,10 +4560,7 @@ describe('PATCH /deletion/resendEmail', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -4850,10 +4784,7 @@ describe('DELETE /deletion/confirm', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .delete(setEndpoint('AAAAAAAA'))

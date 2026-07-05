@@ -174,10 +174,7 @@ describe('GET /', () => {
     vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.query).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.query).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb6'))
@@ -256,10 +253,7 @@ describe('GET /followers/search', () => {
     vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(setEndpoint('someQuery'))
@@ -323,10 +317,7 @@ describe('GET /followers', () => {
     vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(setEndpoint(0))
@@ -405,10 +396,7 @@ describe('GET /following/search', () => {
     vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(setEndpoint('someQuery'))
@@ -472,10 +460,7 @@ describe('GET /following', () => {
     vi.mocked(socialDbHelpers.getTargetAccountId).mockResolvedValueOnce(2);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(setEndpoint(0))
@@ -568,10 +553,7 @@ describe('GET /followRequests/search', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(setEndpoint('someSearchQuery'))
@@ -652,10 +634,7 @@ describe('GET /followRequests', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(setEndpoint())
@@ -1074,10 +1053,7 @@ describe('POST /followRequests/send', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -1201,10 +1177,7 @@ describe('DELETE /followRequests/cancel/:requestId', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .delete(setEndpoint(22))
@@ -1436,10 +1409,7 @@ describe('POST /followRequests/accept', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -1525,10 +1495,7 @@ describe('DELETE /followRequests/decline/:requestId', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .delete(setEndpoint(22))
@@ -1622,10 +1589,7 @@ describe('DELETE /followers/unfollow/:followId', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .delete(setEndpoint(22))
@@ -1719,10 +1683,7 @@ describe('DELETE /followers/remove/:followId', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .delete(setEndpoint(22))
@@ -1801,10 +1762,7 @@ describe('GET /find/:searchQuery', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(setEndpoint('someSearchQuery'))

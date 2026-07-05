@@ -137,9 +137,7 @@ describe('GET /session', () => {
   it('should return false if an unexpected error occurs and log it', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
 
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .get(endpoint)
@@ -219,10 +217,7 @@ describe('DELETE /session', () => {
 
   it('should call logUnexpectedError if an unexpected error is caught when attempting to delete the authSession', async () => {
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .delete(endpoint)

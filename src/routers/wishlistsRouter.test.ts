@@ -179,7 +179,6 @@ describe('POST /', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
     vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
@@ -210,7 +209,6 @@ describe('POST /', () => {
       errno: 1062,
       sqlMessage: `Duplicate entry for key 'account_id'`,
     };
-
     vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
