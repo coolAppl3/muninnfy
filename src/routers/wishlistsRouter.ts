@@ -102,7 +102,7 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
       await connection.rollback();
       res
         .status(403)
-        .json({ message: 'Wishlists limit reached.', reason: 'wishlistLimitReached' });
+        .json({ message: 'Wishlists limit reached.', reason: 'wishlistsLimitReached' });
 
       return;
     }
