@@ -312,3 +312,104 @@ describe('GET /crossWishlistSearch/:itemTitleQuery', () => {
     );
   });
 });
+
+describe('GET /crossWishlistSearch', () => {
+  function setEndpoint(itemTitleQuery: string, publicAccountId: string): string {
+    return `/api/wishlists/crossWishlistSearch?itemTitleQuery=${itemTitleQuery}&publicAccountId=${publicAccountId}`;
+  }
+
+  it('should reject the request if an invalid public account ID is provided', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const res = await request(app)
+      .get(setEndpoint('invalid   title', '818db302-cec8-4fe1-84df-01e2aa505cb6'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid search query.',
+      reason: 'invalidQuery',
+    });
+  });
+
+  it('should reject the request if an invalid public account ID is provided', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const res = await request(app)
+      .get(setEndpoint('some title', 'someInvalidPublicAccountId'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .get(setEndpoint('egg', '818db302-cec8-4fe1-84df-01e2aa505cb6'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should resolve the request and return the results', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          target_account_id: 2,
+          is_following: 0,
+        } as any,
+      ],
+      [],
+    ]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          wishlist_id: 'someWishlistId',
+        },
+        {
+          wishlist_id: 'someOtherWishlistId',
+        },
+      ] as any,
+      [],
+    ]);
+
+    const res = await request(app)
+      .get(setEndpoint('some title', '818db302-cec8-4fe1-84df-01e2aa505cb6'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual(['someWishlistId', 'someOtherWishlistId']);
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
+
+    const res = await request(app)
+      .get(setEndpoint('some title', '818db302-cec8-4fe1-84df-01e2aa505cb9'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
