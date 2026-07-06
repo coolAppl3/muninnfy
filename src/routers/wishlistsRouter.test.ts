@@ -513,3 +513,133 @@ describe('GET /all', () => {
     );
   });
 });
+
+describe('GET /:wishlistId', () => {
+  function setEndpoint(wishlistId: string): string {
+    return `/api/wishlists/${wishlistId}`;
+  }
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if an invalid wishlist ID is provided', async () => {
+    const res = await request(app)
+      .get(setEndpoint('someInvalidWishlistId'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid wishlist ID.',
+      reason: 'invalidWishlistId',
+    });
+  });
+
+  it('should reject the request if the wishlist is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Wishlist not found.',
+      reason: 'wishlistNotFound',
+    });
+  });
+
+  it('should resolve the request and return the data', async () => {
+    const wishlistDetails = {
+      privacy_level: PRIVATE_WISHLIST_PRIVACY_LEVEL,
+      title: 'some title',
+      created_on_timestamp: 1.772e12,
+      is_favorited: false,
+    };
+
+    const wishlistItem = {
+      item_id: 1,
+      added_on_timestamp: 1.771e12,
+      title: 'some item',
+      description: 'some description',
+      link: null,
+      price: null,
+      purchased_on_timestamp: null,
+
+      tag_id: 1,
+      tag_name: 'someTag',
+    };
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[wishlistDetails as any], []]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[wishlistItem] as any, []]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    const { tag_id, tag_name, ...rest } = wishlistItem;
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      wishlistDetails,
+      wishlistItems: [
+        {
+          ...rest,
+          tags: [
+            {
+              id: tag_id,
+              name: tag_name,
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
