@@ -195,21 +195,21 @@ wishlistsRouter.get(
 
       const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
         `SELECT
-        wishlist_id
-      FROM
-        wishlists
-      WHERE
-        account_id = ? AND
-        EXISTS (
-          SELECT
-            1
-          FROM
-            wishlist_items
-          WHERE
-            wishlist_id = wishlists.wishlist_id AND
-            title LIKE ?
-        )
-      LIMIT ?;`,
+          wishlist_id
+        FROM
+          wishlists
+        WHERE
+          account_id = ? AND
+          EXISTS (
+            SELECT
+              1
+            FROM
+              wishlist_items
+            WHERE
+              wishlist_id = wishlists.wishlist_id AND
+              title LIKE ?
+          )
+        LIMIT ?;`,
         [accountId, `%${itemTitleQuery}%`, TOTAL_WISHLISTS_LIMIT]
       );
 
