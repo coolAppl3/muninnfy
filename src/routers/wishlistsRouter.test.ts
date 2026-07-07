@@ -419,7 +419,7 @@ describe('GET /all', () => {
   const endpoint: string = '/api/wishlists/all';
 
   it('should reject the request if it does not contain an authSessionId cookie', async () => {
-    const res = await request(app).get(endpoint).send({});
+    const res = await request(app).get(endpoint);
 
     expect(res.status).toBe(401);
     expect(res.body).toStrictEqual({
@@ -431,8 +431,7 @@ describe('GET /all', () => {
   it('should reject the request if it contains an invalid authSessionId cookie', async () => {
     const res = await request(app)
       .get(endpoint)
-      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
-      .send({});
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
 
     expect(res.status).toBe(401);
     expect(res.body).toStrictEqual({
@@ -476,8 +475,7 @@ describe('GET /all', () => {
 
     const res = await request(app)
       .get(endpoint)
-      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
-      .send({});
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
 
     expect(res.status).toBe(200);
     expect(res.body).toStrictEqual({
@@ -520,9 +518,7 @@ describe('GET /:wishlistId', () => {
   }
 
   it('should reject the request if it does not contain an authSessionId cookie', async () => {
-    const res = await request(app)
-      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
-      .send({});
+    const res = await request(app).get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'));
 
     expect(res.status).toBe(401);
     expect(res.body).toStrictEqual({
@@ -534,8 +530,7 @@ describe('GET /:wishlistId', () => {
   it('should reject the request if it contains an invalid authSessionId cookie', async () => {
     const res = await request(app)
       .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
-      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
-      .send({});
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
 
     expect(res.status).toBe(401);
     expect(res.body).toStrictEqual({
@@ -547,8 +542,7 @@ describe('GET /:wishlistId', () => {
   it('should reject the request if an invalid wishlist ID is provided', async () => {
     const res = await request(app)
       .get(setEndpoint('someInvalidWishlistId'))
-      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
-      .send({});
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
 
     expect(res.status).toBe(400);
     expect(res.body).toStrictEqual({
@@ -563,8 +557,7 @@ describe('GET /:wishlistId', () => {
 
     const res = await request(app)
       .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
-      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
-      .send({});
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
 
     expect(res.status).toBe(404);
     expect(res.body).toStrictEqual({
@@ -600,8 +593,7 @@ describe('GET /:wishlistId', () => {
 
     const res = await request(app)
       .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
-      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
-      .send({});
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
 
     const { tag_id, tag_name, ...rest } = wishlistItem;
 
@@ -1257,7 +1249,7 @@ describe('DELETE /empty', () => {
   const endpoint: string = '/api/wishlists/empty';
 
   it('should reject the request if it does not contain an authSessionId cookie', async () => {
-    const res = await request(app).delete(endpoint).send({});
+    const res = await request(app).delete(endpoint);
 
     expect(res.status).toBe(401);
     expect(res.body).toStrictEqual({
@@ -1269,8 +1261,7 @@ describe('DELETE /empty', () => {
   it('should reject the request if it contains an invalid authSessionId cookie', async () => {
     const res = await request(app)
       .delete(endpoint)
-      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
-      .send({});
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId');
 
     expect(res.status).toBe(401);
     expect(res.body).toStrictEqual({
@@ -1285,8 +1276,7 @@ describe('DELETE /empty', () => {
 
     const res = await request(app)
       .delete(endpoint)
-      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
-      .send({});
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
 
     expect(res.status).toBe(200);
     expect(res.body).toStrictEqual({});
