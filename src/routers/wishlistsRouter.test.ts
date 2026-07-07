@@ -1252,3 +1252,76 @@ describe('PATCH /change/favorite', () => {
     );
   });
 });
+
+describe('DELETE /empty', () => {
+  const endpoint: string = '/api/wishlists/empty';
+
+  it('should reject the request if it does not contain an authSessionId cookie', async () => {
+    const res = await request(app).delete(endpoint).send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should reject the request if it contains an invalid authSessionId cookie', async () => {
+    const res = await request(app)
+      .delete(endpoint)
+      .set('Cookie', 'authSessionId=someInvalidAuthSessionId')
+      .send({});
+
+    expect(res.status).toBe(401);
+    expect(res.body).toStrictEqual({
+      message: 'Sign in session expired.',
+      reason: 'authSessionExpired',
+    });
+  });
+
+  it('should resolve the request and delete any empty wishlists', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([{ affectedRows: 1 } as any, []]);
+
+    const res = await request(app)
+      .delete(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6')
+      .send({});
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({});
+
+    expect(dbPool.execute).toHaveBeenCalledExactlyOnceWith(
+      `DELETE FROM
+        wishlists
+      WHERE
+        account_id = ? AND
+        NOT EXISTS (
+          SELECT 1 FROM wishlist_items WHERE wishlist_items.wishlist_id = wishlists.wishlist_id
+        )
+      LIMIT ?;`,
+      [1, TOTAL_WISHLISTS_LIMIT]
+    );
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
+
+    const res = await request(app)
+      .delete(endpoint)
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
