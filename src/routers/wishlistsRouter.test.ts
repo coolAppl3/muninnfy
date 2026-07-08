@@ -8,6 +8,7 @@ import { mockConnection } from '../tests/setup';
 import {
   FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
   PRIVATE_WISHLIST_PRIVACY_LEVEL,
+  PUBLIC_WISHLIST_PRIVACY_LEVEL,
   TOTAL_WISHLISTS_LIMIT,
 } from '../util/constants/wishlistConstants';
 import * as isSqlError from '../util/sqlUtils/isSqlError';
@@ -1398,6 +1399,220 @@ describe('DELETE /:wishlistId', () => {
 
     const res = await request(app)
       .delete(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
+
+describe('GET /view/:wishlistId', () => {
+  function setEndpoint(wishlistId: string): string {
+    return `/api/wishlists/view/${wishlistId}`;
+  }
+
+  it('should reject the request if an invalid wishlist ID is provided', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const res = await request(app)
+      .get(setEndpoint('someInvalidWishlistId'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual({
+      message: 'Invalid wishlist ID.',
+      reason: 'invalidWishlistId',
+    });
+  });
+
+  it('should reject the request if the wishlist is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Wishlist not found.',
+      reason: 'wishlistNotFound',
+    });
+  });
+
+  it('should reject the request if made by the wishlist owner', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 1,
+          privacy_level: PUBLIC_WISHLIST_PRIVACY_LEVEL,
+          title: 'some title',
+          created_on_timestamp: 1.771e12,
+
+          owner_public_account_id: 'somePublicAccountId',
+          owner_username: 'johnDoe',
+          owner_display_name: 'John Doe',
+
+          is_follower: false,
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Wishlist owner.',
+      reason: 'wishlistOwner',
+    });
+  });
+
+  it('should reject the request if the wishlist is private', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 2,
+          privacy_level: PRIVATE_WISHLIST_PRIVACY_LEVEL,
+          title: 'some title',
+          created_on_timestamp: 1.771e12,
+
+          owner_public_account_id: 'somePublicAccountId',
+          owner_username: 'johnDoe',
+          owner_display_name: 'John Doe',
+
+          is_follower: false,
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Wishlist not found.',
+      reason: 'wishlistNotFound',
+    });
+  });
+
+  it('should reject the request if the wishlist is only visible to followers and the user is not a follower', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 2,
+          privacy_level: FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+          title: 'some title',
+          created_on_timestamp: 1.771e12,
+
+          owner_public_account_id: 'somePublicAccountId',
+          owner_username: 'johnDoe',
+          owner_display_name: 'John Doe',
+
+          is_follower: false,
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Wishlist not found.',
+      reason: 'wishlistNotFound',
+    });
+  });
+
+  it('should resolve the request and return the data', async () => {
+    const wishlistItem = {
+      item_id: 1,
+      added_on_timestamp: 1.771e12,
+      title: 'some item',
+      description: 'some description',
+      link: null,
+      price: null,
+      purchased_on_timestamp: null,
+
+      tag_id: 1,
+      tag_name: 'someTag',
+    };
+
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          account_id: 2,
+          privacy_level: FOLLOWERS_WISHLIST_PRIVACY_LEVEL,
+          title: 'some title',
+          created_on_timestamp: 1.771e12,
+
+          owner_public_account_id: 'somePublicAccountId',
+          owner_username: 'johnDoe',
+          owner_display_name: 'John Doe',
+
+          is_follower: true,
+        } as any,
+      ],
+      [],
+    ]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[wishlistItem as any], []]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    const { tag_id, tag_name, ...rest } = wishlistItem;
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      viewWishlistDetails: {
+        title: 'some title',
+        created_on_timestamp: 1.771e12,
+      },
+      wishlistItems: [
+        {
+          ...rest,
+          tags: [
+            {
+              id: tag_id,
+              name: tag_name,
+            },
+          ],
+        },
+      ],
+      ownerDetails: {
+        owner_public_account_id: 'somePublicAccountId',
+        owner_username: 'johnDoe',
+        owner_display_name: 'John Doe',
+      },
+    });
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
       .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
 
     expect(res.status).toBe(500);
