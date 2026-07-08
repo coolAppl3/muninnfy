@@ -1007,9 +1007,11 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
+
       owner_public_account_id: string;
       owner_username: string;
       owner_display_name: string;
+
       is_follower: boolean;
     };
 
