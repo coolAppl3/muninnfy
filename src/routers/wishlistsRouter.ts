@@ -1188,6 +1188,11 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
       return;
     }
 
+    if (accountDetails.target_account_id === accountId) {
+      res.status(409).json({ message: 'Account owner.', reason: 'accountOwner' });
+      return;
+    }
+
     type Wishlist = {
       wishlist_id: string;
       title: string;
