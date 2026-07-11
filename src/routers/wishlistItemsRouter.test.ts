@@ -341,10 +341,7 @@ describe('POST /', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -397,10 +394,7 @@ describe('POST /', () => {
       errno: 1062,
       sqlMessage: `Duplicate value for key 'title'`,
     };
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .post(endpoint)
@@ -762,10 +756,7 @@ describe('PATCH /', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -819,10 +810,7 @@ describe('PATCH /', () => {
       errno: 1062,
       sqlMessage: `Duplicate value for key 'title'`,
     };
-
-    vi.mocked(mockConnection.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(mockConnection.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -967,10 +955,7 @@ describe('DELETE /', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .delete(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1', 1))
@@ -1199,10 +1184,7 @@ describe('DELETE /bulk', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .delete(endpoint)
@@ -1457,10 +1439,7 @@ describe('PATCH /purchaseStatus', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)
@@ -1725,10 +1704,7 @@ describe('PATCH /purchaseStatus/bulk', () => {
     vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
 
     const unexpectedError: Error = new Error('someUnexpectedError');
-
-    vi.mocked(dbPool.execute).mockImplementationOnce(() => {
-      throw unexpectedError;
-    });
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
 
     const res = await request(app)
       .patch(endpoint)

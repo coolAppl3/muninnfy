@@ -69,9 +69,16 @@ export default function ViewWishlists(): JSX.Element {
         }
 
         console.log(err);
-        const { isHandled } = handleAsyncError(err);
+        const { isHandled, status } = handleAsyncError(err);
 
         if (isHandled) {
+          return;
+        }
+
+        if (status === 409) {
+          displayPopupMessage('Loading your wishlists.', 'success');
+          navigate(`/wishlists`);
+
           return;
         }
 

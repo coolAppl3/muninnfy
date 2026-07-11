@@ -5,7 +5,7 @@ import {
   isValidWishlistPrivacyLevel,
   isValidWishlistTitle,
 } from '../util/validation/wishlistValidation';
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getAccountIdByAuthSessionId } from '../db/helpers/authDbHelpers';
 import { logUnexpectedError } from '../logs/errorLogger';
 import { dbPool } from '../db/db';
@@ -65,21 +65,25 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
+  let connection: PoolConnection | null = null;
+
   try {
+    connection = await dbPool.getConnection();
+    await connection.beginTransaction();
+
     type AccountWishlistsDetails = {
       wishlists_created_count: number;
-      title_already_used: boolean;
     };
 
-    const [accountWishlistsRows] = await dbPool.execute<RowDataPacket[]>(
+    const [accountWishlistsRows] = await connection.execute<RowDataPacket[]>(
       `SELECT
-        COUNT(*) AS wishlists_created_count,
-        EXISTS (SELECT 1 FROM wishlists WHERE title = :title AND account_id = :accountId ) AS title_already_used
+        COUNT(*) AS wishlists_created_count
       FROM
         wishlists
       WHERE
-        account_id = :accountId;`,
-      { accountId, title: title }
+        account_id = :accountId
+      FOR UPDATE;`,
+      { accountId }
     );
 
     const accountWishlistsDetails = accountWishlistsRows[0] as
@@ -87,31 +91,26 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
       | undefined;
 
     if (!accountWishlistsDetails) {
+      await connection.rollback();
       res.status(500).json({ message: 'Internal server error.' });
-      await logUnexpectedError(req, null, 'Failed to fetch wishlists_created_count.');
 
+      await logUnexpectedError(req, null, 'Failed to fetch wishlists_created_count.');
       return;
     }
 
     if (accountWishlistsDetails.wishlists_created_count >= TOTAL_WISHLISTS_LIMIT) {
+      await connection.rollback();
       res
         .status(403)
-        .json({ message: 'Wishlists limit reached.', reason: 'wishlistLimitReached' });
-      return;
-    }
+        .json({ message: 'Wishlists limit reached.', reason: 'wishlistsLimitReached' });
 
-    if (accountWishlistsDetails.title_already_used) {
-      res.status(409).json({
-        message: 'You already have a wishlist with this title.',
-        reason: 'duplicateTitle',
-      });
       return;
     }
 
     const wishlistId: string = generateCryptoUuid();
     const currentTimestamp: number = Date.now();
 
-    await dbPool.execute(
+    await connection.execute(
       `INSERT INTO wishlists (
         wishlist_id,
         account_id,
@@ -134,9 +133,11 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
       ]
     );
 
+    await connection.commit();
     res.status(201).json({ wishlistId });
   } catch (err: unknown) {
     console.log(err);
+    await connection?.rollback();
 
     if (res.headersSent) {
       await logUnexpectedError(req, err, 'Attempted to send two responses.');
@@ -160,6 +161,8 @@ wishlistsRouter.post('/', async (req: Request, res: Response) => {
 
     res.status(500).json({ message: 'Internal server error.' });
     await logUnexpectedError(req, err);
+  } finally {
+    connection?.release();
   }
 });
 
@@ -192,21 +195,21 @@ wishlistsRouter.get(
 
       const [wishlistRows] = await dbPool.execute<RowDataPacket[]>(
         `SELECT
-        wishlist_id
-      FROM
-        wishlists
-      WHERE
-        account_id = ? AND
-        EXISTS (
-          SELECT
-            1
-          FROM
-            wishlist_items
-          WHERE
-            wishlist_id = wishlists.wishlist_id AND
-            title LIKE ?
-        )
-      LIMIT ?;`,
+          wishlist_id
+        FROM
+          wishlists
+        WHERE
+          account_id = ? AND
+          EXISTS (
+            SELECT
+              1
+            FROM
+              wishlist_items
+            WHERE
+              wishlist_id = wishlists.wishlist_id AND
+              title LIKE ?
+          )
+        LIMIT ?;`,
         [accountId, `%${itemTitleQuery}%`, TOTAL_WISHLISTS_LIMIT]
       );
 
@@ -1004,9 +1007,11 @@ wishlistsRouter.get('/view/:wishlistId', async (req: Request, res: Response) => 
       privacy_level: number;
       title: string;
       created_on_timestamp: number;
+
       owner_public_account_id: string;
       owner_username: string;
       owner_display_name: string;
+
       is_follower: boolean;
     };
 
@@ -1180,6 +1185,11 @@ wishlistsRouter.get('/view/all/:publicAccountId', async (req: Request, res: Resp
 
     if (!accountDetails) {
       res.status(404).json({ message: 'Account not found.', reason: 'accountNotFound' });
+      return;
+    }
+
+    if (accountDetails.target_account_id === accountId) {
+      res.status(409).json({ message: 'Account owner.', reason: 'accountOwner' });
       return;
     }
 
