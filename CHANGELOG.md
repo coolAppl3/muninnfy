@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.5.15] (2026-07-11)
+
+### Improvements
+
+- Reworked POST `wishlists` to use a transaction to ensure the wishlists limit isn't exceeded.
+
+
+### Bug Fixes
+
+- Fixed GET `wishlists/view/all/:publicAccountId` not correctly rejecting requests made by the account owner.
+
+
+### Tests
+
+- Added test suites for the following endpoints:
+  - POST `wishlists`.
+  - GET `wishlists/crossWishlistSearch/:itemTitleQuery`.
+  - GET `wishlists/crossWishlistSearch`.
+  - GET `wishlists/all`.
+  - GET `wishlists/:wishlistId`.
+  - PATCH `wishlists/change/title`.
+  - PATCH `wishlists/change/privacyLevel`.
+  - PATCH `wishlists/change/favorite`.
+  - DELETE `wishlists/empty`.
+  - DELETE `wishlists/:wishlistId`.
+  - GET `wishlists/view/:wishlistId`.
+  - GET `wishlists/view/all/:publicAccountId`.
+- Replaced unnecessary `mockImplementationOnce` calls with `mockRejectedValueOnce`.
+
+
 ## [0.5.14] (2026-07-02)
 
 ### Improvements
