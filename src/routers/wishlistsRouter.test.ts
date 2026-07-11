@@ -1626,3 +1626,145 @@ describe('GET /view/:wishlistId', () => {
     );
   });
 });
+
+describe('GET /view/all/:publicAccountId', () => {
+  function setEndpoint(publicAccountId: string): string {
+    return `/api/wishlists/view/all/${publicAccountId}`;
+  }
+
+  it('should reject the request if an invalid public account ID is provided', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const res = await request(app)
+      .get(setEndpoint('someInvalidPublicAccount'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if the account is not found', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([[], []]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb9'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toStrictEqual({
+      message: 'Account not found.',
+      reason: 'accountNotFound',
+    });
+  });
+
+  it('should reject the request if if made by the account owner', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          target_account_id: 1,
+          owner_username: 'johnDoe',
+          owner_display_name: 'John Doe',
+          is_following: 0,
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb9'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(409);
+    expect(res.body).toStrictEqual({
+      message: 'Account owner.',
+      reason: 'accountOwner',
+    });
+  });
+
+  it('should resolve the request and return the user wishlists', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          target_account_id: 2,
+          owner_username: 'johnDoe',
+          owner_display_name: 'John Doe',
+          is_following: 0,
+        } as any,
+      ],
+      [],
+    ]);
+    vi.mocked(dbPool.execute).mockResolvedValueOnce([
+      [
+        {
+          wishlist_id: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+          title: 'some title',
+          created_on_timestamp: 1.772e12,
+
+          items_count: 1,
+          purchased_items_count: 0,
+          total_items_price: 100,
+          price_to_complete: 100,
+        } as any,
+      ],
+      [],
+    ]);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb9'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual({
+      ownerDetails: {
+        owner_username: 'johnDoe',
+        owner_display_name: 'John Doe',
+      },
+      wishlists: [
+        {
+          wishlist_id: '818db302-cec8-4fe1-84df-01e2aa505cb1',
+          title: 'some title',
+          created_on_timestamp: 1.772e12,
+
+          items_count: 1,
+          purchased_items_count: 0,
+          total_items_price: 100,
+          price_to_complete: 100,
+        },
+      ],
+      combinedWishlistsStatistics: {
+        totalItemsCount: 1,
+        totalPurchasedItemsCount: 0,
+        totalWishlistsWorth: 100,
+        totalWishlistsSpent: 0,
+        totalWishlistsToComplete: 100,
+      },
+    });
+  });
+
+  it('should reject the request if an unexpected error occurs and log it', async () => {
+    vi.mocked(authDbHelpers.getAccountIdByAuthSessionId).mockResolvedValueOnce(1);
+
+    const unexpectedError: Error = new Error('someUnexpectedError');
+    vi.mocked(dbPool.execute).mockRejectedValueOnce(unexpectedError);
+
+    const res = await request(app)
+      .get(setEndpoint('818db302-cec8-4fe1-84df-01e2aa505cb1'))
+      .set('Cookie', 'authSessionId=818db302-cec8-4fe1-84df-01e2aa505cb6');
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Internal server error.',
+    });
+
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Object),
+      unexpectedError
+    );
+  });
+});
