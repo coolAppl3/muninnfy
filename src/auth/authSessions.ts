@@ -62,24 +62,16 @@ export async function createAuthSession(
       return true;
     }
 
-    const oldestAuthSession = (sessionRows as SessionDetails[]).reduce(
-      (oldest: SessionDetails | null, current: SessionDetails) => {
-        if (!oldest) {
-          return current;
-        }
-
+    const oldestAuthSession: SessionDetails = (sessionRows as SessionDetails[]).reduce(
+      (oldest: SessionDetails, current: SessionDetails) => {
         if (current.created_on_timestamp < oldest.created_on_timestamp) {
           return current;
         }
 
         return oldest;
       },
-      null
+      sessionRows[0] as SessionDetails
     );
-
-    if (!oldestAuthSession) {
-      return false;
-    }
 
     const [resultSetHeader] = await connection.execute<ResultSetHeader>(
       `UPDATE
