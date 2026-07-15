@@ -1,19 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import * as cookieUtils from '../util/cookieUtils';
 import { getAuthSessionId } from './authUtils';
-import { Request, Response } from 'express';
+import { mockReq, mockRes } from '../tests/setup';
 
 vi.mock('../util/cookieUtils');
 
-const mockReq = {} as Request;
-const mockRes = {
-  status: vi.fn().mockReturnThis(),
-  json: vi.fn(),
-};
-
 describe('getAuthSessionId', () => {
   it('should call getRequestCookie', async () => {
-    getAuthSessionId(mockReq, mockRes as unknown as Response);
+    getAuthSessionId(mockReq, mockRes);
 
     expect(cookieUtils.getRequestCookie).toHaveBeenCalledExactlyOnceWith(
       mockReq,
@@ -22,7 +16,7 @@ describe('getAuthSessionId', () => {
   });
 
   it('should, if no authSessionId is cookie is found, reject the request if sendResponse is true and return null', async () => {
-    const result = getAuthSessionId(mockReq, mockRes as unknown as Response, true);
+    const result = getAuthSessionId(mockReq, mockRes, true);
 
     expect(result).toBe(null);
     expect(mockRes.status).toHaveBeenCalledExactlyOnceWith(401);
@@ -34,7 +28,7 @@ describe('getAuthSessionId', () => {
 
   it('should, if an invalid authSessionId is provided, reject the request if sendResponse is true, return null, and call removeRequestCookie', async () => {
     vi.mocked(cookieUtils.getRequestCookie).mockReturnValueOnce('someInvalidAuthSessionId');
-    const result = getAuthSessionId(mockReq, mockRes as unknown as Response, true);
+    const result = getAuthSessionId(mockReq, mockRes, true);
 
     expect(result).toBe(null);
     expect(mockRes.status).toHaveBeenCalledExactlyOnceWith(401);
@@ -52,7 +46,7 @@ describe('getAuthSessionId', () => {
     vi.mocked(cookieUtils.getRequestCookie).mockReturnValueOnce(
       '818db302-cec8-4fe1-84df-01e2aa505cb6'
     );
-    const result = getAuthSessionId(mockReq, mockRes as unknown as Response);
+    const result = getAuthSessionId(mockReq, mockRes);
 
     expect(result).toBe('818db302-cec8-4fe1-84df-01e2aa505cb6');
   });

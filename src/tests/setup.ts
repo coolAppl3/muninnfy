@@ -21,6 +21,12 @@ export const mockConnection = {
   release: vi.fn(),
 };
 
+export const mockReq = {} as Request;
+export const mockRes = {
+  status: vi.fn().mockReturnThis(),
+  json: vi.fn(),
+} as unknown as Response;
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
