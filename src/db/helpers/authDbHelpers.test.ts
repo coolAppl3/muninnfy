@@ -4,7 +4,9 @@ import { dbPool } from '../db';
 import { getAccountIdByAuthSessionId } from './authDbHelpers';
 import { mockReq, mockRes } from '../../tests/setup';
 import { hourMilliseconds } from '../../util/constants/globalConstants';
+import * as errorLogger from '../../logs/errorLogger';
 
+vi.mock('../../logs/errorLogger');
 vi.mock('../../util/cookieUtils');
 
 describe('getAccountIdByAuthSessionId', () => {
@@ -90,5 +92,10 @@ describe('getAccountIdByAuthSessionId', () => {
     expect(result).toBeNull();
     expect(mockRes.status).toHaveBeenCalledExactlyOnceWith(500);
     expect(mockRes.json).toHaveBeenCalledExactlyOnceWith({ message: 'Internal server error.' });
+    expect(errorLogger.logUnexpectedError).toHaveBeenCalledExactlyOnceWith(
+      mockReq,
+      {},
+      'Failed to get account_id.'
+    );
   });
 });
