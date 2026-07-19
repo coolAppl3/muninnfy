@@ -1,5 +1,4 @@
-import mysql, { Pool, PoolConnection } from 'mysql2/promise';
-import { logUnexpectedError } from '../logs/errorLogger';
+import mysql, { Pool } from 'mysql2/promise';
 
 export const dbPool: Pool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -25,13 +24,4 @@ export const dbPool: Pool = mysql.createPool({
 
     return next();
   },
-});
-
-dbPool.on('release', async (connection: PoolConnection) => {
-  try {
-    await connection.execute(`SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;`);
-  } catch (err: unknown) {
-    console.log(err);
-    logUnexpectedError(null, err, 'Failed to reset transaction isolation level.');
-  }
 });
