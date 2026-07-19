@@ -60,14 +60,14 @@ export async function getTargetAccountId(
 
     const [accountRows] = await dbPool.execute<RowDataPacket[]>(
       `SELECT
-      account_id AS target_account_id,
-      is_private,
-      
-      EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
-    FROM
-      accounts
-    WHERE
-      public_account_id = ?;`,
+        account_id AS target_account_id,
+        is_private,
+        
+        EXISTS (SELECT 1 FROM followers WHERE account_id = accounts.account_id AND follower_account_id = ?) AS is_following
+      FROM
+        accounts
+      WHERE
+        public_account_id = ?;`,
       [accountId, publicAccountId]
     );
 
