@@ -74,7 +74,7 @@ export default function WishlistHeaderContent(): JSX.Element {
             setMenuIsOpen(false);
 
             const successfullyCopied: boolean = await copyToClipboard(
-              `${window.location.origin}/wishlist/view/${wishlistId}`
+              `${window.location.origin}/view/wishlist/${wishlistId}`
             );
             successfullyCopied
               ? displayPopupMessage('Share link copied to clipboard.', 'success')
