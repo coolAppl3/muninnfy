@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.0.0] (2026-08-04)
+
+### Improvements
+
+- Adjusted `createAuthSession` to default to the first available auth session if all found ones are the same age.
+
+
+### Bug Fixes
+
+- Fixed `affectedRows` instead of `insertId` being used for `notification_id` in `addNotification`.
+- Fixed the wishlist share link copying the wrong path.
+
+
+### Tests
+
+- Added test suites for the following:
+  - `authSessions`.
+  - `authUtils`.
+  - `accountDbHelpers`.
+  - `authDbHelpers`.
+  - `notificationsDbHelpers`.
+  - `socialDbHelpers`.
+  - `wishlistItemsDbHelpers`.
+  - `wishlistItemTagsDbHelpers`.
+  - `requestValidation`.
+  - `socialValidation`.
+  - `userValidation`.
+  - `wishlistItemTagValidation`.
+  - `wishlistItemValidation`.
+  - `wishlistValidation`.
+
+
 ## [0.5.15] (2026-07-11)
 
 ### Improvements

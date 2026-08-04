@@ -163,7 +163,7 @@ function NonAuthOnlyRoute({
   }
 
   if (postAuthNavigate) {
-    return <Navigate to={postAuthNavigate}></Navigate>;
+    return <Navigate to={postAuthNavigate} />;
   }
 
   return (

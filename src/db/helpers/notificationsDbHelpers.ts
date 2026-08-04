@@ -70,7 +70,7 @@ export async function addNotification(
         };
 
     const notificationDetails: NotificationDetails = {
-      notification_id: resultSetHeader.affectedRows,
+      notification_id: resultSetHeader.insertId,
       ...senderDetails,
       notification_timestamp: notificationTimestamp,
       notification_type: notificationType,
